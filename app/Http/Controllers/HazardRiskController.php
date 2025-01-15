@@ -58,13 +58,6 @@ class HazardRiskController extends Controller
     // }
 
 
-    // public function show($id)
-    // {
-    //     $hazardRisk = HazardRisk::findOrFail($id);
-    //     return response()->json($hazardRisk);
-    // }
-
-
     public function update(Request $request, $id)
     {
         $hazardRisk = HazardRisk::findOrFail($id);
