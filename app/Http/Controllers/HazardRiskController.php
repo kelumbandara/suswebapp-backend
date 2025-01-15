@@ -62,7 +62,7 @@ class HazardRiskController extends Controller
     {
         $hazardRisk = HazardRisk::findOrFail($id);
 
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [ 
             'division' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'sub_location' => 'nullable|string|max:255',
