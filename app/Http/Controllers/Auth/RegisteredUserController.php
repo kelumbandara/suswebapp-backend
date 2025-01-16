@@ -20,6 +20,7 @@ class RegisteredUserController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'mobileNumber' => ['required', 'string', 'max:15', 'unique:users,mobile_number'],
             'password' => ['required', 'string', Rules\Password::defaults()],
+            'password_confirmation' => ['required', 'same:password'],
         ]);
 
         Log::info('Validated registration data: ', $validatedData);
