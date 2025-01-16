@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Log;
 
 class RegisteredUserController extends Controller
 {
-
     public function store(Request $request)
     {
         Log::info('Incoming registration data: ', $request->all());
@@ -19,8 +18,8 @@ class RegisteredUserController extends Controller
         $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'mobile_number' => ['required', 'digits:30', 'unique:users'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'mobileNumber' => ['required', 'string', 'max:15', 'unique:users,mobile_number'],
+            'password' => ['required', 'string', Rules\Password::defaults()],
         ]);
 
         Log::info('Validated registration data: ', $validatedData);
@@ -29,13 +28,20 @@ class RegisteredUserController extends Controller
             $user = User::create([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
-                'mobile_number' => $validatedData['mobile_number'],
+                'mobile_number' => $validatedData['mobileNumber'],
                 'password' => Hash::make($validatedData['password']),
             ]);
 
             Log::info('User created successfully: ', $user->toArray());
 
-            return response()->json(['message' => 'Registration successful', 'user' => $user], 201);
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'message' => 'Registration successful',
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' => $user,
+            ], 201);
 
         } catch (\Exception $e) {
             Log::error('Error creating user: ', ['error' => $e->getMessage()]);
