@@ -12,22 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('hazard_risks', function (Blueprint $table) {
-            $table->id();
-            $table->string('reference');
-            $table->string('division'); // New field for Division
-            $table->string('location'); // New field for Location/Department
-            $table->string('sub_location')->nullable(); // New field for Sub Location
+            $table->id(); // Auto-incrementing primary key
+            $table->string('reference_id')->unique(); // New column for prefixed identifier
+            $table->string('division');
+            $table->string('location');
+            $table->string('subLocation')->nullable();
             $table->string('category');
-            $table->string('sub_category')->nullable();
-            $table->string('observation_type')->nullable();
+            $table->string('subCategory')->nullable();
+            $table->string('observationType')->nullable();
             $table->text('description');
-            $table->enum('risk_level', ['LOW', 'MEDIUM', 'HIGH'])->default('LOW');
-            $table->enum('unsafe_act_or_condition', ['UNSAFE_ACT', 'UNSAFE_CONDITION'])->default('UNSAFE_ACT');
+            $table->enum('riskLevel', ['LOW', 'MEDIUM', 'HIGH'])->default('LOW');
+            $table->enum('unsafeActOrCondition', ['UNSAFE_ACT', 'UNSAFE_CONDITION'])->default('UNSAFE_ACT');
             $table->enum('status', ['DRAFT', 'APPROVED', 'DECLINED'])->default('DRAFT');
             $table->string('created_by_user');
             $table->timestamp('created_date')->useCurrent();
-            $table->timestamp('due_date')->nullable(); // New field for Due Date
-            $table->string('assignee')->nullable(); // New field for Assignee
+            $table->timestamp('dueDate')->nullable();
+            $table->string('assignee')->nullable();
             $table->timestamps();
         });
     }

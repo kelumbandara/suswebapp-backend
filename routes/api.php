@@ -15,7 +15,9 @@ Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkE
 
 
 Route::post('hazard-risk', [HazardRiskController::class, 'store']);
+Route::get('hazard-risk', [HazardRiskController::class, 'index']);
 Route::put('hazard-risk/{id}', [HazardRiskController::class, 'update']);
+
 
 
 

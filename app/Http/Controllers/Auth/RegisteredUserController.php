@@ -1,52 +1,42 @@
 <?php
-
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class RegisteredUserController extends Controller
 {
     public function store(Request $request)
     {
-        Log::info('Incoming registration data: ', $request->all());
-
-        $validatedData = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'mobileNumber' => ['required', 'string', 'max:15', 'unique:users,mobile_number'],
-            'password' => ['required', 'string', Rules\Password::defaults()],
-            'password_confirmation' => ['required', 'same:password'],
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'mobileNumber' => 'nullable|string|unique:users,mobileNumber',
+            'password' => 'required|string|min:8',
+            'confirmPassword' => 'required|string|min:8',
         ]);
 
-        Log::info('Validated registration data: ', $validatedData);
-
-        try {
-            $user = User::create([
-                'name' => $validatedData['name'],
-                'email' => $validatedData['email'],
-                'mobile_number' => $validatedData['mobileNumber'],
-                'password' => Hash::make($validatedData['password']),
-            ]);
-
-            Log::info('User created successfully: ', $user->toArray());
-
-            $token = $user->createToken('auth_token')->plainTextToken;
-
+        if ($request->password !== $request->confirmPassword) {
             return response()->json([
-                'message' => 'Registration successful',
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'user' => $user,
-            ], 201);
-
-        } catch (\Exception $e) {
-            Log::error('Error creating user: ', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Error creating user'], 500);
+                'errors' => [
+                    'confirmPassword' => ['The password confirmation does not match.']
+                ]
+            ], 422);
         }
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'mobileNumber' => $request->mobileNumber,
+            'password' => Hash::make($request->password),
+        ]);
+
+        return response()->json([
+            'message' => 'User registered successfully!',
+            'user' => $user,
+        ], 201);
     }
 }

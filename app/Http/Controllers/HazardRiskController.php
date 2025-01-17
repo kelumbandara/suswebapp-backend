@@ -14,16 +14,16 @@ class HazardRiskController extends Controller
         $validator = Validator::make($request->all(), [
             'division' => 'required|string|max:255',
             'location' => 'required|string|max:255',
-            'sub_location' => 'nullable|string|max:255',
+            'subLocation' => 'nullable|string|max:255',
             'category' => 'required|string|max:255',
-            'sub_category' => 'nullable|string|max:255',
-            'observation_type' => 'nullable|string|max:255',
+            'subCategory' => 'nullable|string|max:255',
+            'observationType' => 'nullable|string|max:255',
             'description' => 'required|string',
-            'risk_level' => 'required|in:LOW,MEDIUM,HIGH',
-            'unsafe_act_or_condition' => 'required|in:UNSAFE_ACT,UNSAFE_CONDITION',
+            'riskLevel' => 'required|in:LOW,MEDIUM,HIGH',
+            'unsafeActOrCondition' => 'required|in:UNSAFE_ACT,UNSAFE_CONDITION',
             'status' => 'required|in:DRAFT,APPROVED,DECLINED',
             'created_by_user' => 'required|string|max:255',
-            'due_date' => 'nullable|date',
+            'dueDate' => 'nullable|date',
             'assignee' => 'nullable|string|max:255',
         ]);
 
@@ -34,16 +34,16 @@ class HazardRiskController extends Controller
         $hazardRisk = HazardRisk::create([
             'division' => $request->division,
             'location' => $request->location,
-            'sub_location' => $request->sub_location,
+            'subLocation' => $request->subLocation,
             'category' => $request->category,
-            'sub_category' => $request->sub_category,
-            'observation_type' => $request->observation_type,
+            'subCategory' => $request->subCategory,
+            'observationType' => $request->observationType,
             'description' => $request->description,
-            'risk_level' => $request->risk_level,
-            'unsafe_act_or_condition' => $request->unsafe_act_or_condition,
+            'riskLevel' => $request->riskLevel,
+            'unsafeActOrCondition' => $request->unsafeActOrCondition,
             'status' => $request->status,
             'created_by_user' => $request->created_by_user,
-            'due_date' => $request->due_date,
+            'dueDate' => $request->dueDate,
             'assignee' => $request->assignee,
         ]);
 
@@ -51,30 +51,30 @@ class HazardRiskController extends Controller
     }
 
 
-    // public function index()
-    // {
-    //     $hazardRisks = HazardRisk::all();
-    //     return response()->json($hazardRisks);
-    // }
+    public function index()
+    {
+        $hazardRisks = HazardRisk::all();
+        return response()->json($hazardRisks);
+    }
 
 
     public function update(Request $request, $id)
     {
         $hazardRisk = HazardRisk::findOrFail($id);
 
-        $validator = Validator::make($request->all(), [ 
+        $validator = Validator::make($request->all(), [
             'division' => 'required|string|max:255',
             'location' => 'required|string|max:255',
-            'sub_location' => 'nullable|string|max:255',
+            'subLocation' => 'nullable|string|max:255',
             'category' => 'required|string|max:255',
-            'sub_category' => 'nullable|string|max:255',
-            'observation_type' => 'nullable|string|max:255',
+            'subCategory' => 'nullable|string|max:255',
+            'observationType' => 'nullable|string|max:255',
             'description' => 'required|string',
-            'risk_level' => 'required|in:LOW,MEDIUM,HIGH',
-            'unsafe_act_or_condition' => 'required|in:UNSAFE_ACT,UNSAFE_CONDITION',
+            'riskLevel' => 'required|in:LOW,MEDIUM,HIGH',
+            'unsafeActOrCondition' => 'required|in:UNSAFE_ACT,UNSAFE_CONDITION',
             'status' => 'required|in:DRAFT,APPROVED,DECLINED',
             'created_by_user' => 'required|string|max:255',
-            'due_date' => 'nullable|date',
+            'dueDate' => 'nullable|date',
             'assignee' => 'nullable|string|max:255',
         ]);
 
@@ -85,16 +85,16 @@ class HazardRiskController extends Controller
         $hazardRisk->update([
             'division' => $request->division,
             'location' => $request->location,
-            'sub_location' => $request->sub_location,
+            'subLocation' => $request->sub_location,
             'category' => $request->category,
-            'sub_category' => $request->sub_category,
-            'observation_type' => $request->observation_type,
+            'subCategory' => $request->sub_category,
+            'observationType' => $request->observation_type,
             'description' => $request->description,
-            'risk_level' => $request->risk_level,
-            'unsafe_act_or_condition' => $request->unsafe_act_or_condition,
+            'riskLevel' => $request->risk_level,
+            'unsafeActOrCondition' => $request->unsafe_act_or_condition,
             'status' => $request->status,
             'created_by_user' => $request->created_by_user,
-            'due_date' => $request->due_date,
+            'dueDate' => $request->due_date,
             'assignee' => $request->assignee,
         ]);
 

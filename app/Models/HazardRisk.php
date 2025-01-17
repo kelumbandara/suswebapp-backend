@@ -10,33 +10,35 @@ class HazardRisk extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id',
-        'reference',
+        'reference_id', // Include the new reference_id field
         'division',
         'location',
-        'sub_location',
+        'subLocation',
         'category',
-        'sub_category',
-        'observation_type',
+        'subCategory',
+        'observationType',
         'description',
-        'risk_level',
-        'unsafe_act_or_condition',
+        'riskLevel',
+        'unsafeActOrCondition',
         'status',
         'created_by_user',
         'created_date',
-        'due_date',
+        'dueDate',
         'assignee',
     ];
 
     protected $casts = [
         'created_date' => 'datetime',
-        'due_date' => 'datetime',
-
+        'dueDate' => 'datetime',
     ];
+
     protected static function booted()
     {
         static::creating(function ($hazardRisk) {
-            $hazardRisk->reference = 'EHS-' . (HazardRisk::max('id') + 1);  // auto-increment ID based reference
+            // Generate custom reference_id based on max id
+            $maxId = HazardRisk::max('id') + 1;
+            $hazardRisk->reference_id = 'EHS-' . $maxId;
         });
     }
 }
+
