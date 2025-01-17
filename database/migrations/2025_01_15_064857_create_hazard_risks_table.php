@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,8 +11,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('hazard_risks', function (Blueprint $table) {
-            $table->id(); // Auto-incrementing primary key
-            $table->string('reference_id')->unique(); // New column for prefixed identifier
+            $table->id();
+            $table->string('reference_id')->unique();
             $table->string('division');
             $table->string('locationOrDepartment');
             $table->string('subLocation')->nullable();
@@ -21,9 +20,9 @@ return new class extends Migration
             $table->string('subCategory')->nullable();
             $table->string('observationType')->nullable();
             $table->text('description');
-            $table->enum('riskLevel', ['LOW', 'MEDIUM', 'HIGH'])->default('LOW');
-            $table->enum('unsafeActOrCondition', ['UNSAFE_ACT', 'UNSAFE_CONDITION'])->default('UNSAFE_ACT');
-            $table->enum('status', ['DRAFT', 'APPROVED', 'DECLINED'])->default('DRAFT');
+            $table->enum('riskLevel', ['Low', 'Medium', 'High'])->default('Low');
+            $table->enum('unsafeActOrCondition', ['Unsafe Act', 'Unsafe Condition'])->default('Unsafe Act');
+            $table->enum('status', ['draft', 'approved', 'declined'])->default('draft');
             $table->string('createdByUser');
             $table->timestamp('createdDate')->useCurrent();
             $table->timestamp('dueDate')->nullable();
@@ -32,7 +31,6 @@ return new class extends Migration
             $table->timestamps();
         });
     }
-
 
     public function down(): void
     {

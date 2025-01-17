@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\HazardRisk;
@@ -19,13 +18,13 @@ class HazardRiskController extends Controller
             'subCategory' => 'nullable|string|max:255',
             'observationType' => 'nullable|string|max:255',
             'description' => 'required|string',
-            'riskLevel' => 'required|in:LOW,MEDIUM,HIGH',
-            'unsafeActOrCondition' => 'required|in:UNSAFE_ACT,UNSAFE_CONDITION',
-            'status' => 'required|in:DRAFT,APPROVED,DECLINED',
-            'createdByUser' => 'required|string|max:255',
+            'riskLevel' => 'required|in:Low,Medium,High',
+            'unsafeActOrCondition' => 'required|in:Unsafe Act,Unsafe Condition',
+            'status' => 'nullable|in:draft,approved,declined',
+            'createdByUser' => 'nullable|string|max:255',
             'dueDate' => 'nullable|date',
             'assignee' => 'nullable|string|max:255',
-            'document' => 'nullable|string|max:255', // Validate uploaded document
+            'document' => 'nullable|string|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -65,13 +64,13 @@ class HazardRiskController extends Controller
             'subCategory' => 'nullable|string|max:255',
             'observationType' => 'nullable|string|max:255',
             'description' => 'required|string',
-            'riskLevel' => 'required|in:LOW,MEDIUM,HIGH',
-            'unsafeActOrCondition' => 'required|in:UNSAFE_ACT,UNSAFE_CONDITION',
-            'status' => 'required|in:DRAFT,APPROVED,DECLINED',
-            'createdByUser' => 'required|string|max:255',
+            'riskLevel' => 'required|in:Low,Medium,High',
+            'unsafeActOrCondition' => 'required|in:Unsafe Act,Unsafe Condition',
+            'status' => 'nullable|in:draft,approved,declined',
+            'createdByUser' => 'nullable|string|max:255',
             'dueDate' => 'nullable|date',
             'assignee' => 'nullable|string|max:255',
-            'document' => 'nullable|file|max:2048|mimes:pdf,doc,docx,jpg,png',
+            'document' => 'nullable|string|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -84,7 +83,6 @@ class HazardRiskController extends Controller
             if ($hazardRisk->document) {
                 Storage::disk('public')->delete($hazardRisk->document);
             }
-
             $data['document'] = $request->file('document')->store('documents', 'public');
         }
 
@@ -97,3 +95,6 @@ class HazardRiskController extends Controller
         ]);
     }
 }
+
+
+
