@@ -10,9 +10,9 @@ class HazardRisk extends Model
     use HasFactory;
 
     protected $fillable = [
-        'reference_id', // Include the new reference_id field
+        'reference_id',
         'division',
-        'location',
+        'locationOrDepartment', 
         'subLocation',
         'category',
         'subCategory',
@@ -21,10 +21,11 @@ class HazardRisk extends Model
         'riskLevel',
         'unsafeActOrCondition',
         'status',
-        'created_by_user',
-        'created_date',
+        'createdByUser',
+        'createdDate',
         'dueDate',
         'assignee',
+        'document',
     ];
 
     protected $casts = [
@@ -35,7 +36,6 @@ class HazardRisk extends Model
     protected static function booted()
     {
         static::creating(function ($hazardRisk) {
-            // Generate custom reference_id based on max id
             $maxId = HazardRisk::max('id') + 1;
             $hazardRisk->reference_id = 'EHS-' . $maxId;
         });
