@@ -25,7 +25,7 @@ class HazardRiskController extends Controller
             'createdByUser' => 'required|string|max:255',
             'dueDate' => 'nullable|date',
             'assignee' => 'nullable|string|max:255',
-            'document' => 'nullable|file|max:2048|mimes:pdf,doc,docx,jpg,png', // Validate uploaded document
+            'document' => 'nullable|string|max:255', // Validate uploaded document
         ]);
 
         if ($validator->fails()) {
@@ -35,12 +35,16 @@ class HazardRiskController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('document')) {
-            $data['document'] = $request->file('document')->store('documents', 'public'); // Store document in the 'documents' directory
+            $data['document'] = $request->file('document')->store('documents', 'public');
         }
 
         $hazardRisk = HazardRisk::create($data);
 
-        return response()->json(['message' => 'Hazard/Risk created successfully', 'data' => $hazardRisk], 201);
+        return response()->json([
+            'message' => 'Hazard/Risk created successfully',
+            'data' => $hazardRisk,
+            'document_url' => asset('storage/' . $hazardRisk->document)
+        ], 201);
     }
 
     public function index()
@@ -86,6 +90,10 @@ class HazardRiskController extends Controller
 
         $hazardRisk->update($data);
 
-        return response()->json(['message' => 'Hazard/Risk updated successfully', 'data' => $hazardRisk]);
+        return response()->json([
+            'message' => 'Hazard/Risk updated successfully',
+            'data' => $hazardRisk,
+            'document_url' => asset('storage/' . $hazardRisk->document)
+        ]);
     }
 }
