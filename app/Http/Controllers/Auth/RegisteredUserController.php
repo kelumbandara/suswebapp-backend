@@ -14,23 +14,22 @@ class RegisteredUserController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
-            'mobileNumber' => 'nullable|string|unique:users,mobileNumber',
-            'password' => 'required|string|min:8',
-            'confirmPassword' => 'required|string|min:8',
+            'mobile' => 'nullable|string|unique:users,mobile',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
-        if ($request->password !== $request->confirmPassword) {
+        // Check for validation errors
+        if ($validator->fails()) {
             return response()->json([
-                'errors' => [
-                    'confirmPassword' => ['The password confirmation does not match.']
-                ]
+                'errors' => $validator->errors(),
             ], 422);
         }
 
+        // Create the user
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'mobileNumber' => $request->mobileNumber,
+            'mobile' => $request->mobile,
             'password' => Hash::make($request->password),
         ]);
 
@@ -39,4 +38,5 @@ class RegisteredUserController extends Controller
             'user' => $user,
         ], 201);
     }
+
 }

@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Create the users table
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('mobileNumber')->nullable()->unique(); // Consider adding validation for format
+            $table->string('mobile')->nullable()->unique();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
@@ -27,8 +26,8 @@ return new class extends Migration
             $table->string('email');
             $table->string('token');
             $table->timestamp('created_at')->nullable();
-            $table->foreign('email')->references('email')->on('users')->onDelete('cascade'); // Add foreign key constraint
-            $table->primary('email'); // You can also consider using 'token' as a primary key if needed
+            $table->foreign('email')->references('email')->on('users')->onDelete('cascade');
+            $table->primary('email'); 
         });
 
         // Create the sessions table
