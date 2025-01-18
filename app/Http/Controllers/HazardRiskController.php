@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\HazardRisk;
+use App\Models\HSHazardRisk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -20,7 +21,6 @@ class HazardRiskController extends Controller
             'description' => 'required|string',
             'riskLevel' => 'required|in:Low,Medium,High',
             'unsafeActOrCondition' => 'required|in:Unsafe Act,Unsafe Condition',
-            'status' => 'nullable|in:draft,approved,declined',
             'createdByUser' => 'nullable|string|max:255',
             'dueDate' => 'nullable|date',
             'assignee' => 'nullable|string|max:255',
@@ -37,7 +37,7 @@ class HazardRiskController extends Controller
             $data['document'] = $request->file('document')->store('documents', 'public');
         }
 
-        $hazardRisk = HazardRisk::create($data);
+        $hazardRisk = HSHazardRisk::create($data);
 
         return response()->json([
             'message' => 'Hazard/Risk created successfully',
@@ -48,13 +48,13 @@ class HazardRiskController extends Controller
 
     public function index()
     {
-        $hazardRisks = HazardRisk::all();
+        $hazardRisks = HSHazardRisk::all();
         return response()->json($hazardRisks);
     }
 
     public function update(Request $request, $id)
     {
-        $hazardRisk = HazardRisk::findOrFail($id);
+        $hazardRisk = HSHazardRisk::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
             'division' => 'required|string|max:255',

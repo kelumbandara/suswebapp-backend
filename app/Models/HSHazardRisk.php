@@ -4,7 +4,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class HazardRisk extends Model
+class HSHazardRisk extends Model
 {
     use HasFactory;
 
@@ -41,7 +41,7 @@ class HazardRisk extends Model
     {
         static::creating(function ($hazardRisk) {
             // Set reference_id based on the max id
-            $maxId = HazardRisk::max('id') + 1;
+            $maxId = HSHazardRisk::max('id') + 1;
             $hazardRisk->reference_id = 'EHS-' . $maxId;
 
             // Set the default status to 'draft' if not provided

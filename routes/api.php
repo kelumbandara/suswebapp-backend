@@ -4,6 +4,7 @@ use App\Http\Controllers\api\CalculationController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\HazardRiskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,7 +20,11 @@ Route::get('hazard-risk', [HazardRiskController::class, 'index']);
 Route::put('hazard-risk/{id}', [HazardRiskController::class, 'update']);
 
 
-
+Route::get('documents', [DocumentController::class, 'index']);
+Route::post('documents', [DocumentController::class, 'store']);
+// Route::get('documents/{id}', [DocumentController::class, 'show']);
+Route::put('documents/{id}', [DocumentController::class, 'update']);
+// Route::delete('documents/{id}', [DocumentController::class, 'destroy']);
 
 Route::get('/user', function (Request $request) {
     return $request->user();
