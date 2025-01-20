@@ -31,9 +31,6 @@ class User extends Authenticatable
     /**
      * Mutator for hashing the password before saving
      */
-    public function setPasswordAttribute($value)
-    {
-        $this->attributes['password'] = bcrypt($value);
-    }
+    
 
 }
