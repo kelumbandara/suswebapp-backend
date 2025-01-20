@@ -12,39 +12,39 @@ class HSDocument extends Model
 
     protected $fillable = [
         'id',
-        'document_number',
-        'version_number',
-        'document_type',
+        'documentNumber',
+        'versionNumber',
+        'documentType',
         'title',
         'division',
-        'issuing_authority',
-        'document_owner',
-        'document_reviewer',
-        'physical_location',
+        'issuingAuthority',
+        'documentOwner',
+        'documentReviewer',
+        'physicalLocation',
         'remarks',
         'document',
-        'issued_date',
-        'is_no_expiry',
-        'expiry_date',
-        'notify_date',
-        'created_date',
-        'created_by',
+        'issuedDate',
+        'isNoExpiry',
+        'expiryDate',
+        'notifyDate',
+        'createdDate',
+        'createdBy',
     ];
 
     protected $casts = [
-        'issued_date' => 'date',
-        'expiry_date' => 'date',
-        'notify_date' => 'date',
-        'created_date' => 'date',
+        'issuedDate' => 'date',
+        'expiryDate' => 'date',
+        'notifyDate' => 'date',
+        'createdDate' => 'date',
         'document' => 'array',
     ];
     public function getStatusAttribute()
     {
-        if ($this->is_no_expiry || !$this->expiry_date) {
-            return 'Active'; 
+        if ($this->isNoExpiry || !$this->expiryDate) {
+            return 'Active';
         }
 
-        $expiryDate = Carbon::parse($this->expiry_date);
+        $expiryDate = Carbon::parse($this->expiryDate);
         $now = Carbon::now();
 
         return $expiryDate->isFuture() ? 'Active' : 'Expired';
@@ -55,10 +55,10 @@ class HSDocument extends Model
         parent::boot();
 
         static::saving(function ($document) {
-            if ($document->is_no_expiry || !$document->expiry_date) {
+            if ($document->isNoExpiry || !$document->expiryDate) {
                 $document->status = 'Active';
             } else {
-                $expiryDate = Carbon::parse($document->expiry_date);
+                $expiryDate = Carbon::parse($document->expiryDate);
                 $document->status = $expiryDate->isFuture() ? 'Active' : 'Expired';
             }
         });

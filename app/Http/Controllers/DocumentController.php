@@ -1,41 +1,30 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\HSDocument;
-use Illuminate\Http\Request;
+use App\Http\Requests\HealthAndSafety\DocumentRequest;
+use App\Repositories\All\HSDocuments\DocumentInterface;
 use Illuminate\Support\Str;
 
 class DocumentController extends Controller
 {
-    public function index()
+    protected DocumentInterface $documentInterface;
+
+    public function __construct(DocumentInterface $documentInterface)
     {
-        return response()->json(HSDocument::all());
+        $this->documentInterface = $documentInterface;
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'document_number' => 'required|integer',
-            'version_number' => 'required|integer',
-            'document_type' => 'required|string',
-            'title' => 'required|string',
-            'division' => 'required|string',
-            'issuing_authority' => 'required|string',
-            'document_owner' => 'nullable|string',
-            'document_reviewer' => 'required|string',
-            'physical_location' => 'nullable|string',
-            'remarks' => 'nullable|string',
-            'document' => 'nullable|array',
-            'issued_date' => 'required|date',
-            'is_no_expiry' => 'required|boolean',
-            'expiry_date' => 'nullable|date|required_if:is_no_expiry,false',
-            'notify_date' => 'nullable|date|required_if:is_no_expiry,false',
-            'created_date' => 'nullable|date',
-            'created_by' => 'nullable|string',
-            'document' => 'nullable|string|max:2048',
 
-        ]);
+    public function index()
+    {
+        $documents = $this->documentInterface->all();
+
+        return response()->json($documents);
+    }
+
+    public function store(DocumentRequest $request)
+    {
+        $validated = $request->validated();
 
         $validated['id'] = Str::uuid();
 
@@ -43,56 +32,40 @@ class DocumentController extends Controller
             $validated['document'] = $request->file('document')->store('documents', 'public');
         }
 
-        $document = HSDocument::create($validated);
+        $document = $this->documentInterface->create($validated);
+
+        if (! $document) {
+            return response()->json(['message' => 'Document creation failed'], 500);
+        }
 
         return response()->json([
-            'message' => 'Document created successfully',
-            'data' => $document,
-            'document_url' => asset('storage/' . $document->document)
+            'message'      => 'Document created successfully',
+            'data'         => $document,
+            'document_url' => $document->document ? asset('storage/' . $document->document) : null,
         ], 201);
     }
 
-    // public function show($id)
-    // {
-    //     $document = Document::findOrFail($id);
-
-    //     return response()->json($document);
-    // }
-
-    public function update(Request $request, $id)
+    
+    public function update(DocumentRequest $request, $id)
     {
-        $document = HSDocument::findOrFail($id);
+        $validated = $request->validated();
 
-        $validated = $request->validate([
-            'document_number' => 'required|integer',
-            'version_number' => 'required|integer',
-            'document_type' => 'required|string',
-            'title' => 'required|string',
-            'division' => 'required|string',
-            'issuing_authority' => 'required|string',
-            'document_owner' => 'nullable|string',
-            'document_reviewer' => 'required|string',
-            'physical_location' => 'nullable|string',
-            'remarks' => 'nullable|string',
-            'document' => 'nullable|array',
-            'issued_date' => 'required|date',
-            'is_no_expiry' => 'required|boolean',
-            'expiry_date' => 'nullable|date|required_if:is_no_expiry,false',
-            'notify_date' => 'nullable|date|required_if:is_no_expiry,false',
-            'created_date' => 'nullable|date',
-            'created_by' => 'nullable|string',
+        $document = $this->documentInterface->update($id, $validated);
+
+        return response()->json([
+            'message' => 'Document updated successfully',
+            'data'    => $document,
         ]);
-
-        $document->update($validated);
-
-        return response()->json($document);
     }
 
+    /**
+     * Remove the specified document from the repository.
+     */
     // public function destroy($id)
     // {
-    //     $document = HSDocument::findOrFail($id);
-    //     $document->delete();
-
+    //     // Use the repository to delete the document
+    //     $this->documentInterface->deleteById($id);
     //     return response()->json(['message' => 'Document deleted successfully']);
     // }
 }
+
