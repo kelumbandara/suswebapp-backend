@@ -14,7 +14,6 @@ class DocumentController extends Controller
         $this->documentInterface = $documentInterface;
     }
 
-
     public function index()
     {
         $documents = $this->documentInterface->all();
@@ -45,7 +44,6 @@ class DocumentController extends Controller
         ], 201);
     }
 
-    
     public function update(DocumentRequest $request, $id)
     {
         $validated = $request->validated();
@@ -68,4 +66,3 @@ class DocumentController extends Controller
     //     return response()->json(['message' => 'Document deleted successfully']);
     // }
 }
-

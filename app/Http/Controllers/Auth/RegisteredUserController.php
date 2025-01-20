@@ -3,12 +3,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class RegisteredUserController extends Controller
 {
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -18,19 +19,17 @@ class RegisteredUserController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        // Check for validation errors
         if ($validator->fails()) {
             return response()->json([
                 'errors' => $validator->errors(),
             ], 422);
         }
 
-        // Create the user
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'mobile' => $request->mobile,
-            'password' => Hash::make($request->password),
+            'password' => ($request->password),
         ]);
 
         return response()->json([
@@ -38,5 +37,6 @@ class RegisteredUserController extends Controller
             'user' => $user,
         ], 201);
     }
+
 
 }
