@@ -28,9 +28,5 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    /**
-     * Mutator for hashing the password before saving
-     */
     
-
 }
