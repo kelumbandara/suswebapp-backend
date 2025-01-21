@@ -1,99 +1,53 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\HazardRisk;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\HealthAndSafety\HazardAndRiskRequest;
+use App\Repositories\All\HSHazardRisks\HazardRiskInterface;
+
 
 class HazardRiskController extends Controller
 {
-    public function store(Request $request)
+    protected HazardRiskInterface $hazardRiskInterface;
+
+    public function __construct(HazardRiskInterface $hazardRiskInterface)
     {
-        $validator = Validator::make($request->all(), [
-            'division' => 'required|string|max:255',
-            'locationOrDepartment' => 'required|string|max:255',
-            'subLocation' => 'nullable|string|max:255',
-            'category' => 'required|string|max:255',
-            'subCategory' => 'nullable|string|max:255',
-            'observationType' => 'nullable|string|max:255',
-            'description' => 'required|string',
-            'riskLevel' => 'required|in:LOW,MEDIUM,HIGH',
-            'unsafeActOrCondition' => 'required|in:UNSAFE_ACT,UNSAFE_CONDITION',
-            'status' => 'required|in:DRAFT,APPROVED,DECLINED',
-            'createdByUser' => 'required|string|max:255',
-            'dueDate' => 'nullable|date',
-            'assignee' => 'nullable|string|max:255',
-            'document' => 'nullable|string|max:255', // Validate uploaded document
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
-        }
-
-        $data = $request->all();
-
-        if ($request->hasFile('document')) {
-            $data['document'] = $request->file('document')->store('documents', 'public');
-        }
-
-        $hazardRisk = HazardRisk::create($data);
-
-        return response()->json([
-            'message' => 'Hazard/Risk created successfully',
-            'data' => $hazardRisk,
-            'document_url' => asset('storage/' . $hazardRisk->document)
-        ], 201);
+        $this->hazardRiskInterface = $hazardRiskInterface;
     }
+
+    public function store(HazardAndRiskRequest $request)
+{
+    $validated = $request->validated();
+    $data = $validated;
+
+    if ($request->hasFile('document')) {
+        $data['document'] = $request->file('document')->store('documents', 'public');
+    }
+
+    $hazardRisk = $this->hazardRiskInterface->create($data);
+
+    return response()->json([
+        'message' => 'Hazard/Risk created successfully',
+        'data' => $hazardRisk,
+        'document_url' => asset('storage/' . $hazardRisk->document)
+    ], 201);
+}
 
     public function index()
     {
-        $hazardRisks = HazardRisk::all();
+        $hazardRisks = $this->hazardRiskInterface->all();
         return response()->json($hazardRisks);
     }
-
-    public function update(Request $request, $id)
+    public function update(HazardAndRiskRequest $request, $id)
     {
-        $hazardRisk = HazardRisk::findOrFail($id);
 
-        $validator = Validator::make($request->all(), [
-            'division' => 'required|string|max:255',
-            'locationOrDepartment' => 'required|string|max:255',
-            'subLocation' => 'nullable|string|max:255',
-            'category' => 'required|string|max:255',
-            'subCategory' => 'nullable|string|max:255',
-            'observationType' => 'nullable|string|max:255',
-            'description' => 'required|string',
-            'riskLevel' => 'required|in:LOW,MEDIUM,HIGH',
-            'unsafeActOrCondition' => 'required|in:UNSAFE_ACT,UNSAFE_CONDITION',
-            'status' => 'required|in:DRAFT,APPROVED,DECLINED',
-            'createdByUser' => 'required|string|max:255',
-            'dueDate' => 'nullable|date',
-            'assignee' => 'nullable|string|max:255',
-            'document' => 'nullable|file|max:2048|mimes:pdf,doc,docx,jpg,png',
-        ]);
+        $validated = $request->validated();
+        $hazardRisk = $this->hazardRiskInterface->update($id, $validated);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
-        }
 
-        $data = $request->all();
-
-        if ($request->hasFile('document')) {
-            if ($hazardRisk->document) {
-                Storage::disk('public')->delete($hazardRisk->document);
-            }
-
-            $data['document'] = $request->file('document')->store('documents', 'public');
-        }
-
-        $hazardRisk->update($data);
 
         return response()->json([
             'message' => 'Hazard/Risk updated successfully',
             'data' => $hazardRisk,
-            'document_url' => asset('storage/' . $hazardRisk->document)
         ]);
     }
 }

@@ -1,10 +1,10 @@
 <?php
-
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
@@ -16,25 +16,21 @@ class LoginController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
+        // if (!$user || !Hash::check($request->password, $user->password)) {
+        //     return response()->json(['message' => 'Invalid credentials'], 401);
+        //     }
 
-        if ($user) {
-            if ($request->password === $user->password) {
-                $token = $user->createToken('SATTVA')->plainTextToken;
-
-                return response()->json([
-                    'message' => 'Login successful',
-                    'token' => $token,
-                    'user' => $user
-                ], 201);
-            }
-
-            return response()->json([
-                'message' => 'Invalid password',
-            ], 401);
+        if (!$user || $request->password !== $user->password) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         return response()->json([
-            'message' => 'User not found',
-        ], 404);
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]);
     }
+
+
 }
