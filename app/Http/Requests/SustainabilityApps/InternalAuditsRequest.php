@@ -48,6 +48,16 @@ class InternalAuditsRequest extends FormRequest
     public function messages()
     {
         return [
+            'division.required' => 'Division is required',
+            'auditTitle.required' => 'Audit Title is required',
+            'auditType.required' => 'Audit Type is required',
+            'isNotSupplier.required' => 'Is Not Supplier is required',
+            'factoryName.required' => 'Factory Name is required',
+            'factoryAddress.required' => 'Factory Address is required',
+            'factoryContact.required' => 'Factory Contact is required',
+            'designation.required' => 'Designation is required',
+            'email.required' => 'Email is required',
+            'contactNumber.required' => 'Contact Number is required',
             'supplierType.required_if' => 'Supplier Type is required when the audit is a supplier audit.',
             'factoryLiNo.required_if' => 'Factory License No is required when the audit is a supplier audit.',
             'higgId.required_if' => 'Higg ID is required when the audit is a supplier audit.',

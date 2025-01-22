@@ -42,7 +42,12 @@ class HazardAndRiskRequest extends FormRequest
         return [
             'division.required' => 'Division is required.',
             'locationOrDepartment.required' => 'Location or department is required.',
-            // Other custom messages
+            'category.required' => 'Category is required.',
+            'description.required' => 'Description is required.',
+            'riskLevel.required' => 'Risk level is required.',
+            'unsafeActOrCondition.required' => 'Unsafe act or condition is required.',
+            'document.max' => 'The document must not exceed 2MB.',
+
         ];
     }
 }

@@ -30,4 +30,16 @@ class FactoryDeatailRequest extends FormRequest
             'contact_person'  => 'required|string|max:255',
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'name.required' => 'Name is required',
+            'email.required' => 'Email is required',
+            'contact_number.required' => 'Contact Number is required',
+            'address.required' => 'Address is required',
+            'designation.required' => 'Designation is required',
+            'contact_person.required' => 'Contact Person is required',
+        ];
+    }
 }

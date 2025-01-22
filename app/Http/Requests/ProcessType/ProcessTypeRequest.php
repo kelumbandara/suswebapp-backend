@@ -25,4 +25,10 @@ class ProcessTypeRequest extends FormRequest
             'name' => 'required|string|max:255',
         ];
     }
+    public function messages()
+    {
+        return [
+            'name.required' => 'The name field is required.',
+        ];
+    }
 }

@@ -50,8 +50,15 @@ class DocumentRequest extends FormRequest
     {
         return [
             'documentNumber.required' => 'The document number is required.',
+            'versionNumber.required' => 'The version number is required.',
             'documentType.required' => 'The document type is required.',
-            // Add other custom error messages as needed
+            'title.required' => 'The title is required.',
+            'division.required' => 'The division is required.',
+            'issuingAuthority.required' => 'The issuing authority is required.',
+            'documentReviewer.required' => 'The document reviewer is required.',
+            'issuedDate.required' => 'The issued date is required.',
+            'isNoExpiry.required' => 'The is no expiry is required.',
+
         ];
     }
 }

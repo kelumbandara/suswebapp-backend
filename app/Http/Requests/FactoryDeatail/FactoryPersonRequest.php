@@ -23,7 +23,12 @@ class FactoryPersonRequest extends FormRequest
     {
         return [
             'name' => 'required',
-
+        ];
+    }
+    public function messages()
+    {
+        return [
+            'name.required' => 'Name is required',
         ];
     }
 }
