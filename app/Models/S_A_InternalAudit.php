@@ -45,11 +45,21 @@ class S_A_InternalAudit extends Model
 
     public function setAuditDateAttribute($value)
     {
-        $this->attributes['auditDate'] = Carbon::parse($value)->format('Y-m-d');
+        $this->attributes['auditDate'] = Carbon::parse($value)->format('Y-m-d');  
     }
 
     public function setDateApprovalAttribute($value)
     {
         $this->attributes['dateApproval'] = Carbon::parse($value)->format('Y-m-d');
+    }
+
+    public function getAuditDateAttribute($value)
+    {
+        return Carbon::parse($value)->format('d-m-Y');
+    }
+
+    public function getDateApprovalAttribute($value)
+    {
+        return Carbon::parse($value)->format('d-m-Y');
     }
 }
