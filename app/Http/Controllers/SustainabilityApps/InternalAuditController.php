@@ -28,15 +28,14 @@ class InternalAuditController extends Controller
     public function store(InternalAuditsRequest $request)
     {
         $data = $request->validated();
-        if ($data['is_supplier_audit']) {
-            // Ensure the supplier fields are present in the request
-            $data['supplier_type'] = $request->input('supplier_type');
-            $data['factory_license_no'] = $request->input('factory_license_no');
-            $data['higg_id'] = $request->input('higg_id');
-            $data['zdhc_id'] = $request->input('zdhc_id');
-            $data['process_type'] = $request->input('process_type');
+        if ($data['isNotSupplier']) {
+            $data['supplierType'] = $request->input('supplierType');
+            $data['factoryLiNo'] = $request->input('factoryLiNo');
+            $data['higgId'] = $request->input('higgId');
+            $data['zdhcId'] = $request->input('zdhcId');
+            $data['processType'] = $request->input('processType');
         }
-        $data['reference_id'] = 'AUD-' . strtoupper(uniqid());
+        $data['referenceNumber'] = 'AUD-' . strtoupper(uniqid());
         $audit = $this->InternalAuditInterface->create($data);
 
         return response()->json([
@@ -54,12 +53,12 @@ class InternalAuditController extends Controller
         if ($audit->is_supplier_audit) {
             return response()->json([
                 'audit' => $audit,
-                'supplier_details' => [
-                    'supplier_type' => $audit->supplier_type,
-                    'factory_license_no' => $audit->factory_license_no,
-                    'higg_id' => $audit->higg_id,
-                    'zdhc_id' => $audit->zdhc_id,
-                    'process_type' => $audit->process_type,
+                'supplierDetails' => [
+                    'supplierType' => $audit->supplierType,
+                    'factoryLiNo' => $audit->factoryLiNo,
+                    'higgId' => $audit->higgId,
+                    'zdhcId' => $audit->zdhcId,
+                    'processType' => $audit->processType,
                 ]
             ]);
         }

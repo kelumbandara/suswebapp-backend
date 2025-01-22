@@ -7,6 +7,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\FactoryDeatail\FactoryDeatailController;
+use App\Http\Controllers\FactoryDeatail\FactoryPersonController;
 use App\Http\Controllers\HazardRiskController;
 use App\Http\Controllers\ProcessTypeController;
 use App\Http\Controllers\SustainabilityApps\InternalAuditController;
@@ -27,6 +29,12 @@ Route::post('auditees', [AuditeeController::class, 'store']);
 
 Route::get('process-types', [ProcessTypeController::class, 'show']);
 Route::post('process-types', [ProcessTypeController::class, 'store']);
+
+Route::get('factory-details', [FactoryDeatailController::class, 'show']);
+Route::post('factory-details', [FactoryDeatailController::class, 'store']);
+
+Route::get('factory-people', [FactoryPersonController::class, 'show']);
+Route::post('factory-people', [FactoryPersonController::class, 'store']);
 
 Route::post('hazard-risk', [HazardRiskController::class, 'store']);
 Route::get('hazard-risk', [HazardRiskController::class, 'index']);
