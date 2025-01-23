@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('approver');
             $table->enum('status', ['draft', 'approved', 'declined'])->default('draft');
             $table->string('announcement');
-            $table->date('dateApproval');
+            $table->date('dateApproval')->nullable();
             $table->text('description')->nullable();
             $table->string('lapsedStatus')->nullable();
             $table->string('auditStatus')->nullable();
