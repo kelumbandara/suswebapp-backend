@@ -11,6 +11,7 @@ use App\Http\Controllers\FactoryDeatail\FactoryDeatailController;
 use App\Http\Controllers\FactoryDeatail\FactoryPersonController;
 use App\Http\Controllers\HazardRiskController;
 use App\Http\Controllers\ProcessTypeController;
+use App\Http\Controllers\SustainabilityApps\ExternalAuditController;
 use App\Http\Controllers\SustainabilityApps\InternalAuditController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -51,5 +52,11 @@ Route::post('internal-audits', [InternalAuditController::class, 'store']);
 Route::get('internal-audits/{id}', [InternalAuditController::class, 'show']);
 Route::put('internal-audits/{id}', [InternalAuditController::class, 'update']);
 Route::delete('internal-audits/{id}', [InternalAuditController::class, 'destroy']);
+
+Route::get('external-audits', [ExternalAuditController::class, 'index']);
+Route::post('external-audits', [ExternalAuditController::class, 'store']);
+Route::get('external-audits/{id}', [ExternalAuditController::class, 'show']);
+Route::put('external-audits/{id}', [ExternalAuditController::class, 'update']);
+Route::delete('external-audits/{id}', [ExternalAuditController::class, 'destroy']);
 
 Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'show']);

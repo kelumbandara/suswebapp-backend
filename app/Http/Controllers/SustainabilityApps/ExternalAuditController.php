@@ -3,63 +3,65 @@
 namespace App\Http\Controllers\SustainabilityApps;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\SustainabilityApps\ExternalAuditsRequest;
+use App\Repositories\All\SAExternalAudits\ExternalAuditInterface;
 
 class ExternalAuditController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected ExternalAuditInterface $externalAuditInterface;
+
+    public function __construct(ExternalAuditInterface $externalAuditInterface)
+    {
+        $this->externalAuditInterface = $externalAuditInterface;
+    }
+
     public function index()
     {
-        //
+        $audits = $this->externalAuditInterface->all();
+
+        return response()->json($audits);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(ExternalAuditsRequest $request)
     {
-        //
+        $data = $request->validated();
+
+        $data['referenceNumber'] = 'AUD-' . strtoupper(uniqid());
+
+        $audit = $this->externalAuditInterface->create($data);
+
+        return response()->json([
+            'message' => 'External Audit created successfully!',
+            'audit' => $audit,
+        ], 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function show($id)
     {
-        //
+        $audit = $this->externalAuditInterface->getById($id);
+
+        return response()->json($audit);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+
+    public function update(ExternalAuditsRequest $request, $id)
     {
-        //
+        $data = $request->validated();
+
+        $audit = $this->externalAuditInterface->update($id, $data);
+
+        return response()->json([
+            'message' => 'External Audit updated successfully!',
+            'audit' => $audit,
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy($id)
     {
-        //
-    }
+        $this->externalAuditInterface->deleteById($id);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json([
+            'message' => 'External Audit deleted successfully!',
+        ]);
     }
 }

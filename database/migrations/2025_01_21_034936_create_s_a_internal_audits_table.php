@@ -33,7 +33,7 @@ return new class extends Migration
             $table->date('auditDate')->nullable();
             $table->string('auditee');
             $table->string('approver');
-            $table->enum('status', ['Completed', 'Scheduled'])->default('Completed');
+            $table->enum('status', ['Completed', 'Scheduled'])->default('Scheduled');
             $table->string('auditStatus')->nullable();
             $table->date('dateApproval')->nullable();
             $table->text('description')->nullable();
