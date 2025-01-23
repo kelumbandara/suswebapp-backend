@@ -17,7 +17,7 @@ class ExternalAuditsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'auditorName' => 'required|string|max:255',
+            'auditorName' => 'nullable|string|max:255',
             'auditType' => 'required|string|max:255',
             'auditCategory' => 'required|string|max:255',
             'customer' => 'required|string|max:255',
@@ -40,7 +40,6 @@ class ExternalAuditsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'auditorName.required' => 'The auditor name is required.',
             'auditType.required' => 'The audit type is required.',
             'auditCategory.required' => 'The audit category is required.',
             'customer.required' => 'The customer is required.',
