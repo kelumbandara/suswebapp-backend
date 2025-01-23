@@ -27,4 +27,12 @@ class ProfileUpdateRequest extends FormRequest
             ],
         ];
     }
+    public function massage()
+    {
+        return [
+            'name.required' => 'Name is required',
+            'email.required' => 'Email is required',
+            'email.unique' => 'Email already exists',
+        ];
+    }
 }

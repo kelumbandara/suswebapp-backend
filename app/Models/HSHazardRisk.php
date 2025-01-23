@@ -32,7 +32,6 @@ class HSHazardRisk extends Model
         'dueDate' => 'datetime',
     ];
 
-    // Define the enum values to lowercase
     const RISK_LEVELS = ['Low', 'Medium', 'High'];
     const UNSAFE_ACT_CONDITIONS = ['Unsafe Act', 'Unsafe Condition'];
     const STATUSES = ['draft', 'approved', 'declined'];
@@ -40,11 +39,9 @@ class HSHazardRisk extends Model
     protected static function booted()
     {
         static::creating(function ($hazardRisk) {
-            // Set reference_id based on the max id
             $maxId = HSHazardRisk::max('id') + 1;
             $hazardRisk->reference_id = 'EHS-' . $maxId;
 
-            // Set the default status to 'draft' if not provided
             if ($hazardRisk->status === null) {
                 $hazardRisk->status = 'draft';
             }
