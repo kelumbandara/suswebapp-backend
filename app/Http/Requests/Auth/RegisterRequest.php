@@ -32,8 +32,8 @@ class RegisterRequest extends FormRequest
             'password'          => ['required', 'min:4', 'confirmed'],
             'mobile'            => ['required', 'string', 'max:15', 'unique:users'],
             'department'        => ['nullable', 'string', 'max:255', 'required_if:isCompanyEmployee,true'],
-            'jobPosition'       => ['required', 'string', 'max:255'],
-            'assignedFactory'     => ['nullable', 'array', 'required_if:isCompanyEmployee,true'],
+            'jobPosition'       => ['nullable', 'string', 'required_if:isCompanyEmployee,true'],
+            'assignedFactory'   => ['nullable', 'array', 'required_if:isCompanyEmployee,true'],
             'employeeNumber'    => ['nullable', 'string', 'max:255', 'unique:users', 'required_if:isCompanyEmployee,true'],
 
         ];
@@ -43,19 +43,19 @@ class RegisterRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required'              => 'Name is required',
-            'email.required'             => 'Email is required',
-            'email.unique'               => 'Email is already taken',
-            'password.required'          => 'Password is required',
-            'password.min'               => 'Password must be at least 4 characters.',
-            'password.confirmed'         => 'Password confirmation does not match.',
-            'mobile.required'            => 'Mobile is required',
-            'mobile.unique'              => 'Mobile number already exists.',
-            'employeeNumber.required_if' => 'Employee number is required when the user is a company employee.',
-            'assignedFactory.required_if'  => 'Assigned factory is required when the user is a company employee.',
-            'department.required_if'     => 'Department is required when the user is a company employee.',
-            'employeeNumber.unique'      => 'Employee number already exists.',
-            'jobPosition.required'       => 'Job position is required.',
+            'name.required'               => 'Name is required',
+            'email.required'              => 'Email is required',
+            'email.unique'                => 'Email is already taken',
+            'password.required'           => 'Password is required',
+            'password.min'                => 'Password must be at least 4 characters.',
+            'password.confirmed'          => 'Password confirmation does not match.',
+            'mobile.required'             => 'Mobile is required',
+            'mobile.unique'               => 'Mobile number already exists.',
+            'employeeNumber.required_if'  => 'Employee number is required when the user is a company employee.',
+            'assignedFactory.required_if' => 'Assigned factory is required when the user is a company employee.',
+            'department.required_if'      => 'Department is required when the user is a company employee.',
+            'employeeNumber.unique'       => 'Employee number already exists.',
+            'jobPosition.required'        => 'Job position is required when the user is a company employee.',
 
         ];
     }

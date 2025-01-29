@@ -5,10 +5,11 @@ use App\Http\Controllers\AuditeeController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\CommonControllers\FactoryController;
 use App\Http\Controllers\CommonControllers\JobPositionController;
+use App\Http\Controllers\CommonControllers\UserTypeController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DocumentController;
-use App\Http\Controllers\FactoryDeatail\FactoryDeatailController;
 use App\Http\Controllers\FactoryDeatail\FactoryPersonController;
 use App\Http\Controllers\HazardRiskController;
 use App\Http\Controllers\ProcessTypeController;
@@ -27,6 +28,8 @@ Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkE
 Route::get('job-positions', [JobPositionController::class, 'index']);
 Route::post('job-positions', [JobPositionController::class, 'store']);
 
+Route::get('user-types', [UserTypeController::class, 'index']);
+Route::post('user-types', [UserTypeController::class, 'store']);
 
 Route::post('departments', [DepartmentController::class, 'store']);
 Route::get('departments', [DepartmentController::class, 'Show']);
@@ -37,8 +40,8 @@ Route::post('auditees', [AuditeeController::class, 'store']);
 Route::get('process-types', [ProcessTypeController::class, 'show']);
 Route::post('process-types', [ProcessTypeController::class, 'store']);
 
-Route::get('factory-details', [FactoryDeatailController::class, 'show']);
-Route::post('factory-details', [FactoryDeatailController::class, 'store']);
+Route::get('factory', [FactoryController::class, 'show']);
+Route::post('factory', [FactoryController::class, 'store']);
 
 Route::get('factory-people', [FactoryPersonController::class, 'show']);
 Route::post('factory-people', [FactoryPersonController::class, 'store']);
