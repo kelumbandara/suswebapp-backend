@@ -33,9 +33,15 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'ResponsibleSection' => 'array',
+        'assignedFactory' => 'array',
+    ];
     public function setAssignFactoryAttribute($value)
     {
-        $this->attributes['assignFactory'] = json_encode($value);
+        $this->attributes['assignedFactory'] = json_encode($value);
+        $this->attributes['ResponsibleSection'] = json_encode($value);
     }
 
     // Accessor to retrieve assignFactory as an array

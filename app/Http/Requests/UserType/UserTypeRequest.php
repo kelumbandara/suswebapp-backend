@@ -11,7 +11,7 @@ class UserTypeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,8 @@ class UserTypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'userType' => 'required|string',
+            
         ];
     }
 }

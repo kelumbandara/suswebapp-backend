@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('com_user_types', function (Blueprint $table) {
             $table->string('userType')->nullable();
-            $table->string('section')->nullable();
-            $table->string('areas')->nullable();
-            $table->string('other')->nullable();
+            $table->string('userTypeDescription')->nullable();
+            $table->json('section')->nullable();
+            $table->json('areas')->nullable();
+            $table->json('other')->nullable();
             $table->boolean('status')->default(true);
         });
     }

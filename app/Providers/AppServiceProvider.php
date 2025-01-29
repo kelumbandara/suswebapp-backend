@@ -26,6 +26,8 @@ use App\Repositories\All\SDGReporting\SDGReportingInterface;
 use App\Repositories\All\SDGReporting\SDGReportingRepository;
 use App\Repositories\All\User\UserInterface;
 use App\Repositories\All\User\UserRepository;
+use App\Repositories\All\ComUserType\UserTypeInterface;
+use App\Repositories\All\ComUserType\UserTypeRepository;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -58,5 +60,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SDGReportingInterface::class, SDGReportingRepository::class);
         $this->app->bind(UserInterface::class, UserRepository::class);
         $this->app->bind(JobPositionInterface::class, JobPositionRepository::class);
+        $this->app->bind(UserTypeInterface::class, UserTypeRepository::class);
+
     }
 }

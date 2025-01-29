@@ -3,63 +3,36 @@
 namespace App\Http\Controllers\CommonControllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\UserType\UserTypeRequest;
+use App\Repositories\All\ComUserType\UserTypeInterface;
 
 class UserTypeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $userTypeInterface;
+
+    public function __construct(UserTypeInterface $userTypeInterface)
+    {
+        $this->userTypeInterface = $userTypeInterface;
+    }
+
     public function index()
     {
-        //
+        $userType = $this->userTypeInterface->All();
+        if ($userType->isEmpty()) {
+            return response()->json([
+                'message' => 'No jobPositions found.',
+            ], 404);
+        }
+        return response()->json($userType);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(UserTypeRequest $request)
     {
-        //
-    }
+        $userType = $this->userTypeInterface->create($request->validated());
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json([
+            'message'    => 'JobPosition created successfully!',
+            'department' => $userType,
+        ], 201);
     }
 }
