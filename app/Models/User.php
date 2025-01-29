@@ -16,7 +16,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'IsCompanyEmployee',
+        'isCompanyEmployee',
         'employeeNumber',
         'mobile',
         'emailVerifiedAt',
@@ -34,6 +34,7 @@ class User extends Authenticatable
         'remember_token',
     ];
     protected $casts = [
+        'isCompanyEmployee' => 'boolean',
         'email_verified_at' => 'datetime',
         'ResponsibleSection' => 'array',
         'assignedFactory' => 'array',

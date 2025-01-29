@@ -24,6 +24,8 @@ class RegisteredUserController extends Controller
     public function store(RegisterRequest $request)
     {
         $validatedData = $request->validated();
+        $validatedData['isCompanyEmployee'] = (bool) $validatedData['isCompanyEmployee'];
+
         $user = $this->userInterface->create($validatedData);
 
         return response()->json([
@@ -32,5 +34,13 @@ class RegisteredUserController extends Controller
         ], 201);
     }
 
+    public function index()
+    {
+        $user = $this->userInterface->All();
+
+        return response()->json([
+            'user' => $user,
+        ], 201);
+    }
 
 }
