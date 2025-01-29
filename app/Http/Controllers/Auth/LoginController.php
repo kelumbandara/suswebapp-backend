@@ -16,9 +16,6 @@ class LoginController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
-        // if (!$user || !Hash::check($request->password, $user->password)) {
-        //     return response()->json(['message' => 'Invalid credentials'], 401);
-        //     }
 
         if (!$user || $request->password !== $user->password) {
             return response()->json(['message' => 'Invalid credentials'], 401);
@@ -28,7 +25,7 @@ class LoginController extends Controller
 
         return response()->json([
             'access_token' => $token,
-            'token_type' => 'Bearer',
+            'token_type' => 'Bearer',201
         ]);
     }
 

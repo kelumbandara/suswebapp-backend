@@ -5,6 +5,7 @@ use App\Http\Controllers\AuditeeController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\CommonControllers\JobPositionController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\FactoryDeatail\FactoryDeatailController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\HazardRiskController;
 use App\Http\Controllers\ProcessTypeController;
 use App\Http\Controllers\SustainabilityApps\ExternalAuditController;
 use App\Http\Controllers\SustainabilityApps\InternalAuditController;
+use App\Http\Controllers\SustainabilityApps\SDGReportingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +23,10 @@ Route::post('register', [RegisteredUserController::class, 'store']);
 
 Route::post('login', [LoginController::class, 'login']);
 Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
+
+Route::get('job-positions', [JobPositionController::class, 'index']);
+Route::post('job-positions', [JobPositionController::class, 'store']);
+
 
 Route::post('departments', [DepartmentController::class, 'store']);
 Route::get('departments', [DepartmentController::class, 'Show']);
@@ -36,6 +42,20 @@ Route::post('factory-details', [FactoryDeatailController::class, 'store']);
 
 Route::get('factory-people', [FactoryPersonController::class, 'show']);
 Route::post('factory-people', [FactoryPersonController::class, 'store']);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Route::post('hazard-risk', [HazardRiskController::class, 'store']);
 Route::get('hazard-risk', [HazardRiskController::class, 'index']);
@@ -58,5 +78,11 @@ Route::post('external-audits', [ExternalAuditController::class, 'store']);
 Route::get('external-audits/{id}', [ExternalAuditController::class, 'show']);
 Route::put('external-audits/{id}', [ExternalAuditController::class, 'update']);
 Route::delete('external-audits/{id}', [ExternalAuditController::class, 'destroy']);
+
+Route::get('sdg-reportings', [SDGReportingController::class, 'index']);
+Route::post('sdg-reportings', [SDGReportingController::class, 'store']);
+Route::get('sdg-reportings/{id}', [SDGReportingController::class, 'show']);
+Route::put('sdg-reportings/{id}', [SDGReportingController::class, 'update']);
+Route::delete('sdg-reportings/{id}', [SDGReportingController::class, 'destroy']);
 
 Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'show']);

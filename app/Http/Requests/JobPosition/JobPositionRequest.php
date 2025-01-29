@@ -1,9 +1,10 @@
 <?php
-namespace App\Http\Requests\FactoryDeatail;
+
+namespace App\Http\Requests\JobPosition;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class FactoryPersonRequest extends FormRequest
+class JobPositionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,13 +22,13 @@ class FactoryPersonRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required',
+            'jobPosition' => 'required|string',
         ];
     }
     public function messages()
     {
         return [
-            'name.required' => 'Name is required',
+            'jobPosition.required' => 'Job position is required',
         ];
     }
 }

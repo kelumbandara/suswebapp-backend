@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\HealthAndSafety;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,31 +21,31 @@ class HazardAndRiskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'division' => 'required|string|max:255',
+            'division'             => 'required|string|max:255',
             'locationOrDepartment' => 'required|string|max:255',
-            'subLocation' => 'nullable|string|max:255',
-            'category' => 'required|string|max:255',
-            'subCategory' => 'nullable|string|max:255',
-            'observationType' => 'nullable|string|max:255',
-            'description' => 'required|string',
-            'riskLevel' => 'required|in:Low,Medium,High',
+            'subLocation'          => 'nullable|string|max:255',
+            'category'             => 'required|string|max:255',
+            'subCategory'          => 'nullable|string|max:255',
+            'observationType'      => 'nullable|string|max:255',
+            'description'          => 'required|string',
+            'riskLevel'            => 'required|in:Low,Medium,High',
             'unsafeActOrCondition' => 'required|in:Unsafe Act,Unsafe Condition',
-            'createdByUser' => 'nullable|string|max:255',
-            'dueDate' => 'nullable|date',
-            'assignee' => 'nullable|string|max:255',
-            'document' => 'nullable|string|max:2048',
+            'createdByUser'        => 'nullable|string|max:255',
+            'dueDate'              => 'nullable|date',
+            'assignee'             => 'nullable|string|max:255',
+            'document'             => 'nullable|string|max:2048',
         ];
     }
     public function messages()
     {
         return [
-            'division.required' => 'Division is required.',
+            'division.required'             => 'Division is required.',
             'locationOrDepartment.required' => 'Location or department is required.',
-            'category.required' => 'Category is required.',
-            'description.required' => 'Description is required.',
-            'riskLevel.required' => 'Risk level is required.',
+            'category.required'             => 'Category is required.',
+            'description.required'          => 'Description is required.',
+            'riskLevel.required'            => 'Risk level is required.',
             'unsafeActOrCondition.required' => 'Unsafe act or condition is required.',
-            'document.max' => 'The document must not exceed 2MB.',
+            'document.max'                  => 'The document must not exceed 2MB.',
 
         ];
     }

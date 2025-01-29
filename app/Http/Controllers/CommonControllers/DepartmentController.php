@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Department\DepartmentRequest;
-use App\Repositories\All\Department\DepartmentInterface;
+use App\Repositories\All\ComDepartment\DepartmentInterface;
 
 class DepartmentController extends Controller
 {

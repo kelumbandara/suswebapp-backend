@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\All\Department;
+namespace App\Repositories\All\ComDepartment;
 
 use App\Repositories\Base\EloquentRepositoryInterface;
 

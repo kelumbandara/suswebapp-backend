@@ -1,22 +1,22 @@
 <?php
-namespace App\Repositories\All\Department;
+namespace App\Repositories\All\ComDepartment;
 
-use App\Models\Department;
+use App\Models\ComDepartment;
 use App\Repositories\Base\BaseRepository;
 
 class DepartmentRepository extends BaseRepository implements DepartmentInterface
 {
     /**
-     * @var Department
+     * @var ComDepartment
      */
     protected $model;
 
     /**
      * HazardRiskRepository constructor.
      *
-     * @param Department $model
+     * @param ComDepartment $model
      */
-    public function __construct(Department $model)
+    public function __construct(ComDepartment $model)
     {
         $this->model = $model;
     }

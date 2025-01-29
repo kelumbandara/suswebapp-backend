@@ -10,9 +10,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('h_s_hazard_risks', function (Blueprint $table) {
+        Schema::create('hshr_hazard_risks', function (Blueprint $table) {
             $table->id();
-            $table->string('reference_id')->unique();
+            $table->string('referenceNumber')->unique();
             $table->string('division');
             $table->string('locationOrDepartment');
             $table->string('subLocation')->nullable();
@@ -34,6 +34,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('h_s_hazard_risks');
+        Schema::dropIfExists('hshr_hazard_risks');
     }
 };

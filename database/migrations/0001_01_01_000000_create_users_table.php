@@ -6,18 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('mobile')->nullable()->unique();
             $table->string('password');
+            $table->boolean('isCompanyEmployee')->default(false);
+            $table->string('employeeNumber')->nullable()->unique();
+            $table->string('mobile')->nullable()->unique();
             $table->rememberToken();
+            $table->boolean('emailVerifiedAt')->default(false);
+            $table->string('userType')->nullable()->default('guest');
+            $table->string('department')->nullable();
+            $table->string('jobPosition')->nullable();
+            $table->json('ResponsibleSection')->nullable();
+            $table->string('profileImage')->nullable();
+            $table->boolean('availability')->default(true);
+            $table->json('assignFactory')->nullable();
             $table->timestamps();
         });
 
@@ -27,13 +35,13 @@ return new class extends Migration
             $table->string('token');
             $table->timestamp('created_at')->nullable();
             $table->foreign('email')->references('email')->on('users')->onDelete('cascade');
-            $table->primary('email'); 
+            $table->primary('email');
         });
 
         // Create the sessions table
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index()->constrained()->onDelete('cascade'); // Nullable, but use foreign key constraint
+            $table->foreignId('user_id')->nullable()->index()->constrained('users')->onDelete('cascade');
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->longText('payload');
@@ -46,7 +54,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('com_users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }

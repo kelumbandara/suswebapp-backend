@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Repositories\All\Auditee\AuditeeInterface;
 use App\Repositories\All\Auditee\AuditeeRepository;
-use App\Repositories\All\Department\DepartmentInterface;
-use App\Repositories\All\Department\DepartmentRepository;
+use App\Repositories\All\ComDepartment\DepartmentInterface;
+use App\Repositories\All\ComDepartment\DepartmentRepository;
+use App\Repositories\All\ComJobPosition\JobPositionInterface;
+use App\Repositories\All\ComJobPosition\JobPositionRepository;
 use App\Repositories\All\FactoryDeatail\FactoryDeatailInterface;
 use App\Repositories\All\FactoryDeatail\FactoryDeatailRepository;
 use App\Repositories\All\FactoryPerson\FactoryPersonInterface;
@@ -20,6 +22,10 @@ use App\Repositories\All\SAExternalAudits\ExternalAuditInterface;
 use App\Repositories\All\SAExternalAudits\ExternalAuditRepository;
 use App\Repositories\All\SAInternalAudits\InternalAuditInterface;
 use App\Repositories\All\SAInternalAudits\InternalAuditRepository;
+use App\Repositories\All\SDGReporting\SDGReportingInterface;
+use App\Repositories\All\SDGReporting\SDGReportingRepository;
+use App\Repositories\All\User\UserInterface;
+use App\Repositories\All\User\UserRepository;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -49,5 +55,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ProcessTypeInterface::class, ProcessTypeRepository::class);
         $this->app->bind(FactoryDeatailInterface::class, FactoryDeatailRepository::class);
         $this->app->bind(FactoryPersonInterface::class, FactoryPersonRepository::class);
+        $this->app->bind(SDGReportingInterface::class, SDGReportingRepository::class);
+        $this->app->bind(UserInterface::class, UserRepository::class);
+        $this->app->bind(JobPositionInterface::class, JobPositionRepository::class);
     }
 }

@@ -2,35 +2,29 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
+use App\Repositories\All\User\UserInterface;
 use Illuminate\Support\Facades\Validator;
 
 class RegisteredUserController extends Controller
 {
+    protected $userInterface;
 
-    public function store(Request $request)
+    /**
+     * Constructor injection of UserInterface.
+     *
+     * @param UserInterface $userInterface
+     */
+    public function __construct(UserInterface $userInterface)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email',
-            'mobile' => 'nullable|string|unique:users,mobile',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        $this->userInterface = $userInterface;
+    }
 
-        if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'mobile' => $request->mobile,
-            'password' => ($request->password),
-        ]);
+    public function store(RegisterRequest $request)
+    {
+        $validatedData = $request->validated();
+        $user = $this->userInterface->create($validatedData);
 
         return response()->json([
             'message' => 'User registered successfully!',

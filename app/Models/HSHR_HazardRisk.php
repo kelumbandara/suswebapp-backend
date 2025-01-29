@@ -4,7 +4,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class HSHazardRisk extends Model
+class HSHR_HazardRisk extends Model
 {
     use HasFactory;
 
@@ -39,7 +39,7 @@ class HSHazardRisk extends Model
     protected static function booted()
     {
         static::creating(function ($hazardRisk) {
-            $maxId = HSHazardRisk::max('id') + 1;
+            $maxId = HSHR_HazardRisk::max('id') + 1;
             $hazardRisk->reference_id = 'EHS-' . $maxId;
 
             if ($hazardRisk->status === null) {

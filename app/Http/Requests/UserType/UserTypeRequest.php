@@ -1,16 +1,17 @@
 <?php
-namespace App\Http\Requests\FactoryDeatail;
+
+namespace App\Http\Requests\UserType;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class FactoryPersonRequest extends FormRequest
+class UserTypeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -21,13 +22,7 @@ class FactoryPersonRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required',
-        ];
-    }
-    public function messages()
-    {
-        return [
-            'name.required' => 'Name is required',
+            //
         ];
     }
 }
