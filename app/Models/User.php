@@ -26,7 +26,7 @@ class User extends Authenticatable
         'ResponsibleSection',
         'profileImage',
         'availability',
-        'assignFactory',
+        'assignedFactory',
     ];
 
     protected $hidden = [

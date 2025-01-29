@@ -33,7 +33,7 @@ class RegisterRequest extends FormRequest
             'mobile'            => ['required', 'string', 'max:15', 'unique:users'],
             'department'        => ['nullable', 'string', 'max:255', 'required_if:isCompanyEmployee,true'],
             'jobPosition'       => ['required', 'string', 'max:255'],
-            'assignFactory'     => ['nullable', 'array', 'required_if:isCompanyEmployee,true'],
+            'assignedFactory'     => ['nullable', 'array', 'required_if:isCompanyEmployee,true'],
             'employeeNumber'    => ['nullable', 'string', 'max:255', 'unique:users', 'required_if:isCompanyEmployee,true'],
 
         ];
@@ -52,7 +52,7 @@ class RegisterRequest extends FormRequest
             'mobile.required'            => 'Mobile is required',
             'mobile.unique'              => 'Mobile number already exists.',
             'employeeNumber.required_if' => 'Employee number is required when the user is a company employee.',
-            'assignFactory.required_if'  => 'Assign factory is required when the user is a company employee.',
+            'assignedFactory.required_if'  => 'Assigned factory is required when the user is a company employee.',
             'department.required_if'     => 'Department is required when the user is a company employee.',
             'employeeNumber.unique'      => 'Employee number already exists.',
             'jobPosition.required'       => 'Job position is required.',

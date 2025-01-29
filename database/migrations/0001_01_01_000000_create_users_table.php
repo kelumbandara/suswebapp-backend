@@ -25,7 +25,7 @@ return new class extends Migration
             $table->json('ResponsibleSection')->nullable();
             $table->string('profileImage')->nullable();
             $table->boolean('availability')->default(true);
-            $table->json('assignFactory')->nullable();
+            $table->json('assignedFactory')->nullable();
             $table->timestamps();
         });
 
