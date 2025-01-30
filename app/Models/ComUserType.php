@@ -14,7 +14,7 @@ class ComUserType extends Model
     protected $fillable = [
         'userType',
         'userTypeDescription',
-        'section',
+        'sectionCode',
         'areas',
         'other',
         'status',

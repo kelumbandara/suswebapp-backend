@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Repositories\All\AssigneeLevel\AssigneeLevelInterface;
+use App\Repositories\All\AssigneeLevel\AssigneeLevelRepository;
 use App\Repositories\All\Auditee\AuditeeInterface;
 use App\Repositories\All\Auditee\AuditeeRepository;
 use App\Repositories\All\ComDepartment\DepartmentInterface;
@@ -61,6 +63,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UserInterface::class, UserRepository::class);
         $this->app->bind(JobPositionInterface::class, JobPositionRepository::class);
         $this->app->bind(UserTypeInterface::class, UserTypeRepository::class);
+        $this->app->bind(AssigneeLevelInterface::class, AssigneeLevelRepository::class);
+
 
     }
 }
