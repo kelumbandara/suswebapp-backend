@@ -10,6 +10,7 @@ use App\Http\Controllers\CommonControllers\DepartmentController;
 use App\Http\Controllers\CommonControllers\FactoryController;
 use App\Http\Controllers\CommonControllers\JobPositionController;
 use App\Http\Controllers\CommonControllers\UserTypeController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\FactoryDeatail\FactoryPersonController;
 use App\Http\Controllers\HazardRiskController;
 use App\Http\Controllers\ProcessTypeController;
@@ -34,7 +35,7 @@ Route::get('user-types', [UserTypeController::class, 'index']);
 Route::post('user-types', [UserTypeController::class, 'store']);
 
 Route::post('departments', [DepartmentController::class, 'store']);
-Route::get('departments', [DepartmentController::class, 'show']);
+Route::get('departments', [DepartmentController::class, 'index']);
 
 Route::get('auditees', [AuditeeController::class, 'show']);
 Route::post('auditees', [AuditeeController::class, 'store']);
