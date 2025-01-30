@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\CommonControllers;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Department\DepartmentRequest;
 use App\Repositories\All\ComDepartment\DepartmentInterface;
 
