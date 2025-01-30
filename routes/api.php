@@ -35,7 +35,7 @@ Route::get('user-types', [UserTypeController::class, 'index']);
 Route::post('user-types', [UserTypeController::class, 'store']);
 
 Route::post('departments', [DepartmentController::class, 'store']);
-Route::get('departments', [DepartmentController::class, 'Show']);
+Route::get('departments', [DepartmentController::class, 'show']); 
 
 Route::get('auditees', [AuditeeController::class, 'show']);
 Route::post('auditees', [AuditeeController::class, 'store']);
