@@ -19,4 +19,14 @@ class UserController extends Controller
         return response()->json($request->user());
     }
 
+
+    public function index()
+    {
+        $user = $this->userInterface->All();
+
+        return response()->json([
+            'user' => $user,
+        ], 200);
+    }
+
 }

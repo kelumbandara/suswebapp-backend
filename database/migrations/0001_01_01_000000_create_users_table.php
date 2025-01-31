@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('userType')->nullable()->default('guest');
             $table->string('department')->nullable();
             $table->string('jobPosition')->nullable();
-            $table->json('ResponsibleSection')->nullable();
+            $table->json('responsibleSection')->nullable();
             $table->integer('assigneeLevel')->nullable();
             $table->string('profileImage')->nullable();
             $table->boolean('availability')->default(true);
