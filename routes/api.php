@@ -20,7 +20,9 @@ use Illuminate\Support\Facades\Route;
 Route::post('calculate', [CalculationController::class, 'store']);
 Route::post('register', [RegisteredUserController::class, 'store']);
 
-Route::get('all-users', [AdminController::class, 'index']);
+Route::post('admin', [AdminController::class, 'index']);
+
+Route::get('all-users', [UserController::class, 'index']);
 
 Route::post('login', [LoginController::class, 'login']);
 Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
