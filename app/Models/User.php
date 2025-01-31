@@ -20,6 +20,7 @@ class User extends Authenticatable
         'employeeNumber',
         'mobile',
         'emailVerifiedAt',
+        'otp',
         'userType',
         'department',
         'jobPosition',

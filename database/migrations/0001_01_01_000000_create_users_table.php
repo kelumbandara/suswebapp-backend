@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('employeeNumber')->nullable()->unique();
             $table->string('mobile')->nullable()->unique();
             $table->rememberToken();
+            $table->string('otp')->nullable();
+            $table->timestamp('otp_expires_at')->nullable();
             $table->boolean('emailVerifiedAt')->default(false);
             $table->string('userType')->nullable()->default('guest');
             $table->string('department')->nullable();

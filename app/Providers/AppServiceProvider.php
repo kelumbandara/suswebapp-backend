@@ -49,22 +49,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
-
-        $this->app->bind(HazardRiskInterface::class, HazardRiskRepository::class);
-        $this->app->bind(DocumentInterface::class, DocumentRepository::class);
-        $this->app->bind(InternalAuditInterface::class, InternalAuditRepository::class);
-        $this->app->bind(ExternalAuditInterface::class, ExternalAuditRepository::class);
         $this->app->bind(DepartmentInterface::class, DepartmentRepository::class);
-        $this->app->bind(AuditeeInterface::class, AuditeeRepository::class);
-        $this->app->bind(ProcessTypeInterface::class, ProcessTypeRepository::class);
         $this->app->bind(FactoryInterface::class, FactoryRepository::class);
-        $this->app->bind(FactoryPersonInterface::class, FactoryPersonRepository::class);
-        $this->app->bind(SDGReportingInterface::class, SDGReportingRepository::class);
         $this->app->bind(UserInterface::class, UserRepository::class);
         $this->app->bind(JobPositionInterface::class, JobPositionRepository::class);
         $this->app->bind(UserTypeInterface::class, UserTypeRepository::class);
         $this->app->bind(AssigneeLevelInterface::class, AssigneeLevelRepository::class);
-
-
+        
     }
 }
