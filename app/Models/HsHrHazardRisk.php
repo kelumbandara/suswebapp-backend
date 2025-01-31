@@ -29,4 +29,20 @@ class HsHrHazardRisk extends Model
         'assigneeLevel',
         'responsibleSection',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            $model->referenceNumber = $model->generateReferenceNumber();
+        });
+    }
+
+    private function generateReferenceNumber()
+    {
+        $latest = HsHrHazardRisk::latest()->first();
+        $lastId = $latest ? $latest->id : 0;
+
+        return 'EHS-' . ($lastId + 1);
+    }
+
 }

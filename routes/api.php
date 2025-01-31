@@ -9,6 +9,9 @@ use App\Http\Controllers\CommonControllers\DepartmentController;
 use App\Http\Controllers\CommonControllers\FactoryController;
 use App\Http\Controllers\CommonControllers\JobPositionController;
 use App\Http\Controllers\CommonControllers\UserTypeController;
+use App\Http\Controllers\HealthAndSaftyControllers\HazardAndRiskController;
+use App\Http\Controllers\HealthAndSaftyControllers\HrCategoryController;
+use App\Http\Controllers\HealthAndSaftyControllers\HrDivisionController;
 use App\Http\Controllers\ProcessTypeController;
 
 use App\Http\Controllers\UserController;
@@ -17,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('calculate', [CalculationController::class, 'store']);
 Route::post('register', [RegisteredUserController::class, 'store']);
 
-Route::get('users', [AdminController::class, 'index']);
+Route::get('all-users', [AdminController::class, 'index']);
 
 Route::post('login', [LoginController::class, 'login']);
 Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
@@ -34,8 +37,16 @@ Route::get('departments', [DepartmentController::class, 'index']);
 
 
 
-Route::get('process-types', [ProcessTypeController::class, 'show']);
-Route::post('process-types', [ProcessTypeController::class, 'store']);
+Route::get('hazard-and-risk', [HazardAndRiskController::class, 'show']);
+Route::post('hazard-and-risk', [HazardAndRiskController::class, 'store']);
+
+
+Route::get('hr-categories', [HrCategoryController::class, 'index']);
+Route::post('hr-categories', [HrCategoryController::class, 'store']);
+
+
+Route::get('hr-divisions', [HrDivisionController::class, 'index']);
+Route::post('hr-divisions', [HrDivisionController::class, 'store']);
 
 Route::get('factory', [FactoryController::class, 'show']);
 Route::post('factory', [FactoryController::class, 'store']);

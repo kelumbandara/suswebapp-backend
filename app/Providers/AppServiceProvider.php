@@ -30,6 +30,12 @@ use App\Repositories\All\ComUserType\UserTypeInterface;
 use App\Repositories\All\ComUserType\UserTypeRepository;
 use App\Repositories\All\Factory\FactoryInterface;
 use App\Repositories\All\Factory\FactoryRepository;
+use App\Repositories\All\HazardAndRisk\HazardAndRiskInterface;
+use App\Repositories\All\HazardAndRisk\HazardAndRiskRepository;
+use App\Repositories\All\HRCategory\HRCategoryInterface;
+use App\Repositories\All\HRCategory\HRCategoryRepository;
+use App\Repositories\All\HRDivision\HRDivisionInterface;
+use App\Repositories\All\HRDivision\HRDivisionRepository;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -55,6 +61,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(JobPositionInterface::class, JobPositionRepository::class);
         $this->app->bind(UserTypeInterface::class, UserTypeRepository::class);
         $this->app->bind(AssigneeLevelInterface::class, AssigneeLevelRepository::class);
-        
+        $this->app->bind(HazardAndRiskInterface::class, HazardAndRiskRepository::class);
+        $this->app->bind(HRCategoryInterface::class, HRCategoryRepository::class);
+        $this->app->bind(HRDivisionInterface::class, HRDivisionRepository::class);
+
+
+
     }
 }

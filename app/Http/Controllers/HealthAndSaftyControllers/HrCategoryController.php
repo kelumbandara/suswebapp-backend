@@ -3,63 +3,36 @@
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\HRCategory\HRCategoryRequest;
+use App\Repositories\All\HRCategory\HRCategoryInterface;
 
 class HrCategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $hrCategoryInterface;
+
+    public function __construct(HRCategoryInterface $hrCategoryInterface)
+    {
+        $this->hrCategoryInterface = $hrCategoryInterface;
+    }
+
     public function index()
     {
-        //
+        $category = $this->hrCategoryInterface->All();
+        if ($category->isEmpty()) {
+            return response()->json([
+                'message' => 'No category found.',
+            ], 404);
+        }
+        return response()->json($category);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(HRCategoryRequest $request)
     {
-        //
-    }
+        $category = $this->hrCategoryInterface->create($request->validated());
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json([
+            'message'    => 'category created successfully!',
+            'category' => $category,
+        ], 201);
     }
 }

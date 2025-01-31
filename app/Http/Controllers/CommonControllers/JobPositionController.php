@@ -32,7 +32,7 @@ class JobPositionController extends Controller
 
         return response()->json([
             'message'    => 'JobPosition created successfully!',
-            'department' => $jobPosition,
+            'jobPosition' => $jobPosition,
         ], 201);
     }
 }

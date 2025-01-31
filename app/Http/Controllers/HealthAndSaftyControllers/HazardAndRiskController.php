@@ -3,63 +3,43 @@
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\HazardandRisk\HazardandRiskRequest;
+use App\Repositories\All\HazardAndRisk\HazardAndRiskInterface;
 use Illuminate\Http\Request;
 
 class HazardAndRiskController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
+    protected $hazardAndRiskInterface;
+
+    public function __construct(HazardAndRiskInterface $hazardAndRiskInterface)
+    {
+        $this->hazardAndRiskInterface = $hazardAndRiskInterface;
+    }
+
     public function index()
     {
-        //
+        $hazardRisks = $this->hazardAndRiskInterface->All();
+        if ($hazardRisks->isEmpty()) {
+            return response()->json([
+                'message' => 'No hazard and risk records found.',
+            ], 404);
+        }
+
+        return response()->json($hazardRisks, 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(HazardandRiskRequest $request)
     {
-        //
-    }
+        // Validate the request, create the record through the repository
+        $validatedData = $request->validated();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        // Call the repository method to create a new hazard and risk record
+        $hazardRisk = $this->hazardAndRiskInterface->create($validatedData);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json([
+            'message'    => 'Hazard and risk record created successfully!',
+            'hazardRisk'   => $hazardRisk,
+        ], 201); 
     }
 }
