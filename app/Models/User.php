@@ -24,7 +24,7 @@ class User extends Authenticatable
         'userType',
         'department',
         'jobPosition',
-        'ResponsibleSection',
+        'responsibleSection',
         'assigneeLevel',
         'profileImage',
         'availability',
