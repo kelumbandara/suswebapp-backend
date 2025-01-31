@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('department')->nullable();
             $table->string('jobPosition')->nullable();
             $table->json('ResponsibleSection')->nullable();
-            $table->string('assigneeLevel')->nullable();
+            $table->integer('assigneeLevel')->nullable();
             $table->string('profileImage')->nullable();
             $table->boolean('availability')->default(true);
             $table->json('assignedFactory')->nullable();

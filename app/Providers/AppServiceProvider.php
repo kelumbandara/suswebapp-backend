@@ -10,6 +10,8 @@ use App\Repositories\All\ComDepartment\DepartmentInterface;
 use App\Repositories\All\ComDepartment\DepartmentRepository;
 use App\Repositories\All\ComJobPosition\JobPositionInterface;
 use App\Repositories\All\ComJobPosition\JobPositionRepository;
+use App\Repositories\All\ComResponsibleSection\ComResponsibleSectionInterface;
+use App\Repositories\All\ComResponsibleSection\ComResponsibleSectionRepository;
 use App\Repositories\All\FactoryPerson\FactoryPersonInterface;
 use App\Repositories\All\FactoryPerson\FactoryPersonRepository;
 use App\Repositories\All\HSDocuments\DocumentInterface;
@@ -64,6 +66,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(HazardAndRiskInterface::class, HazardAndRiskRepository::class);
         $this->app->bind(HRCategoryInterface::class, HRCategoryRepository::class);
         $this->app->bind(HRDivisionInterface::class, HRDivisionRepository::class);
+        $this->app->bind(ComResponsibleSectionInterface::class, ComResponsibleSectionRepository::class);
 
 
 

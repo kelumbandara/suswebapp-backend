@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('com_assignee_levels', function (Blueprint $table) {
+        Schema::create('com_responsible_sections', function (Blueprint $table) {
             $table->id();
-            $table->integer('levelId')->nullable();
-            $table->string('levelName')->nullable();
+            $table->string('sectionName')->nullable();
+            $table->json('sectionCode')->nullable();
+            $table->string('responsibleId')->nullable();
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('com_assignee_levels');
+        Schema::dropIfExists('com_responsible_sections');
     }
 };
