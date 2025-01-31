@@ -21,16 +21,11 @@ class UserController extends Controller
 
 
     public function index()
-{
-    $users = $this->userInterface->All()->map(function ($user) {
-        return [
-            'userId' => $user->id,
-            'name' => $user->name,
-            'assigneeLevel' => $user->assigneeLevel,
-            'responsibleSection' => $user->responsibleSection,
-        ];
-    });
+    {
+        $user = $this->userInterface->All();
 
-    return response()->json($users, 201);
-}
+        return response()->json([
+            'user' => $user,
+        ], 200);
+    }
 }
