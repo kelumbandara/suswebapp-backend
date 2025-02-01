@@ -15,18 +15,41 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'mobile',
         'password',
+        'isCompanyEmployee',
+        'employeeNumber',
+        'mobile',
+        'emailVerifiedAt',
+        'otp',
+        'userType',
+        'department',
+        'jobPosition',
+        'responsibleSection',
+        'assigneeLevel',
+        'profileImage',
+        'availability',
+        'assignedFactory',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
-
     protected $casts = [
+        'isCompanyEmployee' => 'boolean',
         'email_verified_at' => 'datetime',
+        'ResponsibleSection' => 'array',
+        'assignedFactory' => 'array',
     ];
+    public function setAssignFactoryAttribute($value)
+    {
+        $this->attributes['assignedFactory'] = json_encode($value);
+        $this->attributes['ResponsibleSection'] = json_encode($value);
+    }
 
-    
+    // Accessor to retrieve assignFactory as an array
+    public function getAssignFactoryAttribute($value)
+    {
+        return json_decode($value, true);
+    }
 }

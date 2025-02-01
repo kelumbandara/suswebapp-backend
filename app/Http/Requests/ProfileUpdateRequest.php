@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests;
 
 use App\Models\User;
@@ -16,7 +15,7 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name'  => ['required', 'string', 'max:255'],
             'email' => [
                 'required',
                 'string',
@@ -30,9 +29,9 @@ class ProfileUpdateRequest extends FormRequest
     public function massage()
     {
         return [
-            'name.required' => 'Name is required',
+            'name.required'  => 'Name is required',
             'email.required' => 'Email is required',
-            'email.unique' => 'Email already exists',
+            'email.unique'   => 'Email already exists',
         ];
     }
 }

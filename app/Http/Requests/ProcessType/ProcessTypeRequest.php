@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\ProcessType;
 
 use Illuminate\Foundation\Http\FormRequest;

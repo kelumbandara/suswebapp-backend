@@ -2,41 +2,36 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Notifications\WelcomeNotification\WelcomeNotification;
+use App\Repositories\All\User\UserInterface;
+use Illuminate\Support\Facades\Notification;
 
 class RegisteredUserController extends Controller
 {
+    protected $userInterface;
 
-    public function store(Request $request)
+    public function __construct(UserInterface $userInterface)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email',
-            'mobile' => 'nullable|string|unique:users,mobile',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        $this->userInterface = $userInterface;
+    }
 
-        if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->errors(),
-            ], 422);
+    public function store(RegisterRequest $request)
+    {
+        $validatedData = $request->validated();
+        $validatedData['isCompanyEmployee'] = (bool) $validatedData['isCompanyEmployee'];
+
+        $user = $this->userInterface->create($validatedData);
+
+        try {
+            Notification::send($user, new WelcomeNotification($user->name));
+        } catch (\Exception $e) {
+            // Handle exception if needed
         }
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'mobile' => $request->mobile,
-            'password' => ($request->password),
-        ]);
 
         return response()->json([
             'message' => 'User registered successfully!',
             'user' => $user,
         ], 201);
     }
-
-
 }
