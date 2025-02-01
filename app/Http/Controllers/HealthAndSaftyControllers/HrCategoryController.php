@@ -38,11 +38,11 @@ class HrCategoryController extends Controller
 
     public function getcategories()
     {
-        // Fetch categories from the database
         $categories = $this->hrCategoryInterface->all(['id', 'categoryName']);
 
-        // Ensure unique categories by categoryName using collection's unique() method
-        $uniqueCategories = $categories->unique('categoryName');
+        $uniqueCategories = $categories->groupBy('categoryName')->map(function ($item) {
+            return $item->first();
+        })->values();
 
         if ($uniqueCategories->isEmpty()) {
             return response()->json([
@@ -53,9 +53,9 @@ class HrCategoryController extends Controller
         return response()->json($uniqueCategories);
     }
 
+
     public function getSubcategories($categoryName)
 {
-    // Fetch subcategories based on categoryName with id and subCategory
     $subcategories = $this->hrCategoryInterface->getByColumn(['categoryName' => $categoryName], ['id', 'subCategory']);
 
     if ($subcategories->isEmpty()) {
@@ -64,13 +64,12 @@ class HrCategoryController extends Controller
         ], 404);
     }
 
-    // Map the subcategories to get the id and subCategory, then make them unique by subCategory
     $uniqueSubcategories = $subcategories->map(function ($item) {
         return [
             'id' => $item->id,
             'subCategory' => $item->subCategory
         ];
-    })->unique('subCategory'); // Ensure unique subCategories
+    })->unique('subCategory');
 
     return response()->json($uniqueSubcategories);
 }
