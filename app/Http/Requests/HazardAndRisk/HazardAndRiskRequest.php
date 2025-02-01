@@ -23,22 +23,23 @@ class HazardAndRiskRequest extends FormRequest
     {
         return [
             'category' => 'required|string|max:255',
-            'subCategory' => 'nullable|string|max:255',
+            'subCategory' => 'required|string|max:255',
             'observationType' => 'nullable|string|max:255',
-            'division' => 'nullable|string|max:255',
+            'division' => 'required|string|max:255',
             'assignee' => 'required|string|max:255',
-            'locationOrDepartment' => 'nullable|string|max:255',
+            'locationOrDepartment' => 'required|string|max:255',
             'subLocation' => 'nullable|string|max:255',
-            'description' => 'required|string',
-            'documents' => 'nullable|url',
+            'description' => 'nullable|string',
+            'documents' => 'nullable|string|max:255',
             'dueDate' => 'nullable|date',
             'condition' => 'nullable|string|max:255',
             'riskLevel' => 'nullable|string|max:255',
             'unsafeActOrCondition' => 'nullable|string|max:255',
-            'status' => 'required|string|max:255',
-            'serverDateAndTime' => 'required|date',
-            'assigneeLevel' => 'required|integer',
-            'responsibleSection' => 'required|string|max:255',
+            'status' => 'nullable|string|max:255',
+            'serverDateAndTime' => 'nullable|date',
+            'assigneeLevel' => 'nullable|integer',
+            'responsibleSection' => 'nullable|string|max:255',
+
         ];
     }
 }

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('observationType')->nullable();
             $table->string('division')->nullable();
             $table->string('assignee')->nullable();
+            $table->string('createdByUser')->nullable();
             $table->string('locationOrDepartment')->nullable();
             $table->string('subLocation')->nullable();
             $table->string('description')->nullable();
@@ -26,8 +27,8 @@ return new class extends Migration
             $table->dateTime('dueDate')->nullable();
             $table->string('condition')->nullable();
             $table->enum('riskLevel', ['Low', 'Medium', 'High'])->default('Low')->nullable();
-            $table->enum('unsafeActOrCondition', ['unsafeAct', 'UnsafeCondition', 'draft'])->default('draft')->nullable();
-            $table->enum('status', ['Open', 'In Progress', 'draft'])->default('draft')->nullable();
+            $table->enum('unsafeActOrCondition', ['Unsafe Act', 'Unsafe Condition'])->default('Unsafe Act')->nullable();
+            $table->enum('status', ['Open',  'draft'])->default('draft')->nullable();
             $table->dateTime('serverDateAndTime')->nullable();
             $table->integer('assigneeLevel')->nullable();
             $table->string('responsibleSection')->nullable()->default('HazardRisks');

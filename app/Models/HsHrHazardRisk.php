@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class HsHrHazardRisk extends Model
 {
     use HasFactory;
+    protected $table = 'hs_hr_hazard_risks';
 
     protected $fillable = [
         'referenceNumber',
@@ -28,6 +29,7 @@ class HsHrHazardRisk extends Model
         'serverDateAndTime',
         'assigneeLevel',
         'responsibleSection',
+        'createdByUser',
     ];
     protected $casts = [
         'dueDate' => 'datetime',

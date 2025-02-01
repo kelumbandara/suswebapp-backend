@@ -2,7 +2,7 @@
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\HazardandRisk\HazardAndRiskRequest;
+use App\Http\Requests\HazardAndRisk\HazardAndRiskRequest;
 use App\Repositories\All\HazardAndRisk\HazardAndRiskInterface;
 use Carbon\Carbon;
 
@@ -29,24 +29,26 @@ class HazardAndRiskController extends Controller
     }
 
     public function store(HazardAndRiskRequest $request)
-{
-    // Validate the request, create the record through the repository
-    $validatedData = $request->validated();
+    {
+        $validatedData = $request->validated();
 
-    // Convert the 'dueDate' to the correct format
-    if (isset($validatedData['dueDate'])) {
-        $validatedData['dueDate'] = Carbon::parse($validatedData['dueDate'])->toDateTimeString();
+        // Convert the `dueDate` and `serverDateAndTime` to correct DateTime format
+        if (isset($validatedData['dueDate'])) {
+            $validatedData['dueDate'] = Carbon::parse($validatedData['dueDate'])->toDateTimeString();
+        }
+
+        if (isset($validatedData['serverDateAndTime'])) {
+            $validatedData['serverDateAndTime'] = Carbon::parse($validatedData['serverDateAndTime'])->toDateTimeString();
+        }
+
+        // Creating the hazard and risk record
+        $hazardRisk = $this->hazardAndRiskInterface->create($validatedData);
+
+        return response()->json([
+            'message'    => 'Hazard and risk record created successfully!',
+            'hazardRisk' => $hazardRisk,
+        ], 201);
     }
-
-    // Call the repository method to create a new hazard and risk record
-    $hazardRisk = $this->hazardAndRiskInterface->create($validatedData);
-
-    return response()->json([
-        'message'    => 'Hazard and risk record created successfully!',
-        'hazardRisk' => $hazardRisk,
-    ], 201);
-}
-
 
     public function show($id)
     {
@@ -61,7 +63,7 @@ class HazardAndRiskController extends Controller
         return response()->json($hazardRisk, 200);
     }
 
-    public function update($id, HazardandRiskRequest $request)
+    public function update($id, HazardAndRiskRequest $request)
     {
         $hazardRisk = $this->hazardAndRiskInterface->findById($id);
 
@@ -78,7 +80,7 @@ class HazardAndRiskController extends Controller
         return response()->json([
             'message'    => 'Hazard and risk record updated successfully!',
             'hazardRisk' => $hazardRisk,
-        ], 200);
+        ], 201);
     }
 
     public function destroy($id)
