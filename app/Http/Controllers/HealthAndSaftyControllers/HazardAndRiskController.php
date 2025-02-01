@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HazardandRisk\HazardandRiskRequest;
 use App\Repositories\All\HazardAndRisk\HazardAndRiskInterface;
-use Illuminate\Http\Request;
 
 class HazardAndRiskController extends Controller
 {
@@ -39,7 +37,70 @@ class HazardAndRiskController extends Controller
 
         return response()->json([
             'message'    => 'Hazard and risk record created successfully!',
-            'hazardRisk'   => $hazardRisk,
-        ], 201); 
+            'hazardRisk' => $hazardRisk,
+        ], 201);
     }
+
+    public function show($id)
+    {
+        $hazardRisk = $this->hazardAndRiskInterface->findById($id);
+
+        if (! $hazardRisk) {
+            return response()->json([
+                'message' => 'Hazard and risk record not found.',
+            ], 404);
+        }
+
+        return response()->json($hazardRisk, 200);
+    }
+
+    public function update($id, HazardandRiskRequest $request)
+    {
+        $hazardRisk = $this->hazardAndRiskInterface->findById($id);
+
+        if (! $hazardRisk) {
+            return response()->json([
+                'message' => 'Hazard and risk record not found.',
+            ], 404);
+        }
+
+        // Validate and update the record through the repository
+        $validatedData = $request->validated();
+        $hazardRisk    = $this->hazardAndRiskInterface->update($id, $validatedData);
+
+        return response()->json([
+            'message'    => 'Hazard and risk record updated successfully!',
+            'hazardRisk' => $hazardRisk,
+        ], 200);
+    }
+
+    public function destroy($id)
+    {
+        $hazardRisk = $this->hazardAndRiskInterface->findById($id);
+
+        if (! $hazardRisk) {
+            return response()->json([
+                'message' => 'Hazard and risk record not found.',
+            ], 404);
+        }
+
+        $this->hazardAndRiskInterface->deleteById($id);
+
+        return response()->json([
+            'message' => 'Hazard and risk record deleted successfully!',
+        ], 200);
+    }
+    public function edit($id)
+    {
+        $hazardRisk = $this->hazardAndRiskInterface->findById($id);
+
+        if (! $hazardRisk) {
+            return response()->json([
+                'message' => 'Hazard and risk record not found.',
+            ], 404);
+        }
+
+        return response()->json($hazardRisk, 200);
+    }
+
 }

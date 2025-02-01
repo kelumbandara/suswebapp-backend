@@ -41,6 +41,11 @@ Route::get('departments', [DepartmentController::class, 'index']);
 
 Route::get('hazard-and-risk', [HazardAndRiskController::class, 'show']);
 Route::post('hazard-and-risk', [HazardAndRiskController::class, 'store']);
+Route::get('/hazard-risk/{id}', [HazardAndRiskController::class, 'show']);
+Route::put('/hazard-risk/{id}', [HazardAndRiskController::class, 'update']);
+Route::patch('/hazard-risk/{id}', [HazardAndRiskController::class, 'update']);
+Route::delete('/hazard-risk/{id}', [HazardAndRiskController::class, 'destroy']);
+Route::get('/hazard-risk/{id}/edit', [HazardAndRiskController::class, 'edit']);
 
 
 Route::get('hr-categories', [HrCategoryController::class, 'index']);
