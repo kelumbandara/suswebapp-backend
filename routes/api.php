@@ -45,6 +45,9 @@ Route::post('hazard-and-risk', [HazardAndRiskController::class, 'store']);
 
 Route::get('hr-categories', [HrCategoryController::class, 'index']);
 Route::post('hr-categories', [HrCategoryController::class, 'store']);
+Route::get('categories', [HrCategoryController::class, 'getcategories']);
+Route::get('categories/{categoryName}/subcategories', [HrCategoryController::class, 'getSubcategories']);
+Route::get('subcategories/{subcategories}/observations', [HrCategoryController::class, 'getObservations']);
 
 
 Route::get('hr-divisions', [HrDivisionController::class, 'index']);

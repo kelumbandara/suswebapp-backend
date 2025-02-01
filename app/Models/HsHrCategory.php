@@ -17,4 +17,19 @@ class HsHrCategory extends Model
         'observationType',
     ];
 
+    public function subcategories()
+    {
+        return $this->hasMany(HsHrCategory::class, 'categoryName', 'categoryName');
+    }
+
+    public function subSubcategories()
+    {
+        return $this->hasMany(HsHrCategory::class, 'subCategory', 'subCategory');
+    }
+
+    public function observations()
+    {
+        return $this->hasMany(HsHrCategory::class, 'subSubCategory', 'subSubCategory');
+    }
+
 }
