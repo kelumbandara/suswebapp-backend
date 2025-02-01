@@ -8,27 +8,33 @@ use Illuminate\Database\Eloquent\Model;
 class HsHrHazardRisk extends Model
 {
     use HasFactory;
+    protected $table = 'hs_hr_hazard_risks';
 
     protected $fillable = [
         'referenceNumber',
-        'categoryName',
+        'category',
         'subCategory',
         'observationType',
-        'divisionName',
-        'assigneeName',
-        'location',
+        'division',
+        'assignee',
+        'locationOrDepartment',
         'subLocation',
         'description',
-        'fileUrl',
+        'documents',
         'dueDate',
         'condition',
         'riskLevel',
-        'unsafeType',
+        'unsafeActOrCondition',
         'status',
         'serverDateAndTime',
         'assigneeLevel',
         'responsibleSection',
+        'createdByUser',
     ];
+    protected $casts = [
+        'dueDate' => 'datetime',
+        'serverDateAndTime' => 'datetime',
+        ];
 
     protected static function booted()
     {

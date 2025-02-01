@@ -2,8 +2,9 @@
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\HazardandRisk\HazardandRiskRequest;
+use App\Http\Requests\HazardAndRisk\HazardAndRiskRequest;
 use App\Repositories\All\HazardAndRisk\HazardAndRiskInterface;
+use Carbon\Carbon;
 
 class HazardAndRiskController extends Controller
 {
@@ -27,12 +28,18 @@ class HazardAndRiskController extends Controller
         return response()->json($hazardRisks, 200);
     }
 
-    public function store(HazardandRiskRequest $request)
+    public function store(HazardAndRiskRequest $request)
     {
-        // Validate the request, create the record through the repository
         $validatedData = $request->validated();
 
-        // Call the repository method to create a new hazard and risk record
+        if (isset($validatedData['dueDate'])) {
+            $validatedData['dueDate'] = Carbon::parse($validatedData['dueDate'])->toDateTimeString();
+        }
+
+        if (isset($validatedData['serverDateAndTime'])) {
+            $validatedData['serverDateAndTime'] = Carbon::parse($validatedData['serverDateAndTime'])->toDateTimeString();
+        }
+
         $hazardRisk = $this->hazardAndRiskInterface->create($validatedData);
 
         return response()->json([
@@ -54,7 +61,7 @@ class HazardAndRiskController extends Controller
         return response()->json($hazardRisk, 200);
     }
 
-    public function update($id, HazardandRiskRequest $request)
+    public function update($id, HazardAndRiskRequest $request)
     {
         $hazardRisk = $this->hazardAndRiskInterface->findById($id);
 
@@ -64,14 +71,13 @@ class HazardAndRiskController extends Controller
             ], 404);
         }
 
-        // Validate and update the record through the repository
         $validatedData = $request->validated();
         $hazardRisk    = $this->hazardAndRiskInterface->update($id, $validatedData);
 
         return response()->json([
             'message'    => 'Hazard and risk record updated successfully!',
             'hazardRisk' => $hazardRisk,
-        ], 200);
+        ], 201);
     }
 
     public function destroy($id)
