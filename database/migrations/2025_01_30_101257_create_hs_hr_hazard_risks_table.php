@@ -14,24 +14,23 @@ return new class extends Migration
         Schema::create('hs_hr_hazard_risks', function (Blueprint $table) {
             $table->id();
             $table->string('referenceNumber')->nullable();
-            $table->string('categoryName')->nullable();
+            $table->string('category')->nullable();
             $table->string('subCategory')->nullable();
             $table->string('observationType')->nullable();
-            $table->string('divisionName')->nullable();
-            $table->string('assigneeName')->nullable();
-            $table->string('location')->nullable();
+            $table->string('division')->nullable();
+            $table->string('assignee')->nullable();
+            $table->string('locationOrDepartment')->nullable();
             $table->string('subLocation')->nullable();
             $table->string('description')->nullable();
-            $table->string('fileUrl')->nullable();
+            $table->string('documents')->nullable();
             $table->dateTime('dueDate')->nullable();
             $table->string('condition')->nullable();
             $table->enum('riskLevel', ['Low', 'Medium', 'High'])->default('Low')->nullable();
-            $table->enum('unsafeType', ['unsafeAct', 'UnsafeCondition', 'draft'])->default('draft')->nullable();
+            $table->enum('unsafeActOrCondition', ['unsafeAct', 'UnsafeCondition', 'draft'])->default('draft')->nullable();
             $table->enum('status', ['Open', 'In Progress', 'draft'])->default('draft')->nullable();
             $table->dateTime('serverDateAndTime')->nullable();
-            $table->string('assigneeLevel')->nullable();
-            $table->string('responsibleSection')->nullable();
-
+            $table->integer('assigneeLevel')->nullable();
+            $table->string('responsibleSection')->nullable()->default('HazardRisks');
             $table->timestamps();
         });
     }
