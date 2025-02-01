@@ -4,6 +4,7 @@ namespace App\Http\Controllers\HealthAndSaftyControllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HazardandRisk\HazardandRiskRequest;
 use App\Repositories\All\HazardAndRisk\HazardAndRiskInterface;
+use Carbon\Carbon;
 
 class HazardAndRiskController extends Controller
 {
@@ -28,18 +29,24 @@ class HazardAndRiskController extends Controller
     }
 
     public function store(HazardandRiskRequest $request)
-    {
-        // Validate the request, create the record through the repository
-        $validatedData = $request->validated();
+{
+    // Validate the request, create the record through the repository
+    $validatedData = $request->validated();
 
-        // Call the repository method to create a new hazard and risk record
-        $hazardRisk = $this->hazardAndRiskInterface->create($validatedData);
-
-        return response()->json([
-            'message'    => 'Hazard and risk record created successfully!',
-            'hazardRisk' => $hazardRisk,
-        ], 201);
+    // Convert the 'dueDate' to the correct format
+    if (isset($validatedData['dueDate'])) {
+        $validatedData['dueDate'] = Carbon::parse($validatedData['dueDate'])->toDateTimeString();
     }
+
+    // Call the repository method to create a new hazard and risk record
+    $hazardRisk = $this->hazardAndRiskInterface->create($validatedData);
+
+    return response()->json([
+        'message'    => 'Hazard and risk record created successfully!',
+        'hazardRisk' => $hazardRisk,
+    ], 201);
+}
+
 
     public function show($id)
     {

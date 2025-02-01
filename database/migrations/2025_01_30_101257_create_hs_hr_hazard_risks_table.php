@@ -23,12 +23,12 @@ return new class extends Migration
             $table->string('subLocation')->nullable();
             $table->string('description')->nullable();
             $table->string('fileUrl')->nullable();
-            $table->date('dueDate')->nullable();
+            $table->dateTime('dueDate')->nullable();
             $table->string('condition')->nullable();
             $table->enum('riskLevel', ['Low', 'Medium', 'High'])->default('Low')->nullable();
             $table->enum('unsafeType', ['unsafeAct', 'UnsafeCondition', 'draft'])->default('draft')->nullable();
             $table->enum('status', ['Open', 'In Progress', 'draft'])->default('draft')->nullable();
-            $table->date('serverDateAndTime')->nullable();
+            $table->dateTime('serverDateAndTime')->nullable();
             $table->string('assigneeLevel')->nullable();
             $table->string('responsibleSection')->nullable();
 

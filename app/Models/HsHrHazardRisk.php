@@ -29,6 +29,10 @@ class HsHrHazardRisk extends Model
         'assigneeLevel',
         'responsibleSection',
     ];
+    protected $casts = [
+        'dueDate' => 'datetime',
+        'serverDateAndTime' => 'datetime',
+        ];
 
     protected static function booted()
     {
