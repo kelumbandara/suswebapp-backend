@@ -48,6 +48,8 @@ Route::post('hr-categories', [HrCategoryController::class, 'store']);
 Route::get('categories', [HrCategoryController::class, 'getcategories']);
 Route::get('categories/{categoryName}/subcategories', [HrCategoryController::class, 'getSubcategories']);
 Route::get('subcategories/{subcategories}/observations', [HrCategoryController::class, 'getObservations']);
+Route::post('store-observation', [HrCategoryController::class, 'storeObservation']);
+
 
 
 Route::get('hr-divisions', [HrDivisionController::class, 'index']);

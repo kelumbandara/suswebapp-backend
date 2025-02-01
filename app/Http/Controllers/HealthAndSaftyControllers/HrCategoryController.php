@@ -4,6 +4,7 @@ namespace App\Http\Controllers\HealthAndSaftyControllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HRCategory\HRCategoryRequest;
 use App\Repositories\All\HRCategory\HRCategoryInterface;
+use Illuminate\Http\Request;
 
 class HrCategoryController extends Controller
 {
@@ -37,7 +38,7 @@ class HrCategoryController extends Controller
 
     public function getcategories()
     {
-        $categories = $this->hrCategoryInterface->all()->pluck('categoryName');
+        $categories = $this->hrCategoryInterface->all(['id', 'categoryName']);
 
         if ($categories->isEmpty()) {
             return response()->json([
@@ -50,7 +51,7 @@ class HrCategoryController extends Controller
 
     public function getSubcategories($categoryName)
     {
-        $subcategories = $this->hrCategoryInterface->getByColumn(['categoryName' => $categoryName]);
+        $subcategories = $this->hrCategoryInterface->getByColumn(['categoryName' => $categoryName], ['id', 'subCategory']);
 
         if ($subcategories->isEmpty()) {
             return response()->json([
@@ -58,27 +59,66 @@ class HrCategoryController extends Controller
             ], 404);
         }
 
-        // Extract unique subCategory names
-        $uniqueSubcategories = $subcategories->pluck('subCategory')->unique()->values();
+        $uniqueSubcategories = $subcategories->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'subCategory' => $item->subCategory
+            ];
+        });
 
         return response()->json($uniqueSubcategories);
     }
 
-
     public function getObservations($subcategories)
-    {
-        $observations = $this->hrCategoryInterface->getByColumn(['subCategory' => $subcategories]);
+{
+    $observations = $this->hrCategoryInterface->getByColumn(['subCategory' => $subcategories], ['id', 'observationType']);
 
-        if ($observations->isEmpty()) {
+    if ($observations->isEmpty()) {
+        return response()->json([
+            'message' => 'No observations found.',
+        ], 404);
+    }
+
+    $uniqueObservations = $observations->map(function ($item) {
+        return [
+            'id' => $item->id,
+            'observationType' => $item->observationType,
+        ];
+    });
+
+    return response()->json($uniqueObservations);
+}
+
+
+    public function storeObservation(Request $request)
+    {
+        $validated = $request->validate([
+            'categoryName'    => 'required|string|exists:hr_categories,categoryName',
+            'subCategory'     => 'required|string|exists:hr_categories,subCategory',
+            'observationType' => 'required|string|unique:hr_categories,observationType',
+        ]);
+
+        $existingCategory = $this->hrCategoryInterface->getByColumn([
+            'categoryName' => $validated['categoryName'],
+            'subCategory'  => $validated['subCategory'],
+        ])->first();
+
+        if (! $existingCategory) {
             return response()->json([
-                'message' => 'No observations found.',
-            ], 404);
+                'message' => 'The selected category and subcategory do not match.',
+            ], 400);
         }
 
-        // Extract unique observation types
-        $uniqueObservations = $observations->pluck('observationType')->unique()->values();
+        $observation = $this->hrCategoryInterface->create([
+            'categoryName'    => $validated['categoryName'],
+            'subCategory'     => $validated['subCategory'],
+            'observationType' => $validated['observationType'],
+        ]);
 
-        return response()->json($uniqueObservations);
+        return response()->json([
+            'message'     => 'Observation type created successfully!',
+            'observation' => $observation,
+        ], 201);
     }
 
 }
