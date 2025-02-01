@@ -32,7 +32,6 @@ class HazardAndRiskController extends Controller
     {
         $validatedData = $request->validated();
 
-        // Convert the `dueDate` and `serverDateAndTime` to correct DateTime format
         if (isset($validatedData['dueDate'])) {
             $validatedData['dueDate'] = Carbon::parse($validatedData['dueDate'])->toDateTimeString();
         }
@@ -41,7 +40,6 @@ class HazardAndRiskController extends Controller
             $validatedData['serverDateAndTime'] = Carbon::parse($validatedData['serverDateAndTime'])->toDateTimeString();
         }
 
-        // Creating the hazard and risk record
         $hazardRisk = $this->hazardAndRiskInterface->create($validatedData);
 
         return response()->json([
@@ -73,7 +71,6 @@ class HazardAndRiskController extends Controller
             ], 404);
         }
 
-        // Validate and update the record through the repository
         $validatedData = $request->validated();
         $hazardRisk    = $this->hazardAndRiskInterface->update($id, $validatedData);
 
