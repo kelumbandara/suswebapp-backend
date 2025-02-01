@@ -2,7 +2,7 @@
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\HazardandRisk\HazardandRiskRequest;
+use App\Http\Requests\HazardandRisk\HazardAndRiskRequest;
 use App\Repositories\All\HazardAndRisk\HazardAndRiskInterface;
 use Carbon\Carbon;
 
@@ -28,7 +28,7 @@ class HazardAndRiskController extends Controller
         return response()->json($hazardRisks, 200);
     }
 
-    public function store(HazardandRiskRequest $request)
+    public function store(HazardAndRiskRequest $request)
 {
     // Validate the request, create the record through the repository
     $validatedData = $request->validated();
