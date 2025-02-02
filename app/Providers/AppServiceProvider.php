@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Repositories\All\AccidentRecord\AccidentRecordInterface;
 use App\Repositories\All\AccidentRecord\AccidentRecordRepository;
+use App\Repositories\All\AccidentWitness\AccidentWitnessInterface;
+use App\Repositories\All\AccidentWitness\AccidentWitnessRepository;
 use App\Repositories\All\AssigneeLevel\AssigneeLevelInterface;
 use App\Repositories\All\AssigneeLevel\AssigneeLevelRepository;
 use App\Repositories\All\ComDepartment\DepartmentInterface;
@@ -54,6 +56,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(HRDivisionInterface::class, HRDivisionRepository::class);
         $this->app->bind(ComResponsibleSectionInterface::class, ComResponsibleSectionRepository::class);
         $this->app->bind(AccidentRecordInterface::class, AccidentRecordRepository::class);
+        $this->app->bind(AccidentWitnessInterface::class, AccidentWitnessRepository::class);
+
 
 
     }

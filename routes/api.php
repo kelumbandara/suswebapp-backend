@@ -10,6 +10,7 @@ use App\Http\Controllers\CommonControllers\FactoryController;
 use App\Http\Controllers\CommonControllers\JobPositionController;
 use App\Http\Controllers\CommonControllers\UserTypeController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentRecordController;
+use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentWitnessController;
 use App\Http\Controllers\HealthAndSaftyControllers\HazardAndRiskController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrCategoryController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrDivisionController;
@@ -63,6 +64,11 @@ Route::post('accidents', [AiAccidentRecordController::class, 'store']);
 Route::get('accidents/{id}', [AiAccidentRecordController::class, 'show']);
 Route::put('accidents/{id}', [AiAccidentRecordController::class, 'update']);
 Route::delete('accidents/{id}', [AiAccidentRecordController::class, 'destroy']);
+
+Route::get('accident-witnesses', [AiAccidentWitnessController::class, 'index']);
+Route::post('accident-witnesses', [AiAccidentWitnessController::class, 'store']);
+Route::get('accident-witnesses/{id}', [AiAccidentWitnessController::class, 'show']);
+Route::delete('accident-witnesses/{id}', [AiAccidentWitnessController::class, 'destroy']);
 
 
 
