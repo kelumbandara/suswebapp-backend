@@ -14,31 +14,34 @@ return new class extends Migration
         Schema::create('hs_ai_accident_records', function (Blueprint $table) {
             $table->id();
             $table->string('referenceNumber')->nullable()->unique();
+            $table->string('createdByUser')->nullable();
             $table->string('division')->nullable();
             $table->string('location')->nullable();
             $table->string('department')->nullable();
-            $table->string('supervisor')->nullable();
+            $table->string('supervisorName')->nullable();
             $table->string('imageUrl')->nullable();
             $table->string('category')->nullable();
             $table->string('subCategory')->nullable();
             $table->string('accidentType')->nullable();
-            $table->string('primaryRegion')->nullable();
-            $table->string('secondaryRegion')->nullable();
-            $table->string('tertiaryRegion')->nullable();
-            $table->string('cause')->nullable();
-            $table->string('hospital')->nullable();
+            $table->string('affectedPrimaryRegion')->nullable();
+            $table->string('affectedSecondaryRegion')->nullable();
+            $table->string('affectedTertiaryRegion')->nullable();
+            $table->string('injuryCause')->nullable();
+            $table->string('consultedHospital')->nullable();
             $table->string('consultedDoctor')->nullable();
             $table->string('description')->nullable();
             $table->enum('status',['draft', 'open', 'closed'])->default('draft')->nullable();
-            $table->string('workPerformance')->nullable();
-            $table->string('accessToken')->nullable();
+            $table->string('workPerformed')->nullable();
+            $table->string('actionTaken')->nullable();
             $table->date('accidentDate')->nullable();
             $table->time('accidentTime')->nullable();
+            $table->date('reportedDate')->nullable();
             $table->string('injuryType')->nullable();
             $table->string('severity')->nullable();
             $table->string('assignee')->nullable();
             $table->date('expectedDate')->nullable();
             $table->time('expectedTime')->nullable();
+
             $table->timestamps();
         });
     }
