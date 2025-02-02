@@ -2,30 +2,16 @@
 
 namespace App\Providers;
 
+use App\Repositories\All\AccidentRecord\AccidentRecordInterface;
+use App\Repositories\All\AccidentRecord\AccidentRecordRepository;
 use App\Repositories\All\AssigneeLevel\AssigneeLevelInterface;
 use App\Repositories\All\AssigneeLevel\AssigneeLevelRepository;
-use App\Repositories\All\Auditee\AuditeeInterface;
-use App\Repositories\All\Auditee\AuditeeRepository;
 use App\Repositories\All\ComDepartment\DepartmentInterface;
 use App\Repositories\All\ComDepartment\DepartmentRepository;
 use App\Repositories\All\ComJobPosition\JobPositionInterface;
 use App\Repositories\All\ComJobPosition\JobPositionRepository;
 use App\Repositories\All\ComResponsibleSection\ComResponsibleSectionInterface;
 use App\Repositories\All\ComResponsibleSection\ComResponsibleSectionRepository;
-use App\Repositories\All\FactoryPerson\FactoryPersonInterface;
-use App\Repositories\All\FactoryPerson\FactoryPersonRepository;
-use App\Repositories\All\HSDocuments\DocumentInterface;
-use App\Repositories\All\HSDocuments\DocumentRepository;
-use App\Repositories\All\HSHazardRisks\HazardRiskInterface;
-use App\Repositories\All\HSHazardRisks\HazardRiskRepository;
-use App\Repositories\All\ProcessType\ProcessTypeInterface;
-use App\Repositories\All\ProcessType\ProcessTypeRepository;
-use App\Repositories\All\SAExternalAudits\ExternalAuditInterface;
-use App\Repositories\All\SAExternalAudits\ExternalAuditRepository;
-use App\Repositories\All\SAInternalAudits\InternalAuditInterface;
-use App\Repositories\All\SAInternalAudits\InternalAuditRepository;
-use App\Repositories\All\SDGReporting\SDGReportingInterface;
-use App\Repositories\All\SDGReporting\SDGReportingRepository;
 use App\Repositories\All\User\UserInterface;
 use App\Repositories\All\User\UserRepository;
 use App\Repositories\All\ComUserType\UserTypeInterface;
@@ -67,7 +53,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(HRCategoryInterface::class, HRCategoryRepository::class);
         $this->app->bind(HRDivisionInterface::class, HRDivisionRepository::class);
         $this->app->bind(ComResponsibleSectionInterface::class, ComResponsibleSectionRepository::class);
-
+        $this->app->bind(AccidentRecordInterface::class, AccidentRecordRepository::class);
 
 
     }

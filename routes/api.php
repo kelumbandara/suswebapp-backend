@@ -9,6 +9,7 @@ use App\Http\Controllers\CommonControllers\DepartmentController;
 use App\Http\Controllers\CommonControllers\FactoryController;
 use App\Http\Controllers\CommonControllers\JobPositionController;
 use App\Http\Controllers\CommonControllers\UserTypeController;
+use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentRecordController;
 use App\Http\Controllers\HealthAndSaftyControllers\HazardAndRiskController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrCategoryController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrDivisionController;
@@ -37,7 +38,8 @@ Route::post('user-types', [UserTypeController::class, 'store']);
 Route::post('departments', [DepartmentController::class, 'store']);
 Route::get('departments', [DepartmentController::class, 'index']);
 
-
+Route::get('factory', [FactoryController::class, 'show']);
+Route::post('factory', [FactoryController::class, 'store']);
 
 Route::get('hazard-and-risk', [HazardAndRiskController::class, 'index']);
 Route::post('hazard-and-risk', [HazardAndRiskController::class, 'store']);
@@ -53,14 +55,15 @@ Route::get('categories', [HrCategoryController::class, 'getcategories']);
 Route::get('categories/{categoryName}/subcategories', [HrCategoryController::class, 'getSubcategories']);
 Route::get('subcategories/{subcategories}/observations', [HrCategoryController::class, 'getObservations']);
 Route::post('store-observation', [HrCategoryController::class, 'storeObservation']);
-
-
-
 Route::get('hr-divisions', [HrDivisionController::class, 'index']);
 Route::post('hr-divisions', [HrDivisionController::class, 'store']);
 
-Route::get('factory', [FactoryController::class, 'show']);
-Route::post('factory', [FactoryController::class, 'store']);
+Route::get('accidents', [AiAccidentRecordController::class, 'index']);
+Route::post('accidents', [AiAccidentRecordController::class, 'store']);
+Route::get('accidents/{id}', [AiAccidentRecordController::class, 'show']);
+Route::put('accidents/{id}', [AiAccidentRecordController::class, 'update']);
+Route::delete('accidents/{id}', [AiAccidentRecordController::class, 'destroy']);
+
 
 
 
