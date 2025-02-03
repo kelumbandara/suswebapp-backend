@@ -45,9 +45,9 @@ Route::post('factory', [FactoryController::class, 'store']);
 
 Route::get('hazard-and-risk', [HazardAndRiskController::class, 'index']);
 Route::post('hazard-and-risk', [HazardAndRiskController::class, 'store']);
-Route::get('hazard-risk/{id}', [HazardAndRiskController::class, 'show']);
-Route::put('hazard-risk/{id}', [HazardAndRiskController::class, 'update']);
-Route::delete('hazard-risk/{id}', [HazardAndRiskController::class, 'destroy']);
+Route::get('hazard-risk/{id}/show', [HazardAndRiskController::class, 'show']);
+Route::put('hazard-risk/{id}/update', [HazardAndRiskController::class, 'update']);
+Route::delete('hazard-risk/{id}/delete', [HazardAndRiskController::class, 'destroy']);
 Route::get('hazard-risk/{id}/edit', [HazardAndRiskController::class, 'edit']);
 
 
@@ -62,20 +62,20 @@ Route::post('hr-divisions', [HrDivisionController::class, 'store']);
 
 Route::get('accidents', [AiAccidentRecordController::class, 'index']);
 Route::post('accidents', [AiAccidentRecordController::class, 'store']);
-Route::get('accidents/{id}', [AiAccidentRecordController::class, 'show']);
-Route::put('accidents/{id}', [AiAccidentRecordController::class, 'update']);
-Route::delete('accidents/{id}', [AiAccidentRecordController::class, 'destroy']);
+Route::get('accidents/{id}/show', [AiAccidentRecordController::class, 'show']);
+Route::put('accidents/{id}/update', [AiAccidentRecordController::class, 'update']);
+Route::delete('accidents/{id}/delete', [AiAccidentRecordController::class, 'destroy']);
 
 Route::get('accident-witnesses', [AiAccidentWitnessController::class, 'index']);
 Route::post('accident-witnesses', [AiAccidentWitnessController::class, 'store']);
-Route::get('accident-witnesses/{id}', [AiAccidentWitnessController::class, 'show']);
-Route::delete('accident-witnesses/{id}', [AiAccidentWitnessController::class, 'destroy']);
+Route::get('accident-witnesses/{id}/show', [AiAccidentWitnessController::class, 'show']);
+Route::delete('accident-witnesses/{id}/delete', [AiAccidentWitnessController::class, 'destroy']);
 
 Route::get('accident-people', [AiAccidentPeopleController::class, 'index']);
 Route::post('accident-people', [AiAccidentPeopleController::class, 'store']);
-Route::get('accident-people/{id}', [AiAccidentPeopleController::class, 'show']);
-Route::put('accident-people/{id}', [AiAccidentPeopleController::class, 'update']);
-Route::delete('accident-people/{id}', [AiAccidentPeopleController::class, 'destroy']); 
+Route::get('accident-people/{id}/show', [AiAccidentPeopleController::class, 'show']);
+Route::put('accident-people/{id}/update', [AiAccidentPeopleController::class, 'update']);
+Route::delete('accident-people/{id}/delete', [AiAccidentPeopleController::class, 'destroy']);
 
 
 

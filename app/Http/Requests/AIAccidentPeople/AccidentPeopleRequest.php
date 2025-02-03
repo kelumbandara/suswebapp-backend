@@ -29,7 +29,7 @@ class AccidentPeopleRequest extends FormRequest
             'age'         => 'required|integer|min:0',
             'dateOfJoin'  => 'nullable|date',
             'duration'    => 'nullable|integer',
-            'experience'  => 'required|string|in:skill,unskilled,semiskilled,draft', // Updated validation
+            'experience'  => 'required|string|in:skill,unskilled,semiskilled,draft', 
             'designation' => 'nullable|string|max:255',
         ];
     }
