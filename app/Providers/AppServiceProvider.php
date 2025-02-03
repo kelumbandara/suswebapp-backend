@@ -14,6 +14,8 @@ use App\Repositories\All\ComDepartment\DepartmentInterface;
 use App\Repositories\All\ComDepartment\DepartmentRepository;
 use App\Repositories\All\ComJobPosition\JobPositionInterface;
 use App\Repositories\All\ComJobPosition\JobPositionRepository;
+use App\Repositories\All\ComPersonType\PersonTypeInterface;
+use App\Repositories\All\ComPersonType\PersonTypeRepository;
 use App\Repositories\All\ComResponsibleSection\ComResponsibleSectionInterface;
 use App\Repositories\All\ComResponsibleSection\ComResponsibleSectionRepository;
 use App\Repositories\All\User\UserInterface;
@@ -47,6 +49,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
+        
         $this->app->bind(DepartmentInterface::class, DepartmentRepository::class);
         $this->app->bind(FactoryInterface::class, FactoryRepository::class);
         $this->app->bind(UserInterface::class, UserRepository::class);
@@ -60,6 +63,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AccidentRecordInterface::class, AccidentRecordRepository::class);
         $this->app->bind(AccidentWitnessInterface::class, AccidentWitnessRepository::class);
         $this->app->bind(AccidentPeopleInterface::class, AccidentPeopleRepository::class);
+        $this->app->bind(PersonTypeInterface::class, PersonTypeRepository::class);
 
 
 

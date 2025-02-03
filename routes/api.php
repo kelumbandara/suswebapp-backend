@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CommonControllers\DepartmentController;
 use App\Http\Controllers\CommonControllers\FactoryController;
 use App\Http\Controllers\CommonControllers\JobPositionController;
+use App\Http\Controllers\CommonControllers\PersonTypeController;
 use App\Http\Controllers\CommonControllers\UserTypeController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentPeopleController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentRecordController;
@@ -42,6 +43,9 @@ Route::get('departments', [DepartmentController::class, 'index']);
 
 Route::get('factory', [FactoryController::class, 'show']);
 Route::post('factory', [FactoryController::class, 'store']);
+
+Route::get('person-types', [PersonTypeController::class, 'index']);
+Route::post('person-types', [PersonTypeController::class, 'store']);
 
 Route::get('hazard-and-risk', [HazardAndRiskController::class, 'index']);
 Route::post('hazard-and-risk', [HazardAndRiskController::class, 'store']);
