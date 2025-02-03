@@ -95,5 +95,4 @@ Route::get('user-permissions/{id}/show', [ComPermissionController::class, 'show'
 Route::put('user-permissions/{id}/update', [ComPermissionController::class, 'update']);
 Route::delete('user-permissions/{id}/delete', [ComPermissionController::class, 'destroy']);
 
-
 Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'show']);
