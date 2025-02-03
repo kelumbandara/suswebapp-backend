@@ -5,17 +5,25 @@ use App\Http\Controllers\api\CalculationController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\CommonControllers\ComPermissionController;
 use App\Http\Controllers\CommonControllers\DepartmentController;
 use App\Http\Controllers\CommonControllers\FactoryController;
 use App\Http\Controllers\CommonControllers\JobPositionController;
+use App\Http\Controllers\CommonControllers\PersonTypeController;
 use App\Http\Controllers\CommonControllers\UserTypeController;
+use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentCategoryController;
+use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentInjuryTypeController;
+use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentPeopleController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentRecordController;
+use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentTypeController;
+use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentWitnessController;
 use App\Http\Controllers\HealthAndSaftyControllers\HazardAndRiskController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrCategoryController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrDivisionController;
 use App\Http\Controllers\ProcessTypeController;
 
 use App\Http\Controllers\UserController;
+use App\Repositories\All\AccidentCategory\AccidentCategoryInterface;
 use Illuminate\Support\Facades\Route;
 
 Route::post('calculate', [CalculationController::class, 'store']);
@@ -41,11 +49,28 @@ Route::get('departments', [DepartmentController::class, 'index']);
 Route::get('factory', [FactoryController::class, 'show']);
 Route::post('factory', [FactoryController::class, 'store']);
 
+Route::get('person-types', [PersonTypeController::class, 'index']);
+Route::post('person-types', [PersonTypeController::class, 'store']);
+
+Route::post('accident-categories', [AiAccidentCategoryController::class, 'store']);
+Route::get('accident-categories', [AiAccidentCategoryController::class, 'getCategories']);
+Route::get('accident-categories/{categoryName}/subcategories', [AiAccidentCategoryController::class, 'getSubcategories']);
+
+
+Route::get('accident-types', [AiAccidentTypeController::class, 'index']);
+Route::post('accident-types', [AiAccidentTypeController::class, 'store']);
+
+Route::get('accident-injury', [AiAccidentInjuryTypeController::class, 'index']);
+Route::post('accident-injury', [AiAccidentInjuryTypeController::class, 'store']);
+
+
+
+
 Route::get('hazard-and-risk', [HazardAndRiskController::class, 'index']);
 Route::post('hazard-and-risk', [HazardAndRiskController::class, 'store']);
-Route::get('hazard-risk/{id}', [HazardAndRiskController::class, 'show']);
-Route::put('hazard-risk/{id}', [HazardAndRiskController::class, 'update']);
-Route::delete('hazard-risk/{id}', [HazardAndRiskController::class, 'destroy']);
+Route::get('hazard-risk/{id}/show', [HazardAndRiskController::class, 'show']);
+Route::put('hazard-risk/{id}/update', [HazardAndRiskController::class, 'update']);
+Route::delete('hazard-risk/{id}/delete', [HazardAndRiskController::class, 'destroy']);
 Route::get('hazard-risk/{id}/edit', [HazardAndRiskController::class, 'edit']);
 
 
@@ -60,11 +85,14 @@ Route::post('hr-divisions', [HrDivisionController::class, 'store']);
 
 Route::get('accidents', [AiAccidentRecordController::class, 'index']);
 Route::post('accidents', [AiAccidentRecordController::class, 'store']);
-Route::get('accidents/{id}', [AiAccidentRecordController::class, 'show']);
-Route::put('accidents/{id}', [AiAccidentRecordController::class, 'update']);
-Route::delete('accidents/{id}', [AiAccidentRecordController::class, 'destroy']);
+Route::get('accidents/{id}/show', [AiAccidentRecordController::class, 'show']);
+Route::put('accidents/{id}/update', [AiAccidentRecordController::class, 'update']);
+Route::delete('accidents/{id}/delete', [AiAccidentRecordController::class, 'destroy']);
 
+Route::get('user-permissions', [ComPermissionController::class, 'index']);
+Route::post('user-permissions', [ComPermissionController::class, 'store']);
+Route::get('user-permissions/{id}/show', [ComPermissionController::class, 'show']);
+Route::put('user-permissions/{id}/update', [ComPermissionController::class, 'update']);
+Route::delete('user-permissions/{id}/delete', [ComPermissionController::class, 'destroy']);
 
-
-
-Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'show']);
+Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);

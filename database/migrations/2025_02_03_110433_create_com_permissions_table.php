@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('hs_ai_accident_categories', function (Blueprint $table) {
+        Schema::create('com_permissions', function (Blueprint $table) {
             $table->id();
-            $table->string('categoryName')->nullable();
-            $table->string('subCategoryName')->nullable();
+            $table->string('userType')->unique();
+            $table->text('description')->nullable();
+            $table->json('permissionObject');
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('hs_ai_accident_categories');
+        Schema::dropIfExists('com_permissions');
     }
 };

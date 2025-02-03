@@ -2,14 +2,28 @@
 
 namespace App\Providers;
 
+use App\Repositories\All\AccidentCategory\AccidentCategoryInterface;
+use App\Repositories\All\AccidentCategory\AccidentCategoryRepository;
+use App\Repositories\All\AccidentInjuryType\AccidentInjuryTypeInterface;
+use App\Repositories\All\AccidentInjuryType\AccidentInjuryTypeRepository;
+use App\Repositories\All\AccidentPeople\AccidentPeopleInterface;
+use App\Repositories\All\AccidentPeople\AccidentPeopleRepository;
 use App\Repositories\All\AccidentRecord\AccidentRecordInterface;
 use App\Repositories\All\AccidentRecord\AccidentRecordRepository;
+use App\Repositories\All\AccidentType\AccidentTypeInterface;
+use App\Repositories\All\AccidentType\AccidentTypeRepository;
+use App\Repositories\All\AccidentWitness\AccidentWitnessInterface;
+use App\Repositories\All\AccidentWitness\AccidentWitnessRepository;
 use App\Repositories\All\AssigneeLevel\AssigneeLevelInterface;
 use App\Repositories\All\AssigneeLevel\AssigneeLevelRepository;
 use App\Repositories\All\ComDepartment\DepartmentInterface;
 use App\Repositories\All\ComDepartment\DepartmentRepository;
 use App\Repositories\All\ComJobPosition\JobPositionInterface;
 use App\Repositories\All\ComJobPosition\JobPositionRepository;
+use App\Repositories\All\ComPermission\ComPermissionInterface;
+use App\Repositories\All\ComPermission\ComPermissionRepository;
+use App\Repositories\All\ComPersonType\PersonTypeInterface;
+use App\Repositories\All\ComPersonType\PersonTypeRepository;
 use App\Repositories\All\ComResponsibleSection\ComResponsibleSectionInterface;
 use App\Repositories\All\ComResponsibleSection\ComResponsibleSectionRepository;
 use App\Repositories\All\User\UserInterface;
@@ -43,6 +57,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
+
         $this->app->bind(DepartmentInterface::class, DepartmentRepository::class);
         $this->app->bind(FactoryInterface::class, FactoryRepository::class);
         $this->app->bind(UserInterface::class, UserRepository::class);
@@ -54,6 +69,16 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(HRDivisionInterface::class, HRDivisionRepository::class);
         $this->app->bind(ComResponsibleSectionInterface::class, ComResponsibleSectionRepository::class);
         $this->app->bind(AccidentRecordInterface::class, AccidentRecordRepository::class);
+        $this->app->bind(AccidentWitnessInterface::class, AccidentWitnessRepository::class);
+        $this->app->bind(AccidentPeopleInterface::class, AccidentPeopleRepository::class);
+        $this->app->bind(PersonTypeInterface::class, PersonTypeRepository::class);
+        $this->app->bind(AccidentCategoryInterface::class, AccidentCategoryRepository::class);
+        $this->app->bind(AccidentTypeInterface::class, AccidentTypeRepository::class);
+        $this->app->bind(AccidentInjuryTypeInterface::class, AccidentInjuryTypeRepository::class);
+        $this->app->bind(ComPermissionInterface::class, ComPermissionRepository::class);
+
+
+
 
 
     }
