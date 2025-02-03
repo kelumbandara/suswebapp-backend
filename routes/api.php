@@ -5,6 +5,7 @@ use App\Http\Controllers\api\CalculationController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\CommonControllers\ComPermissionController;
 use App\Http\Controllers\CommonControllers\DepartmentController;
 use App\Http\Controllers\CommonControllers\FactoryController;
 use App\Http\Controllers\CommonControllers\JobPositionController;
@@ -88,17 +89,11 @@ Route::get('accidents/{id}/show', [AiAccidentRecordController::class, 'show']);
 Route::put('accidents/{id}/update', [AiAccidentRecordController::class, 'update']);
 Route::delete('accidents/{id}/delete', [AiAccidentRecordController::class, 'destroy']);
 
-Route::get('accident-witnesses', [AiAccidentWitnessController::class, 'index']);
-Route::post('accident-witnesses', [AiAccidentWitnessController::class, 'store']);
-Route::get('accident-witnesses/{id}/show', [AiAccidentWitnessController::class, 'show']);
-Route::delete('accident-witnesses/{id}/delete', [AiAccidentWitnessController::class, 'destroy']);
-
-Route::get('accident-people', [AiAccidentPeopleController::class, 'index']);
-Route::post('accident-people', [AiAccidentPeopleController::class, 'store']);
-Route::get('accident-people/{id}/show', [AiAccidentPeopleController::class, 'show']);
-Route::put('accident-people/{id}/update', [AiAccidentPeopleController::class, 'update']);
-Route::delete('accident-people/{id}/delete', [AiAccidentPeopleController::class, 'destroy']);
-
+Route::get('user-permissions', [ComPermissionController::class, 'index']);
+Route::post('user-permissions', [ComPermissionController::class, 'store']);
+Route::get('user-permissions/{id}/show', [ComPermissionController::class, 'show']);
+Route::put('user-permissions/{id}/update', [ComPermissionController::class, 'update']);
+Route::delete('user-permissions/{id}/delete', [ComPermissionController::class, 'destroy']);
 
 
 Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'show']);

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\AccidentRecord;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,31 +21,34 @@ class AccidentRecordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'division' => 'required|string',
-            'location' => 'required|string',
-            'department' => 'nullable|string',
-            'supervisorName' => 'required|string',
-            'imageUrl' => 'nullable|string',
-            'category' => 'required|string',
-            'subCategory' => 'required|string',
-            'accidentType' => 'required|string',
-            'affectedPrimaryRegion' => 'nullable|string',
-            'affectedSecondaryRegion' => 'nullable|string',
-            'affectedTertiaryRegion' => 'nullable|string',
-            'injuryCause' => 'nullable|string',
-            'consultedHospital' => 'nullable|string',
-            'consultedDoctor' => 'nullable|string',
-            'description' => 'required|string',
-            'workPerformed' => 'nullable|string',
-            'actionTaken' => 'nullable|string',
-            'accidentDate' => 'required|date',
-            'accidentTime' => 'nullable|time',
-            'reportedDate' => 'nullable|date',
-            'injuryType' => 'nullable|string',
-            'severity' => 'nullable|string',
-            'assignee' => 'required|string',
-            'expectedDate' => 'nullable|date',
-            'expectedTime' => 'nullable|time',
+            'division'                      => 'required|string',
+            'location'                      => 'required|string',
+            'department'                    => 'nullable|string',
+            'supervisorName'                => 'required|string',
+            'imageUrl'                      => 'nullable|string',
+            'category'                      => 'required|string',
+            'subCategory'                   => 'required|string',
+            'accidentType'                  => 'required|string',
+            'description'                   => 'required|string',
+            'accidentDate'                  => 'required|date',
+            'reportedDate'                  => 'nullable|date',
+            'assignee'                      => 'required|string',
+            'witnesses'                     => 'nullable|array',
+            'witnesses.*.employeeId'        => 'required|string',
+            'witnesses.*.employeeName'      => 'required|string',
+            'witnesses.*.division'          => 'required|string',
+            'witnesses.*.department'        => 'nullable|string',
+            'people_involved'               => 'nullable|array',
+            'people_involved.*.personType'  => 'required|string',
+            'people_involved.*.employeeId'  => 'nullable|integer',
+            'people_involved.*.personName'  => 'required|string',
+            'people_involved.*.gender'      => 'nullable|string|in:male,female,other',
+            'people_involved.*.age'         => 'required|integer|min:0',
+            'people_involved.*.dateOfJoin'  => 'nullable|date',
+            'people_involved.*.duration'    => 'nullable|integer',
+            'people_involved.*.experience'  => 'nullable|string|in:skill,unskilled,semiskilled,draft',
+            'people_involved.*.designation' => 'nullable|string|max:255',
         ];
     }
+
 }

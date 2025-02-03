@@ -20,6 +20,8 @@ use App\Repositories\All\ComDepartment\DepartmentInterface;
 use App\Repositories\All\ComDepartment\DepartmentRepository;
 use App\Repositories\All\ComJobPosition\JobPositionInterface;
 use App\Repositories\All\ComJobPosition\JobPositionRepository;
+use App\Repositories\All\ComPermission\ComPermissionInterface;
+use App\Repositories\All\ComPermission\ComPermissionRepository;
 use App\Repositories\All\ComPersonType\PersonTypeInterface;
 use App\Repositories\All\ComPersonType\PersonTypeRepository;
 use App\Repositories\All\ComResponsibleSection\ComResponsibleSectionInterface;
@@ -73,6 +75,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AccidentCategoryInterface::class, AccidentCategoryRepository::class);
         $this->app->bind(AccidentTypeInterface::class, AccidentTypeRepository::class);
         $this->app->bind(AccidentInjuryTypeInterface::class, AccidentInjuryTypeRepository::class);
+        $this->app->bind(ComPermissionInterface::class, ComPermissionRepository::class);
+
 
 
 

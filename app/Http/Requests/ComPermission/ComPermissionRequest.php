@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\AIAccidentWitness;
+namespace App\Http\Requests\ComPermission;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AccidentWitnessRequest extends FormRequest
+class ComPermissionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,12 +22,9 @@ class AccidentWitnessRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'accidentId' => 'nullable|integer|exists:hs_ai_accident_records,id',
-            'employeeId' => 'required|string',
-            'employeeName' => 'required|string',
-            'division' => 'required|string',
-            'department' => 'nullable|string',
+            'userType' => 'required|string|unique:com_permissions,userType',
+            'description' => 'nullable|string',
+            'permissionObject' => 'required|array',
         ];
-
     }
 }
