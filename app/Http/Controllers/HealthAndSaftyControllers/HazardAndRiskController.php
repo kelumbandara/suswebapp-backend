@@ -4,21 +4,46 @@ namespace App\Http\Controllers\HealthAndSaftyControllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HazardAndRisk\HazardAndRiskRequest;
 use App\Repositories\All\HazardAndRisk\HazardAndRiskInterface;
+use App\Repositories\All\HRDivision\HRDivisionInterface;
+use App\Repositories\All\User\UserInterface;
 use Carbon\Carbon;
 
 class HazardAndRiskController extends Controller
 {
 
     protected $hazardAndRiskInterface;
+    protected $userInterface;
+    protected $HRDivisionInterface;
 
-    public function __construct(HazardAndRiskInterface $hazardAndRiskInterface)
+    public function __construct(HazardAndRiskInterface $hazardAndRiskInterface, UserInterface $userInterface, HRDivisionInterface $HRDivisionInterface)
     {
         $this->hazardAndRiskInterface = $hazardAndRiskInterface;
+        $this->userInterface          = $userInterface;
+        $this->HRDivisionInterface    = $HRDivisionInterface;
     }
 
     public function index()
     {
         $hazardRisks = $this->hazardAndRiskInterface->All();
+
+        $hazardRisks = $hazardRisks->map(function ($risk) {
+            try {
+                $user               = $this->userInterface->getById($risk->assignee);
+                $risk->assigneeName = $user ? $user->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->assigneeName = 'Unknown';
+            }
+
+            try {
+                $division             = $this->HRDivisionInterface->getById($risk->division);
+                $risk->HSdivisionName = $division ? $division->divisionName : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->HSdivisionName = 'Unknown';
+            }
+
+            return $risk;
+        });
+
         if ($hazardRisks->isEmpty()) {
             return response()->json([
                 'message' => 'No hazard and risk records found.',
