@@ -23,6 +23,7 @@ class AccidentCategoryRequest extends FormRequest
     {
         return [
             'categoryName' => 'required|string',
+            'subCategoryName' => 'required|string',
         ];
     }
 }

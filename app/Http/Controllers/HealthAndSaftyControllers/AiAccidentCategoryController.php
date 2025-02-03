@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
@@ -10,32 +9,49 @@ class AiAccidentCategoryController extends Controller
 {
     protected $accidentCategoryInterface;
 
-    /**
-     * Inject the AccidentPeopleInterface dependency.
-     */
     public function __construct(AccidentCategoryInterface $accidentCategoryInterface)
     {
         $this->accidentCategoryInterface = $accidentCategoryInterface;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $category = $this->accidentCategoryInterface->all();
-        return response()->json($category);
-    }
-
-
     public function store(AccidentCategoryRequest $request)
     {
-        $data = $request->validated();
+        $data     = $request->validated();
         $category = $this->accidentCategoryInterface->create($data);
         return response()->json([
             'message' => 'Accident category created successfully',
-            'data' => $category
+            'data'    => $category,
         ], 201);
+    }
+
+    public function getCategories()
+    {
+        $categories = $this->accidentCategoryInterface->all(['id', 'categoryName']);
+
+        $uniqueCategories = $categories->groupBy('categoryName')->map(function ($item) {
+            return $item->first();
+        })->values();
+
+        if ($uniqueCategories->isEmpty()) {
+            return response()->json([
+                'message' => 'No category found.',
+            ], 404);
+        }
+
+        return response()->json($uniqueCategories);
+    }
+
+    public function getSubcategories($categoryName)
+    {
+        $subcategories = $this->accidentCategoryInterface->getByColumn(['categoryName' => $categoryName], ['id', 'subCategoryName']);
+
+        if ($subcategories->isEmpty()) {
+            return response()->json([
+                'message' => 'No subcategories found for this category.',
+            ], 404);
+        }
+
+        return response()->json($subcategories);
     }
 
 }

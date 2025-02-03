@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('hs_ai_accident_categories', function (Blueprint $table) {
             $table->id();
             $table->string('categoryName')->nullable();
+            $table->string('subCategoryName')->nullable();
             $table->timestamps();
         });
     }

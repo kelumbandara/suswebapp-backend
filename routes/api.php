@@ -51,8 +51,10 @@ Route::post('factory', [FactoryController::class, 'store']);
 Route::get('person-types', [PersonTypeController::class, 'index']);
 Route::post('person-types', [PersonTypeController::class, 'store']);
 
-Route::get('accident-categories', [AiAccidentCategoryController::class, 'index']);
 Route::post('accident-categories', [AiAccidentCategoryController::class, 'store']);
+Route::get('accident-categories', [AiAccidentCategoryController::class, 'getCategories']);
+Route::get('accident-categories/{categoryName}/subcategories', [AiAccidentCategoryController::class, 'getSubcategories']);
+
 
 Route::get('accident-types', [AiAccidentTypeController::class, 'index']);
 Route::post('accident-types', [AiAccidentTypeController::class, 'store']);

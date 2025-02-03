@@ -13,6 +13,7 @@ class HsAiAccidentCategory extends Model
 
     protected $fillable = [
         'categoryName',
+        'subCategoryName'
     ];
 
 }
