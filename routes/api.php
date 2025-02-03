@@ -10,8 +10,11 @@ use App\Http\Controllers\CommonControllers\FactoryController;
 use App\Http\Controllers\CommonControllers\JobPositionController;
 use App\Http\Controllers\CommonControllers\PersonTypeController;
 use App\Http\Controllers\CommonControllers\UserTypeController;
+use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentCategoryController;
+use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentInjuryTypeController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentPeopleController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentRecordController;
+use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentTypeController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentWitnessController;
 use App\Http\Controllers\HealthAndSaftyControllers\HazardAndRiskController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrCategoryController;
@@ -19,6 +22,7 @@ use App\Http\Controllers\HealthAndSaftyControllers\HrDivisionController;
 use App\Http\Controllers\ProcessTypeController;
 
 use App\Http\Controllers\UserController;
+use App\Repositories\All\AccidentCategory\AccidentCategoryInterface;
 use Illuminate\Support\Facades\Route;
 
 Route::post('calculate', [CalculationController::class, 'store']);
@@ -46,6 +50,18 @@ Route::post('factory', [FactoryController::class, 'store']);
 
 Route::get('person-types', [PersonTypeController::class, 'index']);
 Route::post('person-types', [PersonTypeController::class, 'store']);
+
+Route::get('accident-categories', [AiAccidentCategoryController::class, 'index']);
+Route::post('accident-categories', [AiAccidentCategoryController::class, 'store']);
+
+Route::get('accident-types', [AiAccidentTypeController::class, 'index']);
+Route::post('accident-types', [AiAccidentTypeController::class, 'store']);
+
+Route::get('accident-injury', [AiAccidentInjuryTypeController::class, 'index']);
+Route::post('accident-injury', [AiAccidentInjuryTypeController::class, 'store']);
+
+
+
 
 Route::get('hazard-and-risk', [HazardAndRiskController::class, 'index']);
 Route::post('hazard-and-risk', [HazardAndRiskController::class, 'store']);
