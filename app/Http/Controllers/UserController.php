@@ -35,9 +35,12 @@ class UserController extends Controller
     public function index()
     {
         $user = $this->userInterface->All();
-
-        return response()->json([
-            'user' => $user,
-        ], 200);
+        if ($user->isEmpty()) {
+            return response()->json([
+                'message' => 'No users found.',
+            ], 404);
+        }
+        return response()->json($user);
     }
+
 }
