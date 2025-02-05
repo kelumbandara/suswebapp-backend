@@ -17,12 +17,12 @@ class HsAiAccidentPeople extends Model
         'accidentId',
         'personType',
         'employeeId',
-        'personName',
+        'name',
         'gender',
         'age',
         'dateOfJoin',
-        'duration',
-        'experience',
+        'employmentDuration',
+        'industryExperience',
         'designation',
     ];
 

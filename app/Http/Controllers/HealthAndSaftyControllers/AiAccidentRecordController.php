@@ -48,8 +48,8 @@ class AiAccidentRecordController extends Controller
         }
     }
 
-    if (!empty($data['people_involved'])) {
-        foreach ($data['people_involved'] as $person) {
+    if (!empty($data['effectedIndividuals'])) {
+        foreach ($data['effectedIndividuals'] as $person) {
             $person['accidentId'] = $record->id;
             $this->accidentPeopleInterface->create($person);
         }
@@ -98,8 +98,8 @@ class AiAccidentRecordController extends Controller
         }
 
         // Update or create people involved
-        if (!empty($data['people_involved'])) {
-            foreach ($data['people_involved'] as $person) {
+        if (!empty($data['effectedIndividuals'])) {
+            foreach ($data['effectedIndividuals'] as $person) {
                 $person['accidentId'] = $id;
                 $this->accidentPeopleInterface->updateOrCreate(
                     ['accidentId' => $id, 'employeeId' => $person['employeeId'] ?? null],
