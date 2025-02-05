@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('witnessId');
             $table->bigInteger('accidentId')->nullable(); 
             $table->string('employeeId')->nullable();
-            $table->string('employeeName')->nullable();
+            $table->string('name')->nullable();
             $table->string('division')->nullable();
             $table->string('department')->nullable();
             $table->timestamps();

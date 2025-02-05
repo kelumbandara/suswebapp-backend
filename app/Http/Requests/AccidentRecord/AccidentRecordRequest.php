@@ -36,7 +36,7 @@ class AccidentRecordRequest extends FormRequest
             'assignee'                      => 'required|string',
             'witnesses'                     => 'nullable|array',
             'witnesses.*.employeeId'        => 'nullable|string',
-            'witnesses.*.employeeName'      => 'nullable|string',
+            'witnesses.*.name'      => 'nullable|string',
             'witnesses.*.division'          => 'nullable|string',
             'witnesses.*.department'        => 'nullable|string',
             'effectedIndividuals'           => 'required|array',
