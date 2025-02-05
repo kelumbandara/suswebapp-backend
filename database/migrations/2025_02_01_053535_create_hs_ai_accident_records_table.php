@@ -33,7 +33,7 @@ return new class extends Migration
             $table->enum('status',['draft', 'open', 'closed'])->default('draft')->nullable();
             $table->string('workPerformed')->nullable();
             $table->string('actionTaken')->nullable();
-            $table->date('accidentDate')->nullable();
+            $table->datetime('accidentDate')->nullable();
             $table->time('accidentTime')->nullable();
             $table->date('reportedDate')->nullable();
             $table->string('injuryType')->nullable();

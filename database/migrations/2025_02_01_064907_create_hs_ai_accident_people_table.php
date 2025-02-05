@@ -11,7 +11,7 @@ return new class extends Migration
     {
         Schema::create('hs_ai_accident_people', function (Blueprint $table) {
             $table->id('personId');
-            $table->bigInteger('accidentId')->unsigned();
+            $table->bigInteger('accidentId')->nullable();
             $table->string('personType')->nullable();
             $table->string('employeeId')->nullable();
             $table->string('personName')->nullable();

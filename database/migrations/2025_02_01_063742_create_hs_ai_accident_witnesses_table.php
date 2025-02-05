@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('hs_ai_accident_witnesses', function (Blueprint $table) {
             $table->id('witnessId');
-            $table->bigInteger('accidentId')->unsigned(); 
+            $table->bigInteger('accidentId')->nullable(); 
             $table->string('employeeId')->nullable();
             $table->string('employeeName')->nullable();
             $table->string('division')->nullable();
