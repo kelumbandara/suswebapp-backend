@@ -23,12 +23,6 @@ class RegisteredUserController extends Controller
 
         $user = $this->userInterface->create($validatedData);
 
-        try {
-            Notification::send($user, new WelcomeNotification($user->name));
-        } catch (\Exception $e) {
-            // Handle exception if needed
-        }
-
         return response()->json([
             'message' => 'User registered successfully!',
             'user' => $user,
