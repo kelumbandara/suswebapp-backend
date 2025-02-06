@@ -31,6 +31,6 @@ class HsAiIncidentPeople extends Model
      */
     public function accident()
     {
-        return $this->belongsTo(HsAiAccidentRecord::class, 'accidentId');
+        return $this->belongsTo(HsAiIncidentRecode::class, 'incidentId');
     }
 }
