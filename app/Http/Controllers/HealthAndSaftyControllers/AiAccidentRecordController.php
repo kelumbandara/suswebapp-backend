@@ -28,7 +28,7 @@ class AiAccidentRecordController extends Controller
 
         foreach ($records as $record) {
             $record->witnesses = $this->accidentWitnessInterface->findByAccidentId($record->id);
-            $record->people = $this->accidentPeopleInterface->findByAccidentId($record->id);
+            $record->effectedIndividuals = $this->accidentPeopleInterface->findByAccidentId($record->id);
         }
 
         return response()->json($records);
