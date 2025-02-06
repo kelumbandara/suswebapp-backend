@@ -25,51 +25,54 @@ class AiAccidentRecordController extends Controller
     public function index()
     {
         $records = $this->accidentRecordInterface->All();
-    
+
         foreach ($records as $record) {
-            $record->witnesses = $this->accidentWitnessInterface->findByAccidentId($record->id);
-            $record->effectedIndividuals = $this->accidentPeopleInterface->findByAccidentId($record->id);
+            $record->witnesses = $this->accidentWitnessInterface->findById($record->id);
+            $record->effectedIndividuals = $this->accidentPeopleInterface->findById($record->id);
         }
-    
+
         return response()->json($records);
     }
-    
 
-    public function store(AccidentRecordRequest $request): JsonResponse
-{
-    // Get validated data from the request
-    $data = $request->validated();
+    public function store(AccidentRecordRequest $request)
+    {
 
-    // Create the accident record
-    $record = $this->accidentRecordInterface->create($data);
 
-    // Check if the accident record was created
-    if (!$record) {
-        return response()->json(['message' => 'Failed to create accident record'], 500);
-    }
+        // ✅ Validate Request
+        $data = $request->validated();
 
-    if (!empty($data['witnesses'])) {
-        foreach ($data['witnesses'] as $witness) {
-            $witness['accidentId'] = $record->id;
-            $this->accidentWitnessInterface->create($witness);
+        // 🚀 Create Accident Record
+        $record = $this->accidentRecordInterface->create($data);
+
+        if (!$record) {
+            return response()->json(['message' => 'Failed to create accident record'], 500);
         }
-    }
 
-    if (!empty($data['effectedIndividuals'])) {
-        foreach ($data['effectedIndividuals'] as $person) {
-            $person['accidentId'] = $record->id;
-            $this->accidentPeopleInterface->create($person);
+        // 🔹 Store Witnesses (If Exists)
+        if (!empty($data['witnesses'])) {
+            foreach ($data['witnesses'] as $witness) {
+                $witness['accidentId'] = $record->id;
+                $this->accidentWitnessInterface->create($witness);
+            }
         }
+
+        // 🔹 Store Affected Individuals
+        if (!empty($data['effectedIndividuals'])) {
+            foreach ($data['effectedIndividuals'] as $person) {
+                $person['accidentId'] = $record->id;
+                $this->accidentPeopleInterface->create($person);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Accident record created successfully',
+            'record' => $record
+        ], 201);
     }
 
-    return response()->json([
-        'message' => 'Accident record created successfully',
-        'data' => $record
-    ], 201);
-}
 
     // Show accident record by ID
-    public function show(string $id): JsonResponse
+    public function show(string $id)
     {
         $record = $this->accidentRecordInterface->findById($id);
         if (!$record) {
@@ -79,7 +82,7 @@ class AiAccidentRecordController extends Controller
     }
 
     // Update an existing accident record
-    public function update(AccidentRecordRequest $request, string $id): JsonResponse
+    public function update(AccidentRecordRequest $request, string $id)
     {
         $data = $request->validated();
 

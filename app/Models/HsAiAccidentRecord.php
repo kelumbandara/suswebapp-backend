@@ -38,6 +38,8 @@ class HsAiAccidentRecord extends Model
         'injuryType',
         'severity',
         'assignee',
+        'createdUserlevel',
+        'responsiblesection',
         'expectedDate',
         'expectedTime',
     ];
