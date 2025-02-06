@@ -25,12 +25,12 @@ class AiAccidentRecordController extends Controller
     public function index()
     {
         $records = $this->accidentRecordInterface->All();
-
+    
         foreach ($records as $record) {
-            $record->witnesses = $this->accidentWitnessInterface->findById($record->id);
-            $record->effectedIndividuals = $this->accidentPeopleInterface->findById($record->id);
+            $record->witnesses = $this->accidentWitnessInterface->findByAccidentId($record->id);
+            $record->effectedIndividuals = $this->accidentPeopleInterface->findByAccidentId($record->id);
         }
-
+    
         return response()->json($records);
     }
 
