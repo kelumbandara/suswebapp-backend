@@ -38,6 +38,8 @@ use App\Repositories\All\HRCategory\HRCategoryInterface;
 use App\Repositories\All\HRCategory\HRCategoryRepository;
 use App\Repositories\All\HRDivision\HRDivisionInterface;
 use App\Repositories\All\HRDivision\HRDivisionRepository;
+use App\Repositories\All\IncidentRecord\IncidentRecodeInterface;
+use App\Repositories\All\IncidentRecord\IncidentRecodeRepository;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -76,6 +78,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AccidentTypeInterface::class, AccidentTypeRepository::class);
         $this->app->bind(AccidentInjuryTypeInterface::class, AccidentInjuryTypeRepository::class);
         $this->app->bind(ComPermissionInterface::class, ComPermissionRepository::class);
+        $this->app->bind(IncidentRecodeInterface::class, IncidentRecodeRepository::class);
 
 
 
