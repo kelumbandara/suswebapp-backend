@@ -38,17 +38,14 @@ class AiAccidentRecordController extends Controller
     {
 
 
-        // ✅ Validate Request
         $data = $request->validated();
-
-        // 🚀 Create Accident Record
+        dd($data);
         $record = $this->accidentRecordInterface->create($data);
 
         if (!$record) {
             return response()->json(['message' => 'Failed to create accident record'], 500);
         }
 
-        // 🔹 Store Witnesses (If Exists)
         if (!empty($data['witnesses'])) {
             foreach ($data['witnesses'] as $witness) {
                 $witness['accidentId'] = $record->id;
@@ -56,7 +53,6 @@ class AiAccidentRecordController extends Controller
             }
         }
 
-        // 🔹 Store Affected Individuals
         if (!empty($data['effectedIndividuals'])) {
             foreach ($data['effectedIndividuals'] as $person) {
                 $person['accidentId'] = $record->id;
@@ -71,7 +67,6 @@ class AiAccidentRecordController extends Controller
     }
 
 
-    // Show accident record by ID
     public function show(string $id)
     {
         $record = $this->accidentRecordInterface->findById($id);
@@ -81,22 +76,18 @@ class AiAccidentRecordController extends Controller
         return response()->json($record);
     }
 
-    // Update an existing accident record
     public function update(AccidentRecordRequest $request, string $id)
     {
         $data = $request->validated();
 
-        // Check if the accident record exists
         $record = $this->accidentRecordInterface->findById($id);
 
         if (!$record) {
             return response()->json(['message' => 'Accident record not found'], 404);
         }
 
-        // Update the accident record
         $updatedRecord = $this->accidentRecordInterface->update($id, $data);
 
-        // Update or create witnesses
         if (!empty($data['witnesses'])) {
             foreach ($data['witnesses'] as $witness) {
                 $witness['accidentId'] = $id;
@@ -107,7 +98,6 @@ class AiAccidentRecordController extends Controller
             }
         }
 
-        // Update or create people involved
         if (!empty($data['effectedIndividuals'])) {
             foreach ($data['effectedIndividuals'] as $person) {
                 $person['accidentId'] = $id;

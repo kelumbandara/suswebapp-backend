@@ -62,5 +62,28 @@ class AccidentRecordRequest extends FormRequest
 
         ];
     }
+    public function messages()
+    {
+        return [
+            'division.required'                        => 'Division is required.',
+            'location.required'                        => 'Location is required.',
+            'department.required'                      => 'Department is required.',
+            'supervisorName.required'                  => 'Supervisor name is required.',
+            'category.required'                        => 'Category is required.',
+            'subCategory.required'                     => 'Sub Category is required.',
+            'accidentType.required'                    => 'Accident type is required.',
+            'accidentDate.required'                    => 'Accident date is required.',
+            'assignee.required'                        => 'Assignee is required.',
+            'effectedIndividuals.*.personType.required' => 'Person type is required.',
+            'effectedIndividuals.*.employeeId.required' => 'Employee ID is required.',
+            'effectedIndividuals.*.name.required'       => 'Name is required.',
+            'effectedIndividuals.*.age.required'        => 'Age is required.',
+            'effectedIndividuals.*.age.min'             => 'Age must be at least 0 years.',
+            'effectedIndividuals.*.industryExperience.required' => 'Industry experience is required.',
+            'effectedIndividuals.*.industryExperience.in' => 'Industry experience must be one of the following: Skill, Unskilled, Semiskilled, draft',
+            'effectedIndividuals.*.designation.max'    => 'Designation must not be greater than 255 characters.',
+
+        ];
+        }
 
 }
