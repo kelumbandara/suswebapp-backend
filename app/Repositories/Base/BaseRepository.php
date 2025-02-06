@@ -404,6 +404,10 @@ class BaseRepository implements EloquentRepositoryInterface
                                                       // Logic to retrieve the replies for the given model
         return $this->model->find($modelId)->replies; // This is just an example, adjust as needed
     }
+    public function findByAccidentId(int $accidentId)
+{
+    return HsAiAccidentPeople::where('accidentId', $accidentId)->get();
+}
 
 
 }

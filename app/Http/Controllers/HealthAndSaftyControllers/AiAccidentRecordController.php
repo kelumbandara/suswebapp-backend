@@ -25,8 +25,15 @@ class AiAccidentRecordController extends Controller
     public function index()
     {
         $records = $this->accidentRecordInterface->All();
+    
+        foreach ($records as $record) {
+            $record->witnesses = $this->accidentWitnessInterface->findByAccidentId($record->id);
+            $record->effectedIndividuals = $this->accidentPeopleInterface->findByAccidentId($record->id);
+        }
+    
         return response()->json($records);
     }
+    
 
     public function store(AccidentRecordRequest $request): JsonResponse
 {
@@ -48,8 +55,8 @@ class AiAccidentRecordController extends Controller
         }
     }
 
-    if (!empty($data['people_involved'])) {
-        foreach ($data['people_involved'] as $person) {
+    if (!empty($data['effectedIndividuals'])) {
+        foreach ($data['effectedIndividuals'] as $person) {
             $person['accidentId'] = $record->id;
             $this->accidentPeopleInterface->create($person);
         }
@@ -98,8 +105,8 @@ class AiAccidentRecordController extends Controller
         }
 
         // Update or create people involved
-        if (!empty($data['people_involved'])) {
-            foreach ($data['people_involved'] as $person) {
+        if (!empty($data['effectedIndividuals'])) {
+            foreach ($data['effectedIndividuals'] as $person) {
                 $person['accidentId'] = $id;
                 $this->accidentPeopleInterface->updateOrCreate(
                     ['accidentId' => $id, 'employeeId' => $person['employeeId'] ?? null],

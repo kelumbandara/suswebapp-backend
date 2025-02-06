@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('hs_ai_accident_records', function (Blueprint $table) {
             $table->id();
-            $table->string('referenceNumber')->nullable()->unique();
+            $table->string('referenceNumber')->required()->unique();
             $table->string('createdByUser')->nullable();
-            $table->string('division')->nullable();
+            $table->string('division')->required();
             $table->string('location')->nullable();
             $table->string('department')->nullable();
             $table->string('supervisorName')->nullable();
@@ -33,14 +33,17 @@ return new class extends Migration
             $table->enum('status',['draft', 'open', 'closed'])->default('draft')->nullable();
             $table->string('workPerformed')->nullable();
             $table->string('actionTaken')->nullable();
-            $table->date('accidentDate')->nullable();
-            $table->time('accidentTime')->nullable();
-            $table->date('reportedDate')->nullable();
+            $table->string('accidentDate')->nullable();
+            $table->string('accidentTime')->nullable();
+            $table->string('reportedDate')->nullable();
             $table->string('injuryType')->nullable();
             $table->string('severity')->nullable();
             $table->string('assignee')->nullable();
-            $table->date('expectedDate')->nullable();
-            $table->time('expectedTime')->nullable();
+            $table->string('expectedDate')->nullable();
+            $table->string('expectedTime')->nullable();
+            $table->string('createdUserlevel')->nullable();
+            $table->string('responsiblesection')->nullable()->default('AccidentReport');
+
 
             $table->timestamps();
         });
