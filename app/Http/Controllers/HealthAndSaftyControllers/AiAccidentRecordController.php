@@ -39,7 +39,6 @@ class AiAccidentRecordController extends Controller
 
 
         $data = $request->validated();
-        dd($data);
         $record = $this->accidentRecordInterface->create($data);
 
         if (!$record) {
