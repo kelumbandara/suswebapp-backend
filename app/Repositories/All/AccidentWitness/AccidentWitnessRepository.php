@@ -21,6 +21,10 @@ class  AccidentWitnessRepository extends BaseRepository implements AccidentWitne
         $this->model = $model;
     }
 
-
+    public function findByAccidentId(int $accidentId)
+    {
+        return HsAiAccidentWitness::where('accidentId', $accidentId)->get();
+    }
+    
 
 }

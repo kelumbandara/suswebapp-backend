@@ -16,7 +16,7 @@ class HsAiAccidentWitness extends Model
     protected $fillable = [
         'accidentId',
         'employeeId',
-        'employeeName',
+        'name',
         'division',
         'department',
     ];

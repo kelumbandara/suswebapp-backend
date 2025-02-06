@@ -11,15 +11,15 @@ return new class extends Migration
     {
         Schema::create('hs_ai_accident_people', function (Blueprint $table) {
             $table->id('personId');
-            $table->bigInteger('accidentId')->unsigned();
+            $table->bigInteger('accidentId')->nullable();
             $table->string('personType')->nullable();
             $table->string('employeeId')->nullable();
-            $table->string('personName')->nullable();
-            $table->enum('gender', ['male', 'female'])->default('male')->nullable();
+            $table->string('name')->nullable();
+            $table->enum('gender', ['Male', 'Female'])->default('Male')->nullable();
             $table->integer('age')->nullable();
-            $table->date('dateOfJoin')->nullable();
-            $table->string('duration')->nullable();
-            $table->enum('experience', ['skill', 'unskilled','semiskilled','draft'])->default('draft')->nullable();
+            $table->string('dateOfJoin')->nullable();
+            $table->string('employmentDuration')->nullable();
+            $table->enum('industryExperience', ['Skill', 'Unskilled','Semiskilled','draft'])->default('draft')->nullable();
             $table->string('designation')->nullable();
             $table->timestamps();
         });
