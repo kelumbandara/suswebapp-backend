@@ -19,17 +19,16 @@ class UserController extends Controller
 
     public function show(Request $request)
     {
-        $userType = $request->user()->userType;
+        $user = $request->user();
+        $userType = $user->userType;
 
         $permission = $this->comPermissionInterface->getById($userType);
-
+        $userData = $user->toArray();
         if ($permission) {
-            return response()->json([
-                'user' => $request->user(),
-                'permissions' => $permission->permissionObject,
-            ], 200);
+            $userData = array_merge($userData, (array) $permission->permissionObject);
         }
-        return response()->json($request->user(), 200);
+
+        return response()->json($userData, 200);
     }
 
     public function index()
