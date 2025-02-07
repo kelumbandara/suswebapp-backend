@@ -25,44 +25,48 @@ class AiAccidentRecordController extends Controller
     public function index()
     {
         $records = $this->accidentRecordInterface->All();
+
+        foreach ($records as $record) {
+            $record->witnesses = $this->accidentWitnessInterface->findByAccidentId($record->id);
+            $record->people = $this->accidentPeopleInterface->findByAccidentId($record->id);
+        }
+
         return response()->json($records);
     }
 
-    public function store(AccidentRecordRequest $request): JsonResponse
-{
-    // Get validated data from the request
-    $data = $request->validated();
+    public function store(AccidentRecordRequest $request)
+    {
 
-    // Create the accident record
-    $record = $this->accidentRecordInterface->create($data);
 
-    // Check if the accident record was created
-    if (!$record) {
-        return response()->json(['message' => 'Failed to create accident record'], 500);
-    }
+        $data = $request->validated();
+        $record = $this->accidentRecordInterface->create($data);
 
-    if (!empty($data['witnesses'])) {
-        foreach ($data['witnesses'] as $witness) {
-            $witness['accidentId'] = $record->id;
-            $this->accidentWitnessInterface->create($witness);
+        if (!$record) {
+            return response()->json(['message' => 'Failed to create accident record'], 500);
         }
-    }
 
-    if (!empty($data['people_involved'])) {
-        foreach ($data['people_involved'] as $person) {
-            $person['accidentId'] = $record->id;
-            $this->accidentPeopleInterface->create($person);
+        if (!empty($data['witnesses'])) {
+            foreach ($data['witnesses'] as $witness) {
+                $witness['accidentId'] = $record->id;
+                $this->accidentWitnessInterface->create($witness);
+            }
         }
+
+        if (!empty($data['effectedIndividuals'])) {
+            foreach ($data['effectedIndividuals'] as $person) {
+                $person['accidentId'] = $record->id;
+                $this->accidentPeopleInterface->create($person);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Accident record created successfully',
+            'record' => $record
+        ], 201);
     }
 
-    return response()->json([
-        'message' => 'Accident record created successfully',
-        'data' => $record
-    ], 201);
-}
 
-    // Show accident record by ID
-    public function show(string $id): JsonResponse
+    public function show(string $id)
     {
         $record = $this->accidentRecordInterface->findById($id);
         if (!$record) {
@@ -71,22 +75,18 @@ class AiAccidentRecordController extends Controller
         return response()->json($record);
     }
 
-    // Update an existing accident record
-    public function update(AccidentRecordRequest $request, string $id): JsonResponse
+    public function update(AccidentRecordRequest $request, string $id)
     {
         $data = $request->validated();
 
-        // Check if the accident record exists
         $record = $this->accidentRecordInterface->findById($id);
 
         if (!$record) {
             return response()->json(['message' => 'Accident record not found'], 404);
         }
 
-        // Update the accident record
         $updatedRecord = $this->accidentRecordInterface->update($id, $data);
 
-        // Update or create witnesses
         if (!empty($data['witnesses'])) {
             foreach ($data['witnesses'] as $witness) {
                 $witness['accidentId'] = $id;
@@ -97,9 +97,8 @@ class AiAccidentRecordController extends Controller
             }
         }
 
-        // Update or create people involved
-        if (!empty($data['people_involved'])) {
-            foreach ($data['people_involved'] as $person) {
+        if (!empty($data['effectedIndividuals'])) {
+            foreach ($data['effectedIndividuals'] as $person) {
                 $person['accidentId'] = $id;
                 $this->accidentPeopleInterface->updateOrCreate(
                     ['accidentId' => $id, 'employeeId' => $person['employeeId'] ?? null],

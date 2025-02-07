@@ -6,12 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        Schema::create('hs_ai_accident_people', function (Blueprint $table) {
+        Schema::create('hs_ai_incident_people', function (Blueprint $table) {
             $table->id('personId');
-            $table->bigInteger('accidentId')->nullable();
+            $table->bigInteger('incidentId')->nullable();
             $table->string('personType')->nullable();
             $table->string('employeeId')->nullable();
             $table->string('name')->nullable();
@@ -25,8 +27,11 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::dropIfExists('hs_ai_accident_people');
+        Schema::dropIfExists('hs_ai_incident_people');
     }
 };

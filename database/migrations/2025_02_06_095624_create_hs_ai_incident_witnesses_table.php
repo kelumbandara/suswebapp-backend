@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('hs_ai_accident_witnesses', function (Blueprint $table) {
+        Schema::create('hs_ai_incident_witnesses', function (Blueprint $table) {
             $table->id('witnessId');
-            $table->bigInteger('accidentId')->nullable(); 
+            $table->bigInteger('incidentId')->nullable();
             $table->string('employeeId')->nullable();
             $table->string('name')->nullable();
             $table->string('division')->nullable();
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('hs_ai_accident_witnesses');
+        Schema::dropIfExists('hs_ai_incident_witnesses');
     }
 };
