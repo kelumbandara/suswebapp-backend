@@ -21,6 +21,8 @@ use App\Http\Controllers\HealthAndSaftyControllers\AiIncidentFactorsController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiIncidentRecodeController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiIncidentTypeOfConcernController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiIncidentTypeOfNearMissController;
+use App\Http\Controllers\HealthAndSaftyControllers\DocumentDocumentTypeController;
+use App\Http\Controllers\HealthAndSaftyControllers\DocumentRecodeController;
 use App\Http\Controllers\HealthAndSaftyControllers\HazardAndRiskController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrCategoryController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrDivisionController;
@@ -106,6 +108,16 @@ Route::post('incident-types-concern', [AiIncidentTypeOfConcernController::class,
 
 Route::get('incident-factors', [AiIncidentFactorsController::class, 'index']);
 Route::post('incident-factors', [AiIncidentFactorsController::class, 'store']);
+
+Route::get('documents', [DocumentRecodeController::class, 'index']);
+Route::post('documents', [DocumentRecodeController::class, 'store']);
+Route::get('documents/{id}/show', [DocumentRecodeController::class, 'show']);
+Route::put('documents/{id}/update', [DocumentRecodeController::class, 'update']);
+Route::delete('documents/{id}/delete', [DocumentRecodeController::class, 'destroy']);
+
+Route::get('documents-types', [DocumentDocumentTypeController::class, 'index']);
+Route::post('documents-types', [DocumentDocumentTypeController::class, 'store']);
+
 
 
 Route::get('user-permissions', [ComPermissionController::class, 'index']);
