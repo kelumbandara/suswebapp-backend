@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('personName')->nullable();
             $table->enum('gender', ['male', 'female'])->default('male')->nullable();
             $table->integer('age')->nullable();
-            $table->date('dateOfJoin')->nullable();
+            $table->timestamp('dateOfJoin')->nullable();
             $table->string('duration')->nullable();
             $table->enum('experience', ['skill', 'unskilled','semiskilled','draft'])->default('draft')->nullable();
             $table->string('designation')->nullable();
