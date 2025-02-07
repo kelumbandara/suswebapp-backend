@@ -17,6 +17,10 @@ use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentPeopleController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentRecordController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentTypeController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentWitnessController;
+use App\Http\Controllers\HealthAndSaftyControllers\AiIncidentFactorsController;
+use App\Http\Controllers\HealthAndSaftyControllers\AiIncidentRecodeController;
+use App\Http\Controllers\HealthAndSaftyControllers\AiIncidentTypeOfConcernController;
+use App\Http\Controllers\HealthAndSaftyControllers\AiIncidentTypeOfNearMissController;
 use App\Http\Controllers\HealthAndSaftyControllers\HazardAndRiskController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrCategoryController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrDivisionController;
@@ -88,6 +92,21 @@ Route::post('accidents', [AiAccidentRecordController::class, 'store']);
 Route::get('accidents/{id}/show', [AiAccidentRecordController::class, 'show']);
 Route::put('accidents/{id}/update', [AiAccidentRecordController::class, 'update']);
 Route::delete('accidents/{id}/delete', [AiAccidentRecordController::class, 'destroy']);
+
+Route::get('incidents', [AiIncidentRecodeController::class, 'index']);
+Route::post('incidents', [AiIncidentRecodeController::class, 'store']);
+Route::delete('incidents/{id}/delete', [AiIncidentRecodeController::class, 'destroy']);
+
+
+Route::get('incident-types-nearMiss', [AiIncidentTypeOfNearMissController::class, 'index']);
+Route::post('incident-types-nearMiss', [AiIncidentTypeOfNearMissController::class, 'store']);
+
+Route::get('incident-types-concern', [AiIncidentTypeOfConcernController::class, 'index']);
+Route::post('incident-types-concern', [AiIncidentTypeOfConcernController::class, 'store']);
+
+Route::get('incident-factors', [AiIncidentFactorsController::class, 'index']);
+Route::post('incident-factors', [AiIncidentFactorsController::class, 'store']);
+
 
 Route::get('user-permissions', [ComPermissionController::class, 'index']);
 Route::post('user-permissions', [ComPermissionController::class, 'store']);

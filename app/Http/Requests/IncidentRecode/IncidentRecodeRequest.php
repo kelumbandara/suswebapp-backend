@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\IncidentRecode;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -11,7 +10,7 @@ class IncidentRecodeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +21,35 @@ class IncidentRecodeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'division'                                 => 'required|string',
+            'location'                                 => 'required|string',
+            'circumstances'                            => 'nullable|string',
+            'imageUrl'                                 => 'nullable|string',
+            'typeOfNearMiss'                           => 'nullable|string',
+            'typeOfConcern'                            => 'nullable|string',
+            'factors'                                  => 'nullable|string',
+            'causes'                                   => 'nullable|string',
+            'assignee'                                 => 'nullable|string',
+            'incidentDetails'                          => 'nullable|string',
+            'incidentTime'                             => 'nullable|string',
+            'incidentDate'                             => 'required|string',
+            'severity'                                 => 'nullable|string',
+            'witnesses'                                => 'nullable|array',
+            'witnesses.*.employeeId'                   => 'nullable|string',
+            'witnesses.*.name'                         => 'nullable|string',
+            'witnesses.*.division'                     => 'nullable|string',
+            'witnesses.*.department'                   => 'nullable|string',
+            'effectedIndividuals'                      => 'required|array',
+            'effectedIndividuals.*.personType'         => 'required|string',
+            'effectedIndividuals.*.employeeId'         => 'nullable|integer',
+            'effectedIndividuals.*.name'               => 'required|string',
+            'effectedIndividuals.*.gender'             => 'nullable|string|in:Male,Female,other',
+            'effectedIndividuals.*.age'                => 'required|integer|min:0',
+            'effectedIndividuals.*.dateOfJoin'         => 'nullable|string',
+            'effectedIndividuals.*.employmentDuration' => 'nullable|integer',
+            'effectedIndividuals.*.industryExperience' => 'required|string|in:Skill,Unskilled,Semiskilled,draft',
+            'effectedIndividuals.*.designation'        => 'nullable|string|max:255',
+
         ];
     }
 }

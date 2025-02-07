@@ -3,63 +3,33 @@
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AIIncidentTypeOfNearMiss\NearMissRequest;
+use App\Repositories\All\IncidentTypeOfNearMiss\IncidentTypeOfNearMissInterface;
 use Illuminate\Http\Request;
 
 class AiIncidentTypeOfNearMissController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $incidentTypeOfNearMissInterface;
+
+    public function __construct(IncidentTypeOfNearMissInterface $incidentTypeOfNearMissInterface)
+    {
+        $this->incidentTypeOfNearMissInterface = $incidentTypeOfNearMissInterface;
+    }
+
     public function index()
     {
-        //
+        $incidentType = $this->incidentTypeOfNearMissInterface->all();
+        return response()->json($incidentType);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(NearMissRequest $request)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $data = $request->validated();
+        $incidentType = $this->incidentTypeOfNearMissInterface->create($data);
+        return response()->json([
+            'message' => 'Incident type of near miss  created successfully',
+            'data' => $incidentType
+        ], 201);
     }
 }

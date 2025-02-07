@@ -20,6 +20,16 @@ class IncidentWitnessRepository extends BaseRepository implements IncidentWitnes
     {
         $this->model = $model;
     }
+    public function findByIncidentId($incidentId)
+    {
+        return $this->model->where('incidentId', $incidentId)->get();
+    }
+
+    public function deleteByIncidentId($incidentId)
+    {
+        return $this->model->where('incidentId', $incidentId)->delete();
+    }
+
 
 
 
