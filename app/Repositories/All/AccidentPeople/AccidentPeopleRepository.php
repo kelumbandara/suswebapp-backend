@@ -21,10 +21,17 @@ class    AccidentPeopleRepository extends BaseRepository implements AccidentPeop
         $this->model = $model;
     }
 
-    public function findByAccidentId(int $accidentId)
+
+    public function deleteByAccidentId($accidentId)
     {
-        return HsAiAccidentPeople::where('accidentId', $accidentId)->get();
+        return $this->model->where('accidentId', $accidentId)->delete();
     }
-    
+
+    public function findByAccidentId($accidentId)
+{
+    return $this->model->where('accidentId', $accidentId)->get();
+}
+
+
 
 }
