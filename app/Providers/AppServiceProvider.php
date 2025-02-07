@@ -38,6 +38,10 @@ use App\Repositories\All\HRCategory\HRCategoryInterface;
 use App\Repositories\All\HRCategory\HRCategoryRepository;
 use App\Repositories\All\HRDivision\HRDivisionInterface;
 use App\Repositories\All\HRDivision\HRDivisionRepository;
+use App\Repositories\All\HSDocumentDocumentType\DocumentTypeInterface;
+use App\Repositories\All\HSDocumentDocumentType\DocumentTypeRepository;
+use App\Repositories\All\HSDocumentRecode\DocumentInterface;
+use App\Repositories\All\HSDocumentRecode\DocumentRepository;
 use App\Repositories\All\IncidentFactors\IncidentFactorsInterface;
 use App\Repositories\All\IncidentFactors\IncidentFactorsRepository;
 use App\Repositories\All\IncidentPeople\IncidentPeopleInterface;
@@ -94,10 +98,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(IncidentFactorsInterface::class, IncidentFactorsRepository::class);
         $this->app->bind(IncidentPeopleInterface::class, IncidentPeopleRepository::class);
         $this->app->bind(IncidentWitnessInterface::class, IncidentWitnessRepository::class);
-
-
-
-
-
+        $this->app->bind(DocumentInterface::class, DocumentRepository::class);
+        $this->app->bind(DocumentTypeInterface::class, DocumentTypeRepository::class);
     }
 }

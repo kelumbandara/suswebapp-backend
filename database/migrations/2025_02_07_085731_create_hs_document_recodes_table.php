@@ -21,9 +21,9 @@ return new class extends Migration
             $table->string('issuedAuthority')->nullable();
             $table->string('issuedDate')->nullable();
             $table->string('expiryDate')->nullable();
-            $table->string('modifyDate')->nullable();
+            $table->string('notifyDate')->nullable();
             $table->string('elapseDay')->nullable();
-            $table->string('status')->nullable();
+            $table->enum('status',['draft', 'open', 'closed'])->default('draft')->nullable();
             $table->string('documentOwner')->nullable();
             $table->string('documentReviewer')->nullable();
             $table->string('physicalLocation')->nullable();

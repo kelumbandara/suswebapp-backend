@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('hs_document_document_types', function (Blueprint $table) {
             $table->id();
+            $table->string('documentType')->nullable();
             $table->timestamps();
         });
     }
