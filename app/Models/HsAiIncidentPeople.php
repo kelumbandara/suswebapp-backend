@@ -9,12 +9,12 @@ class HsAiIncidentPeople extends Model
 {
     use HasFactory;
 
-    protected $table = 'hs_ai_accident_people';
+    protected $table = 'hs_ai_incident_people';
 
     protected $primaryKey = 'personId';
 
     protected $fillable = [
-        'accidentId',
+        'incidentId',
         'personType',
         'employeeId',
         'name',
@@ -26,10 +26,7 @@ class HsAiIncidentPeople extends Model
         'designation',
     ];
 
-    /**
-     * Relationship with the accident record (assuming the foreign key is `accidentId`).
-     */
-    public function accident()
+    public function incident()
     {
         return $this->belongsTo(HsAiIncidentRecode::class, 'incidentId');
     }

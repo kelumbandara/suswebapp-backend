@@ -1,65 +1,34 @@
 <?php
-
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AIIncidentTypeOfConcern\ConcernRequest;
+use App\Repositories\All\IncidentTypeOfConcern\IncidentTypeOfConcernInterface;
 use Illuminate\Http\Request;
 
 class AiIncidentTypeOfConcernController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $incidentTypeOfConcernInterface;
+
+    public function __construct(IncidentTypeOfConcernInterface $incidentTypeOfConcernInterface)
+    {
+        $this->incidentTypeOfConcernInterface = $incidentTypeOfConcernInterface;
+    }
+
     public function index()
     {
-        //
+        $incidentConcern = $this->incidentTypeOfConcernInterface->all();
+        return response()->json($incidentConcern);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(ConcernRequest $request)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $data = $request->validated();
+        $incidentConcern = $this->incidentTypeOfConcernInterface->create($data);
+        return response()->json([
+            'message' => 'Incident type of concern created successfully',
+            'data' => $incidentConcern
+        ], 201);
     }
 }

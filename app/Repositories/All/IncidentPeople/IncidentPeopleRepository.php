@@ -20,6 +20,15 @@ class IncidentPeopleRepository extends BaseRepository implements IncidentPeopleI
     {
         $this->model = $model;
     }
+    public function deleteByIncidentId($incidentId)
+    {
+        return $this->model->where('incidentId', $incidentId)->delete();
+    }
+
+    public function findByIncidentId($incidentId)
+{
+    return $this->model->where('incidentId', $incidentId)->get();
+}
 
 
 

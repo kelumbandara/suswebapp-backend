@@ -9,7 +9,7 @@ class HsAiIncidentRecode extends Model
 {
     use HasFactory;
 
-    protected $table = 'hs_ai_incident_recode';
+    protected $table = 'hs_ai_incident_recodes';
 
     protected $fillable = [
         'referenceNumber',
@@ -31,4 +31,18 @@ class HsAiIncidentRecode extends Model
         'createdUserLevel',
         'responsibleSection'
     ];
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            $model->referenceNumber = $model->generateReferenceNumber();
+        });
+    }
+
+    private function generateReferenceNumber()
+    {
+        $latest = HsAiAccidentRecord::latest()->first();
+        $lastId = $latest ? $latest->id : 0;
+
+        return 'ICD-' . ($lastId + 1);
+    }
 }

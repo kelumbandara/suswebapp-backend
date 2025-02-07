@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class HsAiIncidentTypeOfNearMiss extends Model
 {
     use HasFactory;
-    protected $table = 'hs_ai_incident_type_of_near_miss';
-    
+    protected $table = 'hs_ai_incident_type_of_near_misses';
+
     protected $fillable = [
         'type'
     ];
