@@ -8,5 +8,7 @@ use App\Repositories\Base\EloquentRepositoryInterface;
 interface AccidentWitnessInterface extends EloquentRepositoryInterface {
 
     public function findByAccidentId(int $accidentId);
+    public function deleteByAccidentId(int $accidentId);
     
+
 }

@@ -4,7 +4,7 @@ namespace App\Repositories\All\AccidentWitness;
 use App\Models\HsAiAccidentWitness;
 use App\Repositories\Base\BaseRepository;
 
-class  AccidentWitnessRepository extends BaseRepository implements AccidentWitnessInterface
+class AccidentWitnessRepository extends BaseRepository implements AccidentWitnessInterface
 {
     /**
      * @var HsAiAccidentWitness
@@ -21,10 +21,15 @@ class  AccidentWitnessRepository extends BaseRepository implements AccidentWitne
         $this->model = $model;
     }
 
-    public function findByAccidentId(int $accidentId)
+    public function findByAccidentId($accidentId)
     {
-        return HsAiAccidentWitness::where('accidentId', $accidentId)->get();
+        return $this->model->where('accidentId', $accidentId)->get();
     }
-    
+
+    public function deleteByAccidentId($accidentId)
+    {
+        return $this->model->where('accidentId', $accidentId)->delete();
+    }
+
 
 }

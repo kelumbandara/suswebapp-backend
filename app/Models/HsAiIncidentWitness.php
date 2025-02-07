@@ -24,6 +24,6 @@ class HsAiIncidentWitness extends Model
 
     public function accident()
     {
-        return $this->belongsTo(HsAiAccidentRecord::class, 'incidentId');
+        return $this->belongsTo(HsAiIncidentRecode::class, 'incidentId');
     }
 }

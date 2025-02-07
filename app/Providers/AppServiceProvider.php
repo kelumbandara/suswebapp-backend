@@ -38,6 +38,18 @@ use App\Repositories\All\HRCategory\HRCategoryInterface;
 use App\Repositories\All\HRCategory\HRCategoryRepository;
 use App\Repositories\All\HRDivision\HRDivisionInterface;
 use App\Repositories\All\HRDivision\HRDivisionRepository;
+use App\Repositories\All\IncidentFactors\IncidentFactorsInterface;
+use App\Repositories\All\IncidentFactors\IncidentFactorsRepository;
+use App\Repositories\All\IncidentPeople\IncidentPeopleInterface;
+use App\Repositories\All\IncidentPeople\IncidentPeopleRepository;
+use App\Repositories\All\IncidentRecord\IncidentRecodeInterface;
+use App\Repositories\All\IncidentRecord\IncidentRecodeRepository;
+use App\Repositories\All\IncidentTypeOfConcern\IncidentTypeOfConcernInterface;
+use App\Repositories\All\IncidentTypeOfConcern\IncidentTypeOfConcernRepository;
+use App\Repositories\All\IncidentTypeOfNearMiss\IncidentTypeOfNearMissInterface;
+use App\Repositories\All\IncidentTypeOfNearMiss\IncidentTypeOfNearMissRepository;
+use App\Repositories\All\IncidentWitness\IncidentWitnessInterface;
+use App\Repositories\All\IncidentWitness\IncidentWitnessRepository;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -76,6 +88,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AccidentTypeInterface::class, AccidentTypeRepository::class);
         $this->app->bind(AccidentInjuryTypeInterface::class, AccidentInjuryTypeRepository::class);
         $this->app->bind(ComPermissionInterface::class, ComPermissionRepository::class);
+        $this->app->bind(IncidentRecodeInterface::class, IncidentRecodeRepository::class);
+        $this->app->bind(IncidentTypeOfConcernInterface::class, IncidentTypeOfConcernRepository::class);
+        $this->app->bind(IncidentTypeOfNearMissInterface::class, IncidentTypeOfNearMissRepository::class);
+        $this->app->bind(IncidentFactorsInterface::class, IncidentFactorsRepository::class);
+        $this->app->bind(IncidentPeopleInterface::class, IncidentPeopleRepository::class);
+        $this->app->bind(IncidentWitnessInterface::class, IncidentWitnessRepository::class);
 
 
 
