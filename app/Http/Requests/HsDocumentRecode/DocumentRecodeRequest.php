@@ -33,9 +33,9 @@ class DocumentRecodeRequest extends FormRequest
             'remarks'          => 'nullable|string',
             'document'         => 'required|string',
             'issuedDate'       => 'required|string',
-            'noExpiry'         => 'nullable|boolean',
-            'expiryDate'       => 'required_if:noExpiry,true|string',
-            'notifyDate'       => 'required_if:noExpiry,true|string',
+            'isNoExpiry'         => 'nullable|boolean',
+            'expiryDate'       => 'required_if:isNoExpiry,true|string',
+            'notifyDate'       => 'required_if:isNoExpiry,true|string',
         ];
     }
 }
