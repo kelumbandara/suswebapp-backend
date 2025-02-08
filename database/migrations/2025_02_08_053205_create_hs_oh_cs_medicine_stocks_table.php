@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('hs_oh_cs_consulting_doctors', function (Blueprint $table) {
+        Schema::create('hs_oh_cs_medicine_stocks', function (Blueprint $table) {
             $table->id();
-            $table->string('DoctorName')->nullable();
+            $table->integer('medicineName')->nullable();
+            $table->integer('division')->nullable();
+            $table->integer('inStock')->nullable();
+            $table->integer('status')->nullable();
+            $table->string('lastUpdated')->nullable();
             $table->timestamps();
         });
     }
@@ -23,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('hs_oh_cs_consulting_doctors');
+        Schema::dropIfExists('hs_oh_cs_medicine_stocks');
     }
 };

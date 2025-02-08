@@ -5,12 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class HsOhCsConsultingDoctor extends Model
+class HsOhCsMedicineStock extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'DoctorName',
+        'medicineName',
+        'division',
+        'inStock',
+        'status',
+        'lastUpdated',
     ];
-
 }

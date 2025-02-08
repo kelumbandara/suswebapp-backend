@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('hs_oh_cs_designations', function (Blueprint $table) {
             $table->id();
+            $table->string('designationName')->nullable();
             $table->timestamps();
         });
     }
