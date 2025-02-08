@@ -12,11 +12,12 @@ class HsOhMiMedicineRequest extends Model
     protected $table = 'hs_oh_mi_medicine_requests';
 
     protected $fillable = [
+        'referenceNumber',
         'medicineName',
         'genericName',
         'division',
         'approver',
-        'referenceNumber',
+        'requestQuantity',
         'inventoryNumber',
         'requestedDate',
         'status',
@@ -24,4 +25,18 @@ class HsOhMiMedicineRequest extends Model
         'assigneeLevel',
         'createdByUser',
     ];
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            $model->referenceNumber = $model->generateReferenceNumber();
+        });
+    }
+
+    private function generateReferenceNumber()
+    {
+        $latest = HsOhMiMedicineRequest::latest()->first();
+        $lastId = $latest ? $latest->id : 0;
+
+        return 'MED-' . ($lastId + 1);
+    }
 }

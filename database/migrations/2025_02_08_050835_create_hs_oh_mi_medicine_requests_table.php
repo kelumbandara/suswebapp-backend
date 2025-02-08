@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('medicineName')->nullable();
             $table->string('genericName')->nullable();
             $table->string('division')->nullable();
+            $table->integer('requestQuantity')->nullable();
             $table->string('approver')->nullable();
             $table->string('inventoryNumber')->nullable();
             $table->string('requestedDate')->nullable();

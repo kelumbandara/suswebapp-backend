@@ -62,6 +62,14 @@ use App\Repositories\All\IncidentTypeOfNearMiss\IncidentTypeOfNearMissInterface;
 use App\Repositories\All\IncidentTypeOfNearMiss\IncidentTypeOfNearMissRepository;
 use App\Repositories\All\IncidentWitness\IncidentWitnessInterface;
 use App\Repositories\All\IncidentWitness\IncidentWitnessRepository;
+use App\Repositories\All\MiMedicineName\MedicineNameInterface;
+use App\Repositories\All\MiMedicineName\MedicineNameRepository;
+use App\Repositories\All\MiMedicineNameForm\MedicineFormInterface;
+use App\Repositories\All\MiMedicineNameForm\MedicineFormRepository;
+use App\Repositories\All\MiMedicineRequest\MedicineRequestInterface;
+use App\Repositories\All\MiMedicineRequest\MedicineRequestRepository;
+use App\Repositories\All\MiMedicineType\MedicineTypeInterface;
+use App\Repositories\All\MiMedicineType\MedicineTypeRepository;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -112,5 +120,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(DesignationInterface::class, DesignationRepository::class);
         $this->app->bind(ConsultingInterface::class, ConsultingRepository::class);
         $this->app->bind(MedicineStockInterface::class, MedicineStockRepository::class);
+        $this->app->bind(MedicineRequestInterface::class, MedicineRequestRepository::class);
+        $this->app->bind(MedicineNameInterface::class, MedicineNameRepository::class);
+        $this->app->bind(MedicineTypeInterface::class, MedicineTypeRepository::class);
+        $this->app->bind(MedicineFormInterface::class, MedicineFormRepository::class);
     }
 }
