@@ -30,6 +30,10 @@ use App\Http\Controllers\HealthAndSaftyControllers\DocumentRecodeController;
 use App\Http\Controllers\HealthAndSaftyControllers\HazardAndRiskController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrCategoryController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrDivisionController;
+use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineNameController;
+use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineNameFormController;
+use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineRequestController;
+use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineTypeController;
 use App\Http\Controllers\ProcessTypeController;
 
 use App\Http\Controllers\UserController;
@@ -141,6 +145,26 @@ Route::get('medicine-stock', [CsMedicineStockController::class, 'index']);
 Route::post('medicine-stock', [CsMedicineStockController::class, 'store']);
 Route::put('medicine-stock/{id}/update', [CsMedicineStockController::class, 'update']);
 Route::delete('medicine-stock/{id}/delete', [CsMedicineStockController::class, 'destroy']);
+
+Route::get('medicine-request', [OsMiMedicineRequestController::class, 'index']);
+Route::post('medicine-request', [OsMiMedicineRequestController::class, 'store']);
+Route::put('medicine-request/{id}/update', [OsMiMedicineRequestController::class, 'update']);
+Route::delete('medicine-request/{id}/delete', [OsMiMedicineRequestController::class, 'destroy']);
+
+Route::get('medicine-name', [OsMiMedicineNameController::class, 'index']);
+Route::post('medicine-name', [OsMiMedicineNameController::class, 'store']);
+Route::put('medicine-name/{id}/update', [OsMiMedicineNameController::class, 'update']);
+Route::delete('medicine-name/{id}/delete', [OsMiMedicineNameController::class, 'destroy']);
+
+Route::get('medicine-form', [OsMiMedicineNameFormController::class, 'index']);
+Route::post('medicine-form', [OsMiMedicineNameFormController::class, 'store']);
+Route::put('medicine-form/{id}/update', [OsMiMedicineNameFormController::class, 'update']);
+Route::delete('medicine-form/{id}/delete', [OsMiMedicineNameFormController::class, 'destroy']);
+
+Route::get('medicine-types', [OsMiMedicineTypeController::class, 'index']);
+Route::post('medicine-types', [OsMiMedicineTypeController::class, 'store']);
+Route::put('medicine-types/{id}/update', [OsMiMedicineTypeController::class, 'update']);
+Route::delete('medicine-types/{id}/delete', [OsMiMedicineTypeController::class, 'destroy']);
 
 
 Route::get('user-permissions', [ComPermissionController::class, 'index']);
