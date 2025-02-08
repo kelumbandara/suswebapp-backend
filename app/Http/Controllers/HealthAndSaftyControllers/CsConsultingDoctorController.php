@@ -3,63 +3,71 @@
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\HsOhCsConsultingDoctor\ConsultingDoctorRequest;
+use App\Repositories\All\CsConsultingDoctor\ConsultingInterface;
 use Illuminate\Http\Request;
 
 class CsConsultingDoctorController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $consultingInterface;
+
+    public function __construct(ConsultingInterface $consultingInterface)
+    {
+        $this->consultingInterface = $consultingInterface;
+    }
+
     public function index()
     {
-        //
+        $doctor = $this->consultingInterface->All();
+        if ($doctor->isEmpty()) {
+            return response()->json([
+                'message' => 'Consulting Doctor not found.',
+            ], 404);
+        }
+        return response()->json($doctor, 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(ConsultingDoctorRequest $request)
     {
-        //
+        $doctor = $this->consultingInterface->create($request->validated());
+
+        return response()->json([
+            'message' => 'Consulting Doctor created successfully.',
+            'data'    => $doctor,
+        ], 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function update(ConsultingDoctorRequest $request, string $id)
     {
-        //
+        $doctor = $this->consultingInterface->findById($id);
+
+        if (! $doctor) {
+            return response()->json([
+                'message' => 'Consulting Doctor not found.',
+            ], 404);
+        }
+
+        $this->consultingInterface->update($id, $request->validated());
+
+        return response()->json([
+            'message' => 'Consulting Doctor updated successfully.',
+        ], 200);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        $doctor = $this->consultingInterface->findById($id);
+
+        if (! $doctor) {
+            return response()->json([
+                'message' => 'Consulting Doctor not found.',
+            ], 404);
+        }
+
+        $this->consultingInterface->deleteById($id);
+
+        return response()->json([
+            'message' => 'Consulting Doctor deleted successfully.',
+        ], 200);
     }
 }

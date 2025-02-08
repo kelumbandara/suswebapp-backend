@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class HsOhMiMedicineRequest extends Model
@@ -11,13 +12,13 @@ class HsOhMiMedicineRequest extends Model
     protected $table = 'hs_oh_mi_medicine_requests';
 
     protected $fillable = [
-        'MedicineName',
-        'GenericName',
+        'medicineName',
+        'genericName',
         'division',
-        'Approver',
-        'ReferenceNumber',
-        'InventoryNumber',
-        'RequestedDate',
+        'approver',
+        'referenceNumber',
+        'inventoryNumber',
+        'requestedDate',
         'status',
         'responsibleSection',
         'assigneeLevel',

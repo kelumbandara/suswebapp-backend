@@ -11,7 +11,7 @@ class MedicineStockRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,11 @@ class MedicineStockRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'medicineName' => 'required|string',
+            'division' => 'nullable|string',
+            'inStock' => 'required|string',
+            'status' => 'nullable|string',
+            'lastUpdated' => 'nullable|string',
         ];
     }
 }

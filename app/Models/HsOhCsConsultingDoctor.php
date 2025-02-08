@@ -10,7 +10,7 @@ class HsOhCsConsultingDoctor extends Model
     use HasFactory;
 
     protected $fillable = [
-        'DoctorName',
+        'doctorName',
     ];
 
 }

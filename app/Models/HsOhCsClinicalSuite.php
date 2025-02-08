@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class HsOhCsClinicalSuite extends Model
 {
     use HasFactory;
+
+    protected $table = 'hs_oh_cs_clinical_suites';
     protected $fillable = [
         'patientId',
         'employeeId',
@@ -16,7 +18,7 @@ class HsOhCsClinicalSuite extends Model
         'gender',
         'age',
         'department',
-        'SubDepartment',
+        'subDepartment',
         'division',
         'workStatus',
         'symptoms',

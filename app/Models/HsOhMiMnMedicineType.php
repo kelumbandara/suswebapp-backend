@@ -11,6 +11,6 @@ class HsOhMiMnMedicineType extends Model
 
     protected $table = 'hs_oh_mi_mn_medicine_types';
     protected $fillable = [
-        'MedicineType',
+        'medicineType',
     ];
 }

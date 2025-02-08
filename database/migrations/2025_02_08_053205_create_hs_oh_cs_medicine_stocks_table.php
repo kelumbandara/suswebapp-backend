@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('hs_oh_cs_medicine_stocks', function (Blueprint $table) {
             $table->id();
-            $table->integer('medicineName')->nullable();
-            $table->integer('division')->nullable();
-            $table->integer('inStock')->nullable();
-            $table->integer('status')->nullable();
+            $table->string('medicineName')->nullable();
+            $table->string('division')->nullable();
+            $table->string('inStock')->nullable();
+            $table->string('status')->nullable();
             $table->string('lastUpdated')->nullable();
             $table->timestamps();
         });

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('hs_oh_mi_mn_forms', function (Blueprint $table) {
             $table->id();
-            $table->string('Name')->nullable();
+            $table->string('formName')->nullable();
             $table->timestamps();
         });
     }

@@ -16,6 +16,8 @@ use App\Repositories\All\AccidentWitness\AccidentWitnessInterface;
 use App\Repositories\All\AccidentWitness\AccidentWitnessRepository;
 use App\Repositories\All\AssigneeLevel\AssigneeLevelInterface;
 use App\Repositories\All\AssigneeLevel\AssigneeLevelRepository;
+use App\Repositories\All\ClinicalSuite\ClinicalSuiteInterface;
+use App\Repositories\All\ClinicalSuite\ClinicalSuiteRepository;
 use App\Repositories\All\ComDepartment\DepartmentInterface;
 use App\Repositories\All\ComDepartment\DepartmentRepository;
 use App\Repositories\All\ComJobPosition\JobPositionInterface;
@@ -30,6 +32,12 @@ use App\Repositories\All\User\UserInterface;
 use App\Repositories\All\User\UserRepository;
 use App\Repositories\All\ComUserType\UserTypeInterface;
 use App\Repositories\All\ComUserType\UserTypeRepository;
+use App\Repositories\All\CsConsultingDoctor\ConsultingInterface;
+use App\Repositories\All\CsConsultingDoctor\ConsultingRepository;
+use App\Repositories\All\CsDesignation\DesignationInterface;
+use App\Repositories\All\CsDesignation\DesignationRepository;
+use App\Repositories\All\CsMedicineStock\MedicineStockInterface;
+use App\Repositories\All\CsMedicineStock\MedicineStockRepository;
 use App\Repositories\All\Factory\FactoryInterface;
 use App\Repositories\All\Factory\FactoryRepository;
 use App\Repositories\All\HazardAndRisk\HazardAndRiskInterface;
@@ -100,5 +108,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(IncidentWitnessInterface::class, IncidentWitnessRepository::class);
         $this->app->bind(DocumentInterface::class, DocumentRepository::class);
         $this->app->bind(DocumentTypeInterface::class, DocumentTypeRepository::class);
+        $this->app->bind(ClinicalSuiteInterface::class, ClinicalSuiteRepository::class);
+        $this->app->bind(DesignationInterface::class, DesignationRepository::class);
+        $this->app->bind(ConsultingInterface::class, ConsultingRepository::class);
+        $this->app->bind(MedicineStockInterface::class, MedicineStockRepository::class);
     }
 }

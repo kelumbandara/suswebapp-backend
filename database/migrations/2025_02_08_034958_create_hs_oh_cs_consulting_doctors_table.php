@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('hs_oh_cs_consulting_doctors', function (Blueprint $table) {
             $table->id();
-            $table->string('DoctorName')->nullable();
+            $table->string('doctorName')->nullable();
             $table->timestamps();
         });
     }

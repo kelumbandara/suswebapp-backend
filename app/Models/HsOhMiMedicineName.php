@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,10 +11,10 @@ class HsOhMiMedicineName extends Model
     protected $table = 'hs_oh_mi_medicine_names';
 
     protected $fillable = [
-        'MedicineName',
-        'GenericName',
-        'DosageStrength',
-        'Form',
-        'MedicineType',
+        'medicineName',
+        'genericName',
+        'dosageStrength',
+        'form',
+        'medicineType',
     ];
 }

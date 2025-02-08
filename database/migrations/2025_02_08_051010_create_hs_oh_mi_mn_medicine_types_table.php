@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('hs_oh_mi_mn_medicine_types', function (Blueprint $table) {
             $table->id();
-            $table->string('MedicineType')->nullable();
+            $table->string('medicineType')->nullable();
             $table->timestamps();
         });
     }

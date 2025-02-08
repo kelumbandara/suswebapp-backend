@@ -9,9 +9,9 @@ class HsOhMiMnForm extends Model
 {
     use HasFactory;
 
-    protected $table = 'hs_oh_mi_mn_forms'; // Explicitly define the table name
+    protected $table = 'hs_oh_mi_mn_forms'; 
 
     protected $fillable = [
-        'Name',
+        'formName',
     ];
 }

@@ -21,6 +21,10 @@ use App\Http\Controllers\HealthAndSaftyControllers\AiIncidentFactorsController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiIncidentRecodeController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiIncidentTypeOfConcernController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiIncidentTypeOfNearMissController;
+use App\Http\Controllers\HealthAndSaftyControllers\ClinicalSuiteRecodeController;
+use App\Http\Controllers\HealthAndSaftyControllers\CsConsultingDoctorController;
+use App\Http\Controllers\HealthAndSaftyControllers\CsDesignationController;
+use App\Http\Controllers\HealthAndSaftyControllers\CsMedicineStockController;
 use App\Http\Controllers\HealthAndSaftyControllers\DocumentDocumentTypeController;
 use App\Http\Controllers\HealthAndSaftyControllers\DocumentRecodeController;
 use App\Http\Controllers\HealthAndSaftyControllers\HazardAndRiskController;
@@ -118,6 +122,25 @@ Route::delete('documents/{id}/delete', [DocumentRecodeController::class, 'destro
 Route::get('documents-types', [DocumentDocumentTypeController::class, 'index']);
 Route::post('documents-types', [DocumentDocumentTypeController::class, 'store']);
 
+Route::get('clinical-suite', [ClinicalSuiteRecodeController::class, 'index']);
+Route::post('clinical-suite', [ClinicalSuiteRecodeController::class, 'store']);
+Route::put('clinical-suite/{id}/update', [ClinicalSuiteRecodeController::class, 'update']);
+Route::delete('clinical-suite/{id}/delete', [ClinicalSuiteRecodeController::class, 'destroy']);
+
+Route::get('designations', [CsDesignationController::class, 'index']);
+Route::post('clinical-suite-types', [CsDesignationController::class, 'store']);
+Route::put('designations/{id}/update', [CsDesignationController::class, 'update']);
+Route::delete('designations/{id}/delete', [CsDesignationController::class, 'destroy']);
+
+Route::get('consulting-doctors', [CsConsultingDoctorController::class, 'index']);
+Route::post('consulting-doctors', [CsConsultingDoctorController::class, 'store']);
+Route::put('consulting-doctors/{id}/update', [CsConsultingDoctorController::class, 'update']);
+Route::delete('consulting-doctors/{id}/delete', [CsConsultingDoctorController::class, 'destroy']);
+
+Route::get('medicine-stock', [CsMedicineStockController::class, 'index']);
+Route::post('medicine-stock', [CsMedicineStockController::class, 'store']);
+Route::put('medicine-stock/{id}/update', [CsMedicineStockController::class, 'update']);
+Route::delete('medicine-stock/{id}/delete', [CsMedicineStockController::class, 'destroy']);
 
 
 Route::get('user-permissions', [ComPermissionController::class, 'index']);
@@ -125,5 +148,6 @@ Route::post('user-permissions', [ComPermissionController::class, 'store']);
 Route::get('user-permissions/{id}/show', [ComPermissionController::class, 'show']);
 Route::put('user-permissions/{id}/update', [ComPermissionController::class, 'update']);
 Route::delete('user-permissions/{id}/delete', [ComPermissionController::class, 'destroy']);
+
 
 Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);

@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('hs_oh_mi_medicine_requests', function (Blueprint $table) {
             $table->id();
-            $table->string('MedicineName')->nullable(); 
-            $table->string('GenericName')->nullable();
+            $table->string('referenceNumber')->nullable();
+            $table->string('medicineName')->nullable();
+            $table->string('genericName')->nullable();
             $table->string('division')->nullable();
-            $table->string('Approver')->nullable();
-            $table->string('ReferenceNumber')->nullable();
-            $table->string('InventoryNumber')->nullable();
-            $table->string('RequestedDate')->nullable();
-            $table->enum('status',['draft', 'open', 'closed'])->default('draft')->nullable();
+            $table->string('approver')->nullable();
+            $table->string('inventoryNumber')->nullable();
+            $table->string('requestedDate')->nullable();
+            $table->enum('status',['pending', 'approved', 'rejected',])->default('pending')->nullable();
             $table->string('responsibleSection')->nullable()->default('Documents');
             $table->string('assigneeLevel')->nullable()->default('1');
             $table->string('createdByUser')->nullable();
