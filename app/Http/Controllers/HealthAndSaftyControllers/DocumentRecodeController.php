@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
@@ -21,17 +20,16 @@ class DocumentRecodeController extends Controller
         return response()->json($document);
     }
 
-
     public function store(DocumentRecodeRequest $request)
-    {
-        $data = $request->validated();
-        $document = $this->documentInterface->create($data);
-        return response()->json([
-            'message' => 'Document created successfully',
-            'data' => $document
-        ], 201);
-    }
-
+{
+    $data = $request->validated();
+    $data['isNoExpiry'] = filter_var($data['isNoExpiry'], FILTER_VALIDATE_BOOLEAN);
+    $document = $this->documentInterface->create($data);
+    return response()->json([
+        'message' => 'Document created successfully',
+        'data' => $document
+    ], 201);
+}
     public function update(DocumentRecodeRequest $request, $id)
     {
         $document = $this->documentInterface->findById($id);
@@ -39,12 +37,12 @@ class DocumentRecodeController extends Controller
             return response()->json(['message' => 'Document not found'], 404);
         }
 
-        $data = $request->validated();
+        $data            = $request->validated();
         $updatedDocument = $this->documentInterface->update($id, $data);
 
         return response()->json([
             'message' => 'Document updated successfully',
-            'data' => $updatedDocument
+            'data'    => $updatedDocument,
         ]);
     }
 
