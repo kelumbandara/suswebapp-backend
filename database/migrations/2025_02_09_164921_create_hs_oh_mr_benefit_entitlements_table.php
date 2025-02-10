@@ -12,7 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('hs_oh_mr_benefit_entitlements', function (Blueprint $table) {
-            $table->id();
+            $table->id('entitlementId');
+            $table->bigInteger('benefitRequestId')->nullable();
+            $table->string('benefitType')->nullable();
+            $table->integer('amountValue')->nullable();
+            $table->integer('totalDaysPaid')->nullable();
+            $table->integer('amount1stInstallment')->nullable();
+            $table->string('dateOf1stInstallment')->nullable();
+            $table->integer('amount2ndInstallment')->nullable();
+            $table->string('dateOf2ndInstallment')->nullable();
+            $table->string('ifBenefitReceived')->nullable();
+            $table->string('benefitName')->nullable();
+            $table->string('benefitAddress')->nullable();
+            $table->integer('benefitTotalAmount')->nullable();
+            $table->string('benefitDate')->nullable();
+            $table->string('description')->nullable();
+
             $table->timestamps();
         });
     }

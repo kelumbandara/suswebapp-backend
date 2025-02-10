@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('hs_oh_mr_benefit_documents', function (Blueprint $table) {
-            $table->id();
+            $table->id('documentId');
+            $table->bigInteger('benefitRequestId')->nullable();
+            $table->string('documentType')->nullable();
+            $table->string('document')->nullable();
             $table->timestamps();
         });
     }

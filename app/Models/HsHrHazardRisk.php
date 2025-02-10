@@ -31,11 +31,7 @@ class HsHrHazardRisk extends Model
         'responsibleSection',
         'createdByUser',
     ];
-    protected $casts = [
-        'dueDate' => 'datetime',
-        'serverDateAndTime' => 'datetime',
-        ];
-
+    
     protected static function booted()
     {
         static::creating(function ($model) {

@@ -97,7 +97,8 @@ class HazardAndRiskController extends Controller
         }
 
         $validatedData = $request->validated();
-        $hazardRisk    = $this->hazardAndRiskInterface->update($id, $validatedData);
+
+        $hazardRisk = $this->hazardAndRiskInterface->update($id, $validatedData);
 
         return response()->json([
             'message'    => 'Hazard and risk record updated successfully!',
