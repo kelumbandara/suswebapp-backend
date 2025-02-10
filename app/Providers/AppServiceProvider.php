@@ -70,6 +70,14 @@ use App\Repositories\All\MiMedicineRequest\MedicineRequestInterface;
 use App\Repositories\All\MiMedicineRequest\MedicineRequestRepository;
 use App\Repositories\All\MiMedicineType\MedicineTypeInterface;
 use App\Repositories\All\MiMedicineType\MedicineTypeRepository;
+use App\Repositories\All\OhMrBeBenefitType\BenefitTypeInterface;
+use App\Repositories\All\OhMrBeBenefitType\BenefitTypeRepository;
+use App\Repositories\All\OhMrBenefitDocument\BenefitDocumentInterface;
+use App\Repositories\All\OhMrBenefitDocument\BenefitDocumentRepository;
+use App\Repositories\All\OhMrBenefitEntitlement\BenefitEntitlementInterface;
+use App\Repositories\All\OhMrBenefitEntitlement\BenefitEntitlementRepository;
+use App\Repositories\All\OhMrBenefitRequest\BenefitRequestInterface;
+use App\Repositories\All\OhMrBenefitRequest\BenefitRequestRepository;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -124,5 +132,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(MedicineNameInterface::class, MedicineNameRepository::class);
         $this->app->bind(MedicineTypeInterface::class, MedicineTypeRepository::class);
         $this->app->bind(MedicineFormInterface::class, MedicineFormRepository::class);
+        $this->app->bind(BenefitRequestInterface::class, BenefitRequestRepository::class);
+        $this->app->bind(BenefitDocumentInterface::class, BenefitDocumentRepository::class);
+        $this->app->bind(BenefitEntitlementInterface::class, BenefitEntitlementRepository::class);
+        $this->app->bind(BenefitTypeInterface::class, BenefitTypeRepository::class);
+
     }
 }

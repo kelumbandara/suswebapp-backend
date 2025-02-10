@@ -24,13 +24,14 @@ return new class extends Migration
             $table->string('subLocation')->nullable();
             $table->string('description')->nullable();
             $table->string('documents')->nullable();
-            $table->dateTime('dueDate')->nullable();
+            $table->string('dueDate')->nullable();
             $table->string('condition')->nullable();
             $table->enum('riskLevel', ['Low', 'Medium', 'High'])->default('Low')->nullable();
             $table->enum('unsafeActOrCondition', ['Unsafe Act', 'Unsafe Condition'])->default('Unsafe Act')->nullable();
-            $table->enum('status', ['Open',  'draft'])->default('draft')->nullable();
-            $table->dateTime('serverDateAndTime')->nullable();
-            $table->integer('assigneeLevel')->nullable();
+            $table->enum('status', ['Open','draft'])->default('draft')->nullable();
+            $table->string('serverDateAndTime')->nullable();
+            $table->integer('assigneeLevel')->nullable()->default(1);
+            $table->string('createdUserLevel')->nullable();
             $table->string('responsibleSection')->nullable()->default('HazardRisks');
             $table->timestamps();
         });

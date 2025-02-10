@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests\AIIncidentPeople;
+namespace App\Http\Requests\HsOhMrBeBenefitType;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PeopleRequest extends FormRequest
+class BenefitTypeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,7 @@ class PeopleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'benefitType' => 'required|string',
         ];
     }
 }

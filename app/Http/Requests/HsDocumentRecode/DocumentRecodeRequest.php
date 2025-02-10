@@ -13,6 +13,13 @@ class DocumentRecodeRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'isNoExpiry' => filter_var($this->isNoExpiry, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+        ]);
+}
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -31,11 +38,11 @@ class DocumentRecodeRequest extends FormRequest
             'physicalLocation' => 'nullable|string',
             'versionNumber'    => 'required|string',
             'remarks'          => 'nullable|string',
-            'document'         => 'required|string',
+            'document'         => 'nullable|string',
             'issuedDate'       => 'required|string',
-            'isNoExpiry'         => 'nullable|boolean',
-            'expiryDate'       => 'required_if:isNoExpiry,true|string',
-            'notifyDate'       => 'required_if:isNoExpiry,true|string',
+            'isNoExpiry'       => 'nullable|boolean',
+            'expiryDate'       => 'required_if:isNoExpiry,false|string',
+            'notifyDate'       => 'required_if:isNoExpiry,false|string',
         ];
     }
 }

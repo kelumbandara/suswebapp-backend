@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\HazardAndRisk;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,23 +21,22 @@ class HazardAndRiskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category' => 'required|string|max:255',
-            'subCategory' => 'required|string|max:255',
-            'observationType' => 'nullable|string|max:255',
-            'division' => 'required|string|max:255',
-            'assignee' => 'required|string|max:255',
+            'category'             => 'required|string|max:255',
+            'subCategory'          => 'required|string|max:255',
+            'observationType'      => 'nullable|string|max:255',
+            'division'             => 'required|string|max:255',
+            'assignee'             => 'required|string|max:255',
             'locationOrDepartment' => 'required|string|max:255',
-            'subLocation' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-            'documents' => 'nullable|string|max:255',
-            'dueDate' => 'nullable|date',
-            'condition' => 'nullable|string|max:255',
-            'riskLevel' => 'nullable|string|max:255',
-            'unsafeActOrCondition' => 'nullable|string|max:255',
-            'status' => 'nullable|string|max:255',
-            'serverDateAndTime' => 'nullable|date',
-            'assigneeLevel' => 'nullable|integer',
-            'responsibleSection' => 'nullable|string|max:255',
+            'subLocation'          => 'nullable|string|max:255',
+            'description'          => 'nullable|string',
+            'documents'            => 'nullable|string|max:255',
+            'dueDate'              => 'nullable|string',
+            'condition'            => 'nullable|string|max:255',
+            'riskLevel'            => 'nullable|string|max:255',
+            'unsafeActOrCondition' => 'nullable|in:Unsafe Act,Unsafe Condition',
+            'serverDateAndTime'    => 'nullable|string',
+            'assigneeLevel'        => 'nullable|integer',
+            'responsibleSection'   => 'nullable|string|max:255',
 
         ];
     }

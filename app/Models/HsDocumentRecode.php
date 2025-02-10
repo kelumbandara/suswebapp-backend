@@ -16,7 +16,7 @@ class HsDocumentRecode extends Model
         'versionNumber',
         'documentType',
         'title',
-        'division', 
+        'division',
         'issuingAuthority',
         'issuedDate',
         'expiryDate',
@@ -32,5 +32,9 @@ class HsDocumentRecode extends Model
         'responsibleSection',
         'assigneeLevel',
         'createdByUser',
+    ];
+    
+    protected $casts = [
+        'isNoExpiry' => 'boolean',
     ];
 }
