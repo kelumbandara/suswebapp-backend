@@ -21,12 +21,12 @@ class HazardAndRiskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category'             => 'nullable|string|max:255',
-            'subCategory'          => 'nullable|string|max:255',
+            'category'             => 'required|string|max:255',
+            'subCategory'          => 'required|string|max:255',
             'observationType'      => 'nullable|string|max:255',
-            'division'             => 'nullable|string|max:255',
-            'assignee'             => 'nullable|string|max:255',
-            'locationOrDepartment' => 'nullable|string|max:255',
+            'division'             => 'required|string|max:255',
+            'assignee'             => 'required|string|max:255',
+            'locationOrDepartment' => 'required|string|max:255',
             'subLocation'          => 'nullable|string|max:255',
             'description'          => 'nullable|string',
             'documents'            => 'nullable|string|max:255',

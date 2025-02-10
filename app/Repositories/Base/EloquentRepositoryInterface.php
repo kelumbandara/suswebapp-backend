@@ -173,7 +173,7 @@ interface EloquentRepositoryInterface
     public function filterWithDateRange($filters, $with = [], $params = []): LengthAwarePaginator;
 
     public function updateOrCreate(array $attributes, array $values = []): Model;
-    
+
 
     public function getById($id);
 

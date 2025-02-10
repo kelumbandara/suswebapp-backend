@@ -83,7 +83,7 @@ Route::post('accident-injury', [AiAccidentInjuryTypeController::class, 'store'])
 Route::get('hazard-and-risk', [HazardAndRiskController::class, 'index']);
 Route::post('hazard-and-risk', [HazardAndRiskController::class, 'store']);
 Route::get('hazard-risk/{id}/show', [HazardAndRiskController::class, 'show']);
-Route::put('hazard-risk/{id}/update', [HazardAndRiskController::class, 'update']);
+Route::post('hazard-risk/{id}/update', [HazardAndRiskController::class, 'update']);
 Route::delete('hazard-risk/{id}/delete', [HazardAndRiskController::class, 'destroy']);
 Route::get('hazard-risk/{id}/edit', [HazardAndRiskController::class, 'edit']);
 
@@ -100,7 +100,7 @@ Route::post('hr-divisions', [HrDivisionController::class, 'store']);
 Route::get('accidents', [AiAccidentRecordController::class, 'index']);
 Route::post('accidents', [AiAccidentRecordController::class, 'store']);
 Route::get('accidents/{id}/show', [AiAccidentRecordController::class, 'show']);
-Route::put('accidents/{id}/update', [AiAccidentRecordController::class, 'update']);
+Route::post('accidents/{id}/update', [AiAccidentRecordController::class, 'update']);
 Route::delete('accidents/{id}/delete', [AiAccidentRecordController::class, 'destroy']);
 
 Route::get('incidents', [AiIncidentRecodeController::class, 'index']);
@@ -120,7 +120,7 @@ Route::post('incident-factors', [AiIncidentFactorsController::class, 'store']);
 Route::get('documents', [DocumentRecodeController::class, 'index']);
 Route::post('documents', [DocumentRecodeController::class, 'store']);
 Route::get('documents/{id}/show', [DocumentRecodeController::class, 'show']);
-Route::put('documents/{id}/update', [DocumentRecodeController::class, 'update']);
+Route::post('documents/{id}/update', [DocumentRecodeController::class, 'update']);
 Route::delete('documents/{id}/delete', [DocumentRecodeController::class, 'destroy']);
 
 Route::get('documents-types', [DocumentDocumentTypeController::class, 'index']);
@@ -128,49 +128,49 @@ Route::post('documents-types', [DocumentDocumentTypeController::class, 'store'])
 
 Route::get('clinical-suite', [ClinicalSuiteRecodeController::class, 'index']);
 Route::post('clinical-suite', [ClinicalSuiteRecodeController::class, 'store']);
-Route::put('clinical-suite/{id}/update', [ClinicalSuiteRecodeController::class, 'update']);
+Route::post('clinical-suite/{id}/update', [ClinicalSuiteRecodeController::class, 'update']);
 Route::delete('clinical-suite/{id}/delete', [ClinicalSuiteRecodeController::class, 'destroy']);
 
 Route::get('designations', [CsDesignationController::class, 'index']);
 Route::post('clinical-suite-types', [CsDesignationController::class, 'store']);
-Route::put('designations/{id}/update', [CsDesignationController::class, 'update']);
+Route::post('designations/{id}/update', [CsDesignationController::class, 'update']);
 Route::delete('designations/{id}/delete', [CsDesignationController::class, 'destroy']);
 
 Route::get('consulting-doctors', [CsConsultingDoctorController::class, 'index']);
 Route::post('consulting-doctors', [CsConsultingDoctorController::class, 'store']);
-Route::put('consulting-doctors/{id}/update', [CsConsultingDoctorController::class, 'update']);
+Route::post('consulting-doctors/{id}/update', [CsConsultingDoctorController::class, 'update']);
 Route::delete('consulting-doctors/{id}/delete', [CsConsultingDoctorController::class, 'destroy']);
 
 Route::get('medicine-stock', [CsMedicineStockController::class, 'index']);
 Route::post('medicine-stock', [CsMedicineStockController::class, 'store']);
-Route::put('medicine-stock/{id}/update', [CsMedicineStockController::class, 'update']);
+Route::post('medicine-stock/{id}/update', [CsMedicineStockController::class, 'update']);
 Route::delete('medicine-stock/{id}/delete', [CsMedicineStockController::class, 'destroy']);
 
 Route::get('medicine-request', [OsMiMedicineRequestController::class, 'index']);
 Route::post('medicine-request', [OsMiMedicineRequestController::class, 'store']);
-Route::put('medicine-request/{id}/update', [OsMiMedicineRequestController::class, 'update']);
+Route::post('medicine-request/{id}/update', [OsMiMedicineRequestController::class, 'update']);
 Route::delete('medicine-request/{id}/delete', [OsMiMedicineRequestController::class, 'destroy']);
 
 Route::get('medicine-name', [OsMiMedicineNameController::class, 'index']);
 Route::post('medicine-name', [OsMiMedicineNameController::class, 'store']);
-Route::put('medicine-name/{id}/update', [OsMiMedicineNameController::class, 'update']);
+Route::post('medicine-name/{id}/update', [OsMiMedicineNameController::class, 'update']);
 Route::delete('medicine-name/{id}/delete', [OsMiMedicineNameController::class, 'destroy']);
 
 Route::get('medicine-form', [OsMiMedicineNameFormController::class, 'index']);
 Route::post('medicine-form', [OsMiMedicineNameFormController::class, 'store']);
-Route::put('medicine-form/{id}/update', [OsMiMedicineNameFormController::class, 'update']);
+Route::post('medicine-form/{id}/update', [OsMiMedicineNameFormController::class, 'update']);
 Route::delete('medicine-form/{id}/delete', [OsMiMedicineNameFormController::class, 'destroy']);
 
 Route::get('medicine-types', [OsMiMedicineTypeController::class, 'index']);
 Route::post('medicine-types', [OsMiMedicineTypeController::class, 'store']);
-Route::put('medicine-types/{id}/update', [OsMiMedicineTypeController::class, 'update']);
+Route::post('medicine-types/{id}/update', [OsMiMedicineTypeController::class, 'update']);
 Route::delete('medicine-types/{id}/delete', [OsMiMedicineTypeController::class, 'destroy']);
 
 
 Route::get('user-permissions', [ComPermissionController::class, 'index']);
 Route::post('user-permissions', [ComPermissionController::class, 'store']);
 Route::get('user-permissions/{id}/show', [ComPermissionController::class, 'show']);
-Route::put('user-permissions/{id}/update', [ComPermissionController::class, 'update']);
+Route::post('user-permissions/{id}/update', [ComPermissionController::class, 'update']);
 Route::delete('user-permissions/{id}/delete', [ComPermissionController::class, 'destroy']);
 
 

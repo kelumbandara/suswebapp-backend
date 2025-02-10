@@ -34,13 +34,6 @@ class HazardAndRiskController extends Controller
                 $risk->assigneeName = 'Unknown';
             }
 
-            try {
-                $division             = $this->HRDivisionInterface->getById($risk->division);
-                $risk->HSdivisionName = $division ? $division->divisionName : 'Unknown';
-            } catch (\Exception $e) {
-                $risk->HSdivisionName = 'Unknown';
-            }
-
             return $risk;
         });
 
@@ -56,14 +49,6 @@ class HazardAndRiskController extends Controller
     public function store(HazardAndRiskRequest $request)
     {
         $validatedData = $request->validated();
-
-        if (isset($validatedData['dueDate'])) {
-            $validatedData['dueDate'] = Carbon::parse($validatedData['dueDate'])->toDateTimeString();
-        }
-
-        if (isset($validatedData['serverDateAndTime'])) {
-            $validatedData['serverDateAndTime'] = Carbon::parse($validatedData['serverDateAndTime'])->toDateTimeString();
-        }
 
         $hazardRisk = $this->hazardAndRiskInterface->create($validatedData);
 
@@ -90,7 +75,7 @@ class HazardAndRiskController extends Controller
     {
         $hazardRisk = $this->hazardAndRiskInterface->findById($id);
 
-        if (! $hazardRisk) {
+        if (!$hazardRisk) {
             return response()->json([
                 'message' => 'Hazard and risk record not found.',
             ], 404);
@@ -98,13 +83,22 @@ class HazardAndRiskController extends Controller
 
         $validatedData = $request->validated();
 
-        $hazardRisk = $this->hazardAndRiskInterface->update($id, $validatedData);
+        $updated = $this->hazardAndRiskInterface->update($id, $validatedData);
 
-        return response()->json([
-            'message'    => 'Hazard and risk record updated successfully!',
-            'hazardRisk' => $hazardRisk,
-        ], 201);
+        if ($updated) {
+            $hazardRisk = $this->hazardAndRiskInterface->findById($id); 
+
+            return response()->json([
+                'message'    => 'Hazard and risk record updated successfully!',
+                'hazardRisk' => $hazardRisk,
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'Failed to update the hazard and risk record.',
+            ], 500);
+        }
     }
+
 
     public function destroy($id)
     {
