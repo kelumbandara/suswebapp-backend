@@ -9,14 +9,14 @@ class HsOhMrBenefitDocument extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'personId';
-    
+    protected $primaryKey = 'documentId';
+
     protected $fillable = [
         'benefitRequestId',
         'documentType',
         'document',
     ];
-    public function benefit()
+    public function benefitDocument()
     {
         return $this->belongsTo(HsOhMrBenefitRequest::class, 'benefitRequestId');
     }

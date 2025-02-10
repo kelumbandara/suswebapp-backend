@@ -31,11 +31,11 @@ class DocumentRecodeRequest extends FormRequest
             'physicalLocation' => 'nullable|string',
             'versionNumber'    => 'required|string',
             'remarks'          => 'nullable|string',
-            'document'         => 'required|string',
+            'document'         => 'nullable|string',
             'issuedDate'       => 'required|string',
             'isNoExpiry'         => 'nullable|boolean',
-            'expiryDate'       => 'required_if:isNoExpiry,true|string',
-            'notifyDate'       => 'required_if:isNoExpiry,true|string',
+            'expiryDate'       => 'required_if:isNoExpiry,false|string',
+            'notifyDate'       => 'required_if:isNoExpiry,false|string',
         ];
     }
 }

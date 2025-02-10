@@ -20,6 +20,14 @@ class BenefitDocumentRepository extends BaseRepository implements BenefitDocumen
     {
         $this->model = $model;
     }
+    public function deleteByDocumentId($documentId)
+    {
+        return $this->model->where('documentId', $documentId)->delete();
+    }
 
+    public function findByDocumentId($documentId)
+    {
+        return $this->model->where('documentId', $documentId)->get();
+    }
 
 }

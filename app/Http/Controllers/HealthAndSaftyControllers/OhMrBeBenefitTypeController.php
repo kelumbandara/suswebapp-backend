@@ -3,61 +3,46 @@
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\HsOhMrBeBenefitType\BenefitTypeRequest;
+use App\Repositories\All\OhMrBeBenefitType\BenefitTypeInterface;
 use Illuminate\Http\Request;
 
 class OhMrBeBenefitTypeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $benefitTypeInterface;
+
+    public function __construct(BenefitTypeInterface $benefitTypeInterface)
+    {
+        $this->benefitTypeInterface = $benefitTypeInterface;
+    }
+
     public function index()
     {
-        //
+        $benefitType = $this->benefitTypeInterface->All();
+        if ($benefitType->isEmpty()) {
+            return response()->json([
+                'message' => 'No benefit type found.',
+            ], 404);
+        }
+        return response()->json($benefitType);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(BenefitTypeRequest $request)
     {
-        //
+        $benefitType = $this->benefitTypeInterface->create($request->validated());
+
+        return response()->json([
+            'message'    => 'benefit type created successfully!',
+            'category' => $benefitType,
+        ], 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+   
     public function destroy(string $id)
     {
         //

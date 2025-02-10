@@ -30,6 +30,7 @@ use App\Http\Controllers\HealthAndSaftyControllers\DocumentRecodeController;
 use App\Http\Controllers\HealthAndSaftyControllers\HazardAndRiskController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrCategoryController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrDivisionController;
+use App\Http\Controllers\HealthAndSaftyControllers\OhMrBeBenefitTypeController;
 use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineNameController;
 use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineNameFormController;
 use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineRequestController;
@@ -50,6 +51,13 @@ Route::get('all-users', [UserController::class, 'index']);
 Route::post('login', [LoginController::class, 'login']);
 Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
 Route::post('reset-password', [ForgotPasswordController::class, 'otpVerifyFunction']);
+
+
+Route::get('user-permissions', [ComPermissionController::class, 'index']);
+Route::post('user-permissions', [ComPermissionController::class, 'store']);
+Route::get('user-permissions/{id}/show', [ComPermissionController::class, 'show']);
+Route::post('user-permissions/{id}/update', [ComPermissionController::class, 'update']);
+Route::delete('user-permissions/{id}/delete', [ComPermissionController::class, 'destroy']);
 
 Route::get('job-positions', [JobPositionController::class, 'index']);
 Route::post('job-positions', [JobPositionController::class, 'store']);
@@ -167,11 +175,11 @@ Route::post('medicine-types/{id}/update', [OsMiMedicineTypeController::class, 'u
 Route::delete('medicine-types/{id}/delete', [OsMiMedicineTypeController::class, 'destroy']);
 
 
-Route::get('user-permissions', [ComPermissionController::class, 'index']);
-Route::post('user-permissions', [ComPermissionController::class, 'store']);
-Route::get('user-permissions/{id}/show', [ComPermissionController::class, 'show']);
-Route::post('user-permissions/{id}/update', [ComPermissionController::class, 'update']);
-Route::delete('user-permissions/{id}/delete', [ComPermissionController::class, 'destroy']);
+
+Route::get('benefit-types', [OhMrBeBenefitTypeController::class, 'index']);
+Route::post('benefit-types', [OhMrBeBenefitTypeController::class, 'store']);
+
+
 
 
 Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);
