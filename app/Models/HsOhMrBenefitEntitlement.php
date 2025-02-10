@@ -21,10 +21,10 @@ class HsOhMrBenefitEntitlement extends Model
         'amount2ndInstallment',
         'dateOf2ndInstallment',
         'ifBenefitReceived',
-        'benefitName',
-        'benefitAddress',
-        'benefitTotalAmount',
-        'benefitDate',
+        'beneficiaryName',
+        'beneficiaryAddress',
+        'beneficiaryTotalAmount',
+        'beneficiaryDate',
         'description',
     ];
     public function entitlement()

@@ -6,6 +6,6 @@ use App\Repositories\Base\EloquentRepositoryInterface;
 
 // Interface
 interface BenefitDocumentInterface extends EloquentRepositoryInterface {
-    public function findByDocumentId(int $documentId);
-    public function deleteByDocumentId(int $documentId);
+    public function findByBenefitRequestId(int $benefitRequestId);
+    public function deleteByBenefitRequestId(int $benefitRequestId);
 }

@@ -21,14 +21,14 @@ class BenefitEntitlementRepository extends BaseRepository implements BenefitEnti
         $this->model = $model;
     }
 
-    public function deleteByEntitlementId($entitlementId)
+    public function deleteByBenefitRequestId($benefitRequestId)
     {
-        return $this->model->where('entitlementId', $entitlementId)->delete();
+        return $this->model->where('benefitRequestId', $benefitRequestId)->delete();
     }
 
-    public function findByEntitlementId($entitlementId)
+    public function findByBenefitRequestId($benefitRequestId)
     {
-        return $this->model->where('entitlementId', $entitlementId)->get();
+        return $this->model->where('benefitRequestId', $benefitRequestId)->get();
     }
 
 }

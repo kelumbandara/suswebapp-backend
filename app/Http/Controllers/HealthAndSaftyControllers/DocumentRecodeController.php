@@ -30,21 +30,24 @@ class DocumentRecodeController extends Controller
         'data' => $document
     ], 201);
 }
-    public function update(DocumentRecodeRequest $request, $id)
-    {
-        $document = $this->documentInterface->findById($id);
-        if (! $document) {
-            return response()->json(['message' => 'Document not found'], 404);
-        }
-
-        $data            = $request->validated();
-        $updatedDocument = $this->documentInterface->update($id, $data);
-
-        return response()->json([
-            'message' => 'Document updated successfully',
-            'data'    => $updatedDocument,
-        ]);
+public function update(DocumentRecodeRequest $request, $id)
+{
+    $document = $this->documentInterface->findById($id);
+    if (!$document) {
+        return response()->json(['message' => 'Document not found'], 404);
     }
+
+    $data = $request->validated();
+    $data['isNoExpiry'] = filter_var($data['isNoExpiry'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+    $updatedDocument = $this->documentInterface->update($id, $data);
+
+    return response()->json([
+        'message' => 'Document updated successfully',
+        'data' => $updatedDocument,
+    ]);
+}
+
 
     public function destroy($id)
     {

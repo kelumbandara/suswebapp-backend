@@ -22,10 +22,10 @@ return new class extends Migration
             $table->integer('amount2ndInstallment')->nullable();
             $table->string('dateOf2ndInstallment')->nullable();
             $table->string('ifBenefitReceived')->nullable();
-            $table->string('benefitName')->nullable();
-            $table->string('benefitAddress')->nullable();
-            $table->integer('benefitTotalAmount')->nullable();
-            $table->string('benefitDate')->nullable();
+            $table->string('beneficiaryName')->nullable();
+            $table->string('beneficiaryAddress')->nullable();
+            $table->integer('beneficiaryTotalAmount')->nullable();
+            $table->string('beneficiaryDate')->nullable();
             $table->string('description')->nullable();
 
             $table->timestamps();
