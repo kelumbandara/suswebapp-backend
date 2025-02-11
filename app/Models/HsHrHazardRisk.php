@@ -31,20 +31,16 @@ class HsHrHazardRisk extends Model
         'responsibleSection',
         'createdByUser',
     ];
-    
+
+
+
     protected static function booted()
     {
-        static::creating(function ($model) {
-            $model->referenceNumber = $model->generateReferenceNumber();
+        static::created(function ($model) {
+            $model->referenceNumber = 'EHS-' . $model->id;
+
+            $model->save();
         });
-    }
-
-    private function generateReferenceNumber()
-    {
-        $latest = HsHrHazardRisk::latest()->first();
-        $lastId = $latest ? $latest->id : 0;
-
-        return 'EHS-' . ($lastId + 1);
     }
 
 }

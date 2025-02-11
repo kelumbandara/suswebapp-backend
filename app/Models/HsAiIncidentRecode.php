@@ -31,18 +31,18 @@ class HsAiIncidentRecode extends Model
         'createdUserLevel',
         'responsibleSection'
     ];
+
     protected static function booted()
     {
         static::creating(function ($model) {
-            $model->referenceNumber = $model->generateReferenceNumber();
+            // Set a temporary reference number before the record is inserted
+            $model->referenceNumber = 'ICD-PENDING'; // Use a temporary value to avoid SQL error
         });
-    }
 
-    private function generateReferenceNumber()
-    {
-        $latest = HsAiAccidentRecord::latest()->first();
-        $lastId = $latest ? $latest->id : 0;
-
-        return 'ICD-' . ($lastId + 1);
+        static::created(function ($model) {
+            // Now that the record has an ID, update the referenceNumber
+            $model->referenceNumber = 'ICD-' . $model->id;
+            $model->save(); // Save again to update the referenceNumber
+        });
     }
 }
