@@ -44,19 +44,17 @@ class HsAiAccidentRecord extends Model
         'expectedTime',
     ];
 
+
     protected static function booted()
     {
         static::creating(function ($model) {
-            $model->referenceNumber = $model->generateReferenceNumber();
+            $model->referenceNumber = 'ICD-PENDING';
         });
-    }
 
-    private function generateReferenceNumber()
-    {
-        $latest = HsAiAccidentRecord::latest()->first();
-        $lastId = $latest ? $latest->id : 0;
-
-        return 'ACD-' . ($lastId + 1);
+        static::created(function ($model) {
+            $model->referenceNumber = 'ICD-' . $model->id;
+            $model->save(); 
+        });
     }
 
 }
