@@ -60,8 +60,8 @@ class DatabaseSeeder extends Seeder
 
         ComPermission::factory()->create([
             'id'               => 2,
-            'userType'         => 'Admin',
-            'description'      => 'Administrator Role with full permissions',
+            'userType'         => 'Guest',
+            'description'      => 'guest Role with full permissions',
             'permissionObject' => json_encode([
                     "INSIGHT_VIEW" => true,
                     "ADMIN_USERS_EDIT" => false,
