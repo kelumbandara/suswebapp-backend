@@ -71,29 +71,57 @@ class AiIncidentRecodeController extends Controller
             'record'  => $record,
         ], 201);
     }
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(IncidentRecodeRequest $request, string $id)
     {
-        //
+        $data = $request->validated();
+        $record = $this->incidentRecordInterface->findById($id);
+
+        if (!$record || !is_object($record)) {
+            return response()->json(['message' => 'Incident record not found'], 404);
+        }
+
+        $updateSuccess = $this->incidentWitnessInterface->update($id, $data);
+
+        if (!$updateSuccess) {
+            return response()->json(['message' => 'Failed to update incident record'], 500);
+        }
+
+        $updatedRecord = $this->incidentRecordInterface->findById($id);
+
+        if (!$updatedRecord || !is_object($updatedRecord)) {
+            return response()->json(['message' => 'Error fetching updated incident record'], 500);
+        }
+
+        $this->incidentWitnessInterface->deleteByIncidentId($id);
+        $this->incidentPeopleInterface->deleteByIncidentId($id);
+
+        if (!empty($data['witnesses'])) {
+            foreach ($data['witnesses'] as $witness) {
+                $witness['incidentId'] = $id;
+                $this->incidentWitnessInterface->create($witness);
+            }
+        }
+
+        if (!empty($data['effectedIndividuals'])) {
+            foreach ($data['effectedIndividuals'] as $person) {
+                $person['incidentId'] = $id;
+                $this->incidentPeopleInterface->create($person);
+            }
+        }
+
+        $updatedRecord->witnesses = $this->incidentWitnessInterface->findByIncidentId($id);
+        $updatedRecord->effectedIndividuals = $this->incidentPeopleInterface->findByIncidentId($id);
+
+        return response()->json([
+            'message' => 'Incident record updated successfully',
+            'record'  => $updatedRecord,
+        ], 200);
     }
+
 
     /**
      * Remove the specified resource from storage.
