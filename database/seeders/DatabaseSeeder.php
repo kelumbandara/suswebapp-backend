@@ -4,6 +4,7 @@ namespace Database\Seeders;
 use App\Models\ComPermission;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,7 +17,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name'     => 'Admin User',
             'email'    => 'admin@suswebapp.com',
-            'password' => ('Admin@1234'),
+            'password' => Hash::make('Admin@1234'),
             'userType' => '1',
         ]);
 
@@ -24,7 +25,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name'     => 'Super Admin',
             'email'    => 'supperadmin@suswebapp.com',
-            'password' => ('Supperadmin@1234'),
+            'password' => Hash::make('Supperadmin@1234'),
             'userType' => '1',
         ]);
 
