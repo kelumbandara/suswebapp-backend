@@ -12,6 +12,8 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
 
+    protected $table = 'users';
+
     protected $fillable = [
         'name',
         'email',
@@ -29,6 +31,7 @@ class User extends Authenticatable
         'profileImage',
         'availability',
         'assignedFactory',
+        
     ];
 
     protected $hidden = [
@@ -37,7 +40,6 @@ class User extends Authenticatable
     ];
     protected $casts = [
         'isCompanyEmployee' => 'boolean',
-        'email_verified_at' => 'datetime',
         'ResponsibleSection' => 'array',
         'assignedFactory' => 'array',
     ];
