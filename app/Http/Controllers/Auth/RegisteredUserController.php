@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Notifications\WelcomeNotification\WelcomeNotification;
 use App\Repositories\All\User\UserInterface;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 
 class RegisteredUserController extends Controller
@@ -20,6 +21,7 @@ class RegisteredUserController extends Controller
     {
         $validatedData = $request->validated();
         $validatedData['isCompanyEmployee'] = (bool) $validatedData['isCompanyEmployee'];
+        $validatedData['password'] = Hash::make($validatedData['password']);
 
         $user = $this->userInterface->create($validatedData);
 
