@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
         // Admin user
         User::factory()->create([
             'name'     => 'Admin User',
-            'email'    => 'admin@gmail.com',
+            'email'    => 'admin@suswebapp.com',
             'password' => ('Admin@1234'),
             'userType' => '1',
         ]);
@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
         // Super Admin user
         User::factory()->create([
             'name'     => 'Super Admin',
-            'email'    => 'supperadmin@email.com',
+            'email'    => 'supperadmin@suswebapp.com',
             'password' => ('Supperadmin@1234'),
             'userType' => '1',
         ]);
