@@ -114,6 +114,7 @@ Route::delete('accidents/{id}/delete', [AiAccidentRecordController::class, 'dest
 
 Route::get('incidents', [AiIncidentRecodeController::class, 'index']);
 Route::post('incidents', [AiIncidentRecodeController::class, 'store']);
+Route::post('incidents/{id}/update', [AiIncidentRecodeController::class, 'update']);
 Route::delete('incidents/{id}/delete', [AiIncidentRecodeController::class, 'destroy']);
 
 
