@@ -38,6 +38,7 @@ class HazardAndRiskRequest extends FormRequest
             'token'                => 'required|string',
             'assigneeLevel'        => 'nullable|integer',
             'responsibleSection'   => 'nullable|string|max:255',
+            'createdByUser'        => 'required|string|max:255',
 
         ];
     }

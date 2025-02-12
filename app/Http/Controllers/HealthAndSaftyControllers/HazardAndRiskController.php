@@ -24,28 +24,35 @@ class HazardAndRiskController extends Controller
     }
 
     public function index()
-    {
-        $hazardRisks = $this->hazardAndRiskInterface->All();
+{
+    $hazardRisks = $this->hazardAndRiskInterface->All();
 
-        $hazardRisks = $hazardRisks->map(function ($risk) {
-            try {
-                $user               = $this->userInterface->getById($risk->assignee);
-                $risk->assigneeName = $user ? $user->name : 'Unknown';
-            } catch (\Exception $e) {
-                $risk->assigneeName = 'Unknown';
-            }
-
-            return $risk;
-        });
-
-        if ($hazardRisks->isEmpty()) {
-            return response()->json([
-                'message' => 'No hazard and risk records found.',
-            ], 404);
+    $hazardRisks = $hazardRisks->map(function ($risk) {
+        try {
+            $assignee = $this->userInterface->getById($risk->assignee);
+            $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
+        } catch (\Exception $e) {
+            $risk->assigneeName = 'Unknown';
         }
 
-        return response()->json($hazardRisks, 200);
+        try {
+            $creator = $this->userInterface->getById($risk->createdByUser);
+            $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+        } catch (\Exception $e) {
+            $risk->createdByUserName = 'Unknown';
+        }
+
+        return $risk;
+    });
+
+    if ($hazardRisks->isEmpty()) {
+        return response()->json([
+            'message' => 'No hazard and risk records found.',
+        ], 404);
     }
+
+    return response()->json($hazardRisks, 200);
+}
 
 
     public function store(HazardAndRiskRequest $request)
