@@ -97,6 +97,9 @@ Route::get('hazard-risk/{id}/show', [HazardAndRiskController::class, 'show']);
 Route::post('hazard-risk/{id}/update', [HazardAndRiskController::class, 'update']);
 Route::delete('hazard-risk/{id}/delete', [HazardAndRiskController::class, 'destroy']);
 Route::get('hazard-risk/{id}/edit', [HazardAndRiskController::class, 'edit']);
+Route::get('hazard-risk-dashboard', [HazardAndRiskController::class, 'dashboardStats']);
+Route::get('hazard-risk-dashboard-division', [HazardAndRiskController::class, 'dashboardStatsByDivision']);
+
 
 
 Route::get('hr-categories', [HrCategoryController::class, 'index']);
@@ -138,10 +141,10 @@ Route::delete('documents/{id}/delete', [DocumentRecodeController::class, 'destro
 Route::get('documents-types', [DocumentDocumentTypeController::class, 'index']);
 Route::post('documents-types', [DocumentDocumentTypeController::class, 'store']);
 
-Route::get('clinical-suite', [ClinicalSuiteRecodeController::class, 'index']);
-Route::post('clinical-suite', [ClinicalSuiteRecodeController::class, 'store']);
-Route::post('clinical-suite/{id}/update', [ClinicalSuiteRecodeController::class, 'update']);
-Route::delete('clinical-suite/{id}/delete', [ClinicalSuiteRecodeController::class, 'destroy']);
+Route::get('patient-records', [ClinicalSuiteRecodeController::class, 'index']);
+Route::post('patient-records', [ClinicalSuiteRecodeController::class, 'store']);
+Route::post('patient-records/{id}/update', [ClinicalSuiteRecodeController::class, 'update']);
+Route::delete('patient-records/{id}/delete', [ClinicalSuiteRecodeController::class, 'destroy']);
 
 Route::get('designations', [CsDesignationController::class, 'index']);
 Route::post('clinical-suite-types', [CsDesignationController::class, 'store']);

@@ -138,4 +138,52 @@ class HazardAndRiskController extends Controller
         return response()->json($hazardRisk, 200);
     }
 
+    public function dashboardStats()
+{
+    try {
+        $total = $this->hazardAndRiskInterface->countAll();
+        $completed = $this->hazardAndRiskInterface->countByStatus('Completed');
+        $pending = $this->hazardAndRiskInterface->countByStatus('Pending');
+        $amount = $this->hazardAndRiskInterface->sumField('amount'); // Assuming an amount field exists
+
+        return response()->json([
+            'total' => $total,
+            'completed' => $completed,
+            'pending' => $pending,
+            'amount' => $amount,
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Error fetching dashboard stats.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+public function dashboardStatsByDivision()
+{
+    try {
+        $divisions = $this->hazardAndRiskInterface->getDistinctDivisions();
+
+        $divisionStats = [];
+
+        foreach ($divisions as $division) {
+            $totalCount = $this->hazardAndRiskInterface->countByDivision($division->division);
+
+            $divisionStats[] = [
+                'division' => $division->division,
+                'total' => $totalCount,
+            ];
+        }
+
+        return response()->json($divisionStats, 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Error fetching division-wise stats.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+
 }
