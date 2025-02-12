@@ -35,6 +35,7 @@ class HazardAndRiskRequest extends FormRequest
             'riskLevel'            => 'nullable|string|max:255',
             'unsafeActOrCondition' => 'nullable|in:Unsafe Act,Unsafe Condition',
             'serverDateAndTime'    => 'nullable|string',
+            'token'                => 'required|string',
             'assigneeLevel'        => 'nullable|integer',
             'responsibleSection'   => 'nullable|string|max:255',
 
