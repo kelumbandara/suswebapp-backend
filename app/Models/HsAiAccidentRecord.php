@@ -26,6 +26,7 @@ class HsAiAccidentRecord extends Model
         'affectedSecondaryRegion',
         'affectedTertiaryRegion',
         'injuryCause',
+        'rootCause',
         'consultedHospital',
         'consultedDoctor',
         'description',
@@ -53,7 +54,7 @@ class HsAiAccidentRecord extends Model
 
         static::created(function ($model) {
             $model->referenceNumber = 'ICD-' . $model->id;
-            $model->save(); 
+            $model->save();
         });
     }
 
