@@ -19,6 +19,10 @@ class AiAccidentInjuryTypeController extends Controller
     public function index()
     {
         $accidentInjuryType = $this->accidentInjuryTypeInterface->all();
+
+        if ($accidentInjuryType->isEmpty()) {
+            return response()->json(['error' => 'No accident injury types found in the database.'], 404);
+        }
         return response()->json($accidentInjuryType);
     }
 

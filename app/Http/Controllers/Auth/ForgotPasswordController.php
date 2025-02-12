@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Notifications\FrogotpasswordOTPsend\SendPasswordChangeConfirmation;
 use App\Repositories\All\User\UserInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 
@@ -35,10 +36,9 @@ class ForgotPasswordController extends Controller
 
         $otp = rand(100000, 999999);
 
-        $user->otp = $otp;
+        $user->otp            = $otp;
         $user->otp_expires_at = now()->addMinutes(5);
         $user->save();
-
 
         try {
             Notification::route('mail', $user->email)->notify(new SendPasswordChangeConfirmation($otp, $user->email));
@@ -50,27 +50,50 @@ class ForgotPasswordController extends Controller
     }
 
     public function otpVerifyFunction(Request $request)
-{
-    $validator = Validator::make($request->only(['email', 'otp']), [
-        'email' => 'required|email|exists:users,email',
-        'otp'   => 'required|digits:6',
-    ]);
+    {
+        $validator = Validator::make($request->only(['email', 'otp']), [
+            'email' => 'required|email|exists:users,email',
+            'otp'   => 'required|digits:6',
+        ]);
 
-    if ($validator->fails()) {
-        return response()->json(['error' => $validator->errors()], 422);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        $user = $this->userInterface->findByColumn(['email' => $request->email]);
+
+        if (! $user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        if ($user->otp !== $request->otp) {
+            return response()->json(['message' => 'Invalid OTP.'], 400);
+        }
+
+        return response()->json(['message' => 'OTP verified successfully.'], 202);
     }
 
-    // Find the user by email
-    $user = $this->userInterface->findByColumn(['email' => $request->email]);
+    public function changePassword(Request $request)
+    {
+        $validator = Validator::make($request->only(['email', 'password']), [
+            'email'    => 'required|email|exists:users,email',
+            'password' => 'required|min:8|confirmed',
+        ]);
 
-    if (!$user) {
-        return response()->json(['message' => 'User not found.'], 404);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        $user = $this->userInterface->findByColumn(['email' => $request->email]);
+
+        if (! $user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return response()->json(['message' => 'Password changed successfully.'], 200);
     }
 
-    if ($user->otp !== $request->otp) {
-        return response()->json(['message' => 'Invalid OTP.'], 400);
-    }
-
-    return response()->json(['message' => 'OTP verified successfully.'], 202);
-}
 }

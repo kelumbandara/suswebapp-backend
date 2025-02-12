@@ -52,6 +52,8 @@ Route::get('all-users', [UserController::class, 'index']);
 Route::post('login', [LoginController::class, 'login']);
 Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
 Route::post('reset-password', [ForgotPasswordController::class, 'otpVerifyFunction']);
+Route::post('change-password', [ForgotPasswordController::class, 'changePassword']);
+
 
 
 Route::get('user-permissions', [ComPermissionController::class, 'index']);
