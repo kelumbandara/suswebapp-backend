@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
             'id'               => 1,
             'userType'         => 'Super Admin',
             'description'      => 'Administrator Role with full permissions',
-            'permissionObject' => json_encode([
+            'permissionObject' => ([
                 "INSIGHT_VIEW"                                    => true,
                 "ADMIN_USERS_EDIT"                                => true,
                 "ADMIN_USERS_VIEW"                                => true,
@@ -62,7 +62,7 @@ class DatabaseSeeder extends Seeder
             'id'               => 2,
             'userType'         => 'Guest',
             'description'      => 'guest Role with full permissions',
-            'permissionObject' => json_encode([
+            'permissionObject' => ([
                     "INSIGHT_VIEW" => true,
                     "ADMIN_USERS_EDIT" => false,
                     "ADMIN_USERS_VIEW" => true,

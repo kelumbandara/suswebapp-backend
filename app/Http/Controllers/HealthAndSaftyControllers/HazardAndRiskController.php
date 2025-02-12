@@ -50,17 +50,7 @@ class HazardAndRiskController extends Controller
 
     public function store(HazardAndRiskRequest $request)
     {
-        $user = Auth::user();
-        dd($user);
-        if (!$user) {
-            return response()->json([
-                'message' => 'Unauthorized: User not found.',
-            ], 401);
-        }
-
         $validatedData = $request->validated();
-
-        $validatedData['create_by'] = $user->id;
 
         $hazardRisk = $this->hazardAndRiskInterface->create($validatedData);
 
