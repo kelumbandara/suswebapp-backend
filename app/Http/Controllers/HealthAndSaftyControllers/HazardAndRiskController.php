@@ -7,6 +7,7 @@ use App\Repositories\All\HazardAndRisk\HazardAndRiskInterface;
 use App\Repositories\All\HRDivision\HRDivisionInterface;
 use App\Repositories\All\User\UserInterface;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class HazardAndRiskController extends Controller
 {
@@ -46,9 +47,20 @@ class HazardAndRiskController extends Controller
         return response()->json($hazardRisks, 200);
     }
 
+
     public function store(HazardAndRiskRequest $request)
     {
+        $user = Auth::user();
+        dd($user);
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unauthorized: User not found.',
+            ], 401);
+        }
+
         $validatedData = $request->validated();
+
+        $validatedData['create_by'] = $user->id;
 
         $hazardRisk = $this->hazardAndRiskInterface->create($validatedData);
 
@@ -86,7 +98,7 @@ class HazardAndRiskController extends Controller
         $updated = $this->hazardAndRiskInterface->update($id, $validatedData);
 
         if ($updated) {
-            $hazardRisk = $this->hazardAndRiskInterface->findById($id); 
+            $hazardRisk = $this->hazardAndRiskInterface->findById($id);
 
             return response()->json([
                 'message'    => 'Hazard and risk record updated successfully!',

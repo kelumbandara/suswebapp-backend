@@ -24,13 +24,13 @@ class UserController extends Controller
 
         $permission = $this->comPermissionInterface->getById($userType);
         $userData = $user->toArray();
+
         if ($permission) {
-            $userData = array_merge($userData, (array) $permission->permissionObject);
+            $userData['permissionObject'] = (array) $permission->permissionObject;
         }
 
         return response()->json($userData, 200);
     }
-
     public function index()
     {
         $user = $this->userInterface->All();
