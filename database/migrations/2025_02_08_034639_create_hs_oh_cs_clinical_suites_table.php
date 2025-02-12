@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('department')->nullable();
             $table->string('subDepartment')->nullable();
             $table->string('division')->nullable();
-            $table->enum('workStatus',['offDuty', 'onDuty', 'draft'])->default('draft')->nullable();
+            $table->enum('workStatus',['OffDuty', 'OnDuty', 'draft'])->default('draft')->nullable();
             $table->string('symptoms')->nullable();
             $table->string('checkInDate')->nullable();
             $table->string('checkInTime')->nullable();
