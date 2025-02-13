@@ -58,7 +58,7 @@ class DatabaseSeeder extends Seeder
 
         ComPermission::factory()->create([
             'id'               => 2,
-            'userType'         => 'Guest',
+            'userType'         => 'guest',
             'description'      => 'guest Role with full permissions',
             'permissionObject' => ([
                     "INSIGHT_VIEW" => true,
