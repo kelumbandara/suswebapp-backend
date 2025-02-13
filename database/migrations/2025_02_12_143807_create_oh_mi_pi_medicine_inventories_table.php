@@ -36,7 +36,6 @@ return new class extends Migration
             $table->string('invoiceReference')->nullable();
             $table->string('manufacturerName')->nullable();
             $table->integer('batchNumber')->nullable();
-            $table->string('issuedQuantity')->nullable();
             $table->string('reorderThreshold')->nullable();
             $table->string('usageInstruction')->nullable();
             $table->string('division')->nullable();
