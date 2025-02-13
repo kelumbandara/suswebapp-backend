@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('hs_oh_mr_benefit_documents', function (Blueprint $table) {
             $table->id('documentId');
-            $table->bigInteger('benefitRequestId')->nullable();
+            $table->bigInteger('benefitId')->nullable();
             $table->string('documentType')->nullable();
             $table->string('document')->nullable();
             $table->timestamps();

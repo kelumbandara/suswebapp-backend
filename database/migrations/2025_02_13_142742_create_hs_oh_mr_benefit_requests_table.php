@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('applicationId')->nullable();
             $table->string('applicationDate')->nullable();
             $table->string('reJoinDate')->nullable();
-            $table->enum('status',['pending', 'approved', 'rejected',])->default('pending')->nullable();
+            $table->enum('status',['draft', 'open', 'closed'])->nullable();
             $table->integer('age')->nullable();
             $table->integer('contactNumber')->nullable();
             $table->string('designation')->nullable();
@@ -35,7 +35,7 @@ return new class extends Migration
             $table->string('actualDeliveryDate')->nullable();
             $table->string('noticeDateAfterDelivery')->nullable();
             $table->string('supportProvider')->nullable();
-            $table->string('responsibleSection')->nullable()->default('BenefitRequest');
+            $table->string('responsibleSection')->nullable()->default('maternityRegister');
             $table->string('assigneeLevel')->nullable()->default('1');
             $table->string('createdByUser')->nullable();
             $table->timestamps();
