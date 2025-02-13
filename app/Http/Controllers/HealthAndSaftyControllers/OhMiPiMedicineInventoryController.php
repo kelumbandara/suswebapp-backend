@@ -26,7 +26,7 @@ class OhMiPiMedicineInventoryController extends Controller
         }
 
         foreach ($records as $record) {
-            $record->witnesses = $this->medicineDisposalInterface->findByInventoryId($record->id);
+            $record->inventory = $this->medicineDisposalInterface->findByInventoryId($record->id);
         }
 
         return response()->json($records, 200);
@@ -43,9 +43,9 @@ class OhMiPiMedicineInventoryController extends Controller
         }
 
         if (! empty($data['disposals'])) {
-            foreach ($data['disposals'] as $witness) {
-                $witness['inventoryId'] = $inventory->id;
-                $this->medicineDisposalInterface->create($witness);
+            foreach ($data['disposals'] as $inventory) {
+                $inventory['inventoryId'] = $inventory->id;
+                $this->medicineDisposalInterface->create($inventory);
             }
         }
 
@@ -88,13 +88,13 @@ class OhMiPiMedicineInventoryController extends Controller
         $this->medicineDisposalInterface->deleteByInventoryId($id);
 
         if (! empty($data['disposals'])) {
-            foreach ($data['disposals'] as $witness) {
-                $witness['inventoryId'] = $id;
-                $this->medicineDisposalInterface->create($witness);
+            foreach ($data['disposals'] as $inventory) {
+                $inventory['inventoryId'] = $id;
+                $this->medicineDisposalInterface->create($inventory);
             }
         }
 
-        $updatedInventory->witnesses = $this->medicineDisposalInterface->findByInventoryId($id);
+        $updatedInventory->inventory = $this->medicineDisposalInterface->findByInventoryId($id);
 
         return response()->json([
             'message' => 'Inventory record updated successfully',

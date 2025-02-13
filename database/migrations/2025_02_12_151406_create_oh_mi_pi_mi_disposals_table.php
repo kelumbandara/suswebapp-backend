@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('oh_mi_pi_mi_disposals', function (Blueprint $table) {
             $table->id('disposalId');
-            $table->bigInteger('incidentId')->nullable();
+            $table->unsignedBigInteger('inventoryId')->nullable();
             $table->string('disposalDate')->nullable();
             $table->string('availableQuantity')->nullable();
             $table->string('disposalQuantity')->nullable();

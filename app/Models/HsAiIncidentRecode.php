@@ -35,14 +35,12 @@ class HsAiIncidentRecode extends Model
     protected static function booted()
     {
         static::creating(function ($model) {
-            // Set a temporary reference number before the record is inserted
-            $model->referenceNumber = 'ICD-PENDING'; // Use a temporary value to avoid SQL error
+            $model->referenceNumber = 'ICD-PENDING';
         });
 
         static::created(function ($model) {
-            // Now that the record has an ID, update the referenceNumber
             $model->referenceNumber = 'ICD-' . $model->id;
-            $model->save(); // Save again to update the referenceNumber
+            $model->save(); 
         });
     }
 }

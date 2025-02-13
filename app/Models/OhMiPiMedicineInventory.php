@@ -44,4 +44,17 @@ class OhMiPiMedicineInventory extends Model
         'createdByUser',
     ];
 
+    protected static function booted()
+    {
+        static::created(function ($model) {
+            $model->referenceNumber = 'MED-' . $model->id;
+
+            $model->save();
+        });
+    }
+
+    public function disposals()
+{
+    return $this->hasMany(OhMiPiMiDisposal::class, 'inventoryId', 'id');
+}
 }

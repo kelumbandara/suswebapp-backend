@@ -9,6 +9,8 @@ class OhMiPiMiDisposal extends Model
 {
     use HasFactory;
 
+    protected $table = 'oh_mi_pi_mi_disposals';
+
     protected $primaryKey = 'disposalId';
 
 
@@ -24,6 +26,6 @@ class OhMiPiMiDisposal extends Model
 
     public function inventory()
     {
-        return $this->belongsTo(OhMiPiMedicineInventory::class, 'inventoryId');
+        return $this->belongsTo(OhMiPiMedicineInventory::class, 'inventoryId', 'id');
     }
 }

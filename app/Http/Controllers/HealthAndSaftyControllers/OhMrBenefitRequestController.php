@@ -113,7 +113,7 @@ class OhMrBenefitRequestController extends Controller
             }
         }
 
-        $updatedRecord->witnesses           = $this->benefitEntitlementInterface->findByBenefitRequestId($id);
+        $updatedRecord->inventory           = $this->benefitEntitlementInterface->findByBenefitRequestId($id);
         $updatedRecord->effectedIndividuals = $this->benefitDocumentInterface->findByBenefitRequestId($id);
 
         return response()->json([
