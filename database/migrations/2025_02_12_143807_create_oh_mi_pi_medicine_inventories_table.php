@@ -41,6 +41,7 @@ return new class extends Migration
             $table->string('usageInstruction')->nullable();
             $table->string('division')->nullable();
             $table->enum('status',['pending', 'approved', 'Shipped','Draft'])->default('Draft')->nullable();
+            $table->string('issuedQuantity')->nullable();
             $table->string('requestedBy')->nullable();
             $table->string('approvedBy')->nullable();
             $table->string('responsibleSection')->nullable()->default('medicineInventory');

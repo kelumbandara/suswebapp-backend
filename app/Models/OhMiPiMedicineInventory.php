@@ -36,6 +36,7 @@ class OhMiPiMedicineInventory extends Model
         'reorderThreshold',
         'usageInstruction',
         'division',
+        'issuedQuantity',
         'requestedBy',
         'approvedBy',
         'status',
