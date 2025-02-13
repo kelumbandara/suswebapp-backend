@@ -21,7 +21,7 @@ class JobPositionController extends Controller
         if ($jobPositions->isEmpty()) {
             return response()->json([
                 'message' => 'No jobPositions found.',
-            ], 404);
+            ]);
         }
         return response()->json($jobPositions);
     }

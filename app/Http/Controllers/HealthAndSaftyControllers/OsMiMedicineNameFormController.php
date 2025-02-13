@@ -22,7 +22,7 @@ class OsMiMedicineNameFormController extends Controller
         if ($medicineForm->isEmpty()) {
             return response()->json([
                 'message' => 'Medicine form not found.',
-            ], 404);
+            ]);
         }
         return response()->json($medicineForm, 200);
     }
@@ -44,7 +44,7 @@ class OsMiMedicineNameFormController extends Controller
         if (! $medicineForm) {
             return response()->json([
                 'message' => 'Medicine form not found.',
-            ], 404);
+            ]);
         }
 
         $this->medicineFormInterface->update($id, $request->validated());
@@ -61,7 +61,7 @@ class OsMiMedicineNameFormController extends Controller
         if (! $medicineForm) {
             return response()->json([
                 'message' => 'Medicine form not found.',
-            ], 404);
+            ]);
         }
 
         $this->medicineFormInterface->deleteById($id);

@@ -25,7 +25,7 @@ class OhMrBenefitRequestController extends Controller
         $records = $this->benefitRequestInterface->All();
 
         if ($records->isEmpty()) {
-            return response()->json(['message' => 'No accident records found'], 404);
+            return response()->json(['message' => 'No accident records found']);
         }
 
         foreach ($records as $record) {
@@ -70,7 +70,7 @@ class OhMrBenefitRequestController extends Controller
     {
         $record = $this->benefitRequestInterface->findById($id);
         if (! $record) {
-            return response()->json(['message' => 'Accident record not found'], 404);
+            return response()->json(['message' => 'Accident record not found']);
         }
         return response()->json($record);
     }
@@ -81,7 +81,7 @@ class OhMrBenefitRequestController extends Controller
         $record = $this->benefitRequestInterface->findById($id);
 
         if (! $record || ! is_object($record)) {
-            return response()->json(['message' => 'Accident record not found'], 404);
+            return response()->json(['message' => 'Accident record not found']);
         }
 
         $updateSuccess = $this->benefitRequestInterface->update($id, $data);
@@ -127,7 +127,7 @@ class OhMrBenefitRequestController extends Controller
         $record = $this->benefitRequestInterface->findById($id);
 
         if (! $record) {
-            return response()->json(['message' => 'Accident record not found'], 404);
+            return response()->json(['message' => 'Accident record not found']);
         }
 
         $this->benefitEntitlementInterface->deleteByBenefitRequestId($id);

@@ -22,7 +22,7 @@ class OsMiMedicineTypeController extends Controller
         if ($medicineType->isEmpty()) {
             return response()->json([
                 'message' => 'Medicine type not found.',
-            ], 404);
+            ]);
         }
         return response()->json($medicineType, 200);
     }
@@ -44,7 +44,7 @@ class OsMiMedicineTypeController extends Controller
         if (! $medicineType) {
             return response()->json([
                 'message' => 'Medicine type not found.',
-            ], 404);
+            ]);
         }
 
         $this->medicineTypeInterface->update($id, $request->validated());
@@ -61,7 +61,7 @@ class OsMiMedicineTypeController extends Controller
         if (! $medicineType) {
             return response()->json([
                 'message' => 'Medicine type not found.',
-            ], 404);
+            ]);
         }
 
         $this->medicineTypeInterface->deleteById($id);

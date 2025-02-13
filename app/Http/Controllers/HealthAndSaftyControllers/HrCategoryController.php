@@ -21,7 +21,7 @@ class HrCategoryController extends Controller
         if ($category->isEmpty()) {
             return response()->json([
                 'message' => 'No category found.',
-            ], 404);
+            ]);
         }
         return response()->json($category);
     }
@@ -47,7 +47,7 @@ class HrCategoryController extends Controller
         if ($uniqueCategories->isEmpty()) {
             return response()->json([
                 'message' => 'No category found.',
-            ], 404);
+            ]);
         }
 
         return response()->json($uniqueCategories);
@@ -61,7 +61,7 @@ class HrCategoryController extends Controller
     if ($subcategories->isEmpty()) {
         return response()->json([
             'message' => 'No subcategories found.',
-        ], 404);
+        ]);
     }
 
     $uniqueSubcategories = $subcategories->map(function ($item) {
@@ -81,7 +81,7 @@ class HrCategoryController extends Controller
     if ($observations->isEmpty()) {
         return response()->json([
             'message' => 'No observations found.',
-        ], 404);
+        ]);
     }
 
     $uniqueObservations = $observations->map(function ($item) {

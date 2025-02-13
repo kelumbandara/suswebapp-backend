@@ -22,7 +22,7 @@ class OhMrBeBenefitTypeController extends Controller
         if ($benefitType->isEmpty()) {
             return response()->json([
                 'message' => 'No benefit type found.',
-            ], 404);
+            ]);
         }
         return response()->json($benefitType);
     }
@@ -42,7 +42,7 @@ class OhMrBeBenefitTypeController extends Controller
         //
     }
 
-   
+
     public function destroy(string $id)
     {
         //

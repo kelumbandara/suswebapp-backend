@@ -22,7 +22,7 @@ class OhMiPiMedicineInventoryController extends Controller
         $records = $this->medicineInventoryInterface->All();
 
         if ($records->isEmpty()) {
-            return response()->json(['message' => 'No inventory records found'], 404);
+            return response()->json(['message' => 'No inventory records found']);
         }
 
         foreach ($records as $record) {
@@ -59,7 +59,7 @@ class OhMiPiMedicineInventoryController extends Controller
     {
         $inventory = $this->medicineInventoryInterface->findById($id);
         if (! $inventory) {
-            return response()->json(['message' => 'Inventory record not found'], 404);
+            return response()->json(['message' => 'Inventory record not found']);
         }
         return response()->json($inventory);
     }
@@ -70,7 +70,7 @@ class OhMiPiMedicineInventoryController extends Controller
         $inventory = $this->medicineInventoryInterface->findById($id);
 
         if (! $inventory || ! is_object($inventory)) {
-            return response()->json(['message' => 'Inventory record not found'], 404);
+            return response()->json(['message' => 'Inventory record not found'] );
         }
 
         $updateSuccess = $this->medicineInventoryInterface->update($id, $data);
@@ -107,7 +107,7 @@ class OhMiPiMedicineInventoryController extends Controller
         $inventory = $this->medicineInventoryInterface->findById($id);
 
         if (! $inventory) {
-            return response()->json(['message' => 'Inventory record not found'], 404);
+            return response()->json(['message' => 'Inventory record not found']);
         }
 
         $this->medicineDisposalInterface->deleteByInventoryId($id);

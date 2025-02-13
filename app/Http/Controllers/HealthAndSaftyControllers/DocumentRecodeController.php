@@ -17,6 +17,11 @@ class DocumentRecodeController extends Controller
     public function index()
     {
         $document = $this->documentInterface->all();
+        if ($document->isEmpty()) {
+            return response()->json([
+                'message' => 'No hazard and risk records found.',
+            ] );
+        }
         return response()->json($document);
     }
 
@@ -34,7 +39,7 @@ public function update(DocumentRecodeRequest $request, $id)
 {
     $document = $this->documentInterface->findById($id);
     if (!$document) {
-        return response()->json(['message' => 'Document not found'], 404);
+        return response()->json(['message' => 'Document not found']);
     }
 
     $data = $request->validated();
@@ -53,7 +58,7 @@ public function update(DocumentRecodeRequest $request, $id)
     {
         $document = $this->documentInterface->findById($id);
         if (! $document) {
-            return response()->json(['message' => 'Document not found'], 404);
+            return response()->json(['message' => 'Document not found']);
         }
 
         $this->documentInterface->deleteById($id);

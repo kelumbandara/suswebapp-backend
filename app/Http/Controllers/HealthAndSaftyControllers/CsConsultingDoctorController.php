@@ -22,7 +22,7 @@ class CsConsultingDoctorController extends Controller
         if ($doctor->isEmpty()) {
             return response()->json([
                 'message' => 'Consulting Doctor not found.',
-            ], 404);
+            ], );
         }
         return response()->json($doctor, 200);
     }
@@ -44,7 +44,7 @@ class CsConsultingDoctorController extends Controller
         if (! $doctor) {
             return response()->json([
                 'message' => 'Consulting Doctor not found.',
-            ], 404);
+            ], );
         }
 
         $this->consultingInterface->update($id, $request->validated());
@@ -61,7 +61,7 @@ class CsConsultingDoctorController extends Controller
         if (! $doctor) {
             return response()->json([
                 'message' => 'Consulting Doctor not found.',
-            ], 404);
+            ], );
         }
 
         $this->consultingInterface->deleteById($id);

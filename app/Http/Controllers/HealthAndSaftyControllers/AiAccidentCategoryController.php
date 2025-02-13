@@ -35,7 +35,7 @@ class AiAccidentCategoryController extends Controller
         if ($uniqueCategories->isEmpty()) {
             return response()->json([
                 'message' => 'No category found.',
-            ], 404);
+            ]);
         }
 
         return response()->json($uniqueCategories);
@@ -48,7 +48,7 @@ class AiAccidentCategoryController extends Controller
         if ($subcategories->isEmpty()) {
             return response()->json([
                 'message' => 'No subcategories found for this category.',
-            ], 404);
+            ]);
         }
 
         return response()->json($subcategories);

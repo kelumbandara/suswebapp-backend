@@ -21,7 +21,7 @@ class FactoryController extends Controller
         if ($factoryDetails->isEmpty()) {
             return response()->json([
                 'message' => 'No factory details found.',
-            ], 404);
+            ]);
         }
 
         return response()->json($factoryDetails);

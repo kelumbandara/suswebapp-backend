@@ -48,7 +48,7 @@ class HazardAndRiskController extends Controller
     if ($hazardRisks->isEmpty()) {
         return response()->json([
             'message' => 'No hazard and risk records found.',
-        ], 404);
+        ]);
     }
 
     return response()->json($hazardRisks, 200);
@@ -74,7 +74,7 @@ class HazardAndRiskController extends Controller
         if (! $hazardRisk) {
             return response()->json([
                 'message' => 'Hazard and risk record not found.',
-            ], 404);
+            ]);
         }
 
         return response()->json($hazardRisk, 200);
@@ -87,7 +87,7 @@ class HazardAndRiskController extends Controller
         if (!$hazardRisk) {
             return response()->json([
                 'message' => 'Hazard and risk record not found.',
-            ], 404);
+            ]);
         }
 
         $validatedData = $request->validated();
@@ -116,7 +116,7 @@ class HazardAndRiskController extends Controller
         if (! $hazardRisk) {
             return response()->json([
                 'message' => 'Hazard and risk record not found.',
-            ], 404);
+            ]);
         }
 
         $this->hazardAndRiskInterface->deleteById($id);
@@ -132,7 +132,7 @@ class HazardAndRiskController extends Controller
         if (! $hazardRisk) {
             return response()->json([
                 'message' => 'Hazard and risk record not found.',
-            ], 404);
+            ]);
         }
 
         return response()->json($hazardRisk, 200);

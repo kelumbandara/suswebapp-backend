@@ -27,7 +27,7 @@ class AiIncidentRecodeController extends Controller
         $records = $this->incidentRecordInterface->All();
 
         if ($records->isEmpty()) {
-            return response()->json(['message' => 'No incident records found'], 404);
+            return response()->json(['message' => 'No incident records found']);
         }
 
         foreach ($records as $record) {
@@ -81,7 +81,7 @@ class AiIncidentRecodeController extends Controller
     $record = $this->incidentRecordInterface->findById($id);
 
     if (!$record || !is_object($record)) {
-        return response()->json(['message' => 'Incident record not found'], 404);
+        return response()->json(['message' => 'Incident record not found']);
     }
 
     // Update the main incident record itself
@@ -131,7 +131,7 @@ class AiIncidentRecodeController extends Controller
         $record = $this->incidentRecordInterface->findById($id);
 
         if (! $record) {
-            return response()->json(['message' => 'Incident record not found'], 404);
+            return response()->json(['message' => 'Incident record not found']);
         }
 
         $this->incidentWitnessInterface->deleteByIncidentId($id);

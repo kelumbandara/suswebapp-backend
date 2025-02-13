@@ -22,7 +22,7 @@ class CsMedicineStockController extends Controller
         if ($medicineStock->isEmpty()) {
             return response()->json([
                 'message' => 'Medicine stock not found.',
-            ], 404);
+            ]);
         }
         return response()->json($medicineStock, 200);
     }
@@ -44,7 +44,7 @@ class CsMedicineStockController extends Controller
         if (! $medicineStock) {
             return response()->json([
                 'message' => 'Medicine stock not found.',
-            ], 404);
+            ]);
         }
 
         $this->medicineStockInterface->update($id, $request->validated());
@@ -61,7 +61,7 @@ class CsMedicineStockController extends Controller
         if (! $medicineStock) {
             return response()->json([
                 'message' => 'Medicine stock not found.',
-            ], 404);
+            ]);
         }
 
         $this->medicineStockInterface->deleteById($id);

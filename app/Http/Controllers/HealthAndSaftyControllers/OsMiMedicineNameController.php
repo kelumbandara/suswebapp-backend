@@ -22,7 +22,7 @@ class OsMiMedicineNameController extends Controller
         if ($medicineName->isEmpty()) {
             return response()->json([
                 'message' => 'Medicine name not found.',
-            ], 404);
+            ],);
         }
         return response()->json($medicineName, 200);
     }
@@ -44,7 +44,7 @@ class OsMiMedicineNameController extends Controller
         if (! $medicineName) {
             return response()->json([
                 'message' => 'Medicine name not found.',
-            ], 404);
+            ]);
         }
 
         $this->medicineNameInterface->update($id, $request->validated());
@@ -61,7 +61,7 @@ class OsMiMedicineNameController extends Controller
         if (! $medicineName) {
             return response()->json([
                 'message' => 'Medicine name not found.',
-            ], 404);
+            ]);
         }
 
         $this->medicineNameInterface->deleteById($id);
