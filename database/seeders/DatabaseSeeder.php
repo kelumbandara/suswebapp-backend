@@ -13,7 +13,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Admin user
         User::factory()->create([
             'name'     => 'Admin User',
             'email'    => 'admin@suswebapp.com',
@@ -21,7 +20,6 @@ class DatabaseSeeder extends Seeder
             'userType' => '1',
         ]);
 
-        // Super Admin user
         User::factory()->create([
             'name'     => 'Super Admin',
             'email'    => 'supperadmin@suswebapp.com',

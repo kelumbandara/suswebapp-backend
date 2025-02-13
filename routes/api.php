@@ -30,6 +30,7 @@ use App\Http\Controllers\HealthAndSaftyControllers\DocumentRecodeController;
 use App\Http\Controllers\HealthAndSaftyControllers\HazardAndRiskController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrCategoryController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrDivisionController;
+use App\Http\Controllers\HealthAndSaftyControllers\OhMiPiMedicineInventoryController;
 use App\Http\Controllers\HealthAndSaftyControllers\OhMrBeBenefitTypeController;
 use App\Http\Controllers\HealthAndSaftyControllers\OhMrBenefitRequestController;
 use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineNameController;
@@ -186,10 +187,13 @@ Route::post('benefit-request', [OhMrBenefitRequestController::class, 'store']);
 Route::post('benefit-request/{id}/update', [OhMrBenefitRequestController:: class, 'update']);
 Route::delete('benefit-request/{id}/delete', [OhMrBenefitRequestController:: class, 'destroy']);
 
-
 Route::get('benefit-types', [OhMrBeBenefitTypeController::class, 'index']);
 Route::post('benefit-types', [OhMrBeBenefitTypeController::class, 'store']);
 
+Route::get('medicine-inventory', [OhMiPiMedicineInventoryController::class, 'index']);
+Route::post('medicine-inventory', [OhMiPiMedicineInventoryController::class, 'store']);
+Route::post('medicine-inventory/{id}/update', [OhMiPiMedicineInventoryController::class, 'update']);
+Route::delete('medicine-inventory/{id}/delete', [OhMiPiMedicineInventoryController::class, 'destroy']);
 
 
 

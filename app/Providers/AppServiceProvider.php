@@ -62,6 +62,10 @@ use App\Repositories\All\IncidentTypeOfNearMiss\IncidentTypeOfNearMissInterface;
 use App\Repositories\All\IncidentTypeOfNearMiss\IncidentTypeOfNearMissRepository;
 use App\Repositories\All\IncidentWitness\IncidentWitnessInterface;
 use App\Repositories\All\IncidentWitness\IncidentWitnessRepository;
+use App\Repositories\All\MedicineDisposal\MedicineDisposalInterface;
+use App\Repositories\All\MedicineDisposal\MedicineDisposalRepository;
+use App\Repositories\All\MedicineInventory\MedicineInventoryInterface;
+use App\Repositories\All\MedicineInventory\MedicineInventoryRepository;
 use App\Repositories\All\MiMedicineName\MedicineNameInterface;
 use App\Repositories\All\MiMedicineName\MedicineNameRepository;
 use App\Repositories\All\MiMedicineNameForm\MedicineFormInterface;
@@ -136,6 +140,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(BenefitDocumentInterface::class, BenefitDocumentRepository::class);
         $this->app->bind(BenefitEntitlementInterface::class, BenefitEntitlementRepository::class);
         $this->app->bind(BenefitTypeInterface::class, BenefitTypeRepository::class);
+        $this->app->bind(MedicineInventoryInterface::class, MedicineInventoryRepository::class);
+        $this->app->bind(MedicineDisposalInterface::class, MedicineDisposalRepository::class);
+
 
     }
 }
