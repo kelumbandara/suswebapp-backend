@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('reJoinDate')->nullable();
             $table->enum('status',['draft', 'open', 'closed'])->nullable();
             $table->integer('age')->nullable();
-            $table->integer('contactNumber')->nullable();
+            $table->string('contactNumber')->nullable();
             $table->string('designation')->nullable();
             $table->string('department')->nullable();
             $table->string('supervisorOrManager')->nullable();

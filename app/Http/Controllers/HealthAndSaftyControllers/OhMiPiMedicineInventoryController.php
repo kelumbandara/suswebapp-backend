@@ -21,9 +21,6 @@ class OhMiPiMedicineInventoryController extends Controller
     {
         $records = $this->medicineInventoryInterface->All();
 
-        if ($records->isEmpty()) {
-            return response()->json(['message' => 'No inventory records found']);
-        }
 
         foreach ($records as $record) {
             $record->inventory = $this->medicineDisposalInterface->findByInventoryId($record->id);

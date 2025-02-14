@@ -26,10 +26,6 @@ class AiIncidentRecodeController extends Controller
     {
         $records = $this->incidentRecordInterface->All();
 
-        if ($records->isEmpty()) {
-            return response()->json(['message' => 'No incident records found']);
-        }
-
         foreach ($records as $record) {
             $record->witnesses           = $this->incidentWitnessInterface->findByIncidentId($record->id);
             $record->effectedIndividuals = $this->incidentPeopleInterface->findByIncidentId($record->id);

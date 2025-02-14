@@ -17,11 +17,7 @@ class DocumentRecodeController extends Controller
     public function index()
     {
         $document = $this->documentInterface->all();
-        if ($document->isEmpty()) {
-            return response()->json([
-                'message' => 'No hazard and risk records found.',
-            ] );
-        }
+
         return response()->json($document);
     }
 

@@ -19,11 +19,7 @@ class OsMiMedicineRequestController extends Controller
     public function index()
     {
         $medicineStock = $this->medicineRequestInterface->All();
-        if ($medicineStock->isEmpty()) {
-            return response()->json([
-                'message' => 'Medicine request not found.',
-            ]);
-        }
+        
         return response()->json($medicineStock, 200);
     }
 

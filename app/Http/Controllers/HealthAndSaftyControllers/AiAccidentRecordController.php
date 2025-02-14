@@ -23,11 +23,6 @@ class AiAccidentRecordController extends Controller
     public function index()
     {
         $records = $this->accidentRecordInterface->All();
-
-        if ($records->isEmpty()) {
-            return response()->json(['message' => 'No accident records found']);
-        }
-
         foreach ($records as $record) {
             $record->witnesses           = $this->accidentWitnessInterface->findByAccidentId($record->id);
             $record->effectedIndividuals = $this->accidentPeopleInterface->findByAccidentId($record->id);

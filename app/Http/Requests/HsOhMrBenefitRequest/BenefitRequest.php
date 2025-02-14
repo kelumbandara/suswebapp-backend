@@ -24,7 +24,7 @@ class BenefitRequest extends FormRequest
             'employeeId'                                       => 'required|string', //
             'employeeName'                                     => 'required|string', //
             'age'                                              => 'nullable|numeric',
-            'contactNumber'                                    => 'nullable|numeric',
+            'contactNumber'                                    => 'nullable|string',
             'designation'                                      => 'required|string', //
             'department'                                       => 'required|string', //
             'supervisorOrManager'                              => 'nullable|string',

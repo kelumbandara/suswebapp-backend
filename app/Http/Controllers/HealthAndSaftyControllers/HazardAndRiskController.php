@@ -22,8 +22,7 @@ class HazardAndRiskController extends Controller
         $this->userInterface          = $userInterface;
         $this->HRDivisionInterface    = $HRDivisionInterface;
     }
-
-    public function index()
+public function index()
 {
     $hazardRisks = $this->hazardAndRiskInterface->All();
 
@@ -45,15 +44,8 @@ class HazardAndRiskController extends Controller
         return $risk;
     });
 
-    if ($hazardRisks->isEmpty()) {
-        return response()->json([
-            'message' => 'No hazard and risk records found.',
-        ]);
-    }
-
     return response()->json($hazardRisks, 200);
 }
-
 
     public function store(HazardAndRiskRequest $request)
     {
