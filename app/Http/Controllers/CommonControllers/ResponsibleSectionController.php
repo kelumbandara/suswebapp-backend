@@ -22,7 +22,7 @@ class ResponsibleSectionController extends Controller
         if ($responsibleSection->isEmpty()) {
             return response()->json([
                 'message' => 'No Responsible Section found.',
-            ], 404);
+            ]);
         }
         return response()->json($responsibleSection);
     }

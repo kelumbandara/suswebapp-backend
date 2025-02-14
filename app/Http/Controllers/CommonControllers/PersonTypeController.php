@@ -23,7 +23,7 @@ class PersonTypeController extends Controller
         if ($personType->isEmpty()) {
             return response()->json([
                 'message' => 'No person type found.',
-            ], 404);
+            ]);
         }
 
         return response()->json($personType);

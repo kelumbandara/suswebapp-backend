@@ -22,31 +22,30 @@ class HazardAndRiskController extends Controller
         $this->userInterface          = $userInterface;
         $this->HRDivisionInterface    = $HRDivisionInterface;
     }
+public function index()
+{
+    $hazardRisks = $this->hazardAndRiskInterface->All();
 
-    public function index()
-    {
-        $hazardRisks = $this->hazardAndRiskInterface->All();
-
-        $hazardRisks = $hazardRisks->map(function ($risk) {
-            try {
-                $user               = $this->userInterface->getById($risk->assignee);
-                $risk->assigneeName = $user ? $user->name : 'Unknown';
-            } catch (\Exception $e) {
-                $risk->assigneeName = 'Unknown';
-            }
-
-            return $risk;
-        });
-
-        if ($hazardRisks->isEmpty()) {
-            return response()->json([
-                'message' => 'No hazard and risk records found.',
-            ], 404);
+    $hazardRisks = $hazardRisks->map(function ($risk) {
+        try {
+            $assignee = $this->userInterface->getById($risk->assignee);
+            $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
+        } catch (\Exception $e) {
+            $risk->assigneeName = 'Unknown';
         }
 
-        return response()->json($hazardRisks, 200);
-    }
+        try {
+            $creator = $this->userInterface->getById($risk->createdByUser);
+            $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+        } catch (\Exception $e) {
+            $risk->createdByUserName = 'Unknown';
+        }
 
+        return $risk;
+    });
+
+    return response()->json($hazardRisks, 200);
+}
 
     public function store(HazardAndRiskRequest $request)
     {
@@ -67,7 +66,7 @@ class HazardAndRiskController extends Controller
         if (! $hazardRisk) {
             return response()->json([
                 'message' => 'Hazard and risk record not found.',
-            ], 404);
+            ]);
         }
 
         return response()->json($hazardRisk, 200);
@@ -80,7 +79,7 @@ class HazardAndRiskController extends Controller
         if (!$hazardRisk) {
             return response()->json([
                 'message' => 'Hazard and risk record not found.',
-            ], 404);
+            ]);
         }
 
         $validatedData = $request->validated();
@@ -109,7 +108,7 @@ class HazardAndRiskController extends Controller
         if (! $hazardRisk) {
             return response()->json([
                 'message' => 'Hazard and risk record not found.',
-            ], 404);
+            ]);
         }
 
         $this->hazardAndRiskInterface->deleteById($id);
@@ -125,10 +124,58 @@ class HazardAndRiskController extends Controller
         if (! $hazardRisk) {
             return response()->json([
                 'message' => 'Hazard and risk record not found.',
-            ], 404);
+            ]);
         }
 
         return response()->json($hazardRisk, 200);
     }
+
+    public function dashboardStats()
+{
+    try {
+        $total = $this->hazardAndRiskInterface->countAll();
+        $completed = $this->hazardAndRiskInterface->countByStatus('Completed');
+        $pending = $this->hazardAndRiskInterface->countByStatus('Pending');
+        $amount = $this->hazardAndRiskInterface->sumField('amount'); // Assuming an amount field exists
+
+        return response()->json([
+            'total' => $total,
+            'completed' => $completed,
+            'pending' => $pending,
+            'amount' => $amount,
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Error fetching dashboard stats.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+public function dashboardStatsByDivision()
+{
+    try {
+        $divisions = $this->hazardAndRiskInterface->getDistinctDivisions();
+
+        $divisionStats = [];
+
+        foreach ($divisions as $division) {
+            $totalCount = $this->hazardAndRiskInterface->countByDivision($division->division);
+
+            $divisionStats[] = [
+                'division' => $division->division,
+                'total' => $totalCount,
+            ];
+        }
+
+        return response()->json($divisionStats, 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Error fetching division-wise stats.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
 
 }

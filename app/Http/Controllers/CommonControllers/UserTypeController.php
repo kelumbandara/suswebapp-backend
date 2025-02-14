@@ -21,7 +21,7 @@ class UserTypeController extends Controller
         if ($userType->isEmpty()) {
             return response()->json([
                 'message' => 'No jobPositions found.',
-            ], 404);
+            ]);
         }
         return response()->json($userType);
     }

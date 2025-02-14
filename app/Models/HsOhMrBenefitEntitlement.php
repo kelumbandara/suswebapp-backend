@@ -12,7 +12,7 @@ class HsOhMrBenefitEntitlement extends Model
     protected $primaryKey = 'entitlementId';
 
     protected $fillable = [
-        'benefitRequestId',
+        'benefitId',
         'benefitType',
         'amountValue',
         'totalDaysPaid',
@@ -27,8 +27,9 @@ class HsOhMrBenefitEntitlement extends Model
         'beneficiaryDate',
         'description',
     ];
-    public function entitlement()
+    public function benefit()
     {
-        return $this->belongsTo(HsOhMrBenefitRequest::class, 'benefitRequestId');
+        return $this->belongsTo(HsOhMrBenefitRequest::class, 'benefitId');
     }
+
 }

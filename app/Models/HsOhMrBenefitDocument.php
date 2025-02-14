@@ -12,13 +12,14 @@ class HsOhMrBenefitDocument extends Model
     protected $primaryKey = 'documentId';
 
     protected $fillable = [
-        'benefitRequestId',
+        'benefitId',
         'documentType',
         'document',
     ];
-    public function benefitDocument()
+
+    public function benefit()
     {
-        return $this->belongsTo(HsOhMrBenefitRequest::class, 'benefitRequestId');
+        return $this->belongsTo(HsOhMrBenefitRequest::class, 'benefitId');
     }
 
 }

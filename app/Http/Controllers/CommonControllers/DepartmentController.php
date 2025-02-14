@@ -22,7 +22,7 @@ class DepartmentController extends Controller
         if ($department->isEmpty()) {
             return response()->json([
                 'message' => 'No jobPositions found.',
-            ], 404);
+            ]);
         }
         return response()->json($department);
     }

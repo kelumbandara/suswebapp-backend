@@ -21,11 +21,11 @@ return new class extends Migration
             $table->string('otp')->nullable();
             $table->timestamp('otp_expires_at')->nullable();
             $table->boolean('emailVerifiedAt')->default(false);
-            $table->string('userType')->nullable()->default('guest');
+            $table->string('userType')->nullable()->default('1');
             $table->string('department')->nullable();
             $table->string('jobPosition')->nullable();
             $table->json('responsibleSection')->nullable();
-            $table->integer('assigneeLevel')->nullable();
+            $table->integer('assigneeLevel')->default(1)->nullable();
             $table->string('profileImage')->nullable();
             $table->boolean('availability')->default(true);
             $table->json('assignedFactory')->nullable();

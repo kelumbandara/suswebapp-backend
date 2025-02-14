@@ -3,38 +3,35 @@ namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HsOhMrBenefitRequest\BenefitRequest;
-use App\Repositories\All\OhMrBenefitDocument\BenefitDocumentInterface;
-use App\Repositories\All\OhMrBenefitEntitlement\BenefitEntitlementInterface;
+use App\Repositories\All\HsOhMrBenefitDocument\BenefitDocumentInterface;
+use App\Repositories\All\HsOhMrBenefitEntitlement\BenefitEntitlementInterface;
 use App\Repositories\All\OhMrBenefitRequest\BenefitRequestInterface;
 
 class OhMrBenefitRequestController extends Controller
 {
+
     protected $benefitRequestInterface;
-    protected $benefitEntitlementInterface;
     protected $benefitDocumentInterface;
+    protected $benefitEntitlementInterface;
 
-    public function __construct(BenefitRequestInterface $benefitRequestInterface, BenefitEntitlementInterface $benefitEntitlementInterface, BenefitDocumentInterface $benefitDocumentInterface)
+    public function __construct(BenefitRequestInterface $benefitRequestInterface, BenefitDocumentInterface $benefitDocumentInterface, BenefitEntitlementInterface $benefitEntitlementInterface)
     {
-        $this->benefitRequestInterface  = $benefitRequestInterface;
+        $this->benefitRequestInterface     = $benefitRequestInterface;
+        $this->benefitDocumentInterface    = $benefitDocumentInterface;
         $this->benefitEntitlementInterface = $benefitEntitlementInterface;
-        $this->benefitDocumentInterface  = $benefitDocumentInterface;
     }
-
     public function index()
     {
         $records = $this->benefitRequestInterface->All();
 
-        if ($records->isEmpty()) {
-            return response()->json(['message' => 'No accident records found'], 404);
-        }
-
         foreach ($records as $record) {
-            $record->witnesses           = $this->benefitEntitlementInterface->findByBenefitRequestId($record->id);
-            $record->effectedIndividuals = $this->benefitDocumentInterface->findByBenefitRequestId($record->id);
+            $record->benefitsAndEntitlements = $this->benefitEntitlementInterface->findByBenefitId($record->id);
+            $record->medicalDocuments        = $this->benefitDocumentInterface->findByBenefitId($record->id);
         }
 
         return response()->json($records, 200);
     }
+
 
     public function store(BenefitRequest $request)
     {
@@ -43,36 +40,27 @@ class OhMrBenefitRequestController extends Controller
         $record = $this->benefitRequestInterface->create($data);
 
         if (! $record) {
-            return response()->json(['message' => 'Failed to create accident record'], 500);
+            return response()->json(['message' => 'Failed to create benefit request'], 500);
         }
 
-        if (! empty($data['witnesses'])) {
-            foreach ($data['witnesses'] as $witness) {
-                $witness['accidentId'] = $record->id;
-                $this->benefitEntitlementInterface->create($witness);
+        if (! empty($data['benefitsAndEntitlements'])) {
+            foreach ($data['benefitsAndEntitlements'] as $entitlements) {
+                $entitlements['benefitId'] = $record->id;
+                $this->benefitEntitlementInterface->create($entitlements);
             }
         }
 
-        if (! empty($data['effectedIndividuals'])) {
-            foreach ($data['effectedIndividuals'] as $person) {
-                $person['accidentId'] = $record->id;
-                $this->benefitDocumentInterface->create($person);
+        if (! empty($data['medicalDocuments'])) {
+            foreach ($data['medicalDocuments'] as $documents) {
+                $documents['benefitId'] = $record->id;
+                $this->benefitDocumentInterface->create($documents);
             }
         }
 
         return response()->json([
-            'message' => 'Accident record created successfully',
+            'message' => 'Benefit request created successfully',
             'record'  => $record,
         ], 201);
-    }
-
-    public function show(string $id)
-    {
-        $record = $this->benefitRequestInterface->findById($id);
-        if (! $record) {
-            return response()->json(['message' => 'Accident record not found'], 404);
-        }
-        return response()->json($record);
     }
 
     public function update(BenefitRequest $request, string $id)
@@ -81,43 +69,38 @@ class OhMrBenefitRequestController extends Controller
         $record = $this->benefitRequestInterface->findById($id);
 
         if (! $record || ! is_object($record)) {
-            return response()->json(['message' => 'Accident record not found'], 404);
+            return response()->json(['message' => 'Benefit request not found']);
         }
 
-        $updateSuccess = $this->benefitRequestInterface->update($id, $data);
+        $updateSuccess = $record->update($data);
 
         if (! $updateSuccess) {
-            return response()->json(['message' => 'Failed to update accident record'], 500);
+            return response()->json(['message' => 'Failed to update benefit request'], 500);
         }
 
-        $updatedRecord = $this->benefitRequestInterface->findById($id);
+        $this->benefitEntitlementInterface->deleteByBenefitId($id);
+        $this->benefitDocumentInterface->deleteByBenefitId($id);
 
-        if (! $updatedRecord || ! is_object($updatedRecord)) {
-            return response()->json(['message' => 'Error fetching updated accident record'], 500);
-        }
-
-        $this->benefitEntitlementInterface->deleteByBenefitRequestId($id);
-        $this->benefitDocumentInterface->deleteByBenefitRequestId($id);
-
-        if (! empty($data['witnesses'])) {
-            foreach ($data['witnesses'] as $witness) {
-                $witness['accidentId'] = $id;
-                $this->benefitEntitlementInterface->create($witness);
+        if (! empty($data['benefitsAndEntitlements'])) {
+            foreach ($data['benefitsAndEntitlements'] as $entitlements) {
+                $entitlements['benefitId'] = $id;
+                $this->benefitEntitlementInterface->create($entitlements);
             }
         }
 
-        if (! empty($data['effectedIndividuals'])) {
-            foreach ($data['effectedIndividuals'] as $person) {
-                $person['accidentId'] = $id;
-                $this->benefitDocumentInterface->create($person);
+        if (! empty($data['medicalDocuments'])) {
+            foreach ($data['medicalDocuments'] as $documents) {
+                $documents['benefitId'] = $id;
+                $this->benefitDocumentInterface->create($documents);
             }
         }
 
-        $updatedRecord->witnesses           = $this->benefitEntitlementInterface->findByBenefitRequestId($id);
-        $updatedRecord->effectedIndividuals = $this->benefitDocumentInterface->findByBenefitRequestId($id);
+        $updatedRecord               = $this->benefitRequestInterface->findById($id);
+        $updatedRecord->entitlements = $this->benefitEntitlementInterface->findByBenefitId($id);
+        $updatedRecord->documents    = $this->benefitDocumentInterface->findByBenefitId($id);
 
         return response()->json([
-            'message' => 'Accident record updated successfully',
+            'message' => 'Benefit request updated successfully',
             'record'  => $updatedRecord,
         ], 200);
     }
@@ -127,15 +110,15 @@ class OhMrBenefitRequestController extends Controller
         $record = $this->benefitRequestInterface->findById($id);
 
         if (! $record) {
-            return response()->json(['message' => 'Accident record not found'], 404);
+            return response()->json(['message' => 'Benefit request not found']);
         }
 
-        $this->benefitEntitlementInterface->deleteByBenefitRequestId($id);
+        $this->benefitEntitlementInterface->deleteByBenefitId($id);
 
-        $this->benefitDocumentInterface->deleteByBenefitRequestId($id);
+        $this->benefitDocumentInterface->deleteByBenefitId($id);
 
         $this->benefitRequestInterface->deleteById($id);
 
-        return response()->json(['message' => 'Accident record deleted successfully'], 200);
+        return response()->json(['message' => 'Benefit request deleted successfully'], 200);
     }
 }

@@ -10,7 +10,7 @@ class HsOhMrBenefitRequest extends Model
     use HasFactory;
 
     protected $fillable = [
-        'employeeId',
+'employeeId',
         'employeeName',
         'applicationId',
         'applicationDate',
@@ -36,4 +36,5 @@ class HsOhMrBenefitRequest extends Model
         'responsibleSection',
         'assigneeLevel',
     ];
+
 }

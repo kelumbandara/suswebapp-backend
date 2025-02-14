@@ -1,5 +1,5 @@
 <?php
-namespace App\Repositories\All\OhMrBenefitEntitlement;
+namespace App\Repositories\All\HsOhMrBenefitEntitlement;
 
 use App\Models\HsOhMrBenefitEntitlement;
 use App\Repositories\Base\BaseRepository;
@@ -20,15 +20,16 @@ class BenefitEntitlementRepository extends BaseRepository implements BenefitEnti
     {
         $this->model = $model;
     }
-
-    public function deleteByBenefitRequestId($benefitRequestId)
+    public function deleteByBenefitId($benefitId)
     {
-        return $this->model->where('benefitRequestId', $benefitRequestId)->delete();
+        return $this->model->where('benefitId', $benefitId)->delete();
     }
 
-    public function findByBenefitRequestId($benefitRequestId)
-    {
-        return $this->model->where('benefitRequestId', $benefitRequestId)->get();
-    }
+    public function findByBenefitId($benefitId)
+{
+    return $this->model->where('benefitId', $benefitId)->get();
+}
+
+
 
 }

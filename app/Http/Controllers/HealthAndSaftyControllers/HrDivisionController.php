@@ -22,7 +22,7 @@ class HrDivisionController extends Controller
         if ($division->isEmpty()) {
             return response()->json([
                 'message' => 'No division found.',
-            ], 404);
+            ]);
         }
         return response()->json($division);
     }

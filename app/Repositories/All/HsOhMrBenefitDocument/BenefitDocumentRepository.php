@@ -1,5 +1,5 @@
 <?php
-namespace App\Repositories\All\OhMrBenefitDocument;
+namespace App\Repositories\All\HsOhMrBenefitDocument;
 
 use App\Models\HsOhMrBenefitDocument;
 use App\Repositories\Base\BaseRepository;
@@ -20,14 +20,17 @@ class BenefitDocumentRepository extends BaseRepository implements BenefitDocumen
     {
         $this->model = $model;
     }
-    public function deleteByBenefitRequestId($benefitRequestId)
+    public function findByBenefitId($benefitId)
     {
-        return $this->model->where('benefitRequestId', $benefitRequestId)->delete();
+        return $this->model->where('benefitId', $benefitId)->get();
     }
 
-    public function findByBenefitRequestId($benefitRequestId)
+    public function deleteByBenefitId($benefitId)
     {
-        return $this->model->where('benefitRequestId', $benefitRequestId)->get();
+        return $this->model->where('benefitId', $benefitId)->delete();
     }
+
+
+
 
 }

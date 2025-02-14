@@ -37,6 +37,7 @@ class AccidentRecordRequest extends FormRequest
             'affectedTertiaryRegion'                   => 'nullable|string',
             'assignee'                                 => 'required|string',
             'injuryCause'                              => 'nullable|string',
+            'rootCause'                                => 'required|string',
             'consultedHospital'                        => 'nullable|string',
             'consultedDoctor'                          => 'nullable|string',
             'workPerformed'                            => 'nullable|string',
@@ -65,25 +66,25 @@ class AccidentRecordRequest extends FormRequest
     public function messages()
     {
         return [
-            'division.nullable'                        => 'Division is nullable.',
-            'location.nullable'                        => 'Location is nullable.',
-            'department.nullable'                      => 'Department is nullable.',
-            'supervisorName.nullable'                  => 'Supervisor name is nullable.',
-            'category.nullable'                        => 'Category is nullable.',
-            'subCategory.nullable'                     => 'Sub Category is nullable.',
-            'accidentType.nullable'                    => 'Accident type is nullable.',
-            'accidentDate.nullable'                    => 'Accident date is nullable.',
-            'assignee.nullable'                        => 'Assignee is nullable.',
-            'effectedIndividuals.*.personType.nullable' => 'Person type is nullable.',
-            'effectedIndividuals.*.employeeId.nullable' => 'Employee ID is nullable.',
-            'effectedIndividuals.*.name.nullable'       => 'Name is nullable.',
-            'effectedIndividuals.*.age.nullable'        => 'Age is nullable.',
-            'effectedIndividuals.*.age.min'             => 'Age must be at least 0 years.',
+            'division.nullable'                                 => 'Division is nullable.',
+            'location.nullable'                                 => 'Location is nullable.',
+            'department.nullable'                               => 'Department is nullable.',
+            'supervisorName.nullable'                           => 'Supervisor name is nullable.',
+            'category.nullable'                                 => 'Category is nullable.',
+            'subCategory.nullable'                              => 'Sub Category is nullable.',
+            'accidentType.nullable'                             => 'Accident type is nullable.',
+            'accidentDate.nullable'                             => 'Accident date is nullable.',
+            'assignee.nullable'                                 => 'Assignee is nullable.',
+            'effectedIndividuals.*.personType.nullable'         => 'Person type is nullable.',
+            'effectedIndividuals.*.employeeId.nullable'         => 'Employee ID is nullable.',
+            'effectedIndividuals.*.name.nullable'               => 'Name is nullable.',
+            'effectedIndividuals.*.age.nullable'                => 'Age is nullable.',
+            'effectedIndividuals.*.age.min'                     => 'Age must be at least 0 years.',
             'effectedIndividuals.*.industryExperience.nullable' => 'Industry experience is nullable.',
-            'effectedIndividuals.*.industryExperience.in' => 'Industry experience must be one of the following: Skill, Unskilled, Semiskilled, draft',
-            'effectedIndividuals.*.designation.max'    => 'Designation must not be greater than 255 characters.',
+            'effectedIndividuals.*.industryExperience.in'       => 'Industry experience must be one of the following: Skill, Unskilled, Semiskilled, draft',
+            'effectedIndividuals.*.designation.max'             => 'Designation must not be greater than 255 characters.',
 
         ];
-        }
+    }
 
 }

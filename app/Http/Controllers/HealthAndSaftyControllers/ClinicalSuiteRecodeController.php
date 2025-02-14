@@ -20,7 +20,7 @@ class ClinicalSuiteRecodeController extends Controller
         if ($clinicalSuite->isEmpty()) {
             return response()->json([
                 'message' => 'No clinicalSuite found.',
-            ], 404);
+            ], );
         }
         return response()->json($clinicalSuite, 200);
     }
@@ -45,7 +45,7 @@ class ClinicalSuiteRecodeController extends Controller
         if (! $clinicalSuite) {
             return response()->json([
                 'message' => 'Clinical suite record not found.',
-            ], 404);
+            ], );
         }
 
         $this->clinicalSuiteInterface->update($id, $request->validated());
@@ -65,7 +65,7 @@ class ClinicalSuiteRecodeController extends Controller
         if (! $clinicalSuite) {
             return response()->json([
                 'message' => 'Clinical suite record not found.',
-            ], 404);
+            ], );
         }
 
         $this->clinicalSuiteInterface->deleteById($id);

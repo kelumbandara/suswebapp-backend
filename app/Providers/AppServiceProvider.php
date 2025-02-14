@@ -50,6 +50,10 @@ use App\Repositories\All\HSDocumentDocumentType\DocumentTypeInterface;
 use App\Repositories\All\HSDocumentDocumentType\DocumentTypeRepository;
 use App\Repositories\All\HSDocumentRecode\DocumentInterface;
 use App\Repositories\All\HSDocumentRecode\DocumentRepository;
+use App\Repositories\All\HsOhMrBenefitDocument\BenefitDocumentInterface;
+use App\Repositories\All\HsOhMrBenefitDocument\BenefitDocumentRepository;
+use App\Repositories\All\HsOhMrBenefitEntitlement\BenefitEntitlementInterface;
+use App\Repositories\All\HsOhMrBenefitEntitlement\BenefitEntitlementRepository;
 use App\Repositories\All\IncidentFactors\IncidentFactorsInterface;
 use App\Repositories\All\IncidentFactors\IncidentFactorsRepository;
 use App\Repositories\All\IncidentPeople\IncidentPeopleInterface;
@@ -62,6 +66,10 @@ use App\Repositories\All\IncidentTypeOfNearMiss\IncidentTypeOfNearMissInterface;
 use App\Repositories\All\IncidentTypeOfNearMiss\IncidentTypeOfNearMissRepository;
 use App\Repositories\All\IncidentWitness\IncidentWitnessInterface;
 use App\Repositories\All\IncidentWitness\IncidentWitnessRepository;
+use App\Repositories\All\MedicineDisposal\MedicineDisposalInterface;
+use App\Repositories\All\MedicineDisposal\MedicineDisposalRepository;
+use App\Repositories\All\MedicineInventory\MedicineInventoryInterface;
+use App\Repositories\All\MedicineInventory\MedicineInventoryRepository;
 use App\Repositories\All\MiMedicineName\MedicineNameInterface;
 use App\Repositories\All\MiMedicineName\MedicineNameRepository;
 use App\Repositories\All\MiMedicineNameForm\MedicineFormInterface;
@@ -72,10 +80,6 @@ use App\Repositories\All\MiMedicineType\MedicineTypeInterface;
 use App\Repositories\All\MiMedicineType\MedicineTypeRepository;
 use App\Repositories\All\OhMrBeBenefitType\BenefitTypeInterface;
 use App\Repositories\All\OhMrBeBenefitType\BenefitTypeRepository;
-use App\Repositories\All\OhMrBenefitDocument\BenefitDocumentInterface;
-use App\Repositories\All\OhMrBenefitDocument\BenefitDocumentRepository;
-use App\Repositories\All\OhMrBenefitEntitlement\BenefitEntitlementInterface;
-use App\Repositories\All\OhMrBenefitEntitlement\BenefitEntitlementRepository;
 use App\Repositories\All\OhMrBenefitRequest\BenefitRequestInterface;
 use App\Repositories\All\OhMrBenefitRequest\BenefitRequestRepository;
 use Illuminate\Support\Facades\Vite;
@@ -136,6 +140,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(BenefitDocumentInterface::class, BenefitDocumentRepository::class);
         $this->app->bind(BenefitEntitlementInterface::class, BenefitEntitlementRepository::class);
         $this->app->bind(BenefitTypeInterface::class, BenefitTypeRepository::class);
+        $this->app->bind(MedicineInventoryInterface::class, MedicineInventoryRepository::class);
+        $this->app->bind(MedicineDisposalInterface::class, MedicineDisposalRepository::class);
+
 
     }
 }

@@ -22,7 +22,7 @@ class CsDesignationController extends Controller
         if ($designation->isEmpty()) {
             return response()->json([
                 'message' => 'Designation not found.',
-            ], 404);
+            ], );
         }
         return response()->json($designation, 200);
     }
@@ -44,7 +44,7 @@ class CsDesignationController extends Controller
         if (! $designation) {
             return response()->json([
                 'message' => 'Designation not found.',
-            ], 404);
+            ]);
         }
 
         $this->designationInterface->update($id, $request->validated());
@@ -61,7 +61,7 @@ class CsDesignationController extends Controller
         if (! $designation) {
             return response()->json([
                 'message' => 'Designation not found.',
-            ], 404);
+            ]);
         }
 
         $this->designationInterface->deleteById($id);

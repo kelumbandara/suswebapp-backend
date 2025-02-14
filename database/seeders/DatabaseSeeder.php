@@ -13,20 +13,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Admin user
         User::factory()->create([
             'name'     => 'Admin User',
             'email'    => 'admin@suswebapp.com',
             'password' => Hash::make('Admin@1234'),
             'userType' => '1',
+            'assigneeLevel' => '0',
         ]);
 
-        // Super Admin user
         User::factory()->create([
             'name'     => 'Super Admin',
             'email'    => 'supperadmin@suswebapp.com',
             'password' => Hash::make('Supperadmin@1234'),
             'userType' => '1',
+            'assigneeLevel' => '0',
+
         ]);
 
         ComPermission::factory()->create([
@@ -60,7 +61,7 @@ class DatabaseSeeder extends Seeder
 
         ComPermission::factory()->create([
             'id'               => 2,
-            'userType'         => 'Guest',
+            'userType'         => 'guest',
             'description'      => 'guest Role with full permissions',
             'permissionObject' => ([
                     "INSIGHT_VIEW" => true,

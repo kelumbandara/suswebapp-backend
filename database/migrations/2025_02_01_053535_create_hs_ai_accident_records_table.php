@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('affectedSecondaryRegion')->nullable();
             $table->string('affectedTertiaryRegion')->nullable();
             $table->string('injuryCause')->nullable();
+            $table->string('rootCause')->nullable();
             $table->string('consultedHospital')->nullable();
             $table->string('consultedDoctor')->nullable();
             $table->string('description')->nullable();

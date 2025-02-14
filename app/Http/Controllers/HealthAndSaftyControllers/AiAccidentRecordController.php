@@ -23,11 +23,6 @@ class AiAccidentRecordController extends Controller
     public function index()
     {
         $records = $this->accidentRecordInterface->All();
-
-        if ($records->isEmpty()) {
-            return response()->json(['message' => 'No accident records found'], 404);
-        }
-
         foreach ($records as $record) {
             $record->witnesses           = $this->accidentWitnessInterface->findByAccidentId($record->id);
             $record->effectedIndividuals = $this->accidentPeopleInterface->findByAccidentId($record->id);
@@ -70,7 +65,7 @@ class AiAccidentRecordController extends Controller
     {
         $record = $this->accidentRecordInterface->findById($id);
         if (! $record) {
-            return response()->json(['message' => 'Accident record not found'], 404);
+            return response()->json(['message' => 'Accident record not found']);
         }
         return response()->json($record);
     }
@@ -81,7 +76,7 @@ class AiAccidentRecordController extends Controller
         $record = $this->accidentRecordInterface->findById($id);
 
         if (!$record || !is_object($record)) {
-            return response()->json(['message' => 'Accident record not found'], 404);
+            return response()->json(['message' => 'Accident record not found']);
         }
 
         $updateSuccess = $this->accidentRecordInterface->update($id, $data);
@@ -129,7 +124,7 @@ class AiAccidentRecordController extends Controller
         $record = $this->accidentRecordInterface->findById($id);
 
         if (! $record) {
-            return response()->json(['message' => 'Accident record not found'], 404);
+            return response()->json(['message' => 'Accident record not found']);
         }
 
         $this->accidentWitnessInterface->deleteByAccidentId($id);

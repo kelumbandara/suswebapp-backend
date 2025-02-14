@@ -30,6 +30,7 @@ use App\Http\Controllers\HealthAndSaftyControllers\DocumentRecodeController;
 use App\Http\Controllers\HealthAndSaftyControllers\HazardAndRiskController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrCategoryController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrDivisionController;
+use App\Http\Controllers\HealthAndSaftyControllers\OhMiPiMedicineInventoryController;
 use App\Http\Controllers\HealthAndSaftyControllers\OhMrBeBenefitTypeController;
 use App\Http\Controllers\HealthAndSaftyControllers\OhMrBenefitRequestController;
 use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineNameController;
@@ -97,6 +98,9 @@ Route::get('hazard-risk/{id}/show', [HazardAndRiskController::class, 'show']);
 Route::post('hazard-risk/{id}/update', [HazardAndRiskController::class, 'update']);
 Route::delete('hazard-risk/{id}/delete', [HazardAndRiskController::class, 'destroy']);
 Route::get('hazard-risk/{id}/edit', [HazardAndRiskController::class, 'edit']);
+Route::get('hazard-risk-dashboard', [HazardAndRiskController::class, 'dashboardStats']);
+Route::get('hazard-risk-dashboard-division', [HazardAndRiskController::class, 'dashboardStatsByDivision']);
+
 
 
 Route::get('hr-categories', [HrCategoryController::class, 'index']);
@@ -138,10 +142,10 @@ Route::delete('documents/{id}/delete', [DocumentRecodeController::class, 'destro
 Route::get('documents-types', [DocumentDocumentTypeController::class, 'index']);
 Route::post('documents-types', [DocumentDocumentTypeController::class, 'store']);
 
-Route::get('clinical-suite', [ClinicalSuiteRecodeController::class, 'index']);
-Route::post('clinical-suite', [ClinicalSuiteRecodeController::class, 'store']);
-Route::post('clinical-suite/{id}/update', [ClinicalSuiteRecodeController::class, 'update']);
-Route::delete('clinical-suite/{id}/delete', [ClinicalSuiteRecodeController::class, 'destroy']);
+Route::get('patient-records', [ClinicalSuiteRecodeController::class, 'index']);
+Route::post('patient-records', [ClinicalSuiteRecodeController::class, 'store']);
+Route::post('patient-records/{id}/update', [ClinicalSuiteRecodeController::class, 'update']);
+Route::delete('patient-records/{id}/delete', [ClinicalSuiteRecodeController::class, 'destroy']);
 
 Route::get('designations', [CsDesignationController::class, 'index']);
 Route::post('clinical-suite-types', [CsDesignationController::class, 'store']);
@@ -183,10 +187,13 @@ Route::post('benefit-request', [OhMrBenefitRequestController::class, 'store']);
 Route::post('benefit-request/{id}/update', [OhMrBenefitRequestController:: class, 'update']);
 Route::delete('benefit-request/{id}/delete', [OhMrBenefitRequestController:: class, 'destroy']);
 
-
 Route::get('benefit-types', [OhMrBeBenefitTypeController::class, 'index']);
 Route::post('benefit-types', [OhMrBeBenefitTypeController::class, 'store']);
 
+Route::get('medicine-inventory', [OhMiPiMedicineInventoryController::class, 'index']);
+Route::post('medicine-inventory', [OhMiPiMedicineInventoryController::class, 'store']);
+Route::post('medicine-inventory/{id}/update', [OhMiPiMedicineInventoryController::class, 'update']);
+Route::delete('medicine-inventory/{id}/delete', [OhMiPiMedicineInventoryController::class, 'destroy']);
 
 
 
