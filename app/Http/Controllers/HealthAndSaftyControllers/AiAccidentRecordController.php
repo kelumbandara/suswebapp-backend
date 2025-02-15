@@ -72,43 +72,43 @@ class AiAccidentRecordController extends Controller
 
     public function update(AccidentRecordRequest $request, string $id)
     {
-        $data = $request->validated();
+        $data   = $request->validated();
         $record = $this->accidentRecordInterface->findById($id);
 
-        if (!$record || !is_object($record)) {
+        if (! $record || ! is_object($record)) {
             return response()->json(['message' => 'Accident record not found']);
         }
 
         $updateSuccess = $this->accidentRecordInterface->update($id, $data);
 
-        if (!$updateSuccess) {
+        if (! $updateSuccess) {
             return response()->json(['message' => 'Failed to update accident record'], 500);
         }
 
         $updatedRecord = $this->accidentRecordInterface->findById($id);
 
-        if (!$updatedRecord || !is_object($updatedRecord)) {
+        if (! $updatedRecord || ! is_object($updatedRecord)) {
             return response()->json(['message' => 'Error fetching updated accident record'], 500);
         }
 
         $this->accidentWitnessInterface->deleteByAccidentId($id);
         $this->accidentPeopleInterface->deleteByAccidentId($id);
 
-        if (!empty($data['witnesses'])) {
+        if (! empty($data['witnesses'])) {
             foreach ($data['witnesses'] as $witness) {
                 $witness['accidentId'] = $id;
                 $this->accidentWitnessInterface->create($witness);
             }
         }
 
-        if (!empty($data['effectedIndividuals'])) {
+        if (! empty($data['effectedIndividuals'])) {
             foreach ($data['effectedIndividuals'] as $person) {
                 $person['accidentId'] = $id;
                 $this->accidentPeopleInterface->create($person);
             }
         }
 
-        $updatedRecord->witnesses = $this->accidentWitnessInterface->findByAccidentId($id);
+        $updatedRecord->witnesses           = $this->accidentWitnessInterface->findByAccidentId($id);
         $updatedRecord->effectedIndividuals = $this->accidentPeopleInterface->findByAccidentId($id);
 
         return response()->json([
@@ -116,8 +116,6 @@ class AiAccidentRecordController extends Controller
             'record'  => $updatedRecord,
         ], 200);
     }
-
-
 
     public function destroy(string $id)
     {

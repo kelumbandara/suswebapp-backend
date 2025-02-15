@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HsOhMiMnMedicineNameForm\MedicineNameFormRequest;
 use App\Repositories\All\MiMedicineNameForm\MedicineFormInterface;
-use Illuminate\Http\Request;
 
 class OsMiMedicineNameFormController extends Controller
 {

@@ -18,7 +18,7 @@ class DocumentRecodeRequest extends FormRequest
         $this->merge([
             'isNoExpiry' => filter_var($this->isNoExpiry, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
         ]);
-}
+    }
 
     /**
      * Get the validation rules that apply to the request.

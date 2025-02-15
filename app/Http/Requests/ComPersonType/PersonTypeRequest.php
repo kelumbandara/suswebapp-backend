@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\ComPersonType;
 
 use Illuminate\Foundation\Http\FormRequest;

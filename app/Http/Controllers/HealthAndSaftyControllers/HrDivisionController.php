@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HRDivision\HRDivisionRequest;
 use App\Repositories\All\HRDivision\HRDivisionInterface;
-use Illuminate\Http\Request;
 
 class HrDivisionController extends Controller
 {
@@ -32,7 +30,7 @@ class HrDivisionController extends Controller
         $division = $this->hrDivisionInterface->create($request->validated());
 
         return response()->json([
-            'message'    => 'division created successfully!',
+            'message'  => 'division created successfully!',
             'category' => $division,
         ], 201);
     }

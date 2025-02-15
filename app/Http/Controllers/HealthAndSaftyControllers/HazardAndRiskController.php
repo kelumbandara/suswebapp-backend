@@ -6,8 +6,6 @@ use App\Http\Requests\HazardAndRisk\HazardAndRiskRequest;
 use App\Repositories\All\HazardAndRisk\HazardAndRiskInterface;
 use App\Repositories\All\HRDivision\HRDivisionInterface;
 use App\Repositories\All\User\UserInterface;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 
 class HazardAndRiskController extends Controller
 {
@@ -22,30 +20,30 @@ class HazardAndRiskController extends Controller
         $this->userInterface          = $userInterface;
         $this->HRDivisionInterface    = $HRDivisionInterface;
     }
-public function index()
-{
-    $hazardRisks = $this->hazardAndRiskInterface->All();
+    public function index()
+    {
+        $hazardRisks = $this->hazardAndRiskInterface->All();
 
-    $hazardRisks = $hazardRisks->map(function ($risk) {
-        try {
-            $assignee = $this->userInterface->getById($risk->assignee);
-            $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
-        } catch (\Exception $e) {
-            $risk->assigneeName = 'Unknown';
-        }
+        $hazardRisks = $hazardRisks->map(function ($risk) {
+            try {
+                $assignee           = $this->userInterface->getById($risk->assignee);
+                $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->assigneeName = 'Unknown';
+            }
 
-        try {
-            $creator = $this->userInterface->getById($risk->createdByUser);
-            $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
-        } catch (\Exception $e) {
-            $risk->createdByUserName = 'Unknown';
-        }
+            try {
+                $creator                 = $this->userInterface->getById($risk->createdByUser);
+                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->createdByUserName = 'Unknown';
+            }
 
-        return $risk;
-    });
+            return $risk;
+        });
 
-    return response()->json($hazardRisks, 200);
-}
+        return response()->json($hazardRisks, 200);
+    }
 
     public function store(HazardAndRiskRequest $request)
     {
@@ -76,7 +74,7 @@ public function index()
     {
         $hazardRisk = $this->hazardAndRiskInterface->findById($id);
 
-        if (!$hazardRisk) {
+        if (! $hazardRisk) {
             return response()->json([
                 'message' => 'Hazard and risk record not found.',
             ]);
@@ -99,7 +97,6 @@ public function index()
             ], 500);
         }
     }
-
 
     public function destroy($id)
     {
@@ -131,51 +128,50 @@ public function index()
     }
 
     public function dashboardStats()
-{
-    try {
-        $total = $this->hazardAndRiskInterface->countAll();
-        $completed = $this->hazardAndRiskInterface->countByStatus('Completed');
-        $pending = $this->hazardAndRiskInterface->countByStatus('Pending');
-        $amount = $this->hazardAndRiskInterface->sumField('amount'); // Assuming an amount field exists
+    {
+        try {
+            $total     = $this->hazardAndRiskInterface->countAll();
+            $completed = $this->hazardAndRiskInterface->countByStatus('Completed');
+            $pending   = $this->hazardAndRiskInterface->countByStatus('Pending');
+            $amount    = $this->hazardAndRiskInterface->sumField('amount'); // Assuming an amount field exists
 
-        return response()->json([
-            'total' => $total,
-            'completed' => $completed,
-            'pending' => $pending,
-            'amount' => $amount,
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Error fetching dashboard stats.',
-            'error' => $e->getMessage(),
-        ], 500);
-    }
-}
-
-public function dashboardStatsByDivision()
-{
-    try {
-        $divisions = $this->hazardAndRiskInterface->getDistinctDivisions();
-
-        $divisionStats = [];
-
-        foreach ($divisions as $division) {
-            $totalCount = $this->hazardAndRiskInterface->countByDivision($division->division);
-
-            $divisionStats[] = [
-                'division' => $division->division,
-                'total' => $totalCount,
-            ];
+            return response()->json([
+                'total'     => $total,
+                'completed' => $completed,
+                'pending'   => $pending,
+                'amount'    => $amount,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error fetching dashboard stats.',
+                'error'   => $e->getMessage(),
+            ], 500);
         }
-
-        return response()->json($divisionStats, 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Error fetching division-wise stats.',
-            'error' => $e->getMessage(),
-        ], 500);
     }
-}
 
+    public function dashboardStatsByDivision()
+    {
+        try {
+            $divisions = $this->hazardAndRiskInterface->getDistinctDivisions();
+
+            $divisionStats = [];
+
+            foreach ($divisions as $division) {
+                $totalCount = $this->hazardAndRiskInterface->countByDivision($division->division);
+
+                $divisionStats[] = [
+                    'division' => $division->division,
+                    'total'    => $totalCount,
+                ];
+            }
+
+            return response()->json($divisionStats, 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error fetching division-wise stats.',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
+    }
 
 }

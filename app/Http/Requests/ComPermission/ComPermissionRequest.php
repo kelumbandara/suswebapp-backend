@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\ComPermission;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,8 +21,8 @@ class ComPermissionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'userType' => 'required|string|unique:com_permissions,userType',
-            'description' => 'nullable|string',
+            'userType'         => 'required|string|unique:com_permissions,userType',
+            'description'      => 'nullable|string',
             'permissionObject' => 'required|array',
         ];
     }

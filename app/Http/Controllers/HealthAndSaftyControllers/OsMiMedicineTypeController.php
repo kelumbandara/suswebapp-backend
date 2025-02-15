@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HsOhMiMedicineType\MedicineTypeRequest;
 use App\Repositories\All\MiMedicineType\medicineTypeInterface;
-use Illuminate\Http\Request;
 
 class OsMiMedicineTypeController extends Controller
 {

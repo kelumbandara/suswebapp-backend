@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\AIIncidentTypeOfNearMiss;
 
 use Illuminate\Foundation\Http\FormRequest;

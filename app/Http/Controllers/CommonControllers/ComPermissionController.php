@@ -1,10 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\CommonControllers;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\All\ComPermission\ComPermissionInterface;
 use App\Http\Requests\ComPermission\ComPermissionRequest;
+use App\Repositories\All\ComPermission\ComPermissionInterface;
 
 class ComPermissionController extends Controller
 {
@@ -28,7 +27,6 @@ class ComPermissionController extends Controller
     {
     }
 
-
     public function store(ComPermissionRequest $request)
     {
         $data = $request->validated();
@@ -50,7 +48,6 @@ class ComPermissionController extends Controller
     {
     }
 
-
     public function update(ComPermissionRequest $request, string $id)
     {
         $data = $request->validated();
@@ -58,7 +55,6 @@ class ComPermissionController extends Controller
         $permission = $this->comPermissionInterface->findById($id, $data);
         return response()->json($permission);
     }
-
 
     public function destroy(string $id)
     {

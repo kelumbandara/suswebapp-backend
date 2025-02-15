@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HsOhMiMedicineRequest\MedicineRequestRequest;
 use App\Repositories\All\MiMedicineRequest\MedicineRequestInterface;
-use Illuminate\Http\Request;
 
 class OsMiMedicineRequestController extends Controller
 {
@@ -19,7 +17,7 @@ class OsMiMedicineRequestController extends Controller
     public function index()
     {
         $medicineStock = $this->medicineRequestInterface->All();
-        
+
         return response()->json($medicineStock, 200);
     }
 

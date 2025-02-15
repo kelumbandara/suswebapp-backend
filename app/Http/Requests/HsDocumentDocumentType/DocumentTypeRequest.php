@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\HsDocumentDocumentType;
 
 use Illuminate\Foundation\Http\FormRequest;

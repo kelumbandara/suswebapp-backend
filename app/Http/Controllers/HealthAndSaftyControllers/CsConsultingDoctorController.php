@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HsOhCsConsultingDoctor\ConsultingDoctorRequest;
 use App\Repositories\All\CsConsultingDoctor\ConsultingInterface;
-use Illuminate\Http\Request;
 
 class CsConsultingDoctorController extends Controller
 {

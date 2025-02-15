@@ -21,7 +21,6 @@ class OhMiPiMedicineInventoryController extends Controller
     {
         $records = $this->medicineInventoryInterface->All();
 
-
         foreach ($records as $record) {
             $record->inventory = $this->medicineDisposalInterface->findByInventoryId($record->id);
         }
@@ -67,7 +66,7 @@ class OhMiPiMedicineInventoryController extends Controller
         $inventory = $this->medicineInventoryInterface->findById($id);
 
         if (! $inventory || ! is_object($inventory)) {
-            return response()->json(['message' => 'Inventory record not found'] );
+            return response()->json(['message' => 'Inventory record not found']);
         }
 
         $updateSuccess = $this->medicineInventoryInterface->update($id, $data);

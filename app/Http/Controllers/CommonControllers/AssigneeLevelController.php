@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\CommonControllers;
 
 use App\Http\Controllers\Controller;
@@ -21,7 +20,6 @@ class AssigneeLevelController extends Controller
         return response()->json($assigneeLevels, 201);
 
     }
-
 
     public function create()
     {

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\HsOhCsDesignation;
 
 use Illuminate\Foundation\Http\FormRequest;

@@ -32,7 +32,6 @@ class OhMrBenefitRequestController extends Controller
         return response()->json($records, 200);
     }
 
-
     public function store(BenefitRequest $request)
     {
 

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\CommonControllers;
 
 use App\Http\Controllers\Controller;
@@ -15,7 +14,6 @@ class DepartmentController extends Controller
         $this->departmentInterface = $departmentInterface;
     }
 
-
     public function index()
     {
         $department = $this->departmentInterface->All();
@@ -27,11 +25,10 @@ class DepartmentController extends Controller
         return response()->json($department);
     }
 
-
     public function store(DepartmentRequest $request)
     {
         $validatedData = $request->validated();
-        $department = $this->departmentInterface->create($validatedData);
+        $department    = $this->departmentInterface->create($validatedData);
 
         return response()->json([
             'message'    => 'Department created successfully!',

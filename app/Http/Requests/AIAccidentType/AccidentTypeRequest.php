@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\AIAccidentType;
 
 use Illuminate\Foundation\Http\FormRequest;

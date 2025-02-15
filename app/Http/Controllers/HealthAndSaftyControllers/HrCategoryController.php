@@ -53,47 +53,45 @@ class HrCategoryController extends Controller
         return response()->json($uniqueCategories);
     }
 
-
     public function getSubcategories($categoryName)
-{
-    $subcategories = $this->hrCategoryInterface->getByColumn(['categoryName' => $categoryName], ['id', 'subCategory']);
+    {
+        $subcategories = $this->hrCategoryInterface->getByColumn(['categoryName' => $categoryName], ['id', 'subCategory']);
 
-    if ($subcategories->isEmpty()) {
-        return response()->json([
-            'message' => 'No subcategories found.',
-        ]);
+        if ($subcategories->isEmpty()) {
+            return response()->json([
+                'message' => 'No subcategories found.',
+            ]);
+        }
+
+        $uniqueSubcategories = $subcategories->map(function ($item) {
+            return [
+                'id'          => $item->id,
+                'subCategory' => $item->subCategory,
+            ];
+        })->unique('subCategory');
+
+        return response()->json($uniqueSubcategories);
     }
-
-    $uniqueSubcategories = $subcategories->map(function ($item) {
-        return [
-            'id' => $item->id,
-            'subCategory' => $item->subCategory
-        ];
-    })->unique('subCategory');
-
-    return response()->json($uniqueSubcategories);
-}
 
     public function getObservations($subcategories)
-{
-    $observations = $this->hrCategoryInterface->getByColumn(['subCategory' => $subcategories], ['id', 'observationType']);
+    {
+        $observations = $this->hrCategoryInterface->getByColumn(['subCategory' => $subcategories], ['id', 'observationType']);
 
-    if ($observations->isEmpty()) {
-        return response()->json([
-            'message' => 'No observations found.',
-        ]);
+        if ($observations->isEmpty()) {
+            return response()->json([
+                'message' => 'No observations found.',
+            ]);
+        }
+
+        $uniqueObservations = $observations->map(function ($item) {
+            return [
+                'id'              => $item->id,
+                'observationType' => $item->observationType,
+            ];
+        });
+
+        return response()->json($uniqueObservations);
     }
-
-    $uniqueObservations = $observations->map(function ($item) {
-        return [
-            'id' => $item->id,
-            'observationType' => $item->observationType,
-        ];
-    });
-
-    return response()->json($uniqueObservations);
-}
-
 
     public function storeObservation(Request $request)
     {
