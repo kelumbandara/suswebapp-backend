@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\AIAccidentInjuryType;
 
 use Illuminate\Foundation\Http\FormRequest;

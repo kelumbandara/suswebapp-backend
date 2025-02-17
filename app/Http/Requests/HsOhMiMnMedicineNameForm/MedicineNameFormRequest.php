@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\HsOhMiMnMedicineNameForm;
 
 use Illuminate\Foundation\Http\FormRequest;

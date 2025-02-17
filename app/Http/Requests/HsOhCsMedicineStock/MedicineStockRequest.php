@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\HsOhCsMedicineStock;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -23,10 +22,10 @@ class MedicineStockRequest extends FormRequest
     {
         return [
             'medicineName' => 'required|string',
-            'division' => 'nullable|string',
-            'inStock' => 'required|string',
-            'status' => 'nullable|string',
-            'lastUpdated' => 'nullable|string',
+            'division'     => 'nullable|string',
+            'inStock'      => 'required|string',
+            'status'       => 'nullable|string',
+            'lastUpdated'  => 'nullable|string',
         ];
     }
 }

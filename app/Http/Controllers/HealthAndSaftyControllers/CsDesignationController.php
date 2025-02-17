@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HsOhCsDesignation\DesignationRequest;
 use App\Repositories\All\CsDesignation\DesignationInterface;
-use Illuminate\Http\Request;
 
 class CsDesignationController extends Controller
 {

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
@@ -32,7 +31,7 @@ class OhMrBeBenefitTypeController extends Controller
         $benefitType = $this->benefitTypeInterface->create($request->validated());
 
         return response()->json([
-            'message'    => 'benefit type created successfully!',
+            'message'  => 'benefit type created successfully!',
             'category' => $benefitType,
         ], 201);
     }
@@ -41,7 +40,6 @@ class OhMrBeBenefitTypeController extends Controller
     {
         //
     }
-
 
     public function destroy(string $id)
     {

@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HsOhCsMedicineStock\MedicineStockRequest;
 use App\Repositories\All\CsMedicineStock\MedicineStockInterface;
-use Illuminate\Http\Request;
 
 class CsMedicineStockController extends Controller
 {

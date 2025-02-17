@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HsOhMiMedicineName\MedicineNameRequest;
 use App\Repositories\All\MiMedicineName\MedicineNameInterface;
-use Illuminate\Http\Request;
 
 class OsMiMedicineNameController extends Controller
 {
@@ -22,7 +20,7 @@ class OsMiMedicineNameController extends Controller
         if ($medicineName->isEmpty()) {
             return response()->json([
                 'message' => 'Medicine name not found.',
-            ],);
+            ], );
         }
         return response()->json($medicineName, 200);
     }

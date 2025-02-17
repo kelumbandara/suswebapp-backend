@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\JobPosition;
 
 use Illuminate\Foundation\Http\FormRequest;

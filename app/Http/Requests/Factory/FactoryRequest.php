@@ -21,7 +21,7 @@ class FactoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'factoryName'           => 'required|string|max:255',
+            'factoryName' => 'required|string|max:255',
 
         ];
     }
@@ -29,7 +29,7 @@ class FactoryRequest extends FormRequest
     public function messages()
     {
         return [
-            'factoryName.required'           => 'Name is required',
+            'factoryName.required' => 'Name is required',
         ];
     }
 }

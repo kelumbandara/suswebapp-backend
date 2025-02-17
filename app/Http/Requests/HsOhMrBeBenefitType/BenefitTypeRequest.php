@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\HsOhMrBeBenefitType;
 
 use Illuminate\Foundation\Http\FormRequest;

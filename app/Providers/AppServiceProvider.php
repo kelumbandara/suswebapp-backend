@@ -50,10 +50,14 @@ use App\Repositories\All\HSDocumentDocumentType\DocumentTypeInterface;
 use App\Repositories\All\HSDocumentDocumentType\DocumentTypeRepository;
 use App\Repositories\All\HSDocumentRecode\DocumentInterface;
 use App\Repositories\All\HSDocumentRecode\DocumentRepository;
+use App\Repositories\All\HsOcMrMdDocumentType\DocumentTypeInterface as HsOcMrMdDocumentTypeDocumentTypeInterface;
+use App\Repositories\All\HsOcMrMdDocumentType\DocumentTypeRepository as HsOcMrMdDocumentTypeDocumentTypeRepository;
 use App\Repositories\All\HsOhMrBenefitDocument\BenefitDocumentInterface;
 use App\Repositories\All\HsOhMrBenefitDocument\BenefitDocumentRepository;
 use App\Repositories\All\HsOhMrBenefitEntitlement\BenefitEntitlementInterface;
 use App\Repositories\All\HsOhMrBenefitEntitlement\BenefitEntitlementRepository;
+use App\Repositories\All\IncidentCircumstances\IncidentCircumstancesInterface;
+use App\Repositories\All\IncidentCircumstances\IncidentCircumstancesRepository;
 use App\Repositories\All\IncidentFactors\IncidentFactorsInterface;
 use App\Repositories\All\IncidentFactors\IncidentFactorsRepository;
 use App\Repositories\All\IncidentPeople\IncidentPeopleInterface;
@@ -78,6 +82,10 @@ use App\Repositories\All\MiMedicineRequest\MedicineRequestInterface;
 use App\Repositories\All\MiMedicineRequest\MedicineRequestRepository;
 use App\Repositories\All\MiMedicineType\MedicineTypeInterface;
 use App\Repositories\All\MiMedicineType\MedicineTypeRepository;
+use App\Repositories\All\OhMiPiSupplierName\SupplierNameInterface;
+use App\Repositories\All\OhMiPiSupplierName\SupplierNameRepository;
+use App\Repositories\All\OhMiPiSupplierType\SupplierTypeInterface;
+use App\Repositories\All\OhMiPiSupplierType\SupplierTypeRepository;
 use App\Repositories\All\OhMrBeBenefitType\BenefitTypeInterface;
 use App\Repositories\All\OhMrBeBenefitType\BenefitTypeRepository;
 use App\Repositories\All\OhMrBenefitRequest\BenefitRequestInterface;
@@ -142,6 +150,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(BenefitTypeInterface::class, BenefitTypeRepository::class);
         $this->app->bind(MedicineInventoryInterface::class, MedicineInventoryRepository::class);
         $this->app->bind(MedicineDisposalInterface::class, MedicineDisposalRepository::class);
+        $this->app->bind(SupplierNameInterface::class, SupplierNameRepository::class);
+        $this->app->bind(SupplierTypeInterface::class, SupplierTypeRepository::class);
+        $this->app->bind(IncidentCircumstancesInterface::class, IncidentCircumstancesRepository::class);
+        $this->app->bind(HsOcMrMdDocumentTypeDocumentTypeInterface::class, HsOcMrMdDocumentTypeDocumentTypeRepository::class);
 
 
     }

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\ResponsibleSection;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,8 +21,8 @@ class ResponsibleSectionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sectionName' => 'required|string|max:255',
-            'sectionCode' => 'required/json',
+            'sectionName'   => 'required|string|max:255',
+            'sectionCode'   => 'required/json',
             'responsibleId' => 'string',
         ];
     }

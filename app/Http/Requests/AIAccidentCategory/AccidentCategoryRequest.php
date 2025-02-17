@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\AIAccidentCategory;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,7 +21,7 @@ class AccidentCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'categoryName' => 'required|string',
+            'categoryName'    => 'required|string',
             'subCategoryName' => 'required|string',
         ];
     }

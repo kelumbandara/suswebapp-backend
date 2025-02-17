@@ -4,7 +4,6 @@ namespace App\Http\Controllers\HealthAndSaftyControllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AIIncidentTypeOfConcern\ConcernRequest;
 use App\Repositories\All\IncidentTypeOfConcern\IncidentTypeOfConcernInterface;
-use Illuminate\Http\Request;
 
 class AiIncidentTypeOfConcernController extends Controller
 {
@@ -21,14 +20,13 @@ class AiIncidentTypeOfConcernController extends Controller
         return response()->json($incidentConcern);
     }
 
-
     public function store(ConcernRequest $request)
     {
-        $data = $request->validated();
+        $data            = $request->validated();
         $incidentConcern = $this->incidentTypeOfConcernInterface->create($data);
         return response()->json([
             'message' => 'Incident type of concern created successfully',
-            'data' => $incidentConcern
+            'data'    => $incidentConcern,
         ], 201);
     }
 }

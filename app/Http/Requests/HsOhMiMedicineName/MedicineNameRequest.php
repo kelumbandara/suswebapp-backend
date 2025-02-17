@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\HsOhMiMedicineName;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,11 +21,11 @@ class MedicineNameRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'medicineName' => 'required|string',
-            'genericName' => 'nullable|string',
+            'medicineName'   => 'required|string',
+            'genericName'    => 'nullable|string',
             'dosageStrength' => 'nullable|string',
-            'form' => 'nullable|string',
-            'medicineType' => 'nullable|string',
+            'form'           => 'nullable|string',
+            'medicineType'   => 'nullable|string',
         ];
 
     }

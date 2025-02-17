@@ -37,7 +37,7 @@ class RegisterRequest extends FormRequest
             'employeeNumber'    => ['nullable', 'string', 'max:255', 'unique:users', 'required_if:isCompanyEmployee,true'],
 
         ];
-  
+
     }
 
     public function messages()

@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AIAccidentType\AccidentTypeRequest;
 use App\Repositories\All\AccidentType\AccidentTypeInterface;
-use Illuminate\Http\Request;
 
 class AiAccidentTypeController extends Controller
 {
@@ -28,14 +26,13 @@ class AiAccidentTypeController extends Controller
         return response()->json($accidentType);
     }
 
-
     public function store(AccidentTypeRequest $request)
     {
-        $data = $request->validated();
+        $data         = $request->validated();
         $accidentType = $this->accidentTypeInterface->create($data);
         return response()->json([
             'message' => 'Accident category created successfully',
-            'data' => $accidentType
+            'data'    => $accidentType,
         ], 201);
     }
 

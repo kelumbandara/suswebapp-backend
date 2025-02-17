@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HsDocumentDocumentType\DocumentTypeRequest;
 use App\Repositories\All\HSDocumentDocumentType\DocumentTypeInterface;
-use Illuminate\Http\Request;
 
 class DocumentDocumentTypeController extends Controller
 {
@@ -22,14 +20,13 @@ class DocumentDocumentTypeController extends Controller
         return response()->json($Document);
     }
 
-
     public function store(DocumentTypeRequest $request)
     {
-        $data = $request->validated();
+        $data     = $request->validated();
         $Document = $this->documentTypeInterface->create($data);
         return response()->json([
             'message' => 'Document created successfully',
-            'data' => $Document
+            'data'    => $Document,
         ], 201);
     }
 }

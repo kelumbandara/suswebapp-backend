@@ -17,6 +17,7 @@ use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentPeopleController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentRecordController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentTypeController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentWitnessController;
+use App\Http\Controllers\HealthAndSaftyControllers\AiIncidentCircumstancesController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiIncidentFactorsController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiIncidentRecodeController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiIncidentTypeOfConcernController;
@@ -30,7 +31,10 @@ use App\Http\Controllers\HealthAndSaftyControllers\DocumentRecodeController;
 use App\Http\Controllers\HealthAndSaftyControllers\HazardAndRiskController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrCategoryController;
 use App\Http\Controllers\HealthAndSaftyControllers\HrDivisionController;
+use App\Http\Controllers\HealthAndSaftyControllers\HsOcMrMdDocumentTypeController;
 use App\Http\Controllers\HealthAndSaftyControllers\OhMiPiMedicineInventoryController;
+use App\Http\Controllers\HealthAndSaftyControllers\OhMiPiMiSupplierNameController;
+use App\Http\Controllers\HealthAndSaftyControllers\OhMiPiMiSupplierTypeController;
 use App\Http\Controllers\HealthAndSaftyControllers\OhMrBeBenefitTypeController;
 use App\Http\Controllers\HealthAndSaftyControllers\OhMrBenefitRequestController;
 use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineNameController;
@@ -123,6 +127,11 @@ Route::post('incidents', [AiIncidentRecodeController::class, 'store']);
 Route::post('incidents/{id}/update', [AiIncidentRecodeController::class, 'update']);
 Route::delete('incidents/{id}/delete', [AiIncidentRecodeController::class, 'destroy']);
 
+Route::get('incident-circumstances', [AiIncidentCircumstancesController::class, 'index']);
+Route::post('incident-circumstances', [AiIncidentCircumstancesController::class, 'store']);
+Route::post('incident-circumstances/{id}/update', [AiIncidentCircumstancesController::class, 'update']);
+Route::delete('incident-circumstances/{id}/delete', [AiIncidentCircumstancesController::class, 'destroy']);
+
 
 Route::get('incident-types-nearMiss', [AiIncidentTypeOfNearMissController::class, 'index']);
 Route::post('incident-types-nearMiss', [AiIncidentTypeOfNearMissController::class, 'store']);
@@ -148,7 +157,7 @@ Route::post('patient-records/{id}/update', [ClinicalSuiteRecodeController::class
 Route::delete('patient-records/{id}/delete', [ClinicalSuiteRecodeController::class, 'destroy']);
 
 Route::get('designations', [CsDesignationController::class, 'index']);
-Route::post('clinical-suite-types', [CsDesignationController::class, 'store']);
+Route::post('designations', [CsDesignationController::class, 'store']);
 Route::post('designations/{id}/update', [CsDesignationController::class, 'update']);
 Route::delete('designations/{id}/delete', [CsDesignationController::class, 'destroy']);
 
@@ -187,6 +196,11 @@ Route::post('benefit-request', [OhMrBenefitRequestController::class, 'store']);
 Route::post('benefit-request/{id}/update', [OhMrBenefitRequestController:: class, 'update']);
 Route::delete('benefit-request/{id}/delete', [OhMrBenefitRequestController:: class, 'destroy']);
 
+Route::get('medical-documents-types', [HsOcMrMdDocumentTypeController::class, 'index']);
+Route::post('medical-documents-types', [HsOcMrMdDocumentTypeController::class, 'store']);
+Route::post('medical-documents-types/{id}/update', [HsOcMrMdDocumentTypeController::class, 'update']);
+Route::delete('medical-documents-types/{id}/delete', [HsOcMrMdDocumentTypeController::class, 'destroy']);
+
 Route::get('benefit-types', [OhMrBeBenefitTypeController::class, 'index']);
 Route::post('benefit-types', [OhMrBeBenefitTypeController::class, 'store']);
 
@@ -195,6 +209,14 @@ Route::post('medicine-inventory', [OhMiPiMedicineInventoryController::class, 'st
 Route::post('medicine-inventory/{id}/update', [OhMiPiMedicineInventoryController::class, 'update']);
 Route::delete('medicine-inventory/{id}/delete', [OhMiPiMedicineInventoryController::class, 'destroy']);
 
+Route::get('supplier-name', [OhMiPiMiSupplierNameController::class, 'index']);
+Route::post('supplier-name', [OhMiPiMiSupplierNameController::class, 'store']);
+Route::post('supplier-name/{id}/update', [OhMiPiMiSupplierNameController::class, 'update']);
+Route::delete('supplier-name/{id}/delete', [OhMiPiMiSupplierNameController::class, 'destroy']);
 
+Route::get('supplier-type', [OhMiPiMiSupplierTypeController::class, 'index']);
+Route::post('supplier-type', [OhMiPiMiSupplierTypeController::class, 'store']);
+Route::post('supplier-type/{id}/update', [OhMiPiMiSupplierTypeController::class, 'update']);
+Route::delete('supplier-type/{id}/delete', [OhMiPiMiSupplierTypeController::class, 'destroy']);
 
 Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);

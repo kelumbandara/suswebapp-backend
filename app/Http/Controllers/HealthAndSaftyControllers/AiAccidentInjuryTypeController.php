@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
@@ -9,7 +8,6 @@ use App\Repositories\All\AccidentInjuryType\AccidentInjuryTypeInterface;
 class AiAccidentInjuryTypeController extends Controller
 {
     protected $accidentInjuryTypeInterface;
-
 
     public function __construct(AccidentInjuryTypeInterface $accidentInjuryTypeInterface)
     {
@@ -26,14 +24,13 @@ class AiAccidentInjuryTypeController extends Controller
         return response()->json($accidentInjuryType);
     }
 
-
     public function store(AccidentInjuryTypeRequest $request)
     {
-        $data = $request->validated();
+        $data               = $request->validated();
         $accidentInjuryType = $this->accidentInjuryTypeInterface->create($data);
         return response()->json([
             'message' => 'Accident injury created successfully',
-            'data' => $accidentInjuryType
+            'data'    => $accidentInjuryType,
         ], 201);
     }
 
