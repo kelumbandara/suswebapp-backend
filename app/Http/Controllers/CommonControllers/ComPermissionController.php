@@ -44,21 +44,42 @@ class ComPermissionController extends Controller
         return response()->json($permission);
     }
 
-    public function edit(string $id)
-    {
-    }
 
     public function update(ComPermissionRequest $request, string $id)
     {
         $data = $request->validated();
+        $permission = $this->comPermissionInterface->findById($id);
 
-        $permission = $this->comPermissionInterface->findById($id, $data);
-        return response()->json($permission);
+        if (!$permission) {
+            return response()->json(['message' => 'Permission not found.'], 404);
+        }
+
+        try {
+            $permission->update([
+                'userType' => $data['userType'] ?? $permission->userType,
+                'description' => $data['description'] ?? $permission->description,
+                'permissionObject' => $data['permissionObject']
+            ]);
+
+            return response()->json([
+                'message' => 'Permission updated successfully',
+                'data' => $permission
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to update permission',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
+
+
+
+
 
     public function destroy(string $id)
     {
         $this->comPermissionInterface->deleteById($id);
-        return response()->json(null, 204);
+        return response()->json(['message' => 'Permission deleted successfully'], 200);
     }
 }
