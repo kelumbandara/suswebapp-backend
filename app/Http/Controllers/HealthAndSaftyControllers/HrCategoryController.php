@@ -54,24 +54,25 @@ class HrCategoryController extends Controller
     }
 
     public function getSubcategories($categoryName)
-    {
-        $subcategories = $this->hrCategoryInterface->getByColumn(['categoryName' => $categoryName], ['id', 'subCategory']);
+{
+    $subcategories = $this->hrCategoryInterface->getByColumn(['categoryName' => $categoryName], ['id', 'subCategory']);
 
-        if ($subcategories->isEmpty()) {
-            return response()->json([
-                'message' => 'No subcategories found.',
-            ]);
-        }
-
-        $uniqueSubcategories = $subcategories->map(function ($item) {
-            return [
-                'id'          => $item->id,
-                'subCategory' => $item->subCategory,
-            ];
-        })->unique('subCategory');
-
-        return response()->json($uniqueSubcategories);
+    if ($subcategories->isEmpty()) {
+        return response()->json([
+            'message' => 'No subcategories found.',
+        ]);
     }
+
+    $formattedSubcategories = $subcategories->map(function ($item) {
+        return [
+            'id' => (int) $item->id,
+            'subCategory' => $item->subCategory,
+        ];
+    })->values(); 
+
+    return response()->json($formattedSubcategories);
+}
+
 
     public function getObservations($subcategories)
     {
