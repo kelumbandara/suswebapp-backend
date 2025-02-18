@@ -52,7 +52,7 @@ class AccidentRecordRequest extends FormRequest
             'witnesses.*.department'                   => 'nullable|string',
             'effectedIndividuals'                      => 'nullable|array',
             'effectedIndividuals.*.personType'         => 'required|string',
-            'effectedIndividuals.*.employeeId'         => 'nullable|integer',
+            'effectedIndividuals.*.employeeId'         => 'nullable|string',
             'effectedIndividuals.*.name'               => 'required|string',
             'effectedIndividuals.*.gender'             => 'nullable|string|in:Male,Female,other',
             'effectedIndividuals.*.age'                => 'required|integer|min:0',
