@@ -6,6 +6,8 @@ use App\Http\Requests\HsOhMrBenefitRequest\BenefitRequest;
 use App\Repositories\All\HsOhMrBenefitDocument\BenefitDocumentInterface;
 use App\Repositories\All\HsOhMrBenefitEntitlement\BenefitEntitlementInterface;
 use App\Repositories\All\OhMrBenefitRequest\BenefitRequestInterface;
+use App\Repositories\All\User\UserInterface;
+use Illuminate\Support\Facades\Auth;
 
 class OhMrBenefitRequestController extends Controller
 {
@@ -13,16 +15,36 @@ class OhMrBenefitRequestController extends Controller
     protected $benefitRequestInterface;
     protected $benefitDocumentInterface;
     protected $benefitEntitlementInterface;
+    protected $userInterface;
 
-    public function __construct(BenefitRequestInterface $benefitRequestInterface, BenefitDocumentInterface $benefitDocumentInterface, BenefitEntitlementInterface $benefitEntitlementInterface)
+
+    public function __construct(BenefitRequestInterface $benefitRequestInterface, BenefitDocumentInterface $benefitDocumentInterface, BenefitEntitlementInterface $benefitEntitlementInterface, UserInterface $userInterface)
     {
         $this->benefitRequestInterface     = $benefitRequestInterface;
         $this->benefitDocumentInterface    = $benefitDocumentInterface;
         $this->benefitEntitlementInterface = $benefitEntitlementInterface;
+        $this->userInterface               = $userInterface;
     }
     public function index()
     {
         $records = $this->benefitRequestInterface->All();
+        $records = $records->map(function ($risk) {
+            try {
+                $assignee           = $this->userInterface->getById($risk->assignee);
+                $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->assigneeName = 'Unknown';
+            }
+
+            try {
+                $creator                 = $this->userInterface->getById($risk->createdByUser);
+                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->createdByUserName = 'Unknown';
+            }
+
+            return $risk;
+        });
 
         foreach ($records as $record) {
             $record->benefitsAndEntitlements = $this->benefitEntitlementInterface->findByBenefitId($record->id);
@@ -34,8 +56,15 @@ class OhMrBenefitRequestController extends Controller
 
     public function store(BenefitRequest $request)
     {
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized']);
+        }
 
         $data   = $request->validated();
+        $data['createdByUser'] = $user->id;
+
         $record = $this->benefitRequestInterface->create($data);
 
         if (! $record) {

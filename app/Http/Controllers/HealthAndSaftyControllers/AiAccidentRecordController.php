@@ -6,23 +6,45 @@ use App\Http\Requests\AccidentRecord\AccidentRecordRequest;
 use App\Repositories\All\AccidentPeople\AccidentPeopleInterface;
 use App\Repositories\All\AccidentRecord\AccidentRecordInterface;
 use App\Repositories\All\AccidentWitness\AccidentWitnessInterface;
+use App\Repositories\All\User\UserInterface;
+use Illuminate\Support\Facades\Auth;
 
 class AiAccidentRecordController extends Controller
 {
     protected $accidentRecordInterface;
     protected $accidentWitnessInterface;
     protected $accidentPeopleInterface;
+    protected $userInterface;
 
-    public function __construct(AccidentRecordInterface $accidentRecordInterface, AccidentWitnessInterface $accidentWitnessInterface, AccidentPeopleInterface $accidentPeopleInterface)
+
+    public function __construct(AccidentRecordInterface $accidentRecordInterface, AccidentWitnessInterface $accidentWitnessInterface, AccidentPeopleInterface $accidentPeopleInterface, UserInterface $userInterface)
     {
         $this->accidentRecordInterface  = $accidentRecordInterface;
         $this->accidentWitnessInterface = $accidentWitnessInterface;
+        $this->userInterface          = $userInterface;
         $this->accidentPeopleInterface  = $accidentPeopleInterface;
     }
 
     public function index()
     {
         $records = $this->accidentRecordInterface->All();
+        $records = $records->map(function ($risk) {
+            try {
+                $assignee           = $this->userInterface->getById($risk->assignee);
+                $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->assigneeName = 'Unknown';
+            }
+
+            try {
+                $creator                 = $this->userInterface->getById($risk->createdByUser);
+                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->createdByUserName = 'Unknown';
+            }
+
+            return $risk;
+        });
         foreach ($records as $record) {
             $record->witnesses           = $this->accidentWitnessInterface->findByAccidentId($record->id);
             $record->effectedIndividuals = $this->accidentPeopleInterface->findByAccidentId($record->id);
@@ -31,10 +53,19 @@ class AiAccidentRecordController extends Controller
         return response()->json($records, 200);
     }
 
+
     public function store(AccidentRecordRequest $request)
     {
+        $user = Auth::user();
 
-        $data   = $request->validated();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized']);
+        }
+
+        $data = $request->validated();
+
+        $data['createdByUser'] = $user->id;
+
         $record = $this->accidentRecordInterface->create($data);
 
         if (! $record) {

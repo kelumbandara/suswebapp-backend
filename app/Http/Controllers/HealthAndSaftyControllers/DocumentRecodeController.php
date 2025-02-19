@@ -4,28 +4,58 @@ namespace App\Http\Controllers\HealthAndSaftyControllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HsDocumentRecode\DocumentRecodeRequest;
 use App\Repositories\All\HSDocumentRecode\DocumentInterface;
+use App\Repositories\All\User\UserInterface;
+use Illuminate\Support\Facades\Auth;
 
 class DocumentRecodeController extends Controller
 {
     protected $documentInterface;
+    protected $userInterface;
 
-    public function __construct(DocumentInterface $documentInterface)
+
+    public function __construct(DocumentInterface $documentInterface, UserInterface $userInterface)
     {
         $this->documentInterface = $documentInterface;
+        $this->userInterface          = $userInterface;
+
     }
 
     public function index()
     {
         $document = $this->documentInterface->all();
 
+        $document = $document->map(function ($risk) {
+            try {
+                $assignee           = $this->userInterface->getById($risk->assignee);
+                $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->assigneeName = 'Unknown';
+            }
+
+            try {
+                $creator                 = $this->userInterface->getById($risk->createdByUser);
+                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->createdByUserName = 'Unknown';
+            }
+
+            return $risk;
+        });
+
         return response()->json($document);
     }
 
     public function store(DocumentRecodeRequest $request)
     {
-        $data               = $request->validated();
-        $data['isNoExpiry'] = filter_var($data['isNoExpiry'], FILTER_VALIDATE_BOOLEAN);
-        $document           = $this->documentInterface->create($data);
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized']);
+        }
+        $data                  = $request->validated();
+        $data['createdByUser'] = $user->id;
+        $data['isNoExpiry']    = filter_var($data['isNoExpiry'], FILTER_VALIDATE_BOOLEAN);
+        $document              = $this->documentInterface->create($data);
         return response()->json([
             'message' => 'Document created successfully',
             'data'    => $document,

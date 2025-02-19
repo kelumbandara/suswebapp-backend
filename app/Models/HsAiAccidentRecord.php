@@ -49,11 +49,11 @@ class HsAiAccidentRecord extends Model
     protected static function booted()
     {
         static::creating(function ($model) {
-            $model->referenceNumber = 'ICD-PENDING';
+            $model->referenceNumber = 'ACD-PENDING';
         });
 
         static::created(function ($model) {
-            $model->referenceNumber = 'ICD-' . $model->id;
+            $model->referenceNumber = 'ACD-' . $model->id;
             $model->save();
         });
     }
