@@ -4,30 +4,57 @@ namespace App\Http\Controllers\HealthAndSaftyControllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HsOhClinicalSuite\ClinicalSuiteRequest;
 use App\Repositories\All\ClinicalSuite\ClinicalSuiteInterface;
+use App\Repositories\All\User\UserInterface;
+use Illuminate\Support\Facades\Auth;
 
 class ClinicalSuiteRecodeController extends Controller
 {
     protected $clinicalSuiteInterface;
+    protected $userInterface;
 
-    public function __construct(ClinicalSuiteInterface $clinicalSuiteInterface)
+
+    public function __construct(ClinicalSuiteInterface $clinicalSuiteInterface, UserInterface $userInterface)
     {
         $this->clinicalSuiteInterface = $clinicalSuiteInterface;
+        $this->userInterface          = $userInterface;
     }
 
     public function index()
     {
         $clinicalSuite = $this->clinicalSuiteInterface->All();
-        if ($clinicalSuite->isEmpty()) {
-            return response()->json([
-                'message' => 'No clinicalSuite found.',
-            ], );
-        }
+        $clinicalSuite = $clinicalSuite->map(function ($risk) {
+            try {
+                $assignee           = $this->userInterface->getById($risk->assignee);
+                $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->assigneeName = 'Unknown';
+            }
+
+            try {
+                $creator                 = $this->userInterface->getById($risk->createdByUser);
+                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->createdByUserName = 'Unknown';
+            }
+
+            return $risk;
+        });
+
         return response()->json($clinicalSuite, 200);
     }
 
     public function store(ClinicalSuiteRequest $request)
     {
-        $clinicalSuite = $this->clinicalSuiteInterface->create($request->validated());
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized']);
+        }
+
+        $validatedData = $request->validated();
+        $validatedData['createdByUser'] = $user->id;
+
+        $clinicalSuite = $this->clinicalSuiteInterface->create($validatedData);
 
         return response()->json([
             'message' => 'Clinical suite record created successfully.',
@@ -35,9 +62,7 @@ class ClinicalSuiteRecodeController extends Controller
         ], 201);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(ClinicalSuiteRequest $request, string $id)
     {
         $clinicalSuite = $this->clinicalSuiteInterface->findById($id);
@@ -55,9 +80,6 @@ class ClinicalSuiteRecodeController extends Controller
         ], 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $clinicalSuite = $this->clinicalSuiteInterface->findById($id);

@@ -37,7 +37,7 @@ class HazardAndRiskRequest extends FormRequest
             'serverDateAndTime'    => 'nullable|string',
             'assigneeLevel'        => 'nullable|integer',
             'responsibleSection'   => 'nullable|string|max:255',
-            'createdByUser'        => 'required|string|max:255',
+            'createdByUser'        => 'nullable|string|max:255',
 
         ];
     }

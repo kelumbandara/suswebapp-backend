@@ -6,6 +6,7 @@ use App\Http\Requests\HazardAndRisk\HazardAndRiskRequest;
 use App\Repositories\All\HazardAndRisk\HazardAndRiskInterface;
 use App\Repositories\All\HRDivision\HRDivisionInterface;
 use App\Repositories\All\User\UserInterface;
+use Illuminate\Support\Facades\Auth;
 
 class HazardAndRiskController extends Controller
 {
@@ -47,7 +48,15 @@ class HazardAndRiskController extends Controller
 
     public function store(HazardAndRiskRequest $request)
     {
-        $validatedData = $request->validated();
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized']);
+        }
+
+        $userId = $user->id;
+
+        $validatedData                  = $request->validated();
+        $validatedData['createdByUser'] = $userId;
 
         $hazardRisk = $this->hazardAndRiskInterface->create($validatedData);
 

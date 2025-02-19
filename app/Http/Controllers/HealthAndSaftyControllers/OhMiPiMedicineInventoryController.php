@@ -5,22 +5,43 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\HsOhMiPiMedicineInventory\MedicineInventoryRequest;
 use App\Repositories\All\MedicineDisposal\MedicineDisposalInterface;
 use App\Repositories\All\MedicineInventory\MedicineInventoryInterface;
+use App\Repositories\All\User\UserInterface;
+use Illuminate\Support\Facades\Auth;
 
 class OhMiPiMedicineInventoryController extends Controller
 {
     protected $medicineInventoryInterface;
     protected $medicineDisposalInterface;
+    protected $userInterface;
 
-    public function __construct(MedicineInventoryInterface $medicineInventoryInterface, MedicineDisposalInterface $medicineDisposalInterface)
+
+    public function __construct(MedicineInventoryInterface $medicineInventoryInterface, MedicineDisposalInterface $medicineDisposalInterface, UserInterface $userInterface)
     {
         $this->medicineInventoryInterface = $medicineInventoryInterface;
         $this->medicineDisposalInterface  = $medicineDisposalInterface;
+        $this->userInterface              = $userInterface;
     }
 
     public function index()
     {
         $records = $this->medicineInventoryInterface->All();
+        $records = $records->map(function ($risk) {
+            try {
+                $assignee           = $this->userInterface->getById($risk->assignee);
+                $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->assigneeName = 'Unknown';
+            }
 
+            try {
+                $creator                 = $this->userInterface->getById($risk->createdByUser);
+                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->createdByUserName = 'Unknown';
+            }
+
+            return $risk;
+        });
         foreach ($records as $record) {
             $record->inventory = $this->medicineDisposalInterface->findByInventoryId($record->id);
         }
@@ -30,18 +51,27 @@ class OhMiPiMedicineInventoryController extends Controller
 
     public function store(MedicineInventoryRequest $request)
     {
+        $user = Auth::user();
 
-        $data      = $request->validated();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized']);
+        }
+
+        $data = $request->validated();
+        $data['createdByUser'] = $user->id;
+
         $inventory = $this->medicineInventoryInterface->create($data);
 
-        if (! $inventory) {
+        if (!$inventory) {
             return response()->json(['message' => 'Failed to create inventory record'], 500);
         }
 
-        if (! empty($data['disposals'])) {
-            foreach ($data['disposals'] as $inventory) {
-                $inventory['inventoryId'] = $inventory->id;
-                $this->medicineDisposalInterface->create($inventory);
+        $inventoryId = $inventory->id;
+
+        if (!empty($data['disposals'])) {
+            foreach ($data['disposals'] as $disposal) {
+                $disposal['inventoryId'] = $inventoryId;
+                $this->medicineDisposalInterface->create($disposal);
             }
         }
 
