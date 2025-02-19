@@ -63,12 +63,13 @@ class HrCategoryController extends Controller
             ]);
         }
 
-        $uniqueSubcategories = $subcategories->map(function ($item) {
+        // Filter out duplicate subcategories
+        $uniqueSubcategories = $subcategories->unique('subCategory')->values()->map(function ($item) {
             return [
-                'id'          => $item->id,
+                'id'          => (int) $item->id,
                 'subCategory' => $item->subCategory,
             ];
-        })->unique('subCategory');
+        });
 
         return response()->json($uniqueSubcategories);
     }

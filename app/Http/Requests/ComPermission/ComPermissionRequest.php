@@ -21,7 +21,7 @@ class ComPermissionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'userType'         => 'required|string|unique:com_permissions,userType',
+            'userType'         => 'required|string|unique:com_permissions,userType,'.$this->route('id'),
             'description'      => 'nullable|string',
             'permissionObject' => 'required|array',
         ];

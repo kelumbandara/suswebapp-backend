@@ -75,9 +75,9 @@ class ForgotPasswordController extends Controller
 
     public function changePassword(Request $request)
     {
-        $validator = Validator::make($request->only(['email', 'password']), [
+        $validator = Validator::make($request->all(), [
             'email'    => 'required|email|exists:users,email',
-            'password' => 'required|min:8|confirmed',
+            'password' => 'required|min:4',
         ]);
 
         if ($validator->fails()) {
@@ -87,10 +87,11 @@ class ForgotPasswordController extends Controller
         $user = $this->userInterface->findByColumn(['email' => $request->email]);
 
         if (! $user) {
-            return response()->json(['message' => 'User not found.'], 404);
+            return response()->json(['error' => 'User not found.'], 404);
         }
 
         $user->password = Hash::make($request->password);
+        $user->otp = null;
         $user->save();
 
         return response()->json(['message' => 'Password changed successfully.'], 200);
