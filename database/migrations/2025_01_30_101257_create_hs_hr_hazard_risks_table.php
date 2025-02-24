@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('subCategory')->nullable();
             $table->string('observationType')->nullable();
             $table->string('division')->nullable();
-            $table->string('assignee')->nullable();
+            $table->string('assigneeId')->nullable();
             $table->string('createdByUser')->nullable();
             $table->string('locationOrDepartment')->nullable();
             $table->string('subLocation')->nullable();
