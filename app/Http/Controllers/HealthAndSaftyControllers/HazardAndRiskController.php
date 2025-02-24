@@ -27,12 +27,11 @@ class HazardAndRiskController extends Controller
 
         $hazardRisks = $hazardRisks->map(function ($risk) {
             try {
-                $assignee           = $this->userInterface->getById($risk->assignee);
-                $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
+                $assignee = $this->userInterface->getById($risk->assigneeId);
+                $risk->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
-                $risk->assigneeName = 'Unknown';
+                $risk->assignee = ['name' => 'Unknown', 'id' => null];
             }
-
             try {
                 $creator                 = $this->userInterface->getById($risk->createdByUser);
                 $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
@@ -123,18 +122,40 @@ class HazardAndRiskController extends Controller
             'message' => 'Hazard and risk record deleted successfully!',
         ], 200);
     }
-    public function edit($id)
-    {
-        $hazardRisk = $this->hazardAndRiskInterface->findById($id);
+    public function assignTask()
+{
+    $user = Auth::user();
 
-        if (! $hazardRisk) {
-            return response()->json([
-                'message' => 'Hazard and risk record not found.',
-            ]);
+    if (!$user) {
+        return response()->json(['message' => 'Unauthorized'], 401);
+    }
+
+    // Fetch only the hazard risks assigned to the authenticated user
+    $hazardRisks = $this->hazardAndRiskInterface->getByAssigneeId($user->id);
+
+    // Process data to add assignee and creator details
+    $hazardRisks = $hazardRisks->map(function ($risk) {
+        try {
+            $assignee = $this->userInterface->getById($risk->assigneeId);
+            $risk->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
+        } catch (\Exception $e) {
+            $risk->assignee = ['name' => 'Unknown', 'id' => null];
         }
 
-        return response()->json($hazardRisk, 200);
-    }
+        try {
+            $creator = $this->userInterface->getById($risk->createdByUser);
+            $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+        } catch (\Exception $e) {
+            $risk->createdByUserName = 'Unknown';
+        }
+
+        return $risk;
+    });
+
+    return response()->json($hazardRisks, 200);
+}
+
+
 
     public function dashboardStats()
     {

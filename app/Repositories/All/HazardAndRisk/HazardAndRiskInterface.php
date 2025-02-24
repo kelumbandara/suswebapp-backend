@@ -12,5 +12,6 @@ interface HazardAndRiskInterface extends EloquentRepositoryInterface {
     public function countByDivision($division);
     public function getAllDivisions();
     public function getDistinctDivisions();
+    public function getByAssigneeId(int $assigneeId);
 
 }

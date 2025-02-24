@@ -91,7 +91,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('hazard-risk/{id}/show', [HazardAndRiskController::class, 'show']);
     Route::post('hazard-risk/{id}/update', [HazardAndRiskController::class, 'update']);
     Route::delete('hazard-risk/{id}/delete', [HazardAndRiskController::class, 'destroy']);
-    Route::get('hazard-risk/{id}/edit', [HazardAndRiskController::class, 'edit']);
+    Route::get('hazard-risks-assign-task', [HazardAndRiskController::class, 'assignTask']);
     Route::get('hazard-risk-dashboard', [HazardAndRiskController::class, 'dashboardStats']);
     Route::get('hazard-risk-dashboard-division', [HazardAndRiskController::class, 'dashboardStatsByDivision']);
 

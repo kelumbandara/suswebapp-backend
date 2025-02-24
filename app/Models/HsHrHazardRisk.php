@@ -16,7 +16,7 @@ class HsHrHazardRisk extends Model
         'subCategory',
         'observationType',
         'division',
-        'assignee',
+        'assigneeId',
         'locationOrDepartment',
         'subLocation',
         'description',

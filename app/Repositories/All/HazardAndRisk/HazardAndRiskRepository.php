@@ -50,6 +50,10 @@ public function getDistinctDivisions()
 {
     return $this->model->select('division')->distinct()->get();
 }
+public function getByAssigneeId($assigneeId)
+{
+    return $this->model->where('assigneeId', $assigneeId)->get();
+}
 
 
 
