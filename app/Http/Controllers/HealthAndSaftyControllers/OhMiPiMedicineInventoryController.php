@@ -14,7 +14,6 @@ class OhMiPiMedicineInventoryController extends Controller
     protected $medicineDisposalInterface;
     protected $userInterface;
 
-
     public function __construct(MedicineInventoryInterface $medicineInventoryInterface, MedicineDisposalInterface $medicineDisposalInterface, UserInterface $userInterface)
     {
         $this->medicineInventoryInterface = $medicineInventoryInterface;
@@ -26,12 +25,6 @@ class OhMiPiMedicineInventoryController extends Controller
     {
         $records = $this->medicineInventoryInterface->All();
         $records = $records->map(function ($risk) {
-            try {
-                $assignee           = $this->userInterface->getById($risk->assignee);
-                $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
-            } catch (\Exception $e) {
-                $risk->assigneeName = 'Unknown';
-            }
 
             try {
                 $creator                 = $this->userInterface->getById($risk->createdByUser);
@@ -53,22 +46,22 @@ class OhMiPiMedicineInventoryController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Unauthorized']);
         }
 
-        $data = $request->validated();
+        $data                  = $request->validated();
         $data['createdByUser'] = $user->id;
 
         $inventory = $this->medicineInventoryInterface->create($data);
 
-        if (!$inventory) {
+        if (! $inventory) {
             return response()->json(['message' => 'Failed to create inventory record'], 500);
         }
 
         $inventoryId = $inventory->id;
 
-        if (!empty($data['disposals'])) {
+        if (! empty($data['disposals'])) {
             foreach ($data['disposals'] as $disposal) {
                 $disposal['inventoryId'] = $inventoryId;
                 $this->medicineDisposalInterface->create($disposal);

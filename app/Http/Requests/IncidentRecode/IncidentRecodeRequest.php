@@ -29,7 +29,7 @@ class IncidentRecodeRequest extends FormRequest
             'typeOfConcern'                            => 'nullable|string',
             'factors'                                  => 'nullable|string',
             'causes'                                   => 'nullable|string',
-            'assignee'                                 => 'nullable|string',
+            'assigneeId'                               => 'nullable|string',
             'incidentDetails'                          => 'nullable|string',
             'incidentTime'                             => 'nullable|string',
             'incidentDate'                             => 'required|string',

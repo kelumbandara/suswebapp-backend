@@ -21,6 +21,9 @@ class IncidentRecodeRepository extends BaseRepository implements IncidentRecodeI
         $this->model = $model;
     }
 
-
+    public function getByAssigneeId($assigneeId)
+    {
+        return $this->model->where('assigneeId', $assigneeId)->get();
+    }
 
 }

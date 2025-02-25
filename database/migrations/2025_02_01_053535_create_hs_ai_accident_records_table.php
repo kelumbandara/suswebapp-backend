@@ -31,7 +31,7 @@ return new class extends Migration
             $table->string('consultedHospital')->nullable();
             $table->string('consultedDoctor')->nullable();
             $table->string('description')->nullable();
-            $table->enum('status',['draft', 'open', 'closed'])->default('draft')->nullable();
+            $table->enum('status', ['draft', 'open', 'closed'])->default('draft')->nullable();
             $table->string('workPerformed')->nullable();
             $table->string('actionTaken')->nullable();
             $table->string('accidentDate')->nullable();
@@ -39,17 +39,15 @@ return new class extends Migration
             $table->string('reportedDate')->nullable();
             $table->string('injuryType')->nullable();
             $table->string('severity')->nullable();
-            $table->string('assignee')->nullable();
+            $table->string('assigneeId')->nullable();
             $table->string('expectedDate')->nullable();
             $table->string('expectedTime')->nullable();
             $table->string('createdUserlevel')->nullable();
             $table->string('responsiblesection')->nullable()->default('AccidentReport');
 
-
             $table->timestamps();
         });
     }
-
 
     public function down(): void
     {

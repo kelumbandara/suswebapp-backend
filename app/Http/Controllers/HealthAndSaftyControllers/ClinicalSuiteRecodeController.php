@@ -12,7 +12,6 @@ class ClinicalSuiteRecodeController extends Controller
     protected $clinicalSuiteInterface;
     protected $userInterface;
 
-
     public function __construct(ClinicalSuiteInterface $clinicalSuiteInterface, UserInterface $userInterface)
     {
         $this->clinicalSuiteInterface = $clinicalSuiteInterface;
@@ -23,12 +22,6 @@ class ClinicalSuiteRecodeController extends Controller
     {
         $clinicalSuite = $this->clinicalSuiteInterface->All();
         $clinicalSuite = $clinicalSuite->map(function ($risk) {
-            try {
-                $assignee           = $this->userInterface->getById($risk->assignee);
-                $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
-            } catch (\Exception $e) {
-                $risk->assigneeName = 'Unknown';
-            }
 
             try {
                 $creator                 = $this->userInterface->getById($risk->createdByUser);
@@ -51,7 +44,7 @@ class ClinicalSuiteRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized']);
         }
 
-        $validatedData = $request->validated();
+        $validatedData                  = $request->validated();
         $validatedData['createdByUser'] = $user->id;
 
         $clinicalSuite = $this->clinicalSuiteInterface->create($validatedData);
@@ -61,7 +54,6 @@ class ClinicalSuiteRecodeController extends Controller
             'data'    => $clinicalSuite,
         ], 201);
     }
-
 
     public function update(ClinicalSuiteRequest $request, string $id)
     {

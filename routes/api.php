@@ -102,11 +102,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('accidents/{id}/show', [AiAccidentRecordController::class, 'show']);
     Route::post('accidents/{id}/update', [AiAccidentRecordController::class, 'update']);
     Route::delete('accidents/{id}/delete', [AiAccidentRecordController::class, 'destroy']);
+    Route::get('accidents-assign-task', [AiAccidentRecordController::class, 'assignTask']);
 
     Route::get('incidents', [AiIncidentRecodeController::class, 'index']);
     Route::post('incidents', [AiIncidentRecodeController::class, 'store']);
     Route::post('incidents/{id}/update', [AiIncidentRecodeController::class, 'update']);
     Route::delete('incidents/{id}/delete', [AiIncidentRecodeController::class, 'destroy']);
+    Route::get('incidents-assign-task', [AiIncidentRecodeController::class, 'assignTask']);
 
     Route::get('documents', [DocumentRecodeController::class, 'index']);
     Route::post('documents', [DocumentRecodeController::class, 'store']);
@@ -123,6 +125,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('medicine-request', [OsMiMedicineRequestController::class, 'store']);
     Route::post('medicine-request/{id}/update', [OsMiMedicineRequestController::class, 'update']);
     Route::delete('medicine-request/{id}/delete', [OsMiMedicineRequestController::class, 'destroy']);
+    Route::get('medicine-request-assign-task', [OsMiMedicineRequestController::class, 'assignTask']);
 
     Route::get('medicine-inventory', [OhMiPiMedicineInventoryController::class, 'index']);
     Route::post('medicine-inventory', [OhMiPiMedicineInventoryController::class, 'store']);

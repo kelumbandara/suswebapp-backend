@@ -26,9 +26,9 @@ return new class extends Migration
             $table->string('incidentDetails')->nullable();
             $table->string('incidentTime')->nullable();
             $table->string('incidentDate')->nullable();
-            $table->enum('status',['draft', 'open', 'closed'])->default('draft')->nullable();
+            $table->enum('status', ['draft', 'open', 'closed'])->default('draft')->nullable();
             $table->string('severity')->nullable();
-            $table->string('assignee')->nullable();
+            $table->string('assigneeId')->nullable();
             $table->string('createdUserLevel')->nullable();
             $table->string('responsibleSection')->nullable()->default('AccidentReport');
             $table->timestamps();

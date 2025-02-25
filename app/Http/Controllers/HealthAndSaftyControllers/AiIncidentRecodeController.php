@@ -21,7 +21,7 @@ class AiIncidentRecodeController extends Controller
         $this->incidentRecordInterface  = $incidentRecordInterface;
         $this->incidentWitnessInterface = $incidentWitnessInterface;
         $this->incidentPeopleInterface  = $incidentPeopleInterface;
-        $this->userInterface          = $userInterface;
+        $this->userInterface            = $userInterface;
 
     }
 
@@ -30,10 +30,10 @@ class AiIncidentRecodeController extends Controller
         $records = $this->incidentRecordInterface->All();
         $records = $records->map(function ($risk) {
             try {
-                $assignee           = $this->userInterface->getById($risk->assignee);
-                $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
+                $assignee       = $this->userInterface->getById($risk->assigneeId);
+                $risk->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
-                $risk->assigneeName = 'Unknown';
+                $risk->assignee = ['name' => 'Unknown', 'id' => null];
             }
 
             try {
@@ -54,7 +54,6 @@ class AiIncidentRecodeController extends Controller
         return response()->json($records, 200);
     }
 
-
     public function store(IncidentRecodeRequest $request)
     {
         $user = Auth::user();
@@ -63,9 +62,9 @@ class AiIncidentRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized']);
         }
 
-        $data   = $request->validated();
+        $data                  = $request->validated();
         $data['createdByUser'] = $user->id;
-        $record = $this->incidentRecordInterface->create($data);
+        $record                = $this->incidentRecordInterface->create($data);
 
         if (! $record) {
             return response()->json(['message' => 'Failed to create Incident record'], 500);
@@ -154,5 +153,36 @@ class AiIncidentRecodeController extends Controller
         $this->incidentRecordInterface->deleteById($id);
 
         return response()->json(['message' => 'Incident record deleted successfully'], 200);
+    }
+
+    public function assignTask()
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $record = $this->incidentRecordInterface->getByAssigneeId($user->id);
+
+        $record = $record->map(function ($incident) {
+            try {
+                $assignee           = $this->userInterface->getById($incident->assigneeId);
+                $incident->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $incident->assignee = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $creator                     = $this->userInterface->getById($incident->createdByUser);
+                $incident->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $incident->createdByUserName = 'Unknown';
+            }
+
+            return $incident;
+        });
+
+        return response()->json($record, 200);
     }
 }

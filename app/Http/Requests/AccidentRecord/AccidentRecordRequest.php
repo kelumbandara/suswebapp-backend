@@ -35,7 +35,7 @@ class AccidentRecordRequest extends FormRequest
             'affectedPrimaryRegion'                    => 'nullable|string',
             'affectedSecondaryRegion'                  => 'nullable|string',
             'affectedTertiaryRegion'                   => 'nullable|string',
-            'assignee'                                 => 'required|string',
+            'assigneeId'                               => 'required|string',
             'injuryCause'                              => 'nullable|string',
             'rootCause'                                => 'required|string',
             'consultedHospital'                        => 'nullable|string',

@@ -1,10 +1,10 @@
 <?php
-
 namespace App\Repositories\All\IncidentRecord;
 
 use App\Repositories\Base\EloquentRepositoryInterface;
 
-// Interface
-interface IncidentRecodeInterface extends EloquentRepositoryInterface {
+interface IncidentRecodeInterface extends EloquentRepositoryInterface
+{
+    public function getByAssigneeId(int $assigneeId);
 
 }
