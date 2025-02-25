@@ -20,4 +20,9 @@ class UserRepository extends BaseRepository implements UserInterface
     {
         $this->model = $model;
     }
+    public function getUsersByAssigneeLevel(int $level)
+{
+    return User::where('assigneeLevel', $level)->get();
+}
+
 }
