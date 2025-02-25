@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -38,13 +37,12 @@ class HsAiAccidentRecord extends Model
         'reportedDate',
         'injuryType',
         'severity',
-        'assignee',
+        'assigneeId',
         'createdUserlevel',
         'responsiblesection',
         'expectedDate',
         'expectedTime',
     ];
-
 
     protected static function booted()
     {

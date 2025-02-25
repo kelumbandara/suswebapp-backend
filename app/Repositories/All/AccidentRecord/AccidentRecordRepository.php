@@ -4,7 +4,7 @@ namespace App\Repositories\All\AccidentRecord;
 use App\Models\HsAiAccidentRecord;
 use App\Repositories\Base\BaseRepository;
 
-class    AccidentRecordRepository extends BaseRepository implements AccidentRecordInterface
+class AccidentRecordRepository extends BaseRepository implements AccidentRecordInterface
 {
     /**
      * @var HsAiAccidentRecord
@@ -21,6 +21,9 @@ class    AccidentRecordRepository extends BaseRepository implements AccidentReco
         $this->model = $model;
     }
 
-
+    public function getByAssigneeId($assigneeId)
+    {
+        return $this->model->where('assigneeId', $assigneeId)->get();
+    }
 
 }

@@ -16,12 +16,11 @@ class AiAccidentRecordController extends Controller
     protected $accidentPeopleInterface;
     protected $userInterface;
 
-
     public function __construct(AccidentRecordInterface $accidentRecordInterface, AccidentWitnessInterface $accidentWitnessInterface, AccidentPeopleInterface $accidentPeopleInterface, UserInterface $userInterface)
     {
         $this->accidentRecordInterface  = $accidentRecordInterface;
         $this->accidentWitnessInterface = $accidentWitnessInterface;
-        $this->userInterface          = $userInterface;
+        $this->userInterface            = $userInterface;
         $this->accidentPeopleInterface  = $accidentPeopleInterface;
     }
 
@@ -30,10 +29,10 @@ class AiAccidentRecordController extends Controller
         $records = $this->accidentRecordInterface->All();
         $records = $records->map(function ($risk) {
             try {
-                $assignee           = $this->userInterface->getById($risk->assignee);
-                $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
+                $assignee       = $this->userInterface->getById($risk->assigneeId);
+                $risk->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
-                $risk->assigneeName = 'Unknown';
+                $risk->assignee = ['name' => 'Unknown', 'id' => null];
             }
 
             try {
@@ -52,7 +51,6 @@ class AiAccidentRecordController extends Controller
 
         return response()->json($records, 200);
     }
-
 
     public function store(AccidentRecordRequest $request)
     {
@@ -163,6 +161,37 @@ class AiAccidentRecordController extends Controller
         $this->accidentRecordInterface->deleteById($id);
 
         return response()->json(['message' => 'Accident record deleted successfully'], 200);
+    }
+
+    public function assignTask()
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $record = $this->accidentRecordInterface->getByAssigneeId($user->id);
+
+        $record = $record->map(function ($accident) {
+            try {
+                $assignee           = $this->userInterface->getById($accident->assigneeId);
+                $accident->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $accident->assignee = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $creator                     = $this->userInterface->getById($accident->createdByUser);
+                $accident->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $accident->createdByUserName = 'Unknown';
+            }
+
+            return $accident;
+        });
+
+        return response()->json($record, 200);
     }
 
 }

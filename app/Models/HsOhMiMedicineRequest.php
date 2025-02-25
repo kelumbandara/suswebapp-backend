@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,7 +15,7 @@ class HsOhMiMedicineRequest extends Model
         'medicineName',
         'genericName',
         'division',
-        'approver',
+        'assigneeId',
         'requestQuantity',
         'inventoryNumber',
         'requestedDate',

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,9 +26,9 @@ class HsAiIncidentRecode extends Model
         'incidentDate',
         'status',
         'severity',
-        'assignee',
+        'assigneeId',
         'createdUserLevel',
-        'responsibleSection'
+        'responsibleSection',
     ];
 
     protected static function booted()
@@ -40,7 +39,7 @@ class HsAiIncidentRecode extends Model
 
         static::created(function ($model) {
             $model->referenceNumber = 'ICD-' . $model->id;
-            $model->save(); 
+            $model->save();
         });
     }
 }

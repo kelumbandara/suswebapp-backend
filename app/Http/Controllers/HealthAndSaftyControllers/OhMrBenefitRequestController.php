@@ -17,7 +17,6 @@ class OhMrBenefitRequestController extends Controller
     protected $benefitEntitlementInterface;
     protected $userInterface;
 
-
     public function __construct(BenefitRequestInterface $benefitRequestInterface, BenefitDocumentInterface $benefitDocumentInterface, BenefitEntitlementInterface $benefitEntitlementInterface, UserInterface $userInterface)
     {
         $this->benefitRequestInterface     = $benefitRequestInterface;
@@ -29,12 +28,6 @@ class OhMrBenefitRequestController extends Controller
     {
         $records = $this->benefitRequestInterface->All();
         $records = $records->map(function ($risk) {
-            try {
-                $assignee           = $this->userInterface->getById($risk->assignee);
-                $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
-            } catch (\Exception $e) {
-                $risk->assigneeName = 'Unknown';
-            }
 
             try {
                 $creator                 = $this->userInterface->getById($risk->createdByUser);
@@ -62,7 +55,7 @@ class OhMrBenefitRequestController extends Controller
             return response()->json(['message' => 'Unauthorized']);
         }
 
-        $data   = $request->validated();
+        $data                  = $request->validated();
         $data['createdByUser'] = $user->id;
 
         $record = $this->benefitRequestInterface->create($data);

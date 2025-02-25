@@ -18,10 +18,10 @@ return new class extends Migration
             $table->string('genericName')->nullable();
             $table->string('division')->nullable();
             $table->integer('requestQuantity')->nullable();
-            $table->string('approver')->nullable();
+            $table->string('assigneeId')->nullable();
             $table->string('inventoryNumber')->nullable();
             $table->string('requestedDate')->nullable();
-            $table->enum('status',['pending', 'approved', 'rejected',])->default('pending')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending')->nullable();
             $table->string('responsibleSection')->nullable()->default('Documents');
             $table->string('assigneeLevel')->nullable()->default('1');
             $table->string('createdByUser')->nullable();

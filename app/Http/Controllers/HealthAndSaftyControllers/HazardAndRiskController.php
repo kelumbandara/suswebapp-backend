@@ -27,7 +27,7 @@ class HazardAndRiskController extends Controller
 
         $hazardRisks = $hazardRisks->map(function ($risk) {
             try {
-                $assignee = $this->userInterface->getById($risk->assigneeId);
+                $assignee       = $this->userInterface->getById($risk->assigneeId);
                 $risk->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $risk->assignee = ['name' => 'Unknown', 'id' => null];
@@ -123,39 +123,35 @@ class HazardAndRiskController extends Controller
         ], 200);
     }
     public function assignTask()
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    if (!$user) {
-        return response()->json(['message' => 'Unauthorized'], 401);
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $hazardRisks = $this->hazardAndRiskInterface->getByAssigneeId($user->id);
+
+        $hazardRisks = $hazardRisks->map(function ($risk) {
+            try {
+                $assignee       = $this->userInterface->getById($risk->assigneeId);
+                $risk->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $risk->assignee = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $creator                 = $this->userInterface->getById($risk->createdByUser);
+                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->createdByUserName = 'Unknown';
+            }
+
+            return $risk;
+        });
+
+        return response()->json($hazardRisks, 200);
     }
-
-    // Fetch only the hazard risks assigned to the authenticated user
-    $hazardRisks = $this->hazardAndRiskInterface->getByAssigneeId($user->id);
-
-    // Process data to add assignee and creator details
-    $hazardRisks = $hazardRisks->map(function ($risk) {
-        try {
-            $assignee = $this->userInterface->getById($risk->assigneeId);
-            $risk->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
-        } catch (\Exception $e) {
-            $risk->assignee = ['name' => 'Unknown', 'id' => null];
-        }
-
-        try {
-            $creator = $this->userInterface->getById($risk->createdByUser);
-            $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
-        } catch (\Exception $e) {
-            $risk->createdByUserName = 'Unknown';
-        }
-
-        return $risk;
-    });
-
-    return response()->json($hazardRisks, 200);
-}
-
-
 
     public function dashboardStats()
     {
