@@ -39,6 +39,7 @@ use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineNameController;
 use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineNameFormController;
 use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineRequestController;
 use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineTypeController;
+use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -211,5 +212,10 @@ Route::get('supplier-type', [OhMiPiMiSupplierTypeController::class, 'index']);
 Route::post('supplier-type', [OhMiPiMiSupplierTypeController::class, 'store']);
 Route::post('supplier-type/{id}/update', [OhMiPiMiSupplierTypeController::class, 'update']);
 Route::delete('supplier-type/{id}/delete', [OhMiPiMiSupplierTypeController::class, 'destroy']);
+
+
+Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
+Route::post('upload', [ImageUploadController::class, 'uploadImage']);
+
 
 Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);

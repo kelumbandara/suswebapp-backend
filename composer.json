@@ -7,10 +7,13 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "google/cloud-storage": "^1.46",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "league/flysystem-google-cloud-storage": "^3.28",
+        "spatie/laravel-google-cloud-storage": "^2.3",
         "tightenco/ziggy": "^2.0",
         "tymon/jwt-auth": "^2.1"
     },
