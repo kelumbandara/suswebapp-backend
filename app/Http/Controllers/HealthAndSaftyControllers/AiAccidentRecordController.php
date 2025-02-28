@@ -98,6 +98,9 @@ class AiAccidentRecordController extends Controller
                 $this->accidentRecordInterface->update($record->id, [
                     'imageUrl' => json_encode($uploadedFiles),
                 ]);
+                return response()->json([
+                    'imageUrl' => $uploadedFiles,
+                ]);
             }
         }
 

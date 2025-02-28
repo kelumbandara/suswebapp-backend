@@ -31,6 +31,10 @@ class HsAiIncidentRecode extends Model
         'responsibleSection',
     ];
 
+    protected $casts = [
+        'imageUrl' => 'array',
+    ];
+
     protected static function booted()
     {
         static::creating(function ($model) {

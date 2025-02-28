@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('referenceNumber')->required()->unique();
             $table->string('createdByUser')->nullable();
-            $table->string('division')->required();
+            $table->string('division')->nullable();
             $table->string('location')->nullable();
             $table->string('circumstances')->nullable();
-            $table->string('imageUrl')->nullable();
+            $table->json('imageUrl')->nullable();
             $table->string('typeOfNearMiss')->nullable();
             $table->string('typeOfConcern')->nullable();
             $table->string('factors')->nullable();

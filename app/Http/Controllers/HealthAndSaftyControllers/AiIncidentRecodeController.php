@@ -7,6 +7,7 @@ use App\Repositories\All\IncidentPeople\IncidentPeopleInterface;
 use App\Repositories\All\IncidentRecord\IncidentRecodeInterface;
 use App\Repositories\All\IncidentWitness\IncidentWitnessInterface;
 use App\Repositories\All\User\UserInterface;
+use App\Services\IncidentService;
 use Illuminate\Support\Facades\Auth;
 
 class AiIncidentRecodeController extends Controller
@@ -15,13 +16,15 @@ class AiIncidentRecodeController extends Controller
     protected $incidentWitnessInterface;
     protected $incidentPeopleInterface;
     protected $userInterface;
+    protected $incidentService;
 
-    public function __construct(IncidentRecodeInterface $incidentRecordInterface, IncidentWitnessInterface $incidentWitnessInterface, IncidentPeopleInterface $incidentPeopleInterface, UserInterface $userInterface)
+    public function __construct(IncidentRecodeInterface $incidentRecordInterface, IncidentWitnessInterface $incidentWitnessInterface, IncidentPeopleInterface $incidentPeopleInterface, UserInterface $userInterface , IncidentService $incidentService)
     {
         $this->incidentRecordInterface  = $incidentRecordInterface;
         $this->incidentWitnessInterface = $incidentWitnessInterface;
         $this->incidentPeopleInterface  = $incidentPeopleInterface;
         $this->userInterface            = $userInterface;
+        $this->incidentService          = $incidentService;
 
     }
 
@@ -42,6 +45,19 @@ class AiIncidentRecodeController extends Controller
             } catch (\Exception $e) {
                 $risk->createdByUserName = 'Unknown';
             }
+
+            if (! empty($risk->imageUrl) && is_string($risk->imageUrl)) {
+                $imageUrl = json_decode($risk->imageUrl, true);
+            } else {
+                $imageUrl = is_array($risk->imageUrl) ? $risk->imageUrl : [];
+            }
+            foreach ($imageUrl as &$imageUrl) {
+                if (isset($imageUrl['gsutil_uri'])) {
+                    $imageUrl['imageUrl'] = $this->incidentService->getImageUrl($imageUrl['gsutil_uri']);
+                }
+            }
+
+            $risk->imageUrl = $imageUrl;
 
             return $risk;
         });
@@ -68,6 +84,24 @@ class AiIncidentRecodeController extends Controller
 
         if (! $record) {
             return response()->json(['message' => 'Failed to create Incident record'], 500);
+        }
+        if ($request->hasFile('imageUrl')) {
+            $uploadedFiles = [];
+
+            foreach ($request->file('imageUrl') as $file) {
+                $uploadedFiles[] = $this->incidentService->uploadImageToGCS($file, $record->id);
+            }
+
+            if (! empty($uploadedFiles)) {
+                $this->incidentRecordInterface->update($record->id, [
+                    'imageUrl' => json_encode($uploadedFiles),
+                ]);
+                return response()->json([
+                    'message' => 'Image uploaded successfully',
+                    'imageUrl' => $uploadedFiles,
+                ]);
+            }
+            
         }
 
         if (! empty($data['witnesses'])) {
