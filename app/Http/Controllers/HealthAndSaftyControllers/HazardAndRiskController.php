@@ -6,6 +6,8 @@ use App\Http\Requests\HazardAndRisk\HazardAndRiskRequest;
 use App\Repositories\All\HazardAndRisk\HazardAndRiskInterface;
 use App\Repositories\All\HRDivision\HRDivisionInterface;
 use App\Repositories\All\User\UserInterface;
+use App\Services\HazardRiskService;
+use App\Services\ImageUploadService;
 use Illuminate\Support\Facades\Auth;
 
 class HazardAndRiskController extends Controller
@@ -14,12 +16,14 @@ class HazardAndRiskController extends Controller
     protected $hazardAndRiskInterface;
     protected $userInterface;
     protected $HRDivisionInterface;
+    protected $hazardAndRiskService;
 
-    public function __construct(HazardAndRiskInterface $hazardAndRiskInterface, UserInterface $userInterface, HRDivisionInterface $HRDivisionInterface)
+    public function __construct(HazardAndRiskInterface $hazardAndRiskInterface, UserInterface $userInterface, HRDivisionInterface $HRDivisionInterface, HazardRiskService $hazardAndRiskService)
     {
         $this->hazardAndRiskInterface = $hazardAndRiskInterface;
         $this->userInterface          = $userInterface;
         $this->HRDivisionInterface    = $HRDivisionInterface;
+        $this->hazardAndRiskService   = $hazardAndRiskService;
     }
     public function index()
     {
@@ -39,6 +43,31 @@ class HazardAndRiskController extends Controller
                 $risk->createdByUserName = 'Unknown';
             }
 
+            if (! empty($risk->documents) && is_string($risk->documents)) {
+                $documents = json_decode($risk->documents, true);
+            } else {
+                $documents = is_array($risk->documents) ? $risk->documents : [];
+            }
+            foreach ($documents as &$document) {
+                if (isset($document['gsutil_uri'])) {
+                    $document['imageUrl'] = $this->hazardAndRiskService->getImageUrl($document['gsutil_uri']);
+                }
+            }
+
+            $risk->documents = $documents;
+
+            // if (!empty($risk->documents) && is_string($risk->documents)) {
+            //     $documents = json_decode($risk->documents, true);
+            // } else {
+            //     $documents = is_array($risk->documents) ? $risk->documents : [];
+            // }
+
+            // if (!empty($documents) && isset($documents[0]['image_id'])) {
+            //     $risk->documents = $this->imageUploadService->getImageUrl($documents[0]['image_id']);
+            // } else {
+            //     $risk->documents = null;
+            // }
+
             return $risk;
         });
 
@@ -49,13 +78,22 @@ class HazardAndRiskController extends Controller
     {
         $user = Auth::user();
         if (! $user) {
-            return response()->json(['message' => 'Unauthorized']);
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $userId = $user->id;
-
+        $userId                         = $user->id;
         $validatedData                  = $request->validated();
         $validatedData['createdByUser'] = $userId;
+
+        if ($request->hasFile('documents')) {
+            $uploadedFiles = [];
+
+            foreach ($request->file('documents') as $file) {
+                $uploadedFiles[] = $this->hazardAndRiskService->uploadImageToGCS($file);
+            }
+
+            $validatedData['documents'] = json_encode($uploadedFiles);
+        }
 
         $hazardRisk = $this->hazardAndRiskInterface->create($validatedData);
 
@@ -90,6 +128,15 @@ class HazardAndRiskController extends Controller
 
         $validatedData = $request->validated();
 
+        if ($request->hasFile('documents')) {
+            $uploadedFiles = [];
+
+            foreach ($request->file('documents') as $file) {
+                $uploadedFiles[] = $this->hazardAndRiskService->uploadImageToGCS($file);
+            }
+
+            $validatedData['documents'] = $uploadedFiles; 
+        }
         $updated = $this->hazardAndRiskInterface->update($id, $validatedData);
 
         if ($updated) {

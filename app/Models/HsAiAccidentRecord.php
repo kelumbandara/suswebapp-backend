@@ -44,6 +44,10 @@ class HsAiAccidentRecord extends Model
         'expectedTime',
     ];
 
+    protected $casts = [
+        'imageUrl' => 'array',
+    ];
+
     protected static function booted()
     {
         static::creating(function ($model) {

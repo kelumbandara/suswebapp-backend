@@ -32,6 +32,10 @@ class HsHrHazardRisk extends Model
         'createdByUser',
     ];
 
+    protected $casts = [
+        'documents' => 'array',
+    ];
+
 
 
     protected static function booted()

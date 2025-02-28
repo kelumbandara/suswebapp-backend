@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('locationOrDepartment')->nullable();
             $table->string('subLocation')->nullable();
             $table->string('description')->nullable();
-            $table->string('documents')->nullable();
+            $table->json('documents')->nullable();
             $table->string('dueDate')->nullable();
             $table->string('condition')->nullable();
             $table->enum('riskLevel', ['Low', 'Medium', 'High'])->default('Low')->nullable();

@@ -7,6 +7,7 @@ use App\Repositories\All\AccidentPeople\AccidentPeopleInterface;
 use App\Repositories\All\AccidentRecord\AccidentRecordInterface;
 use App\Repositories\All\AccidentWitness\AccidentWitnessInterface;
 use App\Repositories\All\User\UserInterface;
+use App\Services\AccidentService;
 use Illuminate\Support\Facades\Auth;
 
 class AiAccidentRecordController extends Controller
@@ -15,13 +16,15 @@ class AiAccidentRecordController extends Controller
     protected $accidentWitnessInterface;
     protected $accidentPeopleInterface;
     protected $userInterface;
+    protected $accidentService;
 
-    public function __construct(AccidentRecordInterface $accidentRecordInterface, AccidentWitnessInterface $accidentWitnessInterface, AccidentPeopleInterface $accidentPeopleInterface, UserInterface $userInterface)
+    public function __construct(AccidentRecordInterface $accidentRecordInterface, AccidentWitnessInterface $accidentWitnessInterface, AccidentPeopleInterface $accidentPeopleInterface, UserInterface $userInterface, AccidentService $accidentService)
     {
         $this->accidentRecordInterface  = $accidentRecordInterface;
         $this->accidentWitnessInterface = $accidentWitnessInterface;
         $this->userInterface            = $userInterface;
         $this->accidentPeopleInterface  = $accidentPeopleInterface;
+        $this->accidentService          = $accidentService;
     }
 
     public function index()
@@ -42,12 +45,26 @@ class AiAccidentRecordController extends Controller
                 $risk->createdByUserName = 'Unknown';
             }
 
+            if (! empty($risk->imageUrl) && is_string($risk->imageUrl)) {
+                $imageUrl = json_decode($risk->imageUrl, true);
+            } else {
+                $imageUrl = is_array($risk->imageUrl) ? $risk->imageUrl : [];
+            }
+            foreach ($imageUrl as &$imageUrl) {
+                if (isset($imageUrl['gsutil_uri'])) {
+                    $imageUrl['imageUrl'] = $this->accidentService->getImageUrl($imageUrl['gsutil_uri']);
+                }
+            }
+
+            $risk->imageUrl = $imageUrl;
+
             return $risk;
         });
         foreach ($records as $record) {
             $record->witnesses           = $this->accidentWitnessInterface->findByAccidentId($record->id);
             $record->effectedIndividuals = $this->accidentPeopleInterface->findByAccidentId($record->id);
         }
+        
 
         return response()->json($records, 200);
     }
@@ -57,17 +74,31 @@ class AiAccidentRecordController extends Controller
         $user = Auth::user();
 
         if (! $user) {
-            return response()->json(['message' => 'Unauthorized']);
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $data = $request->validated();
-
+        $data                  = $request->validated();
         $data['createdByUser'] = $user->id;
 
+        // First, create the accident record
         $record = $this->accidentRecordInterface->create($data);
 
         if (! $record) {
             return response()->json(['message' => 'Failed to create accident record'], 500);
+        }
+
+        if ($request->hasFile('imageUrl')) {
+            $uploadedFiles = [];
+
+            foreach ($request->file('imageUrl') as $file) {
+                $uploadedFiles[] = $this->accidentService->uploadImageToGCS($file, $record->id);
+            }
+
+            if (! empty($uploadedFiles)) {
+                $this->accidentRecordInterface->update($record->id, [
+                    'imageUrl' => json_encode($uploadedFiles),
+                ]);
+            }
         }
 
         if (! empty($data['witnesses'])) {
