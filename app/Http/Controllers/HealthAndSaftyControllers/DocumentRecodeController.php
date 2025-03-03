@@ -5,18 +5,20 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\HsDocumentRecode\DocumentRecodeRequest;
 use App\Repositories\All\HSDocumentRecode\DocumentInterface;
 use App\Repositories\All\User\UserInterface;
+use App\Services\DocumentService;
 use Illuminate\Support\Facades\Auth;
 
 class DocumentRecodeController extends Controller
 {
     protected $documentInterface;
     protected $userInterface;
+    protected $documentService;
 
-
-    public function __construct(DocumentInterface $documentInterface, UserInterface $userInterface)
+    public function __construct(DocumentInterface $documentInterface, UserInterface $userInterface, DocumentService $documentService)
     {
         $this->documentInterface = $documentInterface;
-        $this->userInterface          = $userInterface;
+        $this->userInterface     = $userInterface;
+        $this->documentService   = $documentService;
 
     }
 
@@ -38,6 +40,19 @@ class DocumentRecodeController extends Controller
             } catch (\Exception $e) {
                 $risk->createdByUserName = 'Unknown';
             }
+            if (! empty($risk->document) && is_array($risk->document)) {
+                $updatedDocuments = [];
+                foreach ($risk->document as $doc) {
+                    if (isset($doc['gsutil_uri'])) {
+                        $doc['imageUrl'] = $this->documentService->getImageUrl($doc['gsutil_uri']);
+                    }
+                    $updatedDocuments[] = $doc;
+                }
+
+                $risk->setAttribute('document', $updatedDocuments);
+            } else {
+                $risk->setAttribute('document', []);
+            }
 
             return $risk;
         });
@@ -50,17 +65,31 @@ class DocumentRecodeController extends Controller
         $user = Auth::user();
 
         if (! $user) {
-            return response()->json(['message' => 'Unauthorized']);
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
+
         $data                  = $request->validated();
         $data['createdByUser'] = $user->id;
         $data['isNoExpiry']    = filter_var($data['isNoExpiry'], FILTER_VALIDATE_BOOLEAN);
-        $document              = $this->documentInterface->create($data);
+
+        if ($request->hasFile('document')) {
+            $uploadedFiles = [];
+
+            foreach ($request->file('document') as $file) {
+                $uploadedFiles[] = $this->documentService->uploadImageToGCS($file);
+            }
+
+            $data['document'] = ($uploadedFiles);
+        }
+
+        $document = $this->documentInterface->create($data);
+
         return response()->json([
             'message' => 'Document created successfully',
             'data'    => $document,
         ], 201);
     }
+
     public function update(DocumentRecodeRequest $request, $id)
     {
         $document = $this->documentInterface->findById($id);

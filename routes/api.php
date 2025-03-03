@@ -46,8 +46,6 @@ use Illuminate\Support\Facades\Route;
 Route::post('calculate', [CalculationController::class, 'store']);
 Route::post('register', [RegisteredUserController::class, 'store']);
 
-Route::post('admin', [AdminController::class, 'index']);
-
 Route::get('all-users', [UserController::class, 'index']);
 
 Route::post('login', [LoginController::class, 'login']);
@@ -88,6 +86,9 @@ Route::post('accident-injury', [AiAccidentInjuryTypeController::class, 'store'])
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('users-assignee', [UserController::class, 'assignee']);
+
+    Route::post('users-get', [AdminController::class, 'index']);
+    Route::post('users/{id}/update', [AdminController::class, 'update']);
 
     Route::get('hazard-and-risk', [HazardAndRiskController::class, 'index']);
     Route::post('hazard-and-risk', [HazardAndRiskController::class, 'store']);
@@ -213,9 +214,7 @@ Route::post('supplier-type', [OhMiPiMiSupplierTypeController::class, 'store']);
 Route::post('supplier-type/{id}/update', [OhMiPiMiSupplierTypeController::class, 'update']);
 Route::delete('supplier-type/{id}/delete', [OhMiPiMiSupplierTypeController::class, 'destroy']);
 
-
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
 Route::post('upload', [ImageUploadController::class, 'uploadImage']);
-
 
 Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);

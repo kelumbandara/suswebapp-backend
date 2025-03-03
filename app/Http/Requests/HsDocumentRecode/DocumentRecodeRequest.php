@@ -38,11 +38,13 @@ class DocumentRecodeRequest extends FormRequest
             'physicalLocation' => 'nullable|string',
             'versionNumber'    => 'required|string',
             'remarks'          => 'nullable|string',
-            'document'         => 'nullable|string',
+            'document'        => 'required|array',
+            'document.*'      => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
             'issuedDate'       => 'required|string',
             'isNoExpiry'       => 'nullable|boolean',
             'expiryDate'       => 'required_if:isNoExpiry,false|string',
             'notifyDate'       => 'required_if:isNoExpiry,false|string',
+
         ];
     }
 }

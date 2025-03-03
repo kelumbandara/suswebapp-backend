@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('documentReviewer')->nullable();
             $table->string('physicalLocation')->nullable();
             $table->string('remarks')->nullable();
-            $table->string('document')->nullable();
+            $table->json('document')->nullable();
             $table->boolean('isNoExpiry')->nullable();
             $table->string('responsibleSection')->nullable()->default('Documents');
             $table->string('assigneeLevel')->nullable()->default('1');

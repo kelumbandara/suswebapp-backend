@@ -22,4 +22,8 @@ class HsOhMrBenefitDocument extends Model
         return $this->belongsTo(HsOhMrBenefitRequest::class, 'benefitId');
     }
 
+    protected $casts = [
+        'document' => 'array',
+    ];
+
 }

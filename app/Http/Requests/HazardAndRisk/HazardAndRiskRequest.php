@@ -29,7 +29,7 @@ class HazardAndRiskRequest extends FormRequest
             'locationOrDepartment' => 'required|string|max:255',
             'subLocation'          => 'nullable|string|max:255',
             'description'          => 'nullable|string|max:1025',
-            'documents'            => 'required|array',
+            'documents'            => 'nullable|array',
             'documents.*'          => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
             'dueDate'              => 'nullable|string',
             'condition'            => 'nullable|string|max:255',

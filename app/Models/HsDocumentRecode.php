@@ -33,8 +33,10 @@ class HsDocumentRecode extends Model
         'assigneeLevel',
         'createdByUser',
     ];
-    
+
     protected $casts = [
         'isNoExpiry' => 'boolean',
+        'document' => 'array',
     ];
+
 }

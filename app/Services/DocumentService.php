@@ -2,16 +2,15 @@
 
 namespace App\Services;
 
-use App\Models\HsHrHazardRisk;
 use Google\Cloud\Storage\StorageClient;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 
-class HazardRiskService
+class DocumentService
 {
     public function uploadImageToGCS($file)
     {
-        $fileName = 'uploads/HazardRisk/' . uniqid() . '_' . $file->getClientOriginalName();
+        $fileName = 'uploads/Document/' . uniqid() . '_' . $file->getClientOriginalName();
 
         Storage::disk('gcs')->put($fileName, file_get_contents($file));
 

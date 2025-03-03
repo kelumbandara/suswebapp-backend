@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('documentId');
             $table->bigInteger('benefitId')->nullable();
             $table->string('documentType')->nullable();
-            $table->string('document')->nullable();
+            $table->json('document')->nullable();
             $table->timestamps();
         });
     }
