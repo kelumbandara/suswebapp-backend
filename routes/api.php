@@ -135,6 +135,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('medicine-inventory/{id}/update', [OhMiPiMedicineInventoryController::class, 'update']);
     Route::delete('medicine-inventory/{id}/delete', [OhMiPiMedicineInventoryController::class, 'destroy']);
     Route::post('medicine-inventory/{id}/publish', [OhMiPiMedicineInventoryController::class, 'publishedStatus']);
+    Route::get('transaction-published', [OhMiPiMedicineInventoryController::class, 'published']);
+
 
     Route::get('benefit-request', [OhMrBenefitRequestController::class, 'index']);
     Route::post('benefit-request', [OhMrBenefitRequestController::class, 'store']);

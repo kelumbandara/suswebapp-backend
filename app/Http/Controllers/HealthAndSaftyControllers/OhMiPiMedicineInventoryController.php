@@ -158,4 +158,30 @@ class OhMiPiMedicineInventoryController extends Controller
             'message' => 'Medicine inventory published and added to medicine stock.',
         ], 200);
     }
+
+    public function published()
+{
+    $records = $this->medicineInventoryInterface->All();
+
+    $records = $records->filter(function ($record) {
+        return $record->status === 'published';
+    });
+
+    $records = $records->map(function ($risk) {
+        try {
+            $creator = $this->userInterface->getById($risk->createdByUser);
+            $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+        } catch (\Exception $e) {
+            $risk->createdByUserName = 'Unknown';
+        }
+        return $risk;
+    });
+
+    foreach ($records as $record) {
+        $record->inventory = $this->medicineDisposalInterface->findByInventoryId($record->id);
+    }
+
+    return response()->json($records, 200);
+}
+
 }
