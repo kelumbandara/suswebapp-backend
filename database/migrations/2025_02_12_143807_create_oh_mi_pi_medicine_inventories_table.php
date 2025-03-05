@@ -6,13 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+   
     public function up(): void
     {
         Schema::create('oh_mi_pi_medicine_inventories', function (Blueprint $table) {
             $table->id();
+            $table->integer('requestQuantity')->nullable();
+            $table->string('approverId')->nullable();
+            $table->string('inventoryNumber')->nullable();
+            $table->string('requestedBy')->nullable();
             $table->string('referenceNumber')->nullable();
             $table->string('medicineName')->nullable();
             $table->string('genericName')->nullable();
@@ -39,9 +41,8 @@ return new class extends Migration
             $table->string('reorderThreshold')->nullable();
             $table->string('usageInstruction')->nullable();
             $table->string('division')->nullable();
-            $table->enum('status',['pending', 'approved', 'Shipped','Draft'])->default('Draft')->nullable();
+            $table->enum('status',['pending', 'approved', 'rejected','published','Shipped','Draft'])->default('Draft')->nullable();
             $table->string('issuedQuantity')->nullable();
-            $table->string('requestedBy')->nullable();
             $table->string('approvedBy')->nullable();
             $table->string('responsibleSection')->nullable()->default('medicineInventory');
             $table->string('assigneeLevel')->nullable()->default('1');
@@ -50,9 +51,7 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
+
     public function down(): void
     {
         Schema::dropIfExists('oh_mi_pi_medicine_inventories');

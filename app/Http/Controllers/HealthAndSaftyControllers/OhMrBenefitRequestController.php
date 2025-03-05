@@ -7,6 +7,7 @@ use App\Repositories\All\HsOhMrBenefitDocument\BenefitDocumentInterface;
 use App\Repositories\All\HsOhMrBenefitEntitlement\BenefitEntitlementInterface;
 use App\Repositories\All\OhMrBenefitRequest\BenefitRequestInterface;
 use App\Repositories\All\User\UserInterface;
+use App\Services\BenefitDocumentService;
 use Illuminate\Support\Facades\Auth;
 
 class OhMrBenefitRequestController extends Controller
@@ -16,13 +17,16 @@ class OhMrBenefitRequestController extends Controller
     protected $benefitDocumentInterface;
     protected $benefitEntitlementInterface;
     protected $userInterface;
+    protected $benefitDocumentService;
 
-    public function __construct(BenefitRequestInterface $benefitRequestInterface, BenefitDocumentInterface $benefitDocumentInterface, BenefitEntitlementInterface $benefitEntitlementInterface, UserInterface $userInterface)
+    public function __construct(BenefitRequestInterface $benefitRequestInterface, BenefitDocumentInterface $benefitDocumentInterface, BenefitEntitlementInterface $benefitEntitlementInterface, UserInterface $userInterface, BenefitDocumentService $benefitDocumentService)
     {
         $this->benefitRequestInterface     = $benefitRequestInterface;
         $this->benefitDocumentInterface    = $benefitDocumentInterface;
         $this->benefitEntitlementInterface = $benefitEntitlementInterface;
         $this->userInterface               = $userInterface;
+        $this->benefitDocumentService      = $benefitDocumentService;
+
     }
     public function index()
     {
@@ -74,6 +78,17 @@ class OhMrBenefitRequestController extends Controller
         if (! empty($data['medicalDocuments'])) {
             foreach ($data['medicalDocuments'] as $documents) {
                 $documents['benefitId'] = $record->id;
+
+                if ($request->hasFile('document')) {
+                    $uploadedFiles = [];
+
+                    foreach ($request->file('document') as $file) {
+                        $uploadedFiles[] = $this->benefitDocumentService->uploadImageToGCS($file);
+                    }
+
+                    $data['document'] = ($uploadedFiles);
+                }
+
                 $this->benefitDocumentInterface->create($documents);
             }
         }

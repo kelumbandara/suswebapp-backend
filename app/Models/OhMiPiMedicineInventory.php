@@ -11,6 +11,10 @@ class OhMiPiMedicineInventory extends Model
 
     protected $fillable = [
         'referenceNumber',
+        'approverId',
+        'inventoryNumber',
+        'requestedBy',
+        'requestQuantity',
         'medicineName',
         'genericName',
         'dosageStrength',
@@ -37,7 +41,6 @@ class OhMiPiMedicineInventory extends Model
         'usageInstruction',
         'division',
         'issuedQuantity',
-        'requestedBy',
         'approvedBy',
         'status',
         'responsibleSection',
@@ -45,14 +48,7 @@ class OhMiPiMedicineInventory extends Model
         'createdByUser',
     ];
 
-    protected static function booted()
-    {
-        static::created(function ($model) {
-            $model->referenceNumber = 'MED-' . $model->id;
-
-            $model->save();
-        });
-    }
+    
 
     public function disposals()
 {

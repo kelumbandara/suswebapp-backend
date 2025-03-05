@@ -23,7 +23,7 @@ class MedicineRequestRequest extends FormRequest
         return [
             'medicineName'    => 'required|string',
             'genericName'     => 'required|string',
-            'assigneeId'      => 'nullable|string',
+            'approverId'      => 'nullable|string',
             'division'        => 'required|string',
             'requestQuantity' => 'required|integer',
         ];

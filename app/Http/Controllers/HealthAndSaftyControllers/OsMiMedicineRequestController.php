@@ -3,6 +3,7 @@ namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HsOhMiMedicineRequest\MedicineRequestRequest;
+use App\Repositories\All\MedicineInventory\MedicineInventoryInterface;
 use App\Repositories\All\MiMedicineRequest\MedicineRequestInterface;
 use App\Repositories\All\User\UserInterface;
 use Illuminate\Support\Facades\Auth;
@@ -11,11 +12,13 @@ class OsMiMedicineRequestController extends Controller
 {
     protected $medicineRequestInterface;
     protected $userInterface;
+    protected $medicineInventoryInterface;
 
-    public function __construct(MedicineRequestInterface $medicineRequestInterface, UserInterface $userInterface)
+    public function __construct(MedicineRequestInterface $medicineRequestInterface, UserInterface $userInterface, MedicineInventoryInterface $medicineInventoryInterface)
     {
-        $this->medicineRequestInterface = $medicineRequestInterface;
-        $this->userInterface            = $userInterface;
+        $this->medicineRequestInterface   = $medicineRequestInterface;
+        $this->userInterface              = $userInterface;
+        $this->medicineInventoryInterface = $medicineInventoryInterface;
     }
 
     public function index()
@@ -23,10 +26,10 @@ class OsMiMedicineRequestController extends Controller
         $medicineStock = $this->medicineRequestInterface->All();
         $medicineStock = $medicineStock->map(function ($medicine) {
             try {
-                $assignee           = $this->userInterface->getById($medicine->assigneeId);
-                $medicine->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
+                $approver           = $this->userInterface->getById($medicine->approverId);
+                $medicine->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
-                $medicine->assignee = ['name' => 'Unknown', 'id' => null];
+                $medicine->approver = ['name' => 'Unknown', 'id' => null];
             }
 
             try {
@@ -124,6 +127,31 @@ class OsMiMedicineRequestController extends Controller
         });
 
         return response()->json($medicine, 200);
+    }
+
+    public function approvedStatus(string $id)
+    {
+        $medicineRequest = $this->medicineRequestInterface->findById($id);
+
+        $this->medicineRequestInterface->update($id, ['status' => 'approved']);
+
+        $inventoryData = [
+            'referenceNumber' => $medicineRequest->referenceNumber,
+            'medicineName'    => $medicineRequest->medicineName,
+            'requestQuantity' => $medicineRequest->requestQuantity,
+            'genericName'     => $medicineRequest->genericName,
+            'requestedBy'     => $medicineRequest->requestedBy,
+            'division'        => $medicineRequest->division,
+            'approverId'      => $medicineRequest->approverId,
+            'status'          => 'approved',
+            'inventoryNumber' => $medicineRequest->inventoryNumber,
+        ];
+
+        $this->medicineInventoryInterface->create($inventoryData);
+
+        return response()->json([
+            'message' => 'Medicine request approved and added to inventory.',
+        ], 200);
     }
 
 }

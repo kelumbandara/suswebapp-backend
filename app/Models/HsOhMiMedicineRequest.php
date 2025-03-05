@@ -15,7 +15,7 @@ class HsOhMiMedicineRequest extends Model
         'medicineName',
         'genericName',
         'division',
-        'assigneeId',
+        'approverId',
         'requestQuantity',
         'inventoryNumber',
         'requestedDate',

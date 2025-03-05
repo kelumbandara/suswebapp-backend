@@ -3,6 +3,7 @@ namespace App\Http\Controllers\HealthAndSaftyControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HsOhMiPiMedicineInventory\MedicineInventoryRequest;
+use App\Repositories\All\CsMedicineStock\MedicineStockInterface;
 use App\Repositories\All\MedicineDisposal\MedicineDisposalInterface;
 use App\Repositories\All\MedicineInventory\MedicineInventoryInterface;
 use App\Repositories\All\User\UserInterface;
@@ -13,12 +14,14 @@ class OhMiPiMedicineInventoryController extends Controller
     protected $medicineInventoryInterface;
     protected $medicineDisposalInterface;
     protected $userInterface;
+    protected $medicineStockInterface;
 
-    public function __construct(MedicineInventoryInterface $medicineInventoryInterface, MedicineDisposalInterface $medicineDisposalInterface, UserInterface $userInterface)
+    public function __construct(MedicineInventoryInterface $medicineInventoryInterface, MedicineDisposalInterface $medicineDisposalInterface, UserInterface $userInterface, MedicineStockInterface $medicineStockInterface)
     {
         $this->medicineInventoryInterface = $medicineInventoryInterface;
         $this->medicineDisposalInterface  = $medicineDisposalInterface;
         $this->userInterface              = $userInterface;
+        $this->medicineStockInterface     = $medicineStockInterface;
     }
 
     public function index()
@@ -134,5 +137,25 @@ class OhMiPiMedicineInventoryController extends Controller
         $this->medicineInventoryInterface->deleteById($id);
 
         return response()->json(['message' => 'Inventory record deleted successfully'], 200);
+    }
+
+    public function publishedStatus(string $id)
+    {
+        $medicineStock = $this->medicineInventoryInterface->findById($id);
+
+        $this->medicineInventoryInterface->update($id, ['status' => 'published']);
+
+        $inventoryData = [
+            'medicineName' => $medicineStock->medicineName,
+            'inStock'      => $medicineStock->issuedQuantity,
+            'division'     => $medicineStock->division,
+            'status'       => 'published',
+        ];
+
+        $this->medicineStockInterface->create($inventoryData);
+
+        return response()->json([
+            'message' => 'Medicine inventory published and added to medicine stock.',
+        ], 200);
     }
 }

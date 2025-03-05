@@ -21,6 +21,10 @@ class MedicineInventoryRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'requestQuantity'               => 'nullable|integer',
+            'approverId'                    => 'nullable|string',
+            'inventoryNumber'               => 'nullable|string',
+            'requestedBy'                   => 'nullable|string',
             'medicineName'                  => 'nullable|string',
             'genericName'                   => 'required|string',
             'dosageStrength'                => 'nullable|string',
@@ -45,8 +49,7 @@ class MedicineInventoryRequest extends FormRequest
             'reorderThreshold'              => 'nullable|string',
             'usageInstruction'              => 'nullable|string',
             'division'                      => 'nullable|string',
-            'status'                        => 'nullable|in:Draft,Approved,Shipped',
-            'requestedBy'                   => 'nullable|string',
+            'status'                        => 'nullable|in:Draft,Approved,Shipped,pending,rejected,published',
             'approvedBy'                    => 'nullable|string',
             'disposals'                     => 'nullable|array',
             'disposals.*.disposalDate'      => 'nullable|string',
