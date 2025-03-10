@@ -18,26 +18,47 @@ class UserController extends Controller
         $this->comPermissionInterface = $comPermissionInterface;
     }
 
+    public function show(Request $request)
+    {
+        $user = $request->user();
+        $userType = $user->userType;
+
+        $permission = $this->comPermissionInterface->getById($userType);
+        $userData = $user->toArray();
+
+        if ($permission) {
+            $userData['permissionObject'] = (array) $permission->permissionObject;
+        }
+
+        return response()->json($userData, 200);
+    }
 
 
-public function show(Request $request)
-{
-    $user = $request->user();
-    $userType = $user->userType;
-
-    $permission = $this->comPermissionInterface->getById($userType);
-
-    $userData = $user->toArray();
-
-    $userData['userType'] = [
-        'id'          => $permission->id ?? null,
-        'userType'    => $permission->userType ?? null,
-        'description' => $permission->description ?? null,
-    ];
 
 
-    return response()->json($userData, 200);
-}
+
+// public function show(Request $request)
+// {
+//     $user = $request->user();
+//     $userType = $user->userType; // Assuming a relationship exists
+//     $permission = $this->comPermissionInterface->getById($userType->id ?? null);
+
+//     // Convert user data to an array dynamically
+//     $userData = $user->toArray();
+
+//     // Inject user type details
+//     $userData['userType'] = [
+//         'id'          => $userType->id ?? null,
+//         'userType'    => $userType->userType ?? null,
+//         'description' => $userType->description ?? null,
+//     ];
+
+//     // Attach permissions dynamically
+//     $userData['permissionObject'] = $permission ? (array) $permission->permissionObject : [];
+
+//     return response()->json($userData, 200);
+// }
+
 
 
 
