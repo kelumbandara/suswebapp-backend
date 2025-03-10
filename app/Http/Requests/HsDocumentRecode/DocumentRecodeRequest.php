@@ -38,7 +38,7 @@ class DocumentRecodeRequest extends FormRequest
             'physicalLocation' => 'nullable|string',
             'versionNumber'    => 'required|string',
             'remarks'          => 'nullable|string',
-            'document'        => 'required|array',
+            'document'        => 'nullable|array',
             'document.*'      => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
             'issuedDate'       => 'required|string',
             'isNoExpiry'       => 'nullable|boolean',

@@ -49,7 +49,7 @@ class MedicineInventoryRequest extends FormRequest
             'reorderThreshold'              => 'nullable|string',
             'usageInstruction'              => 'nullable|string',
             'division'                      => 'nullable|string',
-            'status'                        => 'nullable|in:Draft,approved,Shipped,pending,rejected,published,draft',
+            'status'                        => 'nullable|in:Draft,approved,Shipped,pending,rejected,published,Draft',
             'approvedBy'                    => 'nullable|string',
             'disposals'                     => 'nullable|array',
             'disposals.*.disposalDate'      => 'nullable|string',
