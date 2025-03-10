@@ -23,7 +23,7 @@ class UserController extends Controller
 public function show(Request $request)
 {
     $user = $request->user();
-    $userType = $user->userType; 
+    $userType = $user->userType;
 
     $permission = $this->comPermissionInterface->getById($userType);
 
@@ -35,7 +35,6 @@ public function show(Request $request)
         'description' => $permission->description ?? null,
     ];
 
-    $userData['permissionObject'] = $permission ? (array) $permission->permissionObject : [];
 
     return response()->json($userData, 200);
 }
