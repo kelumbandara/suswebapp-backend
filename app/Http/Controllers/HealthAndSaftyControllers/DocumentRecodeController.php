@@ -23,43 +23,47 @@ class DocumentRecodeController extends Controller
     }
 
     public function index()
-    {
-        $document = $this->documentInterface->all();
+{
+    $document = $this->documentInterface->all();
 
-        $document = $document->map(function ($risk) {
-            try {
-                $assignee           = $this->userInterface->getById($risk->assignee);
-                $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
-            } catch (\Exception $e) {
-                $risk->assigneeName = 'Unknown';
-            }
+    $document = $document->map(function ($risk) {
+        try {
+            $assignee           = $this->userInterface->getById($risk->assignee);
+            $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
+        } catch (\Exception $e) {
+            $risk->assigneeName = 'Unknown';
+        }
 
-            try {
-                $creator                 = $this->userInterface->getById($risk->createdByUser);
-                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
-            } catch (\Exception $e) {
-                $risk->createdByUserName = 'Unknown';
-            }
-            if (! empty($risk->document) && is_array($risk->document)) {
-                $updatedDocuments = [];
-                foreach ($risk->document as $doc) {
-                    if (isset($doc['gsutil_uri'])) {
-                        $imageData         = $this->documentService->getImageUrl($risk['gsutil_uri']);
-                        $risk['fileName']  = $imageData['fileName'];
-                        $risk['signedUrl'] = $imageData['signedUrl'];
-                    }
+        try {
+            $creator                 = $this->userInterface->getById($risk->createdByUser);
+            $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+        } catch (\Exception $e) {
+            $risk->createdByUserName = 'Unknown';
+        }
+
+        if (! empty($risk->document) && is_array($risk->document)) {
+            $updatedDocuments = [];
+
+            foreach ($risk->document as $doc) {
+                if (isset($doc['gsutil_uri'])) {
+                    $imageData = $this->documentService->getImageUrl($doc['gsutil_uri']); 
+                    $doc['fileName']  = $imageData['fileName'];
+                    $doc['signedUrl'] = $imageData['signedUrl'];
                 }
-
-                $risk->setAttribute('document', $updatedDocuments);
-            } else {
-                $risk->setAttribute('document', []);
+                $updatedDocuments[] = $doc;
             }
 
-            return $risk;
-        });
+            $risk->setAttribute('document', $updatedDocuments);
+        } else {
+            $risk->setAttribute('document', []);
+        }
 
-        return response()->json($document);
-    }
+        return $risk;
+    });
+
+    return response()->json($document);
+}
+
 
     public function store(DocumentRecodeRequest $request)
     {

@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-   
+
     public function up(): void
     {
         Schema::create('oh_mi_pi_medicine_inventories', function (Blueprint $table) {
@@ -41,7 +41,7 @@ return new class extends Migration
             $table->string('reorderThreshold')->nullable();
             $table->string('usageInstruction')->nullable();
             $table->string('division')->nullable();
-            $table->enum('status',['pending', 'approved', 'rejected','published','Shipped','Draft'])->default('Draft')->nullable();
+            $table->enum('status',['pending', 'approved', 'rejected','published','shipped','draft'])->default('draft')->nullable();
             $table->string('issuedQuantity')->nullable();
             $table->string('approvedBy')->nullable();
             $table->string('responsibleSection')->nullable()->default('medicineInventory');
