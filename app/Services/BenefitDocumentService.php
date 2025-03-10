@@ -26,6 +26,7 @@ class BenefitDocumentService
     public function getImageUrl($gsutilUri)
     {
         $filePath = str_replace('gs://'.env('GOOGLE_CLOUD_STORAGE_BUCKET').'/', '', $gsutilUri);
+        $fileName = basename($filePath);
 
         $storage = new StorageClient([
             'keyFile' => json_decode(file_get_contents(base_path(env('GOOGLE_CLOUD_KEY_FILE'))), true)
@@ -38,6 +39,9 @@ class BenefitDocumentService
 
         $signedUrl = $object->signedUrl($expiresAt);
 
-        return $signedUrl;
-    }
+        return [
+            'fileName'  => $fileName,
+            'signedUrl' => $signedUrl,
+        ];
+        }
 }

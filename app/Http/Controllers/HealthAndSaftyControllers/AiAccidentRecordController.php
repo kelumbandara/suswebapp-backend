@@ -52,7 +52,9 @@ class AiAccidentRecordController extends Controller
             }
             foreach ($imageUrl as &$imageUrl) {
                 if (isset($imageUrl['gsutil_uri'])) {
-                    $imageUrl['imageUrl'] = $this->accidentService->getImageUrl($imageUrl['gsutil_uri']);
+                    $imageData             = $this->accidentService->getImageUrl($imageUrl['gsutil_uri']);
+                    $imageUrl['fileName']  = $imageData['fileName']; // Adding the file name
+                    $imageUrl['signedUrl'] = $imageData['signedUrl'];
                 }
             }
 
@@ -64,7 +66,6 @@ class AiAccidentRecordController extends Controller
             $record->witnesses           = $this->accidentWitnessInterface->findByAccidentId($record->id);
             $record->effectedIndividuals = $this->accidentPeopleInterface->findByAccidentId($record->id);
         }
-        
 
         return response()->json($records, 200);
     }

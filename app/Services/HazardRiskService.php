@@ -38,7 +38,12 @@ class HazardRiskService
         $expiresAt = Carbon::now()->addMinutes(15);
 
         $signedUrl = $object->signedUrl($expiresAt);
+        $fileName = basename($filePath);
 
-        return $signedUrl;
+
+        return [
+            'signedUrl' => $signedUrl,
+            'fileName'  => $fileName,
+        ];
     }
 }

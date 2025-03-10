@@ -139,25 +139,59 @@ class OhMiPiMedicineInventoryController extends Controller
         return response()->json(['message' => 'Inventory record deleted successfully'], 200);
     }
 
-    public function publishedStatus(string $id)
-    {
-        $medicineStock = $this->medicineInventoryInterface->findById($id);
+    // public function publishedStatus(string $id)
+    // {
+    //     $medicineStock = $this->medicineInventoryInterface->findById($id);
 
-        $this->medicineInventoryInterface->update($id, ['status' => 'published']);
+    //     $this->medicineInventoryInterface->update($id, ['status' => 'published']);
 
-        $inventoryData = [
-            'medicineName' => $medicineStock->medicineName,
-            'inStock'      => $medicineStock->issuedQuantity,
-            'division'     => $medicineStock->division,
-            'status'       => 'published',
-        ];
+    //     $inventoryData = [
+    //         'medicineName' => $medicineStock->medicineName,
+    //         'inStock'      => $medicineStock->issuedQuantity,
+    //         'division'     => $medicineStock->division,
+    //         'status'       => 'published',
+    //     ];
 
-        $this->medicineStockInterface->create($inventoryData);
+    //     $this->medicineStockInterface->create($inventoryData);
 
-        return response()->json([
-            'message' => 'Medicine inventory published and added to medicine stock.',
-        ], 200);
+    //     return response()->json([
+    //         'message' => 'Medicine inventory published and added to medicine stock.',
+    //     ], 200);
+    // }
+
+    public function publishedStatus(MedicineInventoryRequest $request, string $id)
+{
+    // Retrieve the validated data from the request
+    $validatedData = $request->validated();
+
+    // Find the medicine stock by ID
+    $medicineStock = $this->medicineInventoryInterface->findById($id);
+
+    // Check if the medicine stock exists
+    if (!$medicineStock) {
+        return response()->json(['message' => 'Medicine stock not found.'], 404);
     }
+
+    // Update the medicine stock with validated data
+    $medicineStock->update($validatedData);
+
+    // Prepare inventory data to be created in the stock table
+    $inventoryData = [
+        'medicineName'      => $medicineStock->medicineName,
+        'inStock'           => $medicineStock->issuedQuantity ?? 0,  // Default to 0 if null
+        'division'          => $medicineStock->division,
+        'status'            => $medicineStock->status, // Using updated status
+        'responsibleSection'=> $medicineStock->responsibleSection,
+        'assigneeLevel'     => $medicineStock->assigneeLevel,
+    ];
+
+    // Create a new inventory entry in the stock table
+    $this->medicineStockInterface->create($inventoryData);
+
+    return response()->json([
+        'message' => 'Medicine inventory published and added to medicine stock.',
+    ], 200);
+}
 
     public function published()
 {

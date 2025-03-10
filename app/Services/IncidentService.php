@@ -1,8 +1,6 @@
 <?php
-
 namespace App\Services;
 
-use App\Models\HsAiAccidentRecord;
 use Google\Cloud\Storage\StorageClient;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -15,8 +13,7 @@ class IncidentService
 
         Storage::disk('gcs')->put($fileName, file_get_contents($file));
 
-        $gsutilUri = "gs://".env('GOOGLE_CLOUD_STORAGE_BUCKET')."/{$fileName}";
-
+        $gsutilUri = "gs://" . env('GOOGLE_CLOUD_STORAGE_BUCKET') . "/{$fileName}";
 
         return [
             'gsutil_uri' => $gsutilUri,
@@ -27,20 +24,24 @@ class IncidentService
     public function getImageUrl($gsutilUri)
     {
         {
-            $filePath = str_replace('gs://'.env('GOOGLE_CLOUD_STORAGE_BUCKET').'/', '', $gsutilUri);
-        
+            $filePath = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $gsutilUri);
+            $fileName = basename($filePath);
+
             $storage = new StorageClient([
-                'keyFile' => json_decode(file_get_contents(base_path(env('GOOGLE_CLOUD_KEY_FILE'))), true)
+                'keyFile' => json_decode(file_get_contents(base_path(env('GOOGLE_CLOUD_KEY_FILE'))), true),
             ]);
-        
+
             $bucket = $storage->bucket(env('GOOGLE_CLOUD_STORAGE_BUCKET'));
             $object = $bucket->object($filePath);
-        
-            $expiresAt = Carbon::now()->addMinutes(15);  
-        
+
+            $expiresAt = Carbon::now()->addMinutes(15);
+
             $signedUrl = $object->signedUrl($expiresAt);
-        
-            return $signedUrl;
+
+            return [
+                'fileName'  => $fileName,
+                'signedUrl' => $signedUrl,
+            ];
         }
     }
 }

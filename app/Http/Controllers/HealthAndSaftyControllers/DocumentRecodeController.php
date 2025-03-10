@@ -42,12 +42,14 @@ class DocumentRecodeController extends Controller
             }
             if (! empty($risk->document) && is_array($risk->document)) {
                 $updatedDocuments = [];
-                foreach ($risk->document as $doc) {
-                    if (isset($doc['gsutil_uri'])) {
-                        $doc['imageUrl'] = $this->documentService->getImageUrl($doc['gsutil_uri']);
+                foreach ($risk->document as &$imageUrl) {
+                    if (isset($imageUrl['gsutil_uri'])) {
+                        $imageData             = $this->documentService->getImageUrl($imageUrl['gsutil_uri']);
+                        $imageUrl['fileName']  = $imageData['fileName']; // Adding the file name
+                        $imageUrl['signedUrl'] = $imageData['signedUrl'];
                     }
-                    $updatedDocuments[] = $doc;
                 }
+
 
                 $risk->setAttribute('document', $updatedDocuments);
             } else {

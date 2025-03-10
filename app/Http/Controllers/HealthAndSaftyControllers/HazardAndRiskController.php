@@ -26,53 +26,44 @@ class HazardAndRiskController extends Controller
         $this->hazardAndRiskService   = $hazardAndRiskService;
     }
     public function index()
-    {
-        $hazardRisks = $this->hazardAndRiskInterface->All();
+{
+    $hazardRisks = $this->hazardAndRiskInterface->All();
 
-        $hazardRisks = $hazardRisks->map(function ($risk) {
-            try {
-                $assignee       = $this->userInterface->getById($risk->assigneeId);
-                $risk->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
-            } catch (\Exception $e) {
-                $risk->assignee = ['name' => 'Unknown', 'id' => null];
+    $hazardRisks = $hazardRisks->map(function ($risk) {
+        try {
+            $assignee       = $this->userInterface->getById($risk->assigneeId);
+            $risk->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
+        } catch (\Exception $e) {
+            $risk->assignee = ['name' => 'Unknown', 'id' => null];
+        }
+        try {
+            $creator                 = $this->userInterface->getById($risk->createdByUser);
+            $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+        } catch (\Exception $e) {
+            $risk->createdByUserName = 'Unknown';
+        }
+
+        if (! empty($risk->documents) && is_string($risk->documents)) {
+            $documents = json_decode($risk->documents, true);
+        } else {
+            $documents = is_array($risk->documents) ? $risk->documents : [];
+        }
+
+        foreach ($documents as &$document) {
+            if (isset($document['gsutil_uri'])) {
+                $imageData = $this->hazardAndRiskService->getImageUrl($document['gsutil_uri']);
+                $document['imageUrl'] = $imageData['signedUrl'];
+                $document['fileName'] = $imageData['fileName'];
             }
-            try {
-                $creator                 = $this->userInterface->getById($risk->createdByUser);
-                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
-            } catch (\Exception $e) {
-                $risk->createdByUserName = 'Unknown';
-            }
+        }
 
-            if (! empty($risk->documents) && is_string($risk->documents)) {
-                $documents = json_decode($risk->documents, true);
-            } else {
-                $documents = is_array($risk->documents) ? $risk->documents : [];
-            }
-            foreach ($documents as &$document) {
-                if (isset($document['gsutil_uri'])) {
-                    $document['imageUrl'] = $this->hazardAndRiskService->getImageUrl($document['gsutil_uri']);
-                }
-            }
+        $risk->documents = $documents;
+        return $risk;
+    });
 
-            $risk->documents = $documents;
+    return response()->json($hazardRisks, 200);
+}
 
-            // if (!empty($risk->documents) && is_string($risk->documents)) {
-            //     $documents = json_decode($risk->documents, true);
-            // } else {
-            //     $documents = is_array($risk->documents) ? $risk->documents : [];
-            // }
-
-            // if (!empty($documents) && isset($documents[0]['image_id'])) {
-            //     $risk->documents = $this->imageUploadService->getImageUrl($documents[0]['image_id']);
-            // } else {
-            //     $risk->documents = null;
-            // }
-
-            return $risk;
-        });
-
-        return response()->json($hazardRisks, 200);
-    }
 
     public function store(HazardAndRiskRequest $request)
     {
@@ -135,7 +126,7 @@ class HazardAndRiskController extends Controller
                 $uploadedFiles[] = $this->hazardAndRiskService->uploadImageToGCS($file);
             }
 
-            $validatedData['documents'] = $uploadedFiles; 
+            $validatedData['documents'] = $uploadedFiles;
         }
         $updated = $this->hazardAndRiskInterface->update($id, $validatedData);
 

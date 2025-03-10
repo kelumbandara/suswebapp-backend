@@ -53,7 +53,9 @@ class AiIncidentRecodeController extends Controller
             }
             foreach ($imageUrl as &$imageUrl) {
                 if (isset($imageUrl['gsutil_uri'])) {
-                    $imageUrl['imageUrl'] = $this->incidentService->getImageUrl($imageUrl['gsutil_uri']);
+                    $imageData             = $this->incidentService->getImageUrl($imageUrl['gsutil_uri']);
+                    $imageUrl['fileName']  = $imageData['fileName']; // Adding the file name
+                    $imageUrl['signedUrl'] = $imageData['signedUrl'];
                 }
             }
 
@@ -101,7 +103,7 @@ class AiIncidentRecodeController extends Controller
                     'imageUrl' => $uploadedFiles,
                 ]);
             }
-            
+
         }
 
         if (! empty($data['witnesses'])) {
