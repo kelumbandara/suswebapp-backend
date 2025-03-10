@@ -37,30 +37,6 @@ class UserController extends Controller
 
 
 
-// public function show(Request $request)
-// {
-//     $user = $request->user();
-//     $userType = $user->userType; // Assuming a relationship exists
-//     $permission = $this->comPermissionInterface->getById($userType->id ?? null);
-
-//     // Convert user data to an array dynamically
-//     $userData = $user->toArray();
-
-//     // Inject user type details
-//     $userData['userType'] = [
-//         'id'          => $userType->id ?? null,
-//         'userType'    => $userType->userType ?? null,
-//         'description' => $userType->description ?? null,
-//     ];
-
-//     // Attach permissions dynamically
-//     $userData['permissionObject'] = $permission ? (array) $permission->permissionObject : [];
-
-//     return response()->json($userData, 200);
-// }
-
-
-
 
     public function index()
     {

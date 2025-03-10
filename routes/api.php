@@ -87,7 +87,7 @@ Route::post('accident-injury', [AiAccidentInjuryTypeController::class, 'store'])
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('users-assignee', [UserController::class, 'assignee']);
 
-    Route::post('users-get', [AdminController::class, 'index']);
+    Route::get('users-get', [AdminController::class, 'index']);
     Route::post('users/{id}/update', [AdminController::class, 'update']);
 
     Route::get('hazard-and-risk', [HazardAndRiskController::class, 'index']);
