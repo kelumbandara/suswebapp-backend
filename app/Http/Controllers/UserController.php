@@ -18,20 +18,30 @@ class UserController extends Controller
         $this->comPermissionInterface = $comPermissionInterface;
     }
 
-    public function show(Request $request)
-    {
-        $user = $request->user();
-        $userType = $user->userType;
 
-        $permission = $this->comPermissionInterface->getById($userType);
-        $userData = $user->toArray();
 
-        if ($permission) {
-            $userData['permissionObject'] = (array) $permission->permissionObject;
-        }
+public function show(Request $request)
+{
+    $user = $request->user();
+    $userType = $user->userType; 
 
-        return response()->json($userData, 200);
-    }
+    $permission = $this->comPermissionInterface->getById($userType);
+
+    $userData = $user->toArray();
+
+    $userData['userType'] = [
+        'id'          => $permission->id ?? null,
+        'userType'    => $permission->userType ?? null,
+        'description' => $permission->description ?? null,
+    ];
+
+    $userData['permissionObject'] = $permission ? (array) $permission->permissionObject : [];
+
+    return response()->json($userData, 200);
+}
+
+
+
     public function index()
     {
         $user = $this->userInterface->All();
