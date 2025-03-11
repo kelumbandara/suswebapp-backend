@@ -46,6 +46,20 @@ class OhMrBenefitRequestController extends Controller
         foreach ($records as $record) {
             $record->benefitsAndEntitlements = $this->benefitEntitlementInterface->findByBenefitId($record->id);
             $record->medicalDocuments        = $this->benefitDocumentInterface->findByBenefitId($record->id);
+            if (!empty($record->document) && is_array($record->document)) {
+                $updatedDocuments = [];
+                foreach ($record->document as $doc) {
+                    if (isset($doc['gsutil_uri'])) {
+                        $doc['imageUrl'] = $this->benefitDocumentService->getImageUrl($doc['gsutil_uri']);
+                    }
+                    $updatedDocuments[] = $doc;
+                }
+
+                $record->setAttribute('document', $updatedDocuments);
+            } else {
+                $record->setAttribute('document', []);
+            }
+
         }
 
         return response()->json($records, 200);
@@ -159,31 +173,3 @@ class OhMrBenefitRequestController extends Controller
     }
 }
 
-
-//
-//store
- // if ($request->hasFile('document')) {
-                //     $uploadedFiles = [];
-
-                //     foreach ($request->file('document') as $file) {
-                //         $uploadedFiles[] = $this->documentService->uploadImageToGCS($file);
-                //     }
-
-                //     $data['document'] = ($uploadedFiles);
-                // }
-
-
-//index
- // if (!empty($record->document) && is_array($record->document)) {
-            //     $updatedDocuments = [];
-            //     foreach ($record->document as $doc) {
-            //         if (isset($doc['gsutil_uri'])) {
-            //             $doc['imageUrl'] = $this->benefitDocumentService->getImageUrl($doc['gsutil_uri']);
-            //         }
-            //         $updatedDocuments[] = $doc;
-            //     }
-
-            //     $record->setAttribute('document', $updatedDocuments);
-            // } else {
-            //     $record->setAttribute('document', []);
-            // }
