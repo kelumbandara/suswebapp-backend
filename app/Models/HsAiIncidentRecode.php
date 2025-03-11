@@ -16,7 +16,7 @@ class HsAiIncidentRecode extends Model
         'division',
         'location',
         'circumstances',
-        'imageUrl',
+        'evidence',
         'typeOfNearMiss',
         'typeOfConcern',
         'factors',
@@ -32,7 +32,7 @@ class HsAiIncidentRecode extends Model
     ];
 
     protected $casts = [
-        'imageUrl' => 'array',
+        'evidence' => 'array',
     ];
 
     protected static function booted()

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('division')->nullable();
             $table->string('location')->nullable();
             $table->string('circumstances')->nullable();
-            $table->json('imageUrl')->nullable();
+            $table->json('evidence')->nullable();
             $table->string('typeOfNearMiss')->nullable();
             $table->string('typeOfConcern')->nullable();
             $table->string('factors')->nullable();

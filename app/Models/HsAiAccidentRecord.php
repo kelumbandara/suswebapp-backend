@@ -17,7 +17,7 @@ class HsAiAccidentRecord extends Model
         'location',
         'department',
         'supervisorName',
-        'imageUrl',
+        'evidence',
         'category',
         'subCategory',
         'accidentType',
@@ -45,7 +45,7 @@ class HsAiAccidentRecord extends Model
     ];
 
     protected $casts = [
-        'imageUrl' => 'array',
+        'evidence' => 'array',
     ];
 
     protected static function booted()

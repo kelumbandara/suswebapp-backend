@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->string('department')->nullable();
             $table->string('supervisorName')->nullable();
-            $table->json('imageUrl')->nullable();
+            $table->json('evidence')->nullable();
             $table->string('category')->nullable();
             $table->string('subCategory')->nullable();
             $table->string('accidentType')->nullable();

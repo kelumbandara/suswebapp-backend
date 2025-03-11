@@ -45,20 +45,21 @@ class AiAccidentRecordController extends Controller
                 $risk->createdByUserName = 'Unknown';
             }
 
-            if (! empty($risk->imageUrl) && is_string($risk->imageUrl)) {
-                $imageUrl = json_decode($risk->imageUrl, true);
+            if (! empty($risk->evidence) && is_string($risk->evidence)) {
+                $evidence = json_decode($risk->evidence, true);
             } else {
-                $imageUrl = is_array($risk->imageUrl) ? $risk->imageUrl : [];
+                $evidence = is_array($risk->evidence) ? $risk->evidence : [];
             }
-            foreach ($imageUrl as &$imageUrl) {
-                if (isset($imageUrl['gsutil_uri'])) {
-                    $imageData             = $this->accidentService->getImageUrl($imageUrl['gsutil_uri']);
-                    $imageUrl['fileName']  = $imageData['fileName']; // Adding the file name
-                    $imageUrl['signedUrl'] = $imageData['signedUrl'];
+            foreach ($evidence as &$evidence) {
+                if (isset($evidence['gsutil_uri'])) {
+                    $imageData             = $this->accidentService->getImageUrl($evidence['gsutil_uri']);
+                    $evidence['fileName']  = $imageData['fileName']; // Adding the file name
+                    $evidence['signedUrl'] = $imageData['signedUrl'];
                 }
             }
 
-            $risk->imageUrl = $imageUrl;
+            $risk->evidence = $evidence;
+
 
             return $risk;
         });
@@ -88,19 +89,19 @@ class AiAccidentRecordController extends Controller
             return response()->json(['message' => 'Failed to create accident record'], 500);
         }
 
-        if ($request->hasFile('imageUrl')) {
+        if ($request->hasFile('evidence')) {
             $uploadedFiles = [];
 
-            foreach ($request->file('imageUrl') as $file) {
+            foreach ($request->file('evidence') as $file) {
                 $uploadedFiles[] = $this->accidentService->uploadImageToGCS($file, $record->id);
             }
 
             if (! empty($uploadedFiles)) {
                 $this->accidentRecordInterface->update($record->id, [
-                    'imageUrl' => json_encode($uploadedFiles),
+                    'evidence' => json_encode($uploadedFiles),
                 ]);
                 return response()->json([
-                    'imageUrl' => $uploadedFiles,
+                    'evidence' => $uploadedFiles,
                 ]);
             }
         }

@@ -9,7 +9,7 @@ class IncidentService
 {
     public function uploadImageToGCS($file)
     {
-        $fileName = 'uploads/Accident/' . uniqid() . '_' . $file->getClientOriginalName();
+        $fileName = 'uploads/Incident/' . uniqid() . '_' . $file->getClientOriginalName();
 
         Storage::disk('gcs')->put($fileName, file_get_contents($file));
 
