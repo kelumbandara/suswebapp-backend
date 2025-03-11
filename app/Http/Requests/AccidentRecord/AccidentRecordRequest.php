@@ -25,7 +25,7 @@ class AccidentRecordRequest extends FormRequest
             'location'                                 => 'required|string',
             'department'                               => 'required|string',
             'supervisorName'                           => 'required|string',
-            'evidence'                                 => 'required|array',
+            'evidence'                                 => 'nullable|array',
             'evidence.*'                               => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
             'category'                                 => 'nullable|string',
             'subCategory'                              => 'nullable|string',

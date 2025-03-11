@@ -18,7 +18,7 @@ class AiIncidentRecodeController extends Controller
     protected $userInterface;
     protected $incidentService;
 
-    public function __construct(IncidentRecodeInterface $incidentRecordInterface, IncidentWitnessInterface $incidentWitnessInterface, IncidentPeopleInterface $incidentPeopleInterface, UserInterface $userInterface , IncidentService $incidentService)
+    public function __construct(IncidentRecodeInterface $incidentRecordInterface, IncidentWitnessInterface $incidentWitnessInterface, IncidentPeopleInterface $incidentPeopleInterface, UserInterface $userInterface, IncidentService $incidentService)
     {
         $this->incidentRecordInterface  = $incidentRecordInterface;
         $this->incidentWitnessInterface = $incidentWitnessInterface;
@@ -47,15 +47,17 @@ class AiIncidentRecodeController extends Controller
             }
 
             if (! empty($risk->evidence) && is_string($risk->evidence)) {
-                $imageUrl = json_decode($risk->imageUrl, true);
+                $decodedEvidence = json_decode($risk->evidence, true);
+                $evidence        = is_array($decodedEvidence) ? $decodedEvidence : [];
             } else {
                 $evidence = is_array($risk->evidence) ? $risk->evidence : [];
             }
-            foreach ($evidence as &$evidence) {
-                if (isset($evidence['gsutil_uri'])) {
-                    $imageData             = $this->incidentService->getImageUrl($evidence['gsutil_uri']);
-                    $evidence['fileName']  = $imageData['fileName']; // Adding the file name
-                    $evidence['signedUrl'] = $imageData['signedUrl'];
+
+            foreach ($evidence as &$item) {
+                if (isset($item['gsutil_uri'])) {
+                    $imageData         = $this->incidentService->getImageUrl($item['gsutil_uri']);
+                    $item['fileName']  = $imageData['fileName'];
+                    $item['signedUrl'] = $imageData['signedUrl'];
                 }
             }
 
@@ -87,23 +89,27 @@ class AiIncidentRecodeController extends Controller
         if (! $record) {
             return response()->json(['message' => 'Failed to create Incident record'], 500);
         }
+
+        $uploadedFiles = [];
         if ($request->hasFile('evidence')) {
-            $uploadedFiles = [];
-
             foreach ($request->file('evidence') as $file) {
-                $uploadedFiles[] = $this->incidentService->uploadImageToGCS($file, $record->id);
+                $uploadedFiles[] = $this->incidentService->uploadImageToGCS($file);
+            }
+        }
+        if (! empty($uploadedFiles)) {
+            $existingEvidence = (! empty($record->evidence) && is_string($record->evidence))
+            ? json_decode($record->evidence, true)
+            : [];
+
+            if (! is_array($existingEvidence)) {
+                $existingEvidence = [];
             }
 
-            if (! empty($uploadedFiles)) {
-                $this->incidentRecordInterface->update($record->id, [
-                    'evidence' => json_encode($uploadedFiles),
-                ]);
-                return response()->json([
-                    'message' => 'Image uploaded successfully',
-                    'evidence' => $uploadedFiles,
-                ]);
-            }
+            $mergedEvidence = array_merge($existingEvidence, $uploadedFiles);
 
+            $this->incidentRecordInterface->update($record->id, [
+                'evidence' => json_encode($mergedEvidence), // Store as a JSON array
+            ]);
         }
 
         if (! empty($data['witnesses'])) {

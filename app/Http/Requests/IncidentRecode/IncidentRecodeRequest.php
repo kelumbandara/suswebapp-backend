@@ -24,7 +24,7 @@ class IncidentRecodeRequest extends FormRequest
             'division'                                 => 'required|string',
             'location'                                 => 'required|string',
             'circumstances'                            => 'nullable|string',
-            'evidence'                                 => 'required|array',
+            'evidence'                                 => 'nullable|array',
             'evidence.*'                               => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
             'typeOfNearMiss'                           => 'nullable|string',
             'typeOfConcern'                            => 'nullable|string',

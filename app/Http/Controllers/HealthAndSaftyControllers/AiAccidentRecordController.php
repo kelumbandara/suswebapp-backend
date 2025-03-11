@@ -46,20 +46,21 @@ class AiAccidentRecordController extends Controller
             }
 
             if (! empty($risk->evidence) && is_string($risk->evidence)) {
-                $evidence = json_decode($risk->evidence, true);
+                $decodedEvidence = json_decode($risk->evidence, true);
+                $evidence        = is_array($decodedEvidence) ? $decodedEvidence : [];
             } else {
                 $evidence = is_array($risk->evidence) ? $risk->evidence : [];
             }
-            foreach ($evidence as &$evidence) {
-                if (isset($evidence['gsutil_uri'])) {
-                    $imageData             = $this->accidentService->getImageUrl($evidence['gsutil_uri']);
-                    $evidence['fileName']  = $imageData['fileName']; // Adding the file name
-                    $evidence['signedUrl'] = $imageData['signedUrl'];
+
+            foreach ($evidence as &$item) {
+                if (isset($item['gsutil_uri'])) {
+                    $imageData         = $this->accidentService->getImageUrl($item['gsutil_uri']);
+                    $item['fileName']  = $imageData['fileName'];
+                    $item['signedUrl'] = $imageData['signedUrl'];
                 }
             }
 
             $risk->evidence = $evidence;
-
 
             return $risk;
         });
@@ -89,21 +90,27 @@ class AiAccidentRecordController extends Controller
             return response()->json(['message' => 'Failed to create accident record'], 500);
         }
 
+        $uploadedFiles = [];
         if ($request->hasFile('evidence')) {
-            $uploadedFiles = [];
-
             foreach ($request->file('evidence') as $file) {
-                $uploadedFiles[] = $this->accidentService->uploadImageToGCS($file, $record->id);
+                $uploadedFiles[] = $this->accidentService->uploadImageToGCS($file);
+            }
+        }
+
+        if (! empty($uploadedFiles)) {
+            $existingEvidence = (! empty($record->evidence) && is_string($record->evidence))
+            ? json_decode($record->evidence, true)
+            : [];
+
+            if (! is_array($existingEvidence)) {
+                $existingEvidence = [];
             }
 
-            if (! empty($uploadedFiles)) {
-                $this->accidentRecordInterface->update($record->id, [
-                    'evidence' => json_encode($uploadedFiles),
-                ]);
-                return response()->json([
-                    'evidence' => $uploadedFiles,
-                ]);
-            }
+            $mergedEvidence = array_merge($existingEvidence, $uploadedFiles);
+
+            $this->accidentRecordInterface->update($record->id, [
+                'evidence' => json_encode($mergedEvidence), // Store as a JSON array
+            ]);
         }
 
         if (! empty($data['witnesses'])) {
