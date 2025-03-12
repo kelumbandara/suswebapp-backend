@@ -154,4 +154,18 @@ class OsMiMedicineRequestController extends Controller
         ], 200);
     }
 
+    public function assignee()
+    {
+        $user = Auth::user();
+
+        $targetLevel = $user->assigneeLevel + 1;
+
+        $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Medicine Request')
+            ->where('availability', 1);
+
+        return response()->json([
+            'approvers' => $assignees,
+        ]);
+    }
+
 }
