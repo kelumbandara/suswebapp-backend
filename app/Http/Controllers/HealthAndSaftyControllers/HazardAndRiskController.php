@@ -7,7 +7,6 @@ use App\Repositories\All\HazardAndRisk\HazardAndRiskInterface;
 use App\Repositories\All\HRDivision\HRDivisionInterface;
 use App\Repositories\All\User\UserInterface;
 use App\Services\HazardRiskService;
-use App\Services\ImageUploadService;
 use Illuminate\Support\Facades\Auth;
 
 class HazardAndRiskController extends Controller
@@ -26,44 +25,43 @@ class HazardAndRiskController extends Controller
         $this->hazardAndRiskService   = $hazardAndRiskService;
     }
     public function index()
-{
-    $hazardRisks = $this->hazardAndRiskInterface->All();
+    {
+        $hazardRisks = $this->hazardAndRiskInterface->All();
 
-    $hazardRisks = $hazardRisks->map(function ($risk) {
-        try {
-            $assignee       = $this->userInterface->getById($risk->assigneeId);
-            $risk->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
-        } catch (\Exception $e) {
-            $risk->assignee = ['name' => 'Unknown', 'id' => null];
-        }
-        try {
-            $creator                 = $this->userInterface->getById($risk->createdByUser);
-            $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
-        } catch (\Exception $e) {
-            $risk->createdByUserName = 'Unknown';
-        }
-
-        if (! empty($risk->documents) && is_string($risk->documents)) {
-            $documents = json_decode($risk->documents, true);
-        } else {
-            $documents = is_array($risk->documents) ? $risk->documents : [];
-        }
-
-        foreach ($documents as &$document) {
-            if (isset($document['gsutil_uri'])) {
-                $imageData = $this->hazardAndRiskService->getImageUrl($document['gsutil_uri']);
-                $document['imageUrl'] = $imageData['signedUrl'];
-                $document['fileName'] = $imageData['fileName'];
+        $hazardRisks = $hazardRisks->map(function ($risk) {
+            try {
+                $assignee       = $this->userInterface->getById($risk->assigneeId);
+                $risk->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $risk->assignee = ['name' => 'Unknown', 'id' => null];
             }
-        }
+            try {
+                $creator                 = $this->userInterface->getById($risk->createdByUser);
+                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->createdByUserName = 'Unknown';
+            }
 
-        $risk->documents = $documents;
-        return $risk;
-    });
+            if (! empty($risk->documents) && is_string($risk->documents)) {
+                $documents = json_decode($risk->documents, true);
+            } else {
+                $documents = is_array($risk->documents) ? $risk->documents : [];
+            }
 
-    return response()->json($hazardRisks, 200);
-}
+            foreach ($documents as &$document) {
+                if (isset($document['gsutil_uri'])) {
+                    $imageData            = $this->hazardAndRiskService->getImageUrl($document['gsutil_uri']);
+                    $document['imageUrl'] = $imageData['signedUrl'];
+                    $document['fileName'] = $imageData['fileName'];
+                }
+            }
 
+            $risk->documents = $documents;
+            return $risk;
+        });
+
+        return response()->json($hazardRisks, 200);
+    }
 
     public function store(HazardAndRiskRequest $request)
     {
@@ -184,11 +182,24 @@ class HazardAndRiskController extends Controller
             } catch (\Exception $e) {
                 $risk->createdByUserName = 'Unknown';
             }
-
             return $risk;
         });
 
         return response()->json($hazardRisks, 200);
+    }
+
+    public function assignee()
+    {
+        $user = Auth::user();
+
+        $targetLevel = $user->assigneeLevel + 1;
+
+        $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Hazard Risk')
+            ->where('availability', 1);
+
+        return response()->json([
+            'assignees' => $assignees,
+        ]);
     }
 
     public function dashboardStats()
@@ -197,7 +208,7 @@ class HazardAndRiskController extends Controller
             $total     = $this->hazardAndRiskInterface->countAll();
             $completed = $this->hazardAndRiskInterface->countByStatus('Completed');
             $pending   = $this->hazardAndRiskInterface->countByStatus('Pending');
-            $amount    = $this->hazardAndRiskInterface->sumField('amount'); // Assuming an amount field exists
+            $amount    = $this->hazardAndRiskInterface->sumField('amount');
 
             return response()->json([
                 'total'     => $total,

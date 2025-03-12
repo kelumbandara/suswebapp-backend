@@ -49,21 +49,5 @@ class UserController extends Controller
         return response()->json($user);
     }
 
-    public function assignee(Request $request)
-    {
-        $currentUser = Auth::user();
-
-        if (!$currentUser) {
-            return response()->json([
-                'message' => 'Unauthorized',
-            ], 401);
-        }
-
-        $nextLevel = $currentUser->assigneeLevel + 1;
-        $assignees = $this->userInterface->getUsersByAssigneeLevel($nextLevel);
-
-
-        return response()->json($assignees);
-    }
 
 }

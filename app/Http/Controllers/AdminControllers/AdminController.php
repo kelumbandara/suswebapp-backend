@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminControllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\ComAssigneeLevel;
 use App\Repositories\All\ComPermission\ComPermissionInterface;
 use App\Repositories\All\User\UserInterface;
 use Illuminate\Http\Request;
@@ -19,17 +20,12 @@ class AdminController extends Controller
     }
     public function index()
 {
-    $users = $this->userInterface->All(); // Assuming this returns a collection of users
+    $users = $this->userInterface->All();
 
-    // Map through each user and retrieve their userType and permissions
     $userData = $users->map(function ($user) {
-        // Fetch permission details based on userType ID
         $permission = $this->comPermissionInterface->getById($user->userType);
-
-        // Get user attributes dynamically
         $userArray = $user->toArray();
 
-        // Dynamically set the userType and permissions
         $userArray['userType'] = [
             'id'          => $permission->id ?? null,
             'userType'    => $permission->userType ?? null,
@@ -47,40 +43,46 @@ class AdminController extends Controller
     public function show(Request $request)
 {
     $user = $request->user();
-    $userType = $user->userType; // Assuming this is the ID of the user type
+    $userType = $user->userType;
 
-    // Fetch permission details based on userType ID
     $permission = $this->comPermissionInterface->getById($userType);
 
-    // Get all user attributes dynamically (using toArray)
     $userData = $user->toArray();
 
-    // Dynamically set the userType and permissions
     $userData['userType'] = [
         'id'          => $permission->id ?? null,
         'userType'    => $permission->userType ?? null,
         'description' => $permission->description ?? null,
     ];
 
-    // Add permissions dynamically
     $userData['permissionObject'] = $permission ? (array) $permission->permissionObject : [];
 
     return response()->json($userData, 200);
 }
 
 
-    public function update(Request $request, string $id)
+public function update(Request $request, string $id)
 {
     $request->validate([
         'userType' => 'required|string',
+        'department' => 'nullable|string',
+        'assignedFactory' => 'nullable|email',
+        'assigneeLevel' => 'required|string',
+        'permissionObject' => 'required|array',
+        'jobPosition' => 'nullable|string',
+        'availability' => 'nullable|boolean',
     ]);
 
     $user = $this->userInterface->findById($id);
-    if (!$user) {
-        return response()->json(['message' => 'User not found'], 404);
-    }
 
     $user->userType = $request->input('userType');
+    $user->department = $request->input('department');
+    $user->assignedFactory = $request->input('assignedFactory');
+    $user->assigneeLevel = $request->input('assigneeLevel');
+    $user->permissionObject = $request->input('permissionObject');
+    $user->jobPosition = $request->input('jobPosition');
+    $user->availability = $request->input('availability', $user->availability);
+
     $user->save();
 
     return response()->json([
@@ -89,8 +91,15 @@ class AdminController extends Controller
     ], 200);
 }
 
-    public function destroy(string $id)
-    {
+public function assigneeLevel()
+{
+    $sections = ComAssigneeLevel::all();
 
-    }
+    return response()->json([
+        'assigneeLevels' => $sections,
+    ], 200);
+}
+
+
+
 }

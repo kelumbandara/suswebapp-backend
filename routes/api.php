@@ -89,6 +89,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('users', [AdminController::class, 'index']);
     Route::post('users/{id}/update', [AdminController::class, 'update']);
+    Route::get('responsible-section', [AdminController::class, 'assigneeLevel']);
+
 
     Route::get('hazard-and-risk', [HazardAndRiskController::class, 'index']);
     Route::post('hazard-and-risk', [HazardAndRiskController::class, 'store']);
@@ -96,6 +98,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('hazard-risk/{id}/update', [HazardAndRiskController::class, 'update']);
     Route::delete('hazard-risk/{id}/delete', [HazardAndRiskController::class, 'destroy']);
     Route::get('hazard-risks-assign-task', [HazardAndRiskController::class, 'assignTask']);
+    Route::get('hazard-risks-assignee', [HazardAndRiskController::class, 'assignee']);
     Route::get('hazard-risk-dashboard', [HazardAndRiskController::class, 'dashboardStats']);
     Route::get('hazard-risk-dashboard-division', [HazardAndRiskController::class, 'dashboardStatsByDivision']);
 
@@ -105,12 +108,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('accidents/{id}/update', [AiAccidentRecordController::class, 'update']);
     Route::delete('accidents/{id}/delete', [AiAccidentRecordController::class, 'destroy']);
     Route::get('accidents-assign-task', [AiAccidentRecordController::class, 'assignTask']);
+    Route::get('accidents-assignee', [AiAccidentRecordController::class, 'assignee']);
 
     Route::get('incidents', [AiIncidentRecodeController::class, 'index']);
     Route::post('incidents', [AiIncidentRecodeController::class, 'store']);
     Route::post('incidents/{id}/update', [AiIncidentRecodeController::class, 'update']);
     Route::delete('incidents/{id}/delete', [AiIncidentRecodeController::class, 'destroy']);
     Route::get('incidents-assign-task', [AiIncidentRecodeController::class, 'assignTask']);
+    Route::get('incidents-assignee', [AiIncidentRecodeController::class, 'assignee']);
 
     Route::get('documents', [DocumentRecodeController::class, 'index']);
     Route::post('documents', [DocumentRecodeController::class, 'store']);
@@ -128,6 +133,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('medicine-request/{id}/update', [OsMiMedicineRequestController::class, 'update']);
     Route::delete('medicine-request/{id}/delete', [OsMiMedicineRequestController::class, 'destroy']);
     Route::get('medicine-request-assign-task', [OsMiMedicineRequestController::class, 'assignTask']);
+    Route::get('medicine-request-assignee', [OsMiMedicineRequestController::class, 'assignee']);
     Route::post('medicine-request/{id}/approve', [OsMiMedicineRequestController::class, 'approvedStatus']);
 
     Route::get('medicine-inventory', [OhMiPiMedicineInventoryController::class, 'index']);
