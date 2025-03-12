@@ -89,6 +89,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('users', [AdminController::class, 'index']);
     Route::post('users/{id}/update', [AdminController::class, 'update']);
+    Route::get('responsible-section', [AdminController::class, 'assigneeLevel']);
+
 
     Route::get('hazard-and-risk', [HazardAndRiskController::class, 'index']);
     Route::post('hazard-and-risk', [HazardAndRiskController::class, 'store']);

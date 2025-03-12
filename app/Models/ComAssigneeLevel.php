@@ -9,8 +9,6 @@ class ComAssigneeLevel extends Model
 {
     use HasFactory;
 
-    protected $table = 'com_assignee_level';
-
     protected $fillable = [
         'levelId',
         'levelName',
