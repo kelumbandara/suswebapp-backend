@@ -227,4 +227,20 @@ class AiIncidentRecodeController extends Controller
 
         return response()->json($record, 200);
     }
+
+    public function assignee()
+    {
+        $user = Auth::user();
+
+        $targetLevel = $user->assigneeLevel + 1;
+
+        $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Incident');
+
+        return response()->json([
+            'assignees' => $assignees,
+        ]);
+    }
+
+
+
 }

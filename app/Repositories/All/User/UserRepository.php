@@ -20,9 +20,13 @@ class UserRepository extends BaseRepository implements UserInterface
     {
         $this->model = $model;
     }
-    public function getUsersByAssigneeLevel(int $level)
+    public function getUsersByAssigneeLevelAndSection(int $level, string $section)
 {
-    return User::where('assigneeLevel', $level)->get();
+    return User::where('assigneeLevel', $level)
+        ->whereJsonContains('responsibleSection', $section)
+        ->get();
 }
+
+
 
 }

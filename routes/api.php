@@ -96,6 +96,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('hazard-risk/{id}/update', [HazardAndRiskController::class, 'update']);
     Route::delete('hazard-risk/{id}/delete', [HazardAndRiskController::class, 'destroy']);
     Route::get('hazard-risks-assign-task', [HazardAndRiskController::class, 'assignTask']);
+    Route::get('hazard-risks-assignee', [HazardAndRiskController::class, 'assignee']);
     Route::get('hazard-risk-dashboard', [HazardAndRiskController::class, 'dashboardStats']);
     Route::get('hazard-risk-dashboard-division', [HazardAndRiskController::class, 'dashboardStatsByDivision']);
 
@@ -105,12 +106,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('accidents/{id}/update', [AiAccidentRecordController::class, 'update']);
     Route::delete('accidents/{id}/delete', [AiAccidentRecordController::class, 'destroy']);
     Route::get('accidents-assign-task', [AiAccidentRecordController::class, 'assignTask']);
+    Route::get('accidents-assignee', [HazardAndRiskController::class, 'assignee']);
 
     Route::get('incidents', [AiIncidentRecodeController::class, 'index']);
     Route::post('incidents', [AiIncidentRecodeController::class, 'store']);
     Route::post('incidents/{id}/update', [AiIncidentRecodeController::class, 'update']);
     Route::delete('incidents/{id}/delete', [AiIncidentRecodeController::class, 'destroy']);
     Route::get('incidents-assign-task', [AiIncidentRecodeController::class, 'assignTask']);
+    Route::get('incidents-assignee', [HazardAndRiskController::class, 'assignee']);
 
     Route::get('documents', [DocumentRecodeController::class, 'index']);
     Route::post('documents', [DocumentRecodeController::class, 'store']);
