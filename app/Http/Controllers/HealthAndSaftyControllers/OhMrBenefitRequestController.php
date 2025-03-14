@@ -31,35 +31,35 @@ class OhMrBenefitRequestController extends Controller
     public function index()
     {
         $records = $this->benefitRequestInterface->All();
-        $records = $records->map(function ($risk) {
-
+        $records = $records->map(function ($record) {
             try {
-                $creator                 = $this->userInterface->getById($risk->createdByUser);
-                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+                $creator                   = $this->userInterface->getById($record->createdByUser);
+                $record->createdByUserName = $creator ? $creator->name : 'Unknown';
             } catch (\Exception $e) {
-                $risk->createdByUserName = 'Unknown';
+                $record->createdByUserName = 'Unknown';
             }
-
-            return $risk;
+            return $record;
         });
 
         foreach ($records as $record) {
             $record->benefitsAndEntitlements = $this->benefitEntitlementInterface->findByBenefitId($record->id);
             $record->medicalDocuments        = $this->benefitDocumentInterface->findByBenefitId($record->id);
-            if (!empty($record->document) && is_array($record->document)) {
-                $updatedDocuments = [];
-                foreach ($record->document as $doc) {
-                    if (isset($doc['gsutil_uri'])) {
-                        $doc['imageUrl'] = $this->benefitDocumentService->getImageUrl($doc['gsutil_uri']);
+
+            if (! empty($record->medicalDocuments)) {
+                foreach ($record->medicalDocuments as $doc) {
+                    if (! empty($doc->document['gsutil_uri'])) {
+                        $filePath  = $doc->document['gsutil_uri'];
+                        $signedUrl = $this->benefitDocumentService->getImageUrl($filePath);
+                        $fileName  = basename($filePath); // Extract filename from path
+
+                        $doc->document = [
+                            "gsutil_uri" => $filePath,
+                            "signed_url" => $signedUrl,
+                            "fileName"   => $fileName,
+                        ];
                     }
-                    $updatedDocuments[] = $doc;
                 }
-
-                $record->setAttribute('document', $updatedDocuments);
-            } else {
-                $record->setAttribute('document', []);
             }
-
         }
 
         return response()->json($records, 200);
@@ -90,17 +90,15 @@ class OhMrBenefitRequestController extends Controller
         }
 
         if (! empty($data['medicalDocuments'])) {
-            foreach ($data['medicalDocuments'] as $documents) {
+            foreach ($data['medicalDocuments'] as $index => &$documents) {
                 $documents['benefitId'] = $record->id;
 
-                if ($request->hasFile('document')) {
-                    $uploadedFiles = [];
-
-                    foreach ($request->file('document') as $file) {
-                        $uploadedFiles[] = $this->benefitDocumentService->uploadImageToGCS($file);
-                    }
-
-                    $data['document'] = ($uploadedFiles);
+                if ($request->hasFile("medicalDocuments.{$index}.document")) {
+                    $documents['document'] = $this->benefitDocumentService->uploadImageToGCS(
+                        $request->file("medicalDocuments.{$index}.document")
+                    );
+                } else {
+                    $documents['document'] = null;
                 }
 
                 $this->benefitDocumentInterface->create($documents);
@@ -172,4 +170,3 @@ class OhMrBenefitRequestController extends Controller
         return response()->json(['message' => 'Benefit request deleted successfully'], 200);
     }
 }
-
