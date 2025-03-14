@@ -54,7 +54,7 @@ class OhMrBenefitRequestController extends Controller
 
                         $doc->document = [
                             "gsutil_uri" => $filePath,
-                            "signed_url" => $signedUrl,
+                            "imageUrl" => $signedUrl,
                             "fileName"   => $fileName,
                         ];
                     }
