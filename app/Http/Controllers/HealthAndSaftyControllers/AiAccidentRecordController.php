@@ -56,7 +56,7 @@ class AiAccidentRecordController extends Controller
                 if (isset($item['gsutil_uri'])) {
                     $imageData         = $this->accidentService->getImageUrl($item['gsutil_uri']);
                     $item['fileName']  = $imageData['fileName'];
-                    $item['signedUrl'] = $imageData['signedUrl'];
+                    $item['imageUrl'] = $imageData['signedUrl'];
                 }
             }
 

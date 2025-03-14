@@ -46,9 +46,9 @@ class DocumentRecodeController extends Controller
 
             foreach ($risk->document as $doc) {
                 if (isset($doc['gsutil_uri'])) {
-                    $imageData = $this->documentService->getImageUrl($doc['gsutil_uri']); 
+                    $imageData = $this->documentService->getImageUrl($doc['gsutil_uri']);
                     $doc['fileName']  = $imageData['fileName'];
-                    $doc['signedUrl'] = $imageData['signedUrl'];
+                    $doc['imageUrl'] = $imageData['signedUrl'];
                 }
                 $updatedDocuments[] = $doc;
             }
