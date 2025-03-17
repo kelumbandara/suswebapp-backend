@@ -58,7 +58,7 @@ class BenefitRequest extends FormRequest
             'benefitsAndEntitlements.*.description'            => 'nullable|string',
             'medicalDocuments'                                 => 'required|array',
             'medicalDocuments.*.documentType'                  => 'nullable|string',
-            'medicalDocuments.*.document'                      => 'required|array',
+            'medicalDocuments.*.document'                      => 'nullable|array',
             'medicalDocuments.*.document'                      => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
 
         ];

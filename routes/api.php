@@ -10,6 +10,7 @@ use App\Http\Controllers\CommonControllers\DepartmentController;
 use App\Http\Controllers\CommonControllers\FactoryController;
 use App\Http\Controllers\CommonControllers\JobPositionController;
 use App\Http\Controllers\CommonControllers\PersonTypeController;
+use App\Http\Controllers\CommonControllers\ResponsibleSectionController;
 use App\Http\Controllers\CommonControllers\UserTypeController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentCategoryController;
 use App\Http\Controllers\HealthAndSaftyControllers\AiAccidentInjuryTypeController;
@@ -59,6 +60,11 @@ Route::get('user-permissions/{id}/show', [ComPermissionController::class, 'show'
 Route::post('user-permissions/{id}/update', [ComPermissionController::class, 'update']);
 Route::delete('user-permissions/{id}/delete', [ComPermissionController::class, 'destroy']);
 
+Route::get('responsible-section', [ResponsibleSectionController::class, 'index']);
+Route::post('responsible-section', [ResponsibleSectionController::class, 'store']);
+
+
+
 Route::get('job-positions', [JobPositionController::class, 'index']);
 Route::post('job-positions', [JobPositionController::class, 'store']);
 
@@ -89,7 +95,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('users', [AdminController::class, 'index']);
     Route::post('users/{id}/update', [AdminController::class, 'update']);
-    Route::get('responsible-section', [AdminController::class, 'assigneeLevel']);
+    Route::get('users-assignee-level', [AdminController::class, 'assigneeLevel']);
 
 
     Route::get('hazard-and-risk', [HazardAndRiskController::class, 'index']);

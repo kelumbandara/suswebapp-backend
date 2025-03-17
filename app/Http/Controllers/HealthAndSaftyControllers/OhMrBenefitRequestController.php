@@ -137,8 +137,25 @@ class OhMrBenefitRequestController extends Controller
         }
 
         if (! empty($data['medicalDocuments'])) {
-            foreach ($data['medicalDocuments'] as $documents) {
+            foreach ($data['medicalDocuments'] as $index => &$documents) {
                 $documents['benefitId'] = $id;
+                if ($request->hasFile("medicalDocuments.{$index}.document")) {
+                    $documents['document'] = $this->benefitDocumentService->uploadImageToGCS(
+                        $request->file("medicalDocuments.{$index}.document")
+                    );
+                } else {
+                    $documents['document'] = null;
+                }
+
+                // if ($request->hasFile('document')) {
+                //     $uploadedFiles = [];
+
+                //     foreach ($request->file('document') as $file) {
+                //         $uploadedFiles[] = $this->benefitDocumentService->uploadImageToGCS($file);
+                //     }
+
+                //     $validatedData['document'] = $uploadedFiles;
+                // }
                 $this->benefitDocumentInterface->create($documents);
             }
         }
