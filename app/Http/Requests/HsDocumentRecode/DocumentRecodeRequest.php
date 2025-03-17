@@ -28,22 +28,22 @@ class DocumentRecodeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'documentType'     => 'required|string',
-            'division'         => 'required|string',
-            'issuingAuthority' => 'required|string',
-            'documentNumber'   => 'required|string',
-            'title'            => 'required|string',
+            'documentType'     => 'nullable|string',
+            'division'         => 'nullable|string',
+            'issuingAuthority' => 'nullable|string',
+            'documentNumber'   => 'nullable|string',
+            'title'            => 'nullable|string',
             'documentOwner'    => 'nullable|string',
-            'documentReviewer' => 'required|string',
+            'documentReviewer' => 'nullable|string',
             'physicalLocation' => 'nullable|string',
-            'versionNumber'    => 'required|string',
+            'versionNumber'    => 'nullable|string',
             'remarks'          => 'nullable|string',
             'document'        => 'required|array',
             'document.*'      => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
-            'issuedDate'       => 'required|string',
-            'isNoExpiry'       => 'nullable|boolean',
-            'expiryDate'       => 'required_if:isNoExpiry,false|string',
-            'notifyDate'       => 'required_if:isNoExpiry,false|string',
+            // 'issuedDate'       => 'nullable|string',
+            // 'isNoExpiry'       => 'nullable|boolean',
+            // 'expiryDate'       => 'required_if:isNoExpiry,false|string',
+            // 'notifyDate'       => 'required_if:isNoExpiry,false|string',
 
         ];
     }
