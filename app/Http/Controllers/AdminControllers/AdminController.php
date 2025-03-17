@@ -4,6 +4,7 @@ namespace App\Http\Controllers\AdminControllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\ComAssigneeLevel;
+use App\Repositories\All\AssigneeLevel\AssigneeLevelInterface;
 use App\Repositories\All\ComPermission\ComPermissionInterface;
 use App\Repositories\All\User\UserInterface;
 use Illuminate\Http\Request;
@@ -12,32 +13,43 @@ class AdminController extends Controller
 {
     protected $userInterface;
     protected $comPermissionInterface;
+    protected $assigneeLevelInterface;
 
-    public function __construct(UserInterface $userInterface, ComPermissionInterface $comPermissionInterface)
+    public function __construct(UserInterface $userInterface, ComPermissionInterface $comPermissionInterface, AssigneeLevelInterface $assigneeLevelInterface)
     {
         $this->userInterface = $userInterface;
         $this->comPermissionInterface = $comPermissionInterface;
+        $this->assigneeLevelInterface = $assigneeLevelInterface;
     }
     public function index()
-{
-    $users = $this->userInterface->All();
+    {
+        $users = $this->userInterface->All();
 
-    $userData = $users->map(function ($user) {
-        $permission = $this->comPermissionInterface->getById($user->userType);
-        $userArray = $user->toArray();
+        $userData = $users->map(function ($user) {
+            $permission = $this->comPermissionInterface->getById($user->userType);
 
-        $userArray['userType'] = [
-            'id'          => $permission->id ?? null,
-            'userType'    => $permission->userType ?? null,
-            'description' => $permission->description ?? null,
-        ];
+            $assigneeLevel = $this->assigneeLevelInterface->getById($user->assigneeLevel);
 
+            $userArray = $user->toArray();
 
-        return $userArray;
-    });
+            $userArray['userType'] = [
+                'id'          => $permission->id ?? null,
+                'userType'    => $permission->userType ?? null,
+                'description' => $permission->description ?? null,
+            ];
 
-    return response()->json($userData, 200);
-}
+            $userArray['assigneeLevel'] = $assigneeLevel ? [
+                'id'        => $assigneeLevel->id,
+                'levelId'   => $assigneeLevel->levelId,
+                'levelName' => $assigneeLevel->levelName,
+            ] : null;
+
+            return $userArray;
+        });
+
+        return response()->json($userData, 200);
+    }
+
 
 
     public function show(Request $request)
@@ -56,6 +68,14 @@ class AdminController extends Controller
     ];
 
     $userData['permissionObject'] = $permission ? (array) $permission->permissionObject : [];
+    $userData['assigneeLevel'] = collect($user->assigneeLevel)->map(function ($level) {
+        return [
+            'id'        => $level->id ?? null,
+            'levelId'   => $level->levelId ?? null,
+            'levelName' => $level->levelName ?? null,
+        ];
+    });
+
 
     return response()->json($userData, 200);
 }
@@ -68,9 +88,9 @@ public function update(Request $request, string $id)
         'department' => 'nullable|string',
         'assignedFactory' => 'nullable|email',
         'assigneeLevel' => 'required|string',
-        'permissionObject' => 'required|array',
         'jobPosition' => 'nullable|string',
         'availability' => 'nullable|boolean',
+        'responsibilitySection' => 'required|string',
     ]);
 
     $user = $this->userInterface->findById($id);
@@ -79,7 +99,7 @@ public function update(Request $request, string $id)
     $user->department = $request->input('department');
     $user->assignedFactory = $request->input('assignedFactory');
     $user->assigneeLevel = $request->input('assigneeLevel');
-    $user->permissionObject = $request->input('permissionObject');
+    $user->responsibilitySection = $request->input('responsibilitySection');
     $user->jobPosition = $request->input('jobPosition');
     $user->availability = $request->input('availability', $user->availability);
 
