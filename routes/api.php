@@ -234,5 +234,8 @@ Route::delete('supplier-type/{id}/delete', [OhMiPiMiSupplierTypeController::clas
 
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
 Route::post('upload', [ImageUploadController::class, 'uploadImage']);
+Route::delete('image/{imageId}', [ImageUploadController::class, 'deleteImage']);
+Route::post('image/update/{imageId}', [ImageUploadController::class, 'updateImage']);
+
 
 Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);
