@@ -22,7 +22,7 @@ class ResponsibleSectionRequest extends FormRequest
     {
         return [
             'sectionName'   => 'required|string|max:255',
-            'sectionCode'   => 'required/json',
+            'sectionCode'   => 'nullable|string|max:255',
             'responsibleId' => 'string',
         ];
     }

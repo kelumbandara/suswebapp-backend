@@ -17,6 +17,10 @@ class LoginController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
+        if ($user->availability != 1) {
+            return response()->json(['message' => 'User is not available'], 403);
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -25,6 +29,7 @@ class LoginController extends Controller
             'token_type' => 'Bearer'
         ], 201);
     }
+
 
 
 }

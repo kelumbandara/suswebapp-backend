@@ -104,6 +104,15 @@ class DocumentRecodeController extends Controller
 
         $data               = $request->validated();
         $data['isNoExpiry'] = filter_var($data['isNoExpiry'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        if ($request->hasFile('document')) {
+            $uploadedFiles = [];
+
+            foreach ($request->file('document') as $file) {
+                $uploadedFiles[] = $this->documentService->uploadImageToGCS($file);
+            }
+
+            $validatedData['document'] = $uploadedFiles;
+        }
 
         $updatedDocument = $this->documentInterface->update($id, $data);
 
