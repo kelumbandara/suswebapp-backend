@@ -90,7 +90,7 @@ public function update(Request $request, string $id)
         'assigneeLevel' => 'required|string',
         'jobPosition' => 'nullable|string',
         'availability' => 'nullable|boolean',
-        'responsibilitySection' => 'required|array',
+        'responsibleSection' => 'required|array',
     ]);
 
     $user = $this->userInterface->findById($id);
@@ -99,7 +99,7 @@ public function update(Request $request, string $id)
     $user->department = $request->input('department');
     $user->assignedFactory = $request->input('assignedFactory');
     $user->assigneeLevel = $request->input('assigneeLevel');
-    $user->responsibilitySection = $request->input('responsibilitySection');
+    $user->responsibleSection = $request->input('responsibleSection');
     $user->jobPosition = $request->input('jobPosition');
     $user->availability = $request->input('availability', $user->availability);
 
