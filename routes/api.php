@@ -5,6 +5,7 @@ use App\Http\Controllers\api\CalculationController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\CommonControllers\AssigneeLevelController;
 use App\Http\Controllers\CommonControllers\ComPermissionController;
 use App\Http\Controllers\CommonControllers\DepartmentController;
 use App\Http\Controllers\CommonControllers\FactoryController;
@@ -63,6 +64,7 @@ Route::delete('user-permissions/{id}/delete', [ComPermissionController::class, '
 Route::get('responsible-section', [ResponsibleSectionController::class, 'index']);
 Route::post('responsible-section', [ResponsibleSectionController::class, 'store']);
 
+Route::get('assignee-level', [AssigneeLevelController::class, 'index']);
 
 
 Route::get('job-positions', [JobPositionController::class, 'index']);
@@ -232,5 +234,8 @@ Route::delete('supplier-type/{id}/delete', [OhMiPiMiSupplierTypeController::clas
 
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
 Route::post('upload', [ImageUploadController::class, 'uploadImage']);
+Route::delete('image/{imageId}', [ImageUploadController::class, 'deleteImage']);
+Route::post('image/update/{imageId}', [ImageUploadController::class, 'updateImage']);
+
 
 Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);

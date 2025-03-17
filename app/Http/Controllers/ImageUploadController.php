@@ -47,4 +47,36 @@ class ImageUploadController extends Controller
         ]);
     }
 
+    public function deleteImage($imageId)
+{
+    $deleted = $this->imageUploadService->deleteImage($imageId);
+
+    if (!$deleted) {
+        return response()->json(['message' => 'Image not found'], 404);
+    }
+
+    return response()->json(['message' => 'Image deleted successfully!']);
+}
+
+public function updateImage(Request $request, $imageId)
+{
+    $request->validate([
+        'image' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+    ]);
+
+    $newFile = $request->file('image');
+
+    $result = $this->imageUploadService->updateImage($imageId, $newFile);
+
+    if (!$result) {
+        return response()->json(['message' => 'Image not found'], 404);
+    }
+
+    return response()->json([
+        'message' => $result['message'],
+        'gsutil_uri' => $result['gsutil_uri'],
+        'image_id' => $result['image_id'],
+    ]);
+}
+
 }
