@@ -46,9 +46,9 @@ class DocumentRecodeController extends Controller
 
             foreach ($risk->document as $doc) {
                 if (isset($doc['gsutil_uri'])) {
-                    $imageData = $this->documentService->getImageUrl($doc['gsutil_uri']); 
+                    $imageData = $this->documentService->getImageUrl($doc['gsutil_uri']);
                     $doc['fileName']  = $imageData['fileName'];
-                    $doc['signedUrl'] = $imageData['signedUrl'];
+                    $doc['imageUrl'] = $imageData['signedUrl'];
                 }
                 $updatedDocuments[] = $doc;
             }
@@ -104,6 +104,15 @@ class DocumentRecodeController extends Controller
 
         $data               = $request->validated();
         $data['isNoExpiry'] = filter_var($data['isNoExpiry'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        if ($request->hasFile('document')) {
+            $uploadedFiles = [];
+
+            foreach ($request->file('document') as $file) {
+                $uploadedFiles[] = $this->documentService->uploadImageToGCS($file);
+            }
+
+            $validatedData['document'] = $uploadedFiles;
+        }
 
         $updatedDocument = $this->documentInterface->update($id, $data);
 

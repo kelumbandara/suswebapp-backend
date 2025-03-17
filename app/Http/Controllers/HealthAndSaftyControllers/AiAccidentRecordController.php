@@ -56,7 +56,7 @@ class AiAccidentRecordController extends Controller
                 if (isset($item['gsutil_uri'])) {
                     $imageData         = $this->accidentService->getImageUrl($item['gsutil_uri']);
                     $item['fileName']  = $imageData['fileName'];
-                    $item['signedUrl'] = $imageData['signedUrl'];
+                    $item['imageUrl'] = $imageData['signedUrl'];
                 }
             }
 
@@ -149,6 +149,15 @@ class AiAccidentRecordController extends Controller
 
         if (! $record || ! is_object($record)) {
             return response()->json(['message' => 'Accident record not found']);
+        }
+        if ($request->hasFile('evidence')) {
+            $uploadedFiles = [];
+
+            foreach ($request->file('evidence') as $file) {
+                $uploadedFiles[] = $this->accidentService->uploadImageToGCS($file);
+            }
+
+            $validatedData['evidence'] = $uploadedFiles;
         }
 
         $updateSuccess = $this->accidentRecordInterface->update($id, $data);
