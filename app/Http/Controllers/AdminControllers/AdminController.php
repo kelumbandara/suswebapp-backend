@@ -38,7 +38,7 @@ class AdminController extends Controller
                 'description' => $permission->description ?? null,
             ];
 
-            $userArray['assigneeLevel'] = $assigneeLevel ? [
+            $userArray['userLevel'] = $assigneeLevel ? [
                 'id'        => $assigneeLevel->id,
                 'levelId'   => $assigneeLevel->levelId,
                 'levelName' => $assigneeLevel->levelName,
