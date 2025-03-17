@@ -86,11 +86,11 @@ public function update(Request $request, string $id)
     $request->validate([
         'userType' => 'required|string',
         'department' => 'nullable|string',
-        'assignedFactory' => 'nullable|email',
+        'assignedFactory' => 'nullable|array',
         'assigneeLevel' => 'required|string',
         'jobPosition' => 'nullable|string',
         'availability' => 'nullable|boolean',
-        'responsibilitySection' => 'required|string',
+        'responsibilitySection' => 'required|array',
     ]);
 
     $user = $this->userInterface->findById($id);
