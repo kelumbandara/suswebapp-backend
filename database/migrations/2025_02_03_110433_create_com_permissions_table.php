@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('userType')->unique();
             $table->text('description')->nullable();
-            $table->string('permissionObject');
+            $table->json('permissionObject');
             $table->timestamps();
         });
     }

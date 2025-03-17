@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('com_responsible_sections', function (Blueprint $table) {
             $table->id();
             $table->string('sectionName')->nullable();
-            $table->json('sectionCode')->nullable();
+            $table->string('sectionCode')->nullable();
             $table->string('responsibleId')->nullable();
             $table->timestamps();
         });
