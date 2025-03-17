@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\AdminControllers;
 
 use App\Http\Controllers\Controller;
@@ -17,10 +16,11 @@ class AdminController extends Controller
 
     public function __construct(UserInterface $userInterface, ComPermissionInterface $comPermissionInterface, AssigneeLevelInterface $assigneeLevelInterface)
     {
-        $this->userInterface = $userInterface;
+        $this->userInterface          = $userInterface;
         $this->comPermissionInterface = $comPermissionInterface;
         $this->assigneeLevelInterface = $assigneeLevelInterface;
     }
+
     public function index()
     {
         $users = $this->userInterface->All();
@@ -51,13 +51,17 @@ class AdminController extends Controller
     }
 
 
+        $user = $this->userInterface->findById($id);
 
-    public function show(Request $request)
-{
-    $user = $request->user();
-    $userType = $user->userType;
+        $user->userType         = $request->input('userType');
+        $user->department       = $request->input('department');
+        $user->assignedFactory  = $request->input('assignedFactory');
+        $user->assigneeLevel    = $request->input('assigneeLevel');
+        $user->permissionObject = $request->input('permissionObject');
+        $user->jobPosition      = $request->input('jobPosition');
+        $user->availability     = $request->input('availability', $user->availability);
 
-    $permission = $this->comPermissionInterface->getById($userType);
+        $user->save();
 
     $userData = $user->toArray();
 
@@ -120,6 +124,13 @@ public function assigneeLevel()
     ], 200);
 }
 
+    public function assigneeLevel()
+    {
+        $sections = ComAssigneeLevel::all();
 
+        return response()->json([
+            'assigneeLevels' => $sections,
+        ], 200);
+    }
 
 }
