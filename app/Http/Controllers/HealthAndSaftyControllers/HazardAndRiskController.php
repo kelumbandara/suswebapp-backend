@@ -197,9 +197,7 @@ class HazardAndRiskController extends Controller
         $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Hazard Risk')
             ->where('availability', 1);
 
-        return response()->json([
-            'assignees' => $assignees,
-        ]);
+        return response()->json($assignees,);
     }
 
     public function dashboardStats()
