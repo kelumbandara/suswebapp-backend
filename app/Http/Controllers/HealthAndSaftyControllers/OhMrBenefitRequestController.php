@@ -147,15 +147,6 @@ class OhMrBenefitRequestController extends Controller
                     $documents['document'] = null;
                 }
 
-                // if ($request->hasFile('document')) {
-                //     $uploadedFiles = [];
-
-                //     foreach ($request->file('document') as $file) {
-                //         $uploadedFiles[] = $this->benefitDocumentService->uploadImageToGCS($file);
-                //     }
-
-                //     $validatedData['document'] = $uploadedFiles;
-                // }
                 $this->benefitDocumentInterface->create($documents);
             }
         }

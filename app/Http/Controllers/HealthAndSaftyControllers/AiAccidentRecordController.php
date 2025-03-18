@@ -239,6 +239,22 @@ class AiAccidentRecordController extends Controller
             } catch (\Exception $e) {
                 $accident->createdByUserName = 'Unknown';
             }
+            if (! empty($accident->evidence) && is_string($accident->evidence)) {
+                $decodedEvidence = json_decode($accident->evidence, true);
+                $evidence        = is_array($decodedEvidence) ? $decodedEvidence : [];
+            } else {
+                $evidence = is_array($accident->evidence) ? $accident->evidence : [];
+            }
+
+            foreach ($evidence as &$item) {
+                if (isset($item['gsutil_uri'])) {
+                    $imageData         = $this->accidentService->getImageUrl($item['gsutil_uri']);
+                    $item['fileName']  = $imageData['fileName'];
+                    $item['imageUrl'] = $imageData['signedUrl'];
+                }
+            }
+
+            $accident->evidence = $evidence;
 
             return $accident;
         });

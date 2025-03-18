@@ -182,6 +182,21 @@ class HazardAndRiskController extends Controller
             } catch (\Exception $e) {
                 $risk->createdByUserName = 'Unknown';
             }
+            if (! empty($risk->documents) && is_string($risk->documents)) {
+                $documents = json_decode($risk->documents, true);
+            } else {
+                $documents = is_array($risk->documents) ? $risk->documents : [];
+            }
+
+            foreach ($documents as &$document) {
+                if (isset($document['gsutil_uri'])) {
+                    $imageData            = $this->hazardAndRiskService->getImageUrl($document['gsutil_uri']);
+                    $document['imageUrl'] = $imageData['signedUrl'];
+                    $document['fileName'] = $imageData['fileName'];
+                }
+            }
+
+            $risk->documents = $documents;
             return $risk;
         });
 

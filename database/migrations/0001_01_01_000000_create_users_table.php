@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('otp')->nullable();
             $table->timestamp('otp_expires_at')->nullable();
             $table->boolean('emailVerifiedAt')->default(false);
-            $table->string('userType')->nullable()->default('1');
+            $table->string('userType')->nullable()->default('2');
             $table->string('department')->nullable();
             $table->string('jobPosition')->nullable();
             $table->json('responsibleSection')->nullable();

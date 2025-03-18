@@ -230,6 +230,23 @@ class AiIncidentRecodeController extends Controller
             } catch (\Exception $e) {
                 $incident->createdByUserName = 'Unknown';
             }
+            if (! empty($incident->evidence) && is_string($incident->evidence)) {
+                $decodedEvidence = json_decode($incident->evidence, true);
+                $evidence        = is_array($decodedEvidence) ? $decodedEvidence : [];
+            } else {
+                $evidence = is_array($incident->evidence) ? $incident->evidence : [];
+            }
+
+            foreach ($evidence as &$item) {
+                if (isset($item['gsutil_uri'])) {
+                    $imageData         = $this->incidentService->getImageUrl($item['gsutil_uri']);
+                    $item['fileName']  = $imageData['fileName'];
+                    $item['imageUrl'] = $imageData['signedUrl'];
+                }
+            }
+
+            $incident->evidence = $evidence;
+
 
             return $incident;
         });

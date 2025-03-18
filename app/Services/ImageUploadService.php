@@ -10,7 +10,7 @@ class ImageUploadService
 {
     public function uploadImageToGCS($file)
     {
-        $fileName = 'uploads/' . uniqid() . '_' . $file->getClientOriginalName();
+        $fileName = 'uploads/uploads/' . uniqid() . '_' . $file->getClientOriginalName();
 
         Storage::disk('gcs')->put($fileName, file_get_contents($file));
 
@@ -38,7 +38,6 @@ class ImageUploadService
         $gsutilUri = $image->filePath;
         $filePath  = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $gsutilUri);
 
-        // Explicitly load credentials
         $storage = new StorageClient([
             'keyFile' => json_decode(file_get_contents(base_path(env('GOOGLE_CLOUD_KEY_FILE'))), true),
         ]);
@@ -46,10 +45,8 @@ class ImageUploadService
         $bucket = $storage->bucket(env('GOOGLE_CLOUD_STORAGE_BUCKET'));
         $object = $bucket->object($filePath);
 
-        // Set expiration time (e.g., 15 minutes)
         $expiresAt = Carbon::now()->addMinutes(15);
 
-        // Generate signed URL
         $signedUrl = $object->signedUrl($expiresAt);
 
         return $signedUrl;
@@ -59,32 +56,27 @@ class ImageUploadService
     {
         $image = ImageSave::find($imageId);
 
-        if (!$image) {
-            return response()->json(['message' => 'Image not found'], 404);
+        if (! $image) {
+            return response()->json(['message' => 'Image not found in database'], 404);
         }
 
-        // Extract file path from GCS URL
         $gsutilUri = $image->filePath;
-        $filePath = str_replace('gs://'.env('GOOGLE_CLOUD_STORAGE_BUCKET').'/', '', $gsutilUri);
+        $filePath  = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $gsutilUri);
 
-        // Initialize Google Cloud Storage
         $storage = new StorageClient([
-            'keyFile' => json_decode(file_get_contents(base_path(env('GOOGLE_CLOUD_KEY_FILE'))), true)
+            'keyFile' => json_decode(file_get_contents(base_path(env('GOOGLE_CLOUD_KEY_FILE'))), true),
         ]);
 
         $bucket = $storage->bucket(env('GOOGLE_CLOUD_STORAGE_BUCKET'));
         $object = $bucket->object($filePath);
 
-        // Check if the file exists before deleting
         if ($object->exists()) {
             $object->delete();
 
-            // Double-check if the file was successfully deleted
-            if (!$object->exists()) {
-                // Delete record from database
+            if (! $object->exists()) {
                 $image->delete();
 
-                return response()->json(['message' => 'Image deleted successfully from Cloud Storage!']);
+                return response()->json(['message' => 'Image deleted successfully from Cloud Storage and database!']);
             } else {
                 return response()->json(['message' => 'Failed to delete image from Cloud Storage'], 500);
             }

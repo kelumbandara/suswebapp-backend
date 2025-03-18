@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\ImageSave;
 use App\Services\ImageUploadService;
 use Illuminate\Http\Request;
 
@@ -42,17 +43,28 @@ class ImageUploadController extends Controller
             'public_url' => $publicUrl,
         ]);
     }
-
     public function deleteImage($imageId)
     {
-        $deleted = $this->imageUploadService->deleteImage($imageId);
+        // Find the image in the database
+        $image = ImageSave::find($imageId);
 
-        if (! $deleted) {
-            return response()->json(['message' => 'Image not found'], 404);
+        if (!$image) {
+            return response()->json(['message' => 'Image not found in database'], 404);
         }
 
-        return response()->json(['message' => 'Image deleted successfully!']);
+        // Delete the image from Google Cloud Storage
+        $deleted = $this->imageUploadService->deleteImage($imageId);
+
+        if (!$deleted) {
+            return response()->json(['message' => 'Failed to delete image from Cloud Storage'], 500);
+        }
+
+        // Now delete the record from the database
+        $image->delete();
+
+        return response()->json(['message' => 'Image deleted successfully from Cloud Storage and database!']);
     }
+
 
     public function updateImage(Request $request, $imageId)
     {
