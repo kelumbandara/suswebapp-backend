@@ -83,9 +83,9 @@ class AdminController extends Controller
         $request->validate([
             'userType'         => 'required|string',
             'department'       => 'nullable|string',
-            'assignedFactory'  => 'nullable|email',
+            'assignedFactory'  => 'nullable|array',
             'assigneeLevel'    => 'required|string',
-            'permissionObject' => 'required|array',
+            'responsibleSection' => 'required|array',
             'jobPosition'      => 'nullable|string',
             'availability'     => 'nullable|boolean',
         ]);
@@ -96,7 +96,7 @@ class AdminController extends Controller
         $user->department       = $request->input('department');
         $user->assignedFactory  = $request->input('assignedFactory');
         $user->assigneeLevel    = $request->input('assigneeLevel');
-        $user->permissionObject = $request->input('permissionObject');
+        $user->responsibleSection = $request->input('responsibleSection');
         $user->jobPosition      = $request->input('jobPosition');
         $user->availability     = $request->input('availability', $user->availability);
 
