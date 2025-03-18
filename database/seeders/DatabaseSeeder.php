@@ -35,7 +35,6 @@ class DatabaseSeeder extends Seeder
             'userType'         => 'Super Admin',
             'description'      => 'Administrator Role with full permissions',
             'permissionObject' => ([
-                'permissionObject' => [
                     "INSIGHT_VIEW"                                               => true,
                     "ADMIN_USERS_VIEW"                                           => true,
                     "ADMIN_USERS_EDIT"                                           => true,
@@ -155,7 +154,7 @@ class DatabaseSeeder extends Seeder
                     "GRIEVANCE_REGISTER_CREATE"                                  => true,
                     "GRIEVANCE_REGISTER_EDIT"                                    => true,
                     "GRIEVANCE_REGISTER_DELETE"                                  => true,
-                ],
+            
 
             ]),
         ]);
