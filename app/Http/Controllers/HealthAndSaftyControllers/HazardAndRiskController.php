@@ -149,7 +149,11 @@ class HazardAndRiskController extends Controller
         if (! $hazardRisk) {
             return response()->json([
                 'message' => 'Hazard and risk record not found.',
-            ]);
+            ], 404);
+        }
+
+        if ($hazardRisk->documents) {
+            app(HazardRiskService::class)->deleteImageFromGCS($hazardRisk->documents);
         }
 
         $this->hazardAndRiskInterface->deleteById($id);
@@ -158,6 +162,7 @@ class HazardAndRiskController extends Controller
             'message' => 'Hazard and risk record deleted successfully!',
         ], 200);
     }
+
     public function assignTask()
     {
         $user = Auth::user();

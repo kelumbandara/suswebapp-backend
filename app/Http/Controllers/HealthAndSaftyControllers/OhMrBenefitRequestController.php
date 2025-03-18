@@ -50,7 +50,7 @@ class OhMrBenefitRequestController extends Controller
                     if (! empty($doc->document['gsutil_uri'])) {
                         $filePath  = $doc->document['gsutil_uri'];
                         $signedUrl = $this->benefitDocumentService->getImageUrl($filePath);
-                        $fileName  = basename($filePath); // Extract filename from path
+                        $fileName  = basename($filePath); 
 
                         $doc->document = [
                             "gsutil_uri" => $filePath,

@@ -80,31 +80,39 @@ class AdminController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'userType'         => 'required|string',
-            'department'       => 'nullable|string',
-            'assignedFactory'  => 'nullable|array',
-            'assigneeLevel'    => 'required|string',
-            'responsibleSection' => 'required|array',
-            'jobPosition'      => 'nullable|string',
-            'availability'     => 'nullable|boolean',
-        ]);
-
         $user = $this->userInterface->findById($id);
 
-        $user->userType         = $request->input('userType');
-        $user->department       = $request->input('department');
-        $user->assignedFactory  = $request->input('assignedFactory');
-        $user->assigneeLevel    = $request->input('assigneeLevel');
-        $user->responsibleSection = $request->input('responsibleSection');
-        $user->jobPosition      = $request->input('jobPosition');
+        $rules = [
+            'availability' => 'nullable|boolean',
+        ];
+
+        // Apply these rules only when availability is 1
+        if ($request->input('availability', $user->availability) == 1) {
+            $rules = array_merge($rules, [
+                'userType'         => 'required|string',
+                'department'       => 'nullable|string',
+                'assignedFactory'  => 'nullable|array',
+                'assigneeLevel'    => 'required|string',
+                'responsibleSection' => 'required|array',
+                'jobPosition'      => 'nullable|string',
+            ]);
+        }
+
+        $request->validate($rules);
+
+        $user->userType         = $request->input('userType', $user->userType);
+        $user->department       = $request->input('department', $user->department);
+        $user->assignedFactory  = $request->input('assignedFactory', $user->assignedFactory);
+        $user->assigneeLevel    = $request->input('assigneeLevel', $user->assigneeLevel);
+        $user->responsibleSection = $request->input('responsibleSection', $user->responsibleSection);
+        $user->jobPosition      = $request->input('jobPosition', $user->jobPosition);
         $user->availability     = $request->input('availability', $user->availability);
 
         $user->save();
 
-    $userData = $user->toArray();
-    return response()->json($userData, 200);
-}
+        return response()->json($user->toArray(), 200);
+    }
+
 
     public function assigneeLevel()
     {
