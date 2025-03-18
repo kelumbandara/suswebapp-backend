@@ -243,7 +243,7 @@ class AiIncidentRecodeController extends Controller
 
         $targetLevel = $user->assigneeLevel + 1;
 
-        $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Incident')
+        $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Incident Section')
             ->where('availability', 1);
         return response()->json($assignees);
     }

@@ -160,7 +160,7 @@ class OsMiMedicineRequestController extends Controller
 
         $targetLevel = $user->assigneeLevel + 1;
 
-        $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Medicine Request')
+        $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Medicine Request Section')
             ->where('availability', 1);
 
         return response()->json($assignees);
