@@ -50,11 +50,11 @@ class OhMrBenefitRequestController extends Controller
                     if (! empty($doc->document['gsutil_uri'])) {
                         $filePath  = $doc->document['gsutil_uri'];
                         $signedUrl = $this->benefitDocumentService->getImageUrl($filePath);
-                        $fileName  = basename($filePath); 
+                        $fileName  = basename($filePath);
 
                         $doc->document = [
                             "gsutil_uri" => $filePath,
-                            "imageUrl" => $signedUrl,
+                            "imageUrl"   => $signedUrl,
                             "fileName"   => $fileName,
                         ];
                     }
@@ -169,12 +169,20 @@ class OhMrBenefitRequestController extends Controller
             return response()->json(['message' => 'Benefit request not found']);
         }
 
-        $this->benefitEntitlementInterface->deleteByBenefitId($id);
+        $documents = $this->benefitDocumentInterface->findByBenefitId($id);
+        if ($documents) {
+            foreach ($documents as $doc) {
+                if (! empty($doc->document['gsutil_uri'])) {
+                    $this->benefitDocumentService->deleteImageFromGCS($doc->document['gsutil_uri']);
+                }
+            }
+        }
 
-        $this->benefitDocumentInterface->deleteByBenefitId($id);
+        $this->benefitEntitlementInterface->deleteByBenefitId($id);
 
         $this->benefitRequestInterface->deleteById($id);
 
         return response()->json(['message' => 'Benefit request deleted successfully'], 200);
     }
+
 }

@@ -54,8 +54,8 @@ class AiAccidentRecordController extends Controller
 
             foreach ($evidence as &$item) {
                 if (isset($item['gsutil_uri'])) {
-                    $imageData         = $this->accidentService->getImageUrl($item['gsutil_uri']);
-                    $item['fileName']  = $imageData['fileName'];
+                    $imageData        = $this->accidentService->getImageUrl($item['gsutil_uri']);
+                    $item['fileName'] = $imageData['fileName'];
                     $item['imageUrl'] = $imageData['signedUrl'];
                 }
             }
@@ -202,18 +202,30 @@ class AiAccidentRecordController extends Controller
     {
         $record = $this->accidentRecordInterface->findById($id);
 
-        if (! $record) {
-            return response()->json(['message' => 'Accident record not found']);
+        if (!$record) {
+            return response()->json(['message' => 'Accident record not found'], 404);
         }
 
         $this->accidentWitnessInterface->deleteByAccidentId($id);
-
         $this->accidentPeopleInterface->deleteByAccidentId($id);
+
+        if ($record->evidence) {
+            $evidence = json_decode($record->evidence, true);
+
+            if (is_array($evidence)) {
+                foreach ($evidence as $item) {
+                    if (isset($item['gsutil_uri'])) {
+                        $this->accidentService->deleteImageFromGCS($item['gsutil_uri']);
+                    }
+                }
+            }
+        }
 
         $this->accidentRecordInterface->deleteById($id);
 
         return response()->json(['message' => 'Accident record deleted successfully'], 200);
     }
+
 
     public function assignTask()
     {
@@ -248,8 +260,8 @@ class AiAccidentRecordController extends Controller
 
             foreach ($evidence as &$item) {
                 if (isset($item['gsutil_uri'])) {
-                    $imageData         = $this->accidentService->getImageUrl($item['gsutil_uri']);
-                    $item['fileName']  = $imageData['fileName'];
+                    $imageData        = $this->accidentService->getImageUrl($item['gsutil_uri']);
+                    $item['fileName'] = $imageData['fileName'];
                     $item['imageUrl'] = $imageData['signedUrl'];
                 }
             }
@@ -270,7 +282,7 @@ class AiAccidentRecordController extends Controller
 
         $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Accident Section')
             ->where('availability', 1);
-        return response()->json( $assignees);
+        return response()->json($assignees);
     }
 
 }
