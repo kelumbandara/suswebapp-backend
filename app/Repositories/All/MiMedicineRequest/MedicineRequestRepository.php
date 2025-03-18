@@ -20,9 +20,9 @@ class MedicineRequestRepository extends BaseRepository implements MedicineReques
     {
         $this->model = $model;
     }
-    public function getByAssigneeId($assigneeId)
+    public function getByAssigneeId($approverId)
     {
-        return $this->model->where('assigneeId', $assigneeId)->get();
+        return $this->model->where('approverId', $approverId)->get();
     }
 
 }
