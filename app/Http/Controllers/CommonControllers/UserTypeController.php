@@ -17,11 +17,7 @@ class UserTypeController extends Controller
     public function index()
     {
         $userType = $this->userTypeInterface->All();
-        if ($userType->isEmpty()) {
-            return response()->json([
-                'message' => 'No jobPositions found.',
-            ]);
-        }
+       
         return response()->json($userType);
     }
 

@@ -20,11 +20,7 @@ class PersonTypeController extends Controller
     {
         $personType = $this->personTypeInterface->all();
 
-        if ($personType->isEmpty()) {
-            return response()->json([
-                'message' => 'No person type found.',
-            ]);
-        }
+        
 
         return response()->json($personType);
     }
