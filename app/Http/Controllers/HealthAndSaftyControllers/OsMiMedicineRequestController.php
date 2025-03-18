@@ -163,9 +163,7 @@ class OsMiMedicineRequestController extends Controller
         $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Medicine Request')
             ->where('availability', 1);
 
-        return response()->json([
-            'approvers' => $assignees,
-        ]);
+        return response()->json($assignees);
     }
 
 }

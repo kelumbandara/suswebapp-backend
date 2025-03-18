@@ -254,9 +254,7 @@ class AiAccidentRecordController extends Controller
 
         $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Accident')
             ->where('availability', 1);
-        return response()->json([
-            'assignees' => $assignees,
-        ]);
+        return response()->json( $assignees);
     }
 
 }
