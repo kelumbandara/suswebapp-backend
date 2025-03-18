@@ -17,11 +17,7 @@ class DepartmentController extends Controller
     public function index()
     {
         $department = $this->departmentInterface->All();
-        if ($department->isEmpty()) {
-            return response()->json([
-                'message' => 'No jobPositions found.',
-            ]);
-        }
+       
         return response()->json($department);
     }
 

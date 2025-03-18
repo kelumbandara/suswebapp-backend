@@ -17,11 +17,7 @@ class ResponsibleSectionController extends Controller
     public function index()
     {
         $responsibleSection = $this->comResponsibleSectionInterface->All();
-        if ($responsibleSection->isEmpty()) {
-            return response()->json([
-                'message' => 'No Responsible Section found.',
-            ]);
-        }
+       
         return response()->json($responsibleSection);
     }
 

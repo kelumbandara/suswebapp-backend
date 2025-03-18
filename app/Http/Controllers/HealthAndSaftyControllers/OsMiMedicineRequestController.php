@@ -110,10 +110,10 @@ class OsMiMedicineRequestController extends Controller
 
         $medicine = $medicine->map(function ($risk) {
             try {
-                $assignee       = $this->userInterface->getById($risk->assigneeId);
-                $risk->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
+                $approver       = $this->userInterface->getById($risk->approverId);
+                $risk->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
-                $risk->assignee = ['name' => 'Unknown', 'id' => null];
+                $risk->approver = ['name' => 'Unknown', 'id' => null];
             }
 
             try {
@@ -163,9 +163,7 @@ class OsMiMedicineRequestController extends Controller
         $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Medicine Request')
             ->where('availability', 1);
 
-        return response()->json([
-            'approvers' => $assignees,
-        ]);
+        return response()->json($assignees);
     }
 
 }

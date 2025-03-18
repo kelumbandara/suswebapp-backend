@@ -17,11 +17,7 @@ class JobPositionController extends Controller
     public function index()
     {
         $jobPositions = $this->jobPositionInterface->All();
-        if ($jobPositions->isEmpty()) {
-            return response()->json([
-                'message' => 'No jobPositions found.',
-            ]);
-        }
+        
         return response()->json($jobPositions);
     }
 
