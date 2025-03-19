@@ -215,14 +215,15 @@ class HazardAndRiskController extends Controller
     public function assignee()
     {
         $user = Auth::user();
-
         $targetLevel = $user->assigneeLevel + 1;
 
         $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Hazard And Risk Section')
-            ->where('availability');
+            ->where('availability', 1) // Ensure it filters available users
+            ->values(); // Reset keys if it's a Collection
 
-        return response()->json($assignees );
+        return response()->json($assignees);
     }
+
 
     public function dashboardStats()
     {
