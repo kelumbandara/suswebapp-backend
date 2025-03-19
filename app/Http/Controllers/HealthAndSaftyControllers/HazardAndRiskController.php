@@ -218,8 +218,8 @@ class HazardAndRiskController extends Controller
         $targetLevel = $user->assigneeLevel + 1;
 
         $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Hazard And Risk Section')
-            ->where('availability', 1) // Ensure it filters available users
-            ->values(); // Reset keys if it's a Collection
+            ->where('availability', 1) 
+            ->values();
 
         return response()->json($assignees);
     }

@@ -194,7 +194,7 @@ class AiIncidentRecodeController extends Controller
         $record = $this->incidentRecordInterface->findById($id);
 
         if (! $record) {
-            return response()->json(['message' => 'Incident record not found'], 404); 
+            return response()->json(['message' => 'Incident record not found'], 404);
         }
 
         $this->incidentWitnessInterface->deleteByIncidentId($id);
@@ -268,8 +268,11 @@ class AiIncidentRecodeController extends Controller
         $targetLevel = $user->assigneeLevel + 1;
 
         $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Incident Section')
-            ->where('availability', 1);
+            ->where('availability', 1)
+            ->values();
+
         return response()->json($assignees);
     }
+
 
 }
