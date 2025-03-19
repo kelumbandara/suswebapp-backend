@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             'email'         => 'admin@suswebapp.com',
             'password'      => Hash::make('Admin@1234'),
             'userType'      => '1',
-            'assigneeLevel' => '0',
+            'assigneeLevel' => '1',
         ]);
 
         User::factory()->create([
@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
             'email'         => 'supperadmin@suswebapp.com',
             'password'      => Hash::make('Supperadmin@1234'),
             'userType'      => '1',
-            'assigneeLevel' => '0',
+            'assigneeLevel' => '1',
 
         ]);
 
