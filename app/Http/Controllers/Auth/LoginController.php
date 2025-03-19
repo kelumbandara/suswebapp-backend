@@ -21,7 +21,9 @@ class LoginController extends Controller
             return response()->json(['message' => 'User is not available'], 403);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken('auth_token', ['*'])
+                      ->expiresAt(now()->addMinutes(1))
+                      ->plainTextToken;
 
         return response()->json([
             'message' => 'Login successful',
