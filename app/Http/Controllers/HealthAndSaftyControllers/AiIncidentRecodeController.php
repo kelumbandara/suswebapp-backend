@@ -55,8 +55,8 @@ class AiIncidentRecodeController extends Controller
 
             foreach ($evidence as &$item) {
                 if (isset($item['gsutil_uri'])) {
-                    $imageData         = $this->incidentService->getImageUrl($item['gsutil_uri']);
-                    $item['fileName']  = $imageData['fileName'];
+                    $imageData        = $this->incidentService->getImageUrl($item['gsutil_uri']);
+                    $item['fileName'] = $imageData['fileName'];
                     $item['imageUrl'] = $imageData['signedUrl'];
                 }
             }
@@ -194,12 +194,20 @@ class AiIncidentRecodeController extends Controller
         $record = $this->incidentRecordInterface->findById($id);
 
         if (! $record) {
-            return response()->json(['message' => 'Incident record not found']);
+            return response()->json(['message' => 'Incident record not found'], 404);
         }
 
         $this->incidentWitnessInterface->deleteByIncidentId($id);
-
         $this->incidentPeopleInterface->deleteByIncidentId($id);
+
+        if (! empty($record->evidence)) {
+            $evidence = json_decode($record->evidence, true);
+            foreach ($evidence as $item) {
+                if (isset($item['gsutil_uri'])) {
+                    $this->incidentService->deleteImageFromGCS($item['gsutil_uri']);
+                }
+            }
+        }
 
         $this->incidentRecordInterface->deleteById($id);
 
@@ -239,14 +247,13 @@ class AiIncidentRecodeController extends Controller
 
             foreach ($evidence as &$item) {
                 if (isset($item['gsutil_uri'])) {
-                    $imageData         = $this->incidentService->getImageUrl($item['gsutil_uri']);
-                    $item['fileName']  = $imageData['fileName'];
+                    $imageData        = $this->incidentService->getImageUrl($item['gsutil_uri']);
+                    $item['fileName'] = $imageData['fileName'];
                     $item['imageUrl'] = $imageData['signedUrl'];
                 }
             }
 
             $incident->evidence = $evidence;
-
 
             return $incident;
         });
@@ -261,8 +268,11 @@ class AiIncidentRecodeController extends Controller
         $targetLevel = $user->assigneeLevel + 1;
 
         $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Incident Section')
-            ->where('availability', 1);
+            ->where('availability', 1)
+            ->values();
+
         return response()->json($assignees);
     }
+
 
 }

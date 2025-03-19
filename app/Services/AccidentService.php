@@ -42,4 +42,15 @@ class AccidentService
         ];
     }
 
+    public function deleteImageFromGCS($gsutilUri)
+    {
+        if (!$gsutilUri) {
+            return false;
+        }
+
+        $filePath = str_replace('gs://'.env('GOOGLE_CLOUD_STORAGE_BUCKET').'/', '', $gsutilUri);
+
+        return Storage::disk('gcs')->delete($filePath);
+    }
+
 }

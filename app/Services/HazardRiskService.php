@@ -11,7 +11,7 @@ class HazardRiskService
 {
     public function uploadImageToGCS($file)
     {
-        $fileName = 'uploads/HazardRisk/' . uniqid() . '_' . $file->getClientOriginalName();
+        $fileName = 'uploads/HazardRisk/Abc' . uniqid() . '_' . $file->getClientOriginalName();
 
         Storage::disk('gcs')->put($fileName, file_get_contents($file));
 
@@ -46,4 +46,16 @@ class HazardRiskService
             'fileName'  => $fileName,
         ];
     }
+
+    public function deleteImageFromGCS($gsutilUri)
+{
+    if (!$gsutilUri) {
+        return false;
+    }
+
+    $filePath = str_replace('gs://'.env('GOOGLE_CLOUD_STORAGE_BUCKET').'/', '', $gsutilUri);
+
+    return Storage::disk('gcs')->delete($filePath);
+}
+
 }
