@@ -11,7 +11,7 @@ class HazardRiskService
 {
     public function uploadImageToGCS($file)
     {
-        $fileName = 'uploads/HazardRisk/' . uniqid() . '_' . $file->getClientOriginalName();
+        $fileName = 'uploads/HazardRisk/Abc' . uniqid() . '_' . $file->getClientOriginalName();
 
         Storage::disk('gcs')->put($fileName, file_get_contents($file));
 

@@ -146,10 +146,10 @@ class HazardAndRiskController extends Controller
     {
         $hazardRisk = $this->hazardAndRiskInterface->findById($id);
 
-       
-
-        if ($hazardRisk->documents) {
-            $this->hazardAndRiskService->deleteImageFromGCS($hazardRisk->documents);
+        if (!empty($hazardRisk->documents)) {
+            foreach ($hazardRisk->documents as $document) {
+                $this->hazardAndRiskService->deleteImageFromGCS($document);
+            }
         }
 
         $deleted = $this->hazardAndRiskInterface->deleteById($id);
@@ -158,11 +158,13 @@ class HazardAndRiskController extends Controller
             return response()->json([
                 'message' => 'Hazard and risk record deleted successfully!',
             ], 200);
-            return response()->json([
-                'message' => 'Failed to delete the hazard and risk record.',
-            ], 500);
         }
+
+        return response()->json([
+            'message' => 'Failed to delete the hazard and risk record.',
+        ], 500);
     }
+
 
 
     public function assignTask()
@@ -217,9 +219,9 @@ class HazardAndRiskController extends Controller
         $targetLevel = $user->assigneeLevel + 1;
 
         $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Hazard And Risk Section')
-            ->where('availability', 1);
+            ->where('availability');
 
-        return response()->json($assignees, );
+        return response()->json($assignees );
     }
 
     public function dashboardStats()
