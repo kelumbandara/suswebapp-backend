@@ -48,14 +48,14 @@ class ImageUploadController extends Controller
         // Find the image in the database
         $image = ImageSave::find($imageId);
 
-        if (!$image) {
+        if (! $image) {
             return response()->json(['message' => 'Image not found in database'], 404);
         }
 
         // Delete the image from Google Cloud Storage
         $deleted = $this->imageUploadService->deleteImage($imageId);
 
-        if (!$deleted) {
+        if (! $deleted) {
             return response()->json(['message' => 'Failed to delete image from Cloud Storage'], 500);
         }
 
@@ -64,7 +64,6 @@ class ImageUploadController extends Controller
 
         return response()->json(['message' => 'Image deleted successfully from Cloud Storage and database!']);
     }
-
 
     public function updateImage(Request $request, $imageId)
     {

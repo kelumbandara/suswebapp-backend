@@ -120,12 +120,31 @@ class HazardAndRiskController extends Controller
         if ($request->hasFile('documents')) {
             $uploadedFiles = [];
 
-            foreach ($request->file('documents') as $file) {
-                $uploadedFiles[] = $this->hazardAndRiskService->uploadImageToGCS($file);
+            if (! empty($hazardRisk->documents)) {
+                $documents = json_decode($hazardRisk->documents, true);
+
+                if (is_array($documents)) {
+                    foreach ($documents as $document) {
+                        if (isset($document['gsutil_uri'])) {
+                            $this->hazardAndRiskService->deleteImageFromGCS($document['gsutil_uri']);
+                        }
+                    }
+                }
             }
 
-            $validatedData['documents'] = $uploadedFiles;
+            foreach ($request->file('documents') as $file) {
+                $uploadResult = $this->hazardAndRiskService->uploadImageToGCS($file);
+
+                if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
+                    $uploadedFiles[] = [
+                        'gsutil_uri' => $uploadResult['gsutil_uri'],
+                    ];
+                }
+            }
+
+            $validatedData['documents'] = json_encode($uploadedFiles);
         }
+
         $updated = $this->hazardAndRiskInterface->update($id, $validatedData);
 
         if ($updated) {
@@ -144,28 +163,28 @@ class HazardAndRiskController extends Controller
 
     public function destroy($id)
     {
-        $hazardRisk = $this->hazardAndRiskInterface->findById($id);
+        $hazardRisk = $this->hazardAndRiskInterface->findById((int) $id);
 
-        if (!empty($hazardRisk->documents)) {
-            foreach ($hazardRisk->documents as $document) {
-                $this->hazardAndRiskService->deleteImageFromGCS($document);
+        if (! empty($hazardRisk->documents)) {
+            if (is_string($hazardRisk->documents)) {
+                $documents = json_decode($hazardRisk->documents, true);
+            } else {
+                $documents = $hazardRisk->documents;
+            }
+
+            if (is_array($documents)) {
+                foreach ($documents as $document) {
+                    $this->hazardAndRiskService->deleteImageFromGCS($document);
+                }
             }
         }
 
         $deleted = $this->hazardAndRiskInterface->deleteById($id);
 
-        if ($deleted) {
-            return response()->json([
-                'message' => 'Hazard and risk record deleted successfully!',
-            ], 200);
-        }
-
         return response()->json([
-            'message' => 'Failed to delete the hazard and risk record.',
-        ], 500);
+            'message' => $deleted ? 'Record deleted successfully!' : 'Failed to delete record.',
+        ], $deleted ? 200 : 500);
     }
-
-
 
     public function assignTask()
     {
@@ -214,16 +233,15 @@ class HazardAndRiskController extends Controller
 
     public function assignee()
     {
-        $user = Auth::user();
+        $user        = Auth::user();
         $targetLevel = $user->assigneeLevel + 1;
 
         $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Hazard And Risk Section')
-            ->where('availability', 1) 
+            ->where('availability', 1)
             ->values();
 
         return response()->json($assignees);
     }
-
 
     public function dashboardStats()
     {

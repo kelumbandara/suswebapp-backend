@@ -107,7 +107,7 @@ class ImageUploadService
             $oldObject->delete();
         }
 
-        $newFileName = 'uploads/' . uniqid() . '_' . $newFile->getClientOriginalName();
+        $newFileName = 'uploads/uploads/' . uniqid() . '_' . $newFile->getClientOriginalName();
         Storage::disk('gcs')->put($newFileName, file_get_contents($newFile));
 
         $newGsutilUri = "gs://" . env('GOOGLE_CLOUD_STORAGE_BUCKET') . "/{$newFileName}";
