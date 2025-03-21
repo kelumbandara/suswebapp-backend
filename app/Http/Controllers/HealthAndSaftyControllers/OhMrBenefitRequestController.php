@@ -93,7 +93,7 @@ class OhMrBenefitRequestController extends Controller
             foreach ($data['medicalDocuments'] as $index => &$documents) {
                 $documents['benefitId'] = $record->id;
 
-                if ($request->hasFile("medicalDocuments.{$index}.document")) {
+                if ($request->hasFile("medicalDocuments.{$index}.document") && $request->file("medicalDocuments.{$index}.document")->isValid()) {
                     $documents['document'] = $this->benefitDocumentService->uploadImageToGCS(
                         $request->file("medicalDocuments.{$index}.document")
                     );
@@ -116,13 +116,11 @@ class OhMrBenefitRequestController extends Controller
         $data   = $request->validated();
         $record = $this->benefitRequestInterface->findById($id);
 
-        if (! $record || ! is_object($record)) {
-            return response()->json(['message' => 'Benefit request not found']);
+        if (! $record) {
+            return response()->json(['message' => 'Benefit request not found'], 404);
         }
 
-        $updateSuccess = $record->update($data);
-
-        if (! $updateSuccess) {
+        if (! $record->update($data)) {
             return response()->json(['message' => 'Failed to update benefit request'], 500);
         }
 
@@ -130,35 +128,43 @@ class OhMrBenefitRequestController extends Controller
         $this->benefitDocumentInterface->deleteByBenefitId($id);
 
         if (! empty($data['benefitsAndEntitlements'])) {
-            foreach ($data['benefitsAndEntitlements'] as $entitlements) {
-                $entitlements['benefitId'] = $id;
-                $this->benefitEntitlementInterface->create($entitlements);
+            foreach ($data['benefitsAndEntitlements'] as $entitlement) {
+                $entitlement['benefitId'] = $id;
+                $this->benefitEntitlementInterface->create($entitlement);
             }
         }
 
         if (! empty($data['medicalDocuments'])) {
-            foreach ($data['medicalDocuments'] as $index => &$documents) {
-                $documents['benefitId'] = $id;
-                if ($request->hasFile("medicalDocuments.{$index}.document")) {
-                    $documents['document'] = $this->benefitDocumentService->uploadImageToGCS(
-                        $request->file("medicalDocuments.{$index}.document")
-                    );
-                } else {
-                    $documents['document'] = null;
+            foreach ($data['medicalDocuments'] as $index => &$document) {
+                $document['benefitId'] = $id;
+
+                if (! empty($document['removeDoc']) && is_array($document['removeDoc'])) {
+                    foreach ($document['removeDoc'] as $removeDoc) {
+                        if (! empty($removeDoc)) {
+                            $this->benefitDocumentService->removeOldDocumentFromStorage($removeDoc);
+                        }
                 }
 
-                $this->benefitDocumentInterface->create($documents);
+                if ($request->hasFile("medicalDocuments.{$index}.document") && $request->file("medicalDocuments.{$index}.document")->isValid()) {
+                    $uploadedDocument = $this->benefitDocumentService->uploadImageToGCS($request->file("medicalDocuments.{$index}.document"));
+                    $document['document'] = $uploadedDocument['gsutil_uri'];
+                } else {
+                    $document['document'] = null; 
+                }
+
+                $this->benefitDocumentInterface->create($document);
             }
         }
 
-        $updatedRecord               = $this->benefitRequestInterface->findById($id);
+        $updatedRecord = $this->benefitRequestInterface->findById($id);
         $updatedRecord->entitlements = $this->benefitEntitlementInterface->findByBenefitId($id);
-        $updatedRecord->documents    = $this->benefitDocumentInterface->findByBenefitId($id);
+        $updatedRecord->documents = $this->benefitDocumentInterface->findByBenefitId($id);
 
         return response()->json([
             'message' => 'Benefit request updated successfully',
-            'record'  => $updatedRecord,
+            'record' => $updatedRecord,
         ], 200);
+    }
     }
 
     public function destroy(string $id)

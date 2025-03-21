@@ -3,7 +3,9 @@ namespace App\Http\Controllers;
 
 use App\Models\ImageSave;
 use App\Services\ImageUploadService;
+use Google\Cloud\Storage\StorageClient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ImageUploadController extends Controller
 {
@@ -67,23 +69,30 @@ class ImageUploadController extends Controller
 
     public function updateImage(Request $request, $imageId)
     {
+        // Validate the incoming request to ensure the 'image' field is a valid image
         $request->validate([
-            'image' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'image' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:2048',  // 2MB max
+            'removeDoc' => 'required|string',  // The old image URL to remove
         ]);
 
-        $newFile = $request->file('image');
+        // Retrieve the 'removeDoc' URL (old image URL) and 'image' (new file)
+        $removeDoc = $request->input('removeDoc');  // The old image URL (gs://...)
+        $newFile = $request->file('image');  // The new image file uploaded
 
-        $result = $this->imageUploadService->updateImage($imageId, $newFile);
+        // Call the ImageUploadService to handle the image update logic
+        $result = $this->imageUploadService->updateImage($imageId, $removeDoc, $newFile);
 
-        if (! $result) {
+        if (!$result) {
             return response()->json(['message' => 'Image not found'], 404);
         }
 
+        // Return a success response with the details
         return response()->json([
             'message'    => $result['message'],
             'gsutil_uri' => $result['gsutil_uri'],
             'image_id'   => $result['image_id'],
         ]);
     }
+
 
 }

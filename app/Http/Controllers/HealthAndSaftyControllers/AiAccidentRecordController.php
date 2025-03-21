@@ -83,7 +83,6 @@ class AiAccidentRecordController extends Controller
         $data                  = $request->validated();
         $data['createdByUser'] = $user->id;
 
-        // First, create the accident record
         $record = $this->accidentRecordInterface->create($data);
 
         if (! $record) {
@@ -109,7 +108,7 @@ class AiAccidentRecordController extends Controller
             $mergedEvidence = array_merge($existingEvidence, $uploadedFiles);
 
             $this->accidentRecordInterface->update($record->id, [
-                'evidence' => json_encode($mergedEvidence), // Store as a JSON array
+                'evidence' => json_encode($mergedEvidence),
             ]);
         }
 
@@ -150,15 +149,34 @@ class AiAccidentRecordController extends Controller
         if (! $record || ! is_object($record)) {
             return response()->json(['message' => 'Accident record not found']);
         }
-        if ($request->hasFile('evidence')) {
-            $uploadedFiles = [];
 
-            foreach ($request->file('evidence') as $file) {
-                $uploadedFiles[] = $this->accidentService->uploadImageToGCS($file);
+        if ($request->has('evidence') && $request->has('removeDoc')) {
+            $removeDocs = $request->input('removeDoc');
+            $newFiles   = $request->file('evidence');
+
+            if (is_array($removeDocs)) {
+                foreach ($removeDocs as $removeDoc) {
+                    $this->accidentService->removeOldDocumentFromStorage($removeDoc);
+                }
             }
 
-            $validatedData['evidence'] = $uploadedFiles;
+            $result = [];
+            foreach ($newFiles as $newFile) {
+                $uploadResult = $this->accidentService->updateDocuments($record, $newFile, null);
+
+                $result[] = [
+                    'gsutil_uri' => $uploadResult['gsutil_uri'],
+                ];
+            }
+
+            if (empty($result)) {
+                return response()->json(['message' => 'Failed to update the documents.'], 500);
+            }
+
+            $validatedData['evidence'] = json_encode($result);
         }
+
+
 
         $updateSuccess = $this->accidentRecordInterface->update($id, $data);
 

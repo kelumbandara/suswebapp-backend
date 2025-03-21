@@ -10,7 +10,7 @@ class ImageUploadService
 {
     public function uploadImageToGCS($file)
     {
-        $fileName = 'uploads/uploads/' . uniqid() . '_' . $file->getClientOriginalName();
+        $fileName = 'uploads/image/' . uniqid() . '_' . $file->getClientOriginalName();
 
         Storage::disk('gcs')->put($fileName, file_get_contents($file));
 
@@ -85,33 +85,36 @@ class ImageUploadService
         }
     }
 
-    public function updateImage($imageId, $newFile)
+    public function updateImage($imageId, $removeDoc, $newFile)
     {
         $image = ImageSave::find($imageId);
 
-        if (! $image) {
-            return false;
+        if (!$image) {
+            return false;  // Image not found
         }
 
-        $oldGsutilUri = $image->filePath;
-        $oldFilePath  = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $oldGsutilUri);
+        // Remove the old image (removeDoc) from cloud storage and database
+        $oldFilePath = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $removeDoc);
 
         $storage = new StorageClient([
             'keyFile' => json_decode(file_get_contents(base_path(env('GOOGLE_CLOUD_KEY_FILE'))), true),
         ]);
 
-        $bucket    = $storage->bucket(env('GOOGLE_CLOUD_STORAGE_BUCKET'));
+        $bucket = $storage->bucket(env('GOOGLE_CLOUD_STORAGE_BUCKET'));
         $oldObject = $bucket->object($oldFilePath);
 
+        // Delete the old image from cloud storage
         if ($oldObject->exists()) {
             $oldObject->delete();
         }
 
-        $newFileName = 'uploads/uploads/' . uniqid() . '_' . $newFile->getClientOriginalName();
+        // Now upload the new image (newDoc)
+        $newFileName = 'uploads/image/' . uniqid() . '_' . $newFile->getClientOriginalName();
         Storage::disk('gcs')->put($newFileName, file_get_contents($newFile));
 
         $newGsutilUri = "gs://" . env('GOOGLE_CLOUD_STORAGE_BUCKET') . "/{$newFileName}";
 
+        // Update the image details in the database
         $image->update([
             'fileName' => $newFileName,
             'filePath' => $newGsutilUri,
@@ -123,5 +126,6 @@ class ImageUploadService
             'image_id'   => $image->id,
         ];
     }
+
 
 }

@@ -110,54 +110,46 @@ class HazardAndRiskController extends Controller
         $hazardRisk = $this->hazardAndRiskInterface->findById($id);
 
         if (! $hazardRisk) {
-            return response()->json([
-                'message' => 'Hazard and risk record not found.',
-            ]);
+            return response()->json(['message' => 'Hazard and risk record not found.'], 404);
         }
 
         $validatedData = $request->validated();
 
-        if ($request->hasFile('documents')) {
-            $uploadedFiles = [];
+        if ($request->has('documents') && $request->has('removeDoc')) {
+            $removeDocs = $request->input('removeDoc');
+            $newFiles   = $request->file('documents');
 
-            if (! empty($hazardRisk->documents)) {
-                $documents = json_decode($hazardRisk->documents, true);
-
-                if (is_array($documents)) {
-                    foreach ($documents as $document) {
-                        if (isset($document['gsutil_uri'])) {
-                            $this->hazardAndRiskService->deleteImageFromGCS($document['gsutil_uri']);
-                        }
-                    }
+            if (is_array($removeDocs)) {
+                foreach ($removeDocs as $removeDoc) {
+                    $this->hazardAndRiskService->removeOldDocumentFromStorage($removeDoc);
                 }
             }
 
-            foreach ($request->file('documents') as $file) {
-                $uploadResult = $this->hazardAndRiskService->uploadImageToGCS($file);
+            $result = [];
+            foreach ($newFiles as $newFile) {
+                $uploadResult = $this->hazardAndRiskService->updateDocuments($hazardRisk, $newFile, null);
 
-                if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
-                    $uploadedFiles[] = [
-                        'gsutil_uri' => $uploadResult['gsutil_uri'],
-                    ];
-                }
+                $result[] = [
+                    'gsutil_uri' => $uploadResult['gsutil_uri'],
+                ];
             }
 
-            $validatedData['documents'] = json_encode($uploadedFiles);
+            if (empty($result)) {
+                return response()->json(['message' => 'Failed to update the documents.'], 500);
+            }
+
+            $validatedData['documents'] = json_encode($result);
         }
-
+ 
         $updated = $this->hazardAndRiskInterface->update($id, $validatedData);
 
         if ($updated) {
-            $hazardRisk = $this->hazardAndRiskInterface->findById($id);
-
             return response()->json([
                 'message'    => 'Hazard and risk record updated successfully!',
                 'hazardRisk' => $hazardRisk,
             ], 200);
         } else {
-            return response()->json([
-                'message' => 'Failed to update the hazard and risk record.',
-            ], 500);
+            return response()->json(['message' => 'Failed to update the hazard and risk record.'], 500);
         }
     }
 
