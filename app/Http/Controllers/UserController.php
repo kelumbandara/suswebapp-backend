@@ -21,8 +21,12 @@ class UserController extends Controller
     public function show(Request $request)
     {
         $user = $request->user();
-        $userType = $user->userType;
 
+        if (!$user || $user->availability != 1) {
+            return response()->json(['message' => 'User not available'], 403);
+        }
+
+        $userType = $user->userType;
         $permission = $this->comPermissionInterface->getById($userType);
         $userData = $user->toArray();
 
@@ -32,6 +36,7 @@ class UserController extends Controller
 
         return response()->json($userData, 200);
     }
+
 
 
 

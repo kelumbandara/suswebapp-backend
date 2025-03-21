@@ -110,62 +110,73 @@ class HazardAndRiskController extends Controller
         $hazardRisk = $this->hazardAndRiskInterface->findById($id);
 
         if (! $hazardRisk) {
-            return response()->json([
-                'message' => 'Hazard and risk record not found.',
-            ]);
+            return response()->json(['message' => 'Hazard and risk record not found.'], 404);
         }
 
         $validatedData = $request->validated();
 
-        if ($request->hasFile('documents')) {
-            $uploadedFiles = [];
+        if ($request->has('documents') && $request->has('removeDoc')) {
+            $removeDocs = $request->input('removeDoc');
+            $newFiles   = $request->file('documents');
 
-            foreach ($request->file('documents') as $file) {
-                $uploadedFiles[] = $this->hazardAndRiskService->uploadImageToGCS($file);
+            if (is_array($removeDocs)) {
+                foreach ($removeDocs as $removeDoc) {
+                    $this->hazardAndRiskService->removeOldDocumentFromStorage($removeDoc);
+                }
             }
 
-            $validatedData['documents'] = $uploadedFiles;
+            $result = [];
+            foreach ($newFiles as $newFile) {
+                $uploadResult = $this->hazardAndRiskService->updateDocuments($hazardRisk, $newFile, null);
+
+                $result[] = [
+                    'gsutil_uri' => $uploadResult['gsutil_uri'],
+                ];
+            }
+
+            if (empty($result)) {
+                return response()->json(['message' => 'Failed to update the documents.'], 500);
+            }
+
+            $validatedData['documents'] = json_encode($result);
         }
+ 
         $updated = $this->hazardAndRiskInterface->update($id, $validatedData);
 
         if ($updated) {
-            $hazardRisk = $this->hazardAndRiskInterface->findById($id);
-
             return response()->json([
                 'message'    => 'Hazard and risk record updated successfully!',
                 'hazardRisk' => $hazardRisk,
             ], 200);
         } else {
-            return response()->json([
-                'message' => 'Failed to update the hazard and risk record.',
-            ], 500);
+            return response()->json(['message' => 'Failed to update the hazard and risk record.'], 500);
         }
     }
 
     public function destroy($id)
     {
-        $hazardRisk = $this->hazardAndRiskInterface->findById($id);
+        $hazardRisk = $this->hazardAndRiskInterface->findById((int) $id);
 
-        if (!empty($hazardRisk->documents)) {
-            foreach ($hazardRisk->documents as $document) {
-                $this->hazardAndRiskService->deleteImageFromGCS($document);
+        if (! empty($hazardRisk->documents)) {
+            if (is_string($hazardRisk->documents)) {
+                $documents = json_decode($hazardRisk->documents, true);
+            } else {
+                $documents = $hazardRisk->documents;
+            }
+
+            if (is_array($documents)) {
+                foreach ($documents as $document) {
+                    $this->hazardAndRiskService->deleteImageFromGCS($document);
+                }
             }
         }
 
         $deleted = $this->hazardAndRiskInterface->deleteById($id);
 
-        if ($deleted) {
-            return response()->json([
-                'message' => 'Hazard and risk record deleted successfully!',
-            ], 200);
-        }
-
         return response()->json([
-            'message' => 'Failed to delete the hazard and risk record.',
-        ], 500);
+            'message' => $deleted ? 'Record deleted successfully!' : 'Failed to delete record.',
+        ], $deleted ? 200 : 500);
     }
-
-
 
     public function assignTask()
     {
@@ -214,16 +225,15 @@ class HazardAndRiskController extends Controller
 
     public function assignee()
     {
-        $user = Auth::user();
+        $user        = Auth::user();
         $targetLevel = $user->assigneeLevel + 1;
 
         $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Hazard And Risk Section')
-            ->where('availability', 1) 
+            ->where('availability', 1)
             ->values();
 
         return response()->json($assignees);
     }
-
 
     public function dashboardStats()
     {

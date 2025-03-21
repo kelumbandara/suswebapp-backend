@@ -143,14 +143,30 @@ class AiIncidentRecodeController extends Controller
         if (! $record || ! is_object($record)) {
             return response()->json(['message' => 'Incident record not found']);
         }
-        if ($request->hasFile('evidence')) {
-            $uploadedFiles = [];
+        if ($request->has('evidence') && $request->has('removeDoc')) {
+            $removeDocs = $request->input('removeDoc');
+            $newFiles   = $request->file('evidence');
 
-            foreach ($request->file('evidence') as $file) {
-                $uploadedFiles[] = $this->incidentService->uploadImageToGCS($file);
+            if (is_array($removeDocs)) {
+                foreach ($removeDocs as $removeDoc) {
+                    $this->incidentService->removeOldDocumentFromStorage($removeDoc);
+                }
             }
 
-            $validatedData['evidence'] = $uploadedFiles;
+            $result = [];
+            foreach ($newFiles as $newFile) {
+                $uploadResult = $this->incidentService->updateDocuments($record, $newFile, null);
+
+                $result[] = [
+                    'gsutil_uri' => $uploadResult['gsutil_uri'],
+                ];
+            }
+
+            if (empty($result)) {
+                return response()->json(['message' => 'Failed to update the documents.'], 500);
+            }
+
+            $validatedData['evidence'] = json_encode($result);
         }
 
         $updateSuccess = $record->update($data);
