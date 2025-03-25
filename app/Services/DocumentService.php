@@ -43,4 +43,48 @@ class DocumentService
             'signedUrl' => $signedUrl,
         ];
         }
+
+        public function deleteImageFromGCS($gsutilUri)
+        {
+            if (! $gsutilUri) {
+                return false;
+            }
+
+            $filePath = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $gsutilUri);
+
+            return Storage::disk('gcs')->delete($filePath);
+        }
+
+        public function updateDocuments( $newFile, $removeDoc)
+        {
+            if ($removeDoc) {
+                $this->removeOldDocumentFromStorage($removeDoc);
+            }
+
+            $newFileName = 'uploads/Document/' . uniqid() . '_' . $newFile->getClientOriginalName();
+            Storage::disk('gcs')->put($newFileName, file_get_contents($newFile));
+
+            $newGsutilUri = "gs://" . env('GOOGLE_CLOUD_STORAGE_BUCKET') . "/{$newFileName}";
+
+            return [
+                'gsutil_uri' => $newGsutilUri,
+            ];
+        }
+
+
+        public function removeOldDocumentFromStorage($removeDoc)
+        {
+            $oldFilePath = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $removeDoc);
+
+            $storage = new StorageClient([
+                'keyFile' => json_decode(file_get_contents(base_path(env('GOOGLE_CLOUD_KEY_FILE'))), true),
+            ]);
+
+            $bucket    = $storage->bucket(env('GOOGLE_CLOUD_STORAGE_BUCKET'));
+            $oldObject = $bucket->object($oldFilePath);
+
+            if ($oldObject->exists()) {
+                $oldObject->delete();
+            }
+        }
 }
