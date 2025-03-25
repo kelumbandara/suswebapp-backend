@@ -127,7 +127,7 @@ class HazardAndRiskController extends Controller
 
             $result = [];
             foreach ($newFiles as $newFile) {
-                $uploadResult = $this->hazardAndRiskService->updateDocuments($hazardRisk, $newFile, null);
+                $uploadResult = $this->hazardAndRiskService->updateDocuments($newFile, null);
 
                 $result[] = [
                     'gsutil_uri' => $uploadResult['gsutil_uri'],
@@ -140,7 +140,7 @@ class HazardAndRiskController extends Controller
 
             $validatedData['documents'] = json_encode($result);
         }
- 
+
         $updated = $this->hazardAndRiskInterface->update($id, $validatedData);
 
         if ($updated) {

@@ -104,14 +104,31 @@ class DocumentRecodeController extends Controller
 
         $data               = $request->validated();
         $data['isNoExpiry'] = filter_var($data['isNoExpiry'] ?? false, FILTER_VALIDATE_BOOLEAN);
-        if ($request->hasFile('document')) {
-            $uploadedFiles = [];
 
-            foreach ($request->file('document') as $file) {
-                $uploadedFiles[] = $this->documentService->uploadImageToGCS($file);
+        if ($request->has('document') && $request->has('removeDoc')) {
+            $removeDocs = $request->input('removeDoc');
+            $newFiles   = $request->file('document');
+
+            if (is_array($removeDocs)) {
+                foreach ($removeDocs as $removeDoc) {
+                    $this->documentService->removeOldDocumentFromStorage($removeDoc);
+                }
             }
 
-            $validatedData['document'] = $uploadedFiles;
+            $result = [];
+            foreach ($newFiles as $newFile) {
+                $uploadResult = $this->documentService->updateDocuments($newFile, null);
+
+                $result[] = [
+                    'gsutil_uri' => $uploadResult['gsutil_uri'],
+                ];
+            }
+
+            if (empty($result)) {
+                return response()->json(['message' => 'Failed to update the documents.'], 500);
+            }
+
+            $validatedData['document'] = json_encode($result);
         }
 
         $updatedDocument = $this->documentInterface->update($id, $data);
@@ -125,8 +142,19 @@ class DocumentRecodeController extends Controller
     public function destroy($id)
     {
         $document = $this->documentInterface->findById($id);
-        if (! $document) {
-            return response()->json(['message' => 'Document not found']);
+
+        if (! empty($document->documents)) {
+            if (is_string($document->documents)) {
+                $documents = json_decode($document->documents, true);
+            } else {
+                $documents = $document->documents;
+            }
+
+            if (is_array($documents)) {
+                foreach ($documents as $document) {
+                    $this->documentService->deleteImageFromGCS($document);
+                }
+            }
         }
 
         $this->documentInterface->deleteById($id);

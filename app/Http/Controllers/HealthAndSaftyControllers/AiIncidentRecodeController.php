@@ -155,7 +155,7 @@ class AiIncidentRecodeController extends Controller
 
             $result = [];
             foreach ($newFiles as $newFile) {
-                $uploadResult = $this->incidentService->updateDocuments($record, $newFile, null);
+                $uploadResult = $this->incidentService->updateDocuments( $newFile, null);
 
                 $result[] = [
                     'gsutil_uri' => $uploadResult['gsutil_uri'],
