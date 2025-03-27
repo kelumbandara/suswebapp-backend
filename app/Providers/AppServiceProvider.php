@@ -90,6 +90,16 @@ use App\Repositories\All\OhMrBeBenefitType\BenefitTypeInterface;
 use App\Repositories\All\OhMrBeBenefitType\BenefitTypeRepository;
 use App\Repositories\All\OhMrBenefitRequest\BenefitRequestInterface;
 use App\Repositories\All\OhMrBenefitRequest\BenefitRequestRepository;
+use App\Repositories\All\SaAiEaAuditCategory\ExternalAuditCategoryInterface;
+use App\Repositories\All\SaAiEaAuditCategory\ExternalAuditCategoryRepository;
+use App\Repositories\All\SaAiEaAuditFirm\ExternalAuditFirmInterface;
+use App\Repositories\All\SaAiEaAuditFirm\ExternalAuditFirmRepository;
+use App\Repositories\All\SaAiEaAuditStandard\ExternalAuditStandardInterface;
+use App\Repositories\All\SaAiEaAuditStandard\ExternalAuditStandardRepository;
+use App\Repositories\All\SaAiEaAuditType\ExternalAuditTypeInterface;
+use App\Repositories\All\SaAiEaAuditType\ExternalAuditTypeRepository;
+use App\Repositories\All\SaAiExternalAudit\ExternalAuditInterface;
+use App\Repositories\All\SaAiExternalAudit\ExternalAuditRepository;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -154,6 +164,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SupplierTypeInterface::class, SupplierTypeRepository::class);
         $this->app->bind(IncidentCircumstancesInterface::class, IncidentCircumstancesRepository::class);
         $this->app->bind(HsOcMrMdDocumentTypeDocumentTypeInterface::class, HsOcMrMdDocumentTypeDocumentTypeRepository::class);
+        $this->app->bind(ExternalAuditInterface::class, ExternalAuditRepository::class);
+        $this->app->bind(ExternalAuditTypeInterface::class, ExternalAuditTypeRepository::class);
+        $this->app->bind(ExternalAuditCategoryInterface::class, ExternalAuditCategoryRepository::class);
+        $this->app->bind(ExternalAuditStandardInterface::class, ExternalAuditStandardRepository::class);
+        $this->app->bind(ExternalAuditFirmInterface::class, ExternalAuditFirmRepository::class);
 
 
     }

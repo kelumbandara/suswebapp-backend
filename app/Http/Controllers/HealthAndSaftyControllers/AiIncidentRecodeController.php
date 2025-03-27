@@ -108,7 +108,7 @@ class AiIncidentRecodeController extends Controller
             $mergedEvidence = array_merge($existingEvidence, $uploadedFiles);
 
             $this->incidentRecordInterface->update($record->id, [
-                'evidence' => json_encode($mergedEvidence), // Store as a JSON array
+                'evidence' => json_encode($mergedEvidence),
             ]);
         }
 
@@ -143,34 +143,43 @@ class AiIncidentRecodeController extends Controller
         if (! $record || ! is_object($record)) {
             return response()->json(['message' => 'Incident record not found']);
         }
-        if ($request->has('evidence') && $request->has('removeDoc')) {
+
+        $evidence = json_decode($record->evidence, true) ?? [];
+
+        if ($request->has('removeDoc')) {
             $removeDocs = $request->input('removeDoc');
-            $newFiles   = $request->file('evidence');
 
             if (is_array($removeDocs)) {
                 foreach ($removeDocs as $removeDoc) {
                     $this->incidentService->removeOldDocumentFromStorage($removeDoc);
                 }
+
+                $evidence = array_values(array_filter($evidence, function ($evidenceItem) use ($removeDocs) {
+                    return ! in_array($evidenceItem['gsutil_uri'], $removeDocs);
+                }));
             }
-
-            $result = [];
-            foreach ($newFiles as $newFile) {
-                $uploadResult = $this->incidentService->updateDocuments( $newFile, null);
-
-                $result[] = [
-                    'gsutil_uri' => $uploadResult['gsutil_uri'],
-                ];
-            }
-
-            if (empty($result)) {
-                return response()->json(['message' => 'Failed to update the documents.'], 500);
-            }
-
-            $validatedData['evidence'] = json_encode($result);
         }
 
-        $updateSuccess = $record->update($data);
+        if ($request->hasFile('evidence')) {
+            $newEvidence = [];
+            $newFiles    = $request->file('evidence');
 
+            foreach ($newFiles as $newFile) {
+                $uploadResult = $this->incidentService->updateDocuments($newFile);
+                if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
+                    $newEvidence[] = [
+                        'gsutil_uri' => $uploadResult['gsutil_uri'],
+                        'file_name'  => $uploadResult['file_name'],
+                    ];
+                }
+            }
+
+            $evidence = array_merge($evidence, $newEvidence);
+        }
+
+        $data['evidence'] = json_encode($evidence);
+
+        $updateSuccess = $record->update($data);
         if (! $updateSuccess) {
             return response()->json(['message' => 'Failed to update incident record'], 500);
         }
@@ -289,6 +298,5 @@ class AiIncidentRecodeController extends Controller
 
         return response()->json($assignees);
     }
-
 
 }

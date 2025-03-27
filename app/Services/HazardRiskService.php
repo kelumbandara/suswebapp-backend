@@ -53,7 +53,7 @@ class HazardRiskService
         return Storage::disk('gcs')->delete($filePath);
     }
 
-    public function updateDocuments( $newFile, $removeDoc)
+    public function updateDocuments($newFile, $removeDoc)
     {
         if ($removeDoc) {
             $this->removeOldDocumentFromStorage($removeDoc);
@@ -69,11 +69,6 @@ class HazardRiskService
         ];
     }
 
-    /**
-     * Removes the old document from Google Cloud Storage.
-     *
-     * @param string $removeDoc The Google Cloud Storage URI of the document to remove.
-     */
     public function removeOldDocumentFromStorage($removeDoc)
     {
         $oldFilePath = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $removeDoc);
