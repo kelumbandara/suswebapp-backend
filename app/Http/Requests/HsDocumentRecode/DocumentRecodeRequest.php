@@ -28,22 +28,23 @@ class DocumentRecodeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'documentType'     => 'nullable|string',
-            'division'         => 'nullable|string',
-            'issuingAuthority' => 'nullable|string',
-            'documentNumber'   => 'nullable|string',
-            'title'            => 'nullable|string',
+            'documentType'     => 'required|string',
+            'division'         => 'required|string',
+            'issuingAuthority' => 'required|string',
+            'documentNumber'   => 'required|string',
+            'title'            => 'required|string',
             'documentOwner'    => 'nullable|string',
-            'documentReviewer' => 'nullable|string',
+            'documentReviewer' => 'required|string',
             'physicalLocation' => 'nullable|string',
-            'versionNumber'    => 'nullable|string',
+            'versionNumber'    => 'required|string',
             'remarks'          => 'nullable|string',
-            'document'        => 'required|array',
-            'document.*'      => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
-            // 'issuedDate'       => 'nullable|string',
-            // 'isNoExpiry'       => 'nullable|boolean',
-            // 'expiryDate'       => 'required_if:isNoExpiry,false|string',
-            // 'notifyDate'       => 'required_if:isNoExpiry,false|string',
+            'removeDoc'        => 'nullable|array',
+            'document'         => 'nullable|array',
+            'document.*'       => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
+            'issuedDate'       => 'nullable|string',
+            'isNoExpiry'       => 'nullable|boolean',
+            'expiryDate'       => 'required_if:isNoExpiry,false|string',
+            'notifyDate'       => 'required_if:isNoExpiry,false|string',
 
         ];
     }

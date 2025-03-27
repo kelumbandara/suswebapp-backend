@@ -132,51 +132,58 @@ class AiAccidentRecordController extends Controller
         ], 201);
     }
 
-    public function show(string $id)
-    {
-        $record = $this->accidentRecordInterface->findById($id);
-        if (! $record) {
-            return response()->json(['message' => 'Accident record not found']);
-        }
-        return response()->json($record);
-    }
-
     public function update(AccidentRecordRequest $request, string $id)
     {
         $data   = $request->validated();
         $record = $this->accidentRecordInterface->findById($id);
 
         if (! $record || ! is_object($record)) {
-            return response()->json(['message' => 'Accident record not found']);
+            return response()->json(['message' => 'Accident record not found'], 404);
         }
 
-        if ($request->has('evidence') && $request->has('removeDoc')) {
+        $documents = [];
+        if (! empty($record->evidence)) {
+            $decoded   = json_decode($record->evidence, true);
+            $documents = is_array($decoded) ? $decoded : [];
+        }
+
+        if ($request->has('removeDoc')) {
             $removeDocs = $request->input('removeDoc');
-            $newFiles   = $request->file('evidence');
 
             if (is_array($removeDocs)) {
                 foreach ($removeDocs as $removeDoc) {
                     $this->accidentService->removeOldDocumentFromStorage($removeDoc);
                 }
+
+                $documents = array_values(array_filter($documents, function ($doc) use ($removeDocs) {
+                    return ! in_array($doc['gsutil_uri'], $removeDocs);
+                }));
             }
-
-            $result = [];
-            foreach ($newFiles as $newFile) {
-                $uploadResult = $this->accidentService->updateDocuments($record, $newFile, null);
-
-                $result[] = [
-                    'gsutil_uri' => $uploadResult['gsutil_uri'],
-                ];
-            }
-
-            if (empty($result)) {
-                return response()->json(['message' => 'Failed to update the documents.'], 500);
-            }
-
-            $validatedData['evidence'] = json_encode($result);
         }
 
+        if ($request->hasFile('evidence')) {
+            $newDocuments = [];
+            $newFiles     = $request->file('evidence');
 
+            foreach ($newFiles as $newFile) {
+                $uploadResult = $this->accidentService->updateDocuments($newFile);
+
+                if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
+                    $newDocuments[] = [
+                        'gsutil_uri' => $uploadResult['gsutil_uri'],
+                        'file_name'  => $uploadResult['file_name'],
+                    ];
+                }
+            }
+
+            if (! empty($newDocuments)) {
+                $documents = array_merge($documents, $newDocuments);
+            }
+        }
+
+        if ($request->has('removeDoc') || $request->hasFile('evidence')) {
+            $data['evidence'] = json_encode(array_values($documents));
+        }
 
         $updateSuccess = $this->accidentRecordInterface->update($id, $data);
 
@@ -190,26 +197,6 @@ class AiAccidentRecordController extends Controller
             return response()->json(['message' => 'Error fetching updated accident record'], 500);
         }
 
-        $this->accidentWitnessInterface->deleteByAccidentId($id);
-        $this->accidentPeopleInterface->deleteByAccidentId($id);
-
-        if (! empty($data['witnesses'])) {
-            foreach ($data['witnesses'] as $witness) {
-                $witness['accidentId'] = $id;
-                $this->accidentWitnessInterface->create($witness);
-            }
-        }
-
-        if (! empty($data['effectedIndividuals'])) {
-            foreach ($data['effectedIndividuals'] as $person) {
-                $person['accidentId'] = $id;
-                $this->accidentPeopleInterface->create($person);
-            }
-        }
-
-        $updatedRecord->witnesses           = $this->accidentWitnessInterface->findByAccidentId($id);
-        $updatedRecord->effectedIndividuals = $this->accidentPeopleInterface->findByAccidentId($id);
-
         return response()->json([
             'message' => 'Accident record updated successfully',
             'record'  => $updatedRecord,
@@ -220,7 +207,7 @@ class AiAccidentRecordController extends Controller
     {
         $record = $this->accidentRecordInterface->findById($id);
 
-        if (!$record) {
+        if (! $record) {
             return response()->json(['message' => 'Accident record not found'], 404);
         }
 
@@ -243,7 +230,6 @@ class AiAccidentRecordController extends Controller
 
         return response()->json(['message' => 'Accident record deleted successfully'], 200);
     }
-
 
     public function assignTask()
     {

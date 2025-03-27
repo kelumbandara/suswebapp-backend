@@ -23,47 +23,49 @@ class DocumentRecodeController extends Controller
     }
 
     public function index()
-{
-    $document = $this->documentInterface->all();
+    {
+        $document = $this->documentInterface->all();
 
-    $document = $document->map(function ($risk) {
-        try {
-            $assignee           = $this->userInterface->getById($risk->assignee);
-            $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
-        } catch (\Exception $e) {
-            $risk->assigneeName = 'Unknown';
-        }
-
-        try {
-            $creator                 = $this->userInterface->getById($risk->createdByUser);
-            $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
-        } catch (\Exception $e) {
-            $risk->createdByUserName = 'Unknown';
-        }
-
-        if (! empty($risk->document) && is_array($risk->document)) {
-            $updatedDocuments = [];
-
-            foreach ($risk->document as $doc) {
-                if (isset($doc['gsutil_uri'])) {
-                    $imageData = $this->documentService->getImageUrl($doc['gsutil_uri']);
-                    $doc['fileName']  = $imageData['fileName'];
-                    $doc['imageUrl'] = $imageData['signedUrl'];
-                }
-                $updatedDocuments[] = $doc;
+        $document = $document->map(function ($risk) {
+            try {
+                $assignee           = $this->userInterface->getById($risk->assignee);
+                $risk->assigneeName = $assignee ? $assignee->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->assigneeName = 'Unknown';
             }
 
-            $risk->setAttribute('document', $updatedDocuments);
-        } else {
-            $risk->setAttribute('document', []);
-        }
+            try {
+                $creator                 = $this->userInterface->getById($risk->createdByUser);
+                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->createdByUserName = 'Unknown';
+            }
 
-        return $risk;
-    });
+            $documents = json_decode($risk->document, true) ?? [];
 
-    return response()->json($document);
-}
+            if (! empty($documents) && is_array($documents)) {
+                $updatedDocuments = [];
 
+                foreach ($documents as $doc) {
+                    if (isset($doc['gsutil_uri'])) {
+                        $imageData       = $this->documentService->getImageUrl($doc['gsutil_uri']);
+                        $doc['fileName'] = $imageData['fileName'] ?? 'Unknown';
+                        $doc['imageUrl'] = $imageData['signedUrl'] ?? null;
+                    }
+                    $updatedDocuments[] = $doc;
+                }
+
+                $risk->setAttribute('document', $updatedDocuments);
+            } else {
+                $risk->setAttribute('document', []);
+            }
+
+            return $risk;
+
+        });
+
+        return response()->json($document);
+    }
 
     public function store(DocumentRecodeRequest $request)
     {
@@ -105,31 +107,41 @@ class DocumentRecodeController extends Controller
         $data               = $request->validated();
         $data['isNoExpiry'] = filter_var($data['isNoExpiry'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
-        if ($request->has('document') && $request->has('removeDoc')) {
+        $documents = json_decode($document->document, true) ?? [];
+
+        if ($request->has('removeDoc')) {
             $removeDocs = $request->input('removeDoc');
-            $newFiles   = $request->file('document');
 
             if (is_array($removeDocs)) {
                 foreach ($removeDocs as $removeDoc) {
                     $this->documentService->removeOldDocumentFromStorage($removeDoc);
                 }
+
+                $documents = array_values(array_filter($documents, function ($doc) use ($removeDocs) {
+                    return ! in_array($doc['gsutil_uri'], $removeDocs);
+                }));
             }
-
-            $result = [];
-            foreach ($newFiles as $newFile) {
-                $uploadResult = $this->documentService->updateDocuments($newFile, null);
-
-                $result[] = [
-                    'gsutil_uri' => $uploadResult['gsutil_uri'],
-                ];
-            }
-
-            if (empty($result)) {
-                return response()->json(['message' => 'Failed to update the documents.'], 500);
-            }
-
-            $validatedData['document'] = json_encode($result);
         }
+
+        if ($request->hasFile('document')) {
+            $newDocuments = [];
+            $newFiles     = $request->file('document');
+
+            foreach ($newFiles as $newFile) {
+                $uploadResult = $this->documentService->updateDocuments($newFile);
+
+                if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
+                    $newDocuments[] = [
+                        'gsutil_uri' => $uploadResult['gsutil_uri'],
+                        'file_name'  => $uploadResult['file_name'],
+                    ];
+                }
+            }
+
+            $documents = array_merge($documents, $newDocuments);
+        }
+
+        $data['document'] = json_encode($documents);
 
         $updatedDocument = $this->documentInterface->update($id, $data);
 
@@ -138,7 +150,6 @@ class DocumentRecodeController extends Controller
             'data'    => $updatedDocument,
         ]);
     }
-
     public function destroy($id)
     {
         $document = $this->documentInterface->findById($id);

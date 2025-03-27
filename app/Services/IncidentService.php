@@ -47,36 +47,32 @@ class IncidentService
 
     public function deleteImageFromGCS($gsutilUri)
     {
-        if (!$gsutilUri) {
+        if (! $gsutilUri) {
             return false;
         }
 
-        $filePath = str_replace('gs://'.env('GOOGLE_CLOUD_STORAGE_BUCKET').'/', '', $gsutilUri);
+        $filePath = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $gsutilUri);
 
         return Storage::disk('gcs')->delete($filePath);
     }
 
-    public function updateDocuments($newFile, $removeDoc)
+    public function updateDocuments($newFile)
     {
-        if ($removeDoc) {
-            $this->removeOldDocumentFromStorage($removeDoc);
+        $newFileName = 'uploads/incident/' . uniqid() . '_' . $newFile->getClientOriginalName();
+
+        // Upload file to GCS
+        $upload = Storage::disk('gcs')->put($newFileName, file_get_contents($newFile));
+
+        if (! $upload) {
+            return null;
         }
 
-        $newFileName = 'uploads/Incident/' . uniqid() . '_' . $newFile->getClientOriginalName();
-        Storage::disk('gcs')->put($newFileName, file_get_contents($newFile));
-
-        $newGsutilUri = "gs://" . env('GOOGLE_CLOUD_STORAGE_BUCKET') . "/{$newFileName}";
-
         return [
-            'gsutil_uri' => $newGsutilUri,
+            'gsutil_uri' => "gs://" . env('GOOGLE_CLOUD_STORAGE_BUCKET') . "/{$newFileName}",
+            'file_name'  => $newFile->getClientOriginalName(),
         ];
     }
 
-    /**
-     * Removes the old document from Google Cloud Storage.
-     *
-     * @param string $removeDoc The Google Cloud Storage URI of the document to remove.
-     */
     public function removeOldDocumentFromStorage($removeDoc)
     {
         $oldFilePath = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $removeDoc);
@@ -85,11 +81,12 @@ class IncidentService
             'keyFile' => json_decode(file_get_contents(base_path(env('GOOGLE_CLOUD_KEY_FILE'))), true),
         ]);
 
-        $bucket = $storage->bucket(env('GOOGLE_CLOUD_STORAGE_BUCKET'));
+        $bucket    = $storage->bucket(env('GOOGLE_CLOUD_STORAGE_BUCKET'));
         $oldObject = $bucket->object($oldFilePath);
 
         if ($oldObject->exists()) {
             $oldObject->delete();
         }
     }
+
 }

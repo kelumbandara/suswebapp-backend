@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Services;
 
 use Google\Cloud\Storage\StorageClient;
@@ -14,9 +13,7 @@ class DocumentService
 
         Storage::disk('gcs')->put($fileName, file_get_contents($file));
 
-        $gsutilUri = "gs://".env('GOOGLE_CLOUD_STORAGE_BUCKET')."/{$fileName}";
-
-
+        $gsutilUri = "gs://" . env('GOOGLE_CLOUD_STORAGE_BUCKET') . "/{$fileName}";
 
         return [
             'gsutil_uri' => $gsutilUri,
@@ -25,10 +22,10 @@ class DocumentService
 
     public function getImageUrl($gsutilUri)
     {
-        $filePath = str_replace('gs://'.env('GOOGLE_CLOUD_STORAGE_BUCKET').'/', '', $gsutilUri);
+        $filePath = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $gsutilUri);
         $fileName = basename($filePath);
-        $storage = new StorageClient([
-            'keyFile' => json_decode(file_get_contents(base_path(env('GOOGLE_CLOUD_KEY_FILE'))), true)
+        $storage  = new StorageClient([
+            'keyFile' => json_decode(file_get_contents(base_path(env('GOOGLE_CLOUD_KEY_FILE'))), true),
         ]);
 
         $bucket = $storage->bucket(env('GOOGLE_CLOUD_STORAGE_BUCKET'));
@@ -42,49 +39,48 @@ class DocumentService
             'fileName'  => $fileName,
             'signedUrl' => $signedUrl,
         ];
+    }
+
+    public function deleteImageFromGCS($gsutilUri)
+    {
+        if (! $gsutilUri) {
+            return false;
         }
 
-        public function deleteImageFromGCS($gsutilUri)
-        {
-            if (! $gsutilUri) {
-                return false;
-            }
+        $filePath = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $gsutilUri);
 
-            $filePath = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $gsutilUri);
+        return Storage::disk('gcs')->delete($filePath);
+    }
 
-            return Storage::disk('gcs')->delete($filePath);
+    public function updateDocuments($newFile)
+    {
+        $newFileName = 'uploads/Document/' . uniqid() . '_' . $newFile->getClientOriginalName();
+
+        $upload = Storage::disk('gcs')->put($newFileName, file_get_contents($newFile));
+
+        if (! $upload) {
+            return null;
         }
 
-        public function updateDocuments( $newFile, $removeDoc)
-        {
-            if ($removeDoc) {
-                $this->removeOldDocumentFromStorage($removeDoc);
-            }
+        return [
+            'gsutil_uri' => "gs://" . env('GOOGLE_CLOUD_STORAGE_BUCKET') . "/{$newFileName}",
+            'file_name'  => $newFile->getClientOriginalName(),
+        ];
+    }
 
-            $newFileName = 'uploads/Document/' . uniqid() . '_' . $newFile->getClientOriginalName();
-            Storage::disk('gcs')->put($newFileName, file_get_contents($newFile));
+    public function removeOldDocumentFromStorage($removeDoc)
+    {
+        $oldFilePath = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $removeDoc);
 
-            $newGsutilUri = "gs://" . env('GOOGLE_CLOUD_STORAGE_BUCKET') . "/{$newFileName}";
+        $storage = new StorageClient([
+            'keyFile' => json_decode(file_get_contents(base_path(env('GOOGLE_CLOUD_KEY_FILE'))), true),
+        ]);
 
-            return [
-                'gsutil_uri' => $newGsutilUri,
-            ];
+        $bucket    = $storage->bucket(env('GOOGLE_CLOUD_STORAGE_BUCKET'));
+        $oldObject = $bucket->object($oldFilePath);
+
+        if ($oldObject->exists()) {
+            $oldObject->delete();
         }
-
-
-        public function removeOldDocumentFromStorage($removeDoc)
-        {
-            $oldFilePath = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $removeDoc);
-
-            $storage = new StorageClient([
-                'keyFile' => json_decode(file_get_contents(base_path(env('GOOGLE_CLOUD_KEY_FILE'))), true),
-            ]);
-
-            $bucket    = $storage->bucket(env('GOOGLE_CLOUD_STORAGE_BUCKET'));
-            $oldObject = $bucket->object($oldFilePath);
-
-            if ($oldObject->exists()) {
-                $oldObject->delete();
-            }
-        }
+    }
 }
