@@ -9,9 +9,6 @@ class AiAccidentTypeController extends Controller
 {
     protected $accidentTypeInterface;
 
-    /**
-     * Inject the AccidentPeopleInterface dependency.
-     */
     public function __construct(AccidentTypeInterface $accidentTypeInterface)
     {
         $this->accidentTypeInterface = $accidentTypeInterface;

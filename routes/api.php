@@ -42,6 +42,10 @@ use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineNameFormControlle
 use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineRequestController;
 use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineTypeController;
 use App\Http\Controllers\ImageUploadController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditCategoryController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditFirmController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditStandardController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditTypeController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -55,50 +59,12 @@ Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkE
 Route::post('reset-password', [ForgotPasswordController::class, 'otpVerifyFunction']);
 Route::post('change-password', [ForgotPasswordController::class, 'changePassword']);
 
-Route::get('user-permissions', [ComPermissionController::class, 'index']);
-Route::post('user-permissions', [ComPermissionController::class, 'store']);
-Route::get('user-permissions/{id}/show', [ComPermissionController::class, 'show']);
-Route::post('user-permissions/{id}/update', [ComPermissionController::class, 'update']);
-Route::delete('user-permissions/{id}/delete', [ComPermissionController::class, 'destroy']);
-
-Route::get('responsible-section', [ResponsibleSectionController::class, 'index']);
-Route::post('responsible-section', [ResponsibleSectionController::class, 'store']);
-
-Route::get('assignee-level', [AssigneeLevelController::class, 'index']);
-
-
-Route::get('job-positions', [JobPositionController::class, 'index']);
-Route::post('job-positions', [JobPositionController::class, 'store']);
-
-Route::get('user-types', [UserTypeController::class, 'index']);
-Route::post('user-types', [UserTypeController::class, 'store']);
-
-Route::post('departments', [DepartmentController::class, 'store']);
-Route::get('departments', [DepartmentController::class, 'index']);
-
-Route::get('factory', [FactoryController::class, 'show']);
-Route::post('factory', [FactoryController::class, 'store']);
-
-Route::get('person-types', [PersonTypeController::class, 'index']);
-Route::post('person-types', [PersonTypeController::class, 'store']);
-
-Route::post('accident-categories', [AiAccidentCategoryController::class, 'store']);
-Route::get('accident-categories', [AiAccidentCategoryController::class, 'getCategories']);
-Route::get('accident-categories/{categoryName}/subcategories', [AiAccidentCategoryController::class, 'getSubcategories']);
-
-Route::get('accident-types', [AiAccidentTypeController::class, 'index']);
-Route::post('accident-types', [AiAccidentTypeController::class, 'store']);
-
-Route::get('accident-injury', [AiAccidentInjuryTypeController::class, 'index']);
-Route::post('accident-injury', [AiAccidentInjuryTypeController::class, 'store']);
-
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('users-assignee', [UserController::class, 'assignee']);
 
     Route::get('users', [AdminController::class, 'index']);
     Route::post('users/{id}/update', [AdminController::class, 'update']);
     Route::get('users-assignee-level', [AdminController::class, 'assigneeLevel']);
-
 
     Route::get('hazard-and-risk', [HazardAndRiskController::class, 'index']);
     Route::post('hazard-and-risk', [HazardAndRiskController::class, 'store']);
@@ -151,12 +117,47 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('medicine-inventory/{id}/publish', [OhMiPiMedicineInventoryController::class, 'publishedStatus']);
     Route::get('transaction-published', [OhMiPiMedicineInventoryController::class, 'published']);
 
-
     Route::get('benefit-request', [OhMrBenefitRequestController::class, 'index']);
     Route::post('benefit-request', [OhMrBenefitRequestController::class, 'store']);
     Route::post('benefit-request/{id}/update', [OhMrBenefitRequestController::class, 'update']);
     Route::delete('benefit-request/{id}/delete', [OhMrBenefitRequestController::class, 'destroy']);
 });
+
+Route::get('user-permissions', [ComPermissionController::class, 'index']);
+Route::post('user-permissions', [ComPermissionController::class, 'store']);
+Route::get('user-permissions/{id}/show', [ComPermissionController::class, 'show']);
+Route::post('user-permissions/{id}/update', [ComPermissionController::class, 'update']);
+Route::delete('user-permissions/{id}/delete', [ComPermissionController::class, 'destroy']);
+
+Route::get('responsible-section', [ResponsibleSectionController::class, 'index']);
+Route::post('responsible-section', [ResponsibleSectionController::class, 'store']);
+
+Route::get('assignee-level', [AssigneeLevelController::class, 'index']);
+
+Route::get('job-positions', [JobPositionController::class, 'index']);
+Route::post('job-positions', [JobPositionController::class, 'store']);
+
+Route::get('user-types', [UserTypeController::class, 'index']);
+Route::post('user-types', [UserTypeController::class, 'store']);
+
+Route::post('departments', [DepartmentController::class, 'store']);
+Route::get('departments', [DepartmentController::class, 'index']);
+
+Route::get('factory', [FactoryController::class, 'show']);
+Route::post('factory', [FactoryController::class, 'store']);
+
+Route::get('person-types', [PersonTypeController::class, 'index']);
+Route::post('person-types', [PersonTypeController::class, 'store']);
+
+Route::post('accident-categories', [AiAccidentCategoryController::class, 'store']);
+Route::get('accident-categories', [AiAccidentCategoryController::class, 'getCategories']);
+Route::get('accident-categories/{categoryName}/subcategories', [AiAccidentCategoryController::class, 'getSubcategories']);
+
+Route::get('accident-types', [AiAccidentTypeController::class, 'index']);
+Route::post('accident-types', [AiAccidentTypeController::class, 'store']);
+
+Route::get('accident-injury', [AiAccidentInjuryTypeController::class, 'index']);
+Route::post('accident-injury', [AiAccidentInjuryTypeController::class, 'store']);
 
 Route::get('hr-categories', [HrCategoryController::class, 'index']);
 Route::post('hr-categories', [HrCategoryController::class, 'store']);
@@ -232,10 +233,21 @@ Route::post('supplier-type', [OhMiPiMiSupplierTypeController::class, 'store']);
 Route::post('supplier-type/{id}/update', [OhMiPiMiSupplierTypeController::class, 'update']);
 Route::delete('supplier-type/{id}/delete', [OhMiPiMiSupplierTypeController::class, 'destroy']);
 
+Route::get('external-audit-type', [SaAiExternalAuditTypeController::class, 'index']);
+Route::post('external-audit-type', [SaAiExternalAuditTypeController::class, 'store']);
+
+Route::get('external-audit-category', [SaAiExternalAuditCategoryController::class, 'index']);
+Route::post('external-audit-type', [SaAiExternalAuditCategoryController::class, 'store']);
+
+Route::get('external-audit-standard', [SaAiExternalAuditStandardController::class, 'index']);
+Route::post('external-audit-type', [SaAiExternalAuditStandardController::class, 'store']);
+
+Route::get('external-audit-firm', [SaAiExternalAuditFirmController::class, 'index']);
+Route::post('external-audit-type', [SaAiExternalAuditFirmController::class, 'store']);
+
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
 Route::post('upload', [ImageUploadController::class, 'uploadImage']);
 Route::delete('image/{imageId}', [ImageUploadController::class, 'deleteImage']);
 Route::post('image/update/{imageId}', [ImageUploadController::class, 'updateImage']);
-
 
 Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);

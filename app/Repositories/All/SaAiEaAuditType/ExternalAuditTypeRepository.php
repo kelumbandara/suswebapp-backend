@@ -21,5 +21,4 @@ class ExternalAuditTypeRepository extends BaseRepository implements ExternalAudi
         $this->model = $model;
     }
 
-
 }

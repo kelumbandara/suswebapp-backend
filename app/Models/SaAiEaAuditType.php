@@ -10,6 +10,6 @@ class SaAiEaAuditType extends Model
     use HasFactory;
 
     protected $fillable = [
-        'auditTypeName',
+        'auditTypeName'
     ];
 }

@@ -86,7 +86,7 @@ class DocumentRecodeController extends Controller
                 $uploadedFiles[] = $this->documentService->uploadImageToGCS($file);
             }
 
-            $data['document'] = ($uploadedFiles);
+            $data['document'] = json_encode($uploadedFiles);
         }
 
         $document = $this->documentInterface->create($data);
