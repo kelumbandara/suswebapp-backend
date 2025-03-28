@@ -5,11 +5,11 @@ use Google\Cloud\Storage\StorageClient;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 
-class HazardRiskService
+class DocumentService
 {
     public function uploadImageToGCS($file)
     {
-        $fileName = 'uploads/HazardRisk/' . uniqid() . '_' . $file->getClientOriginalName();
+        $fileName = 'uploads/ExternalAudit/' . uniqid() . '_' . $file->getClientOriginalName();
 
         Storage::disk('gcs')->put($fileName, file_get_contents($file));
 
@@ -23,8 +23,8 @@ class HazardRiskService
     public function getImageUrl($gsutilUri)
     {
         $filePath = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $gsutilUri);
-
-        $storage = new StorageClient([
+        $fileName = basename($filePath);
+        $storage  = new StorageClient([
             'keyFile' => json_decode(file_get_contents(base_path(env('GOOGLE_CLOUD_KEY_FILE'))), true),
         ]);
 
@@ -34,11 +34,10 @@ class HazardRiskService
         $expiresAt = Carbon::now()->addMinutes(15);
 
         $signedUrl = $object->signedUrl($expiresAt);
-        $fileName  = basename($filePath);
 
         return [
-            'signedUrl' => $signedUrl,
             'fileName'  => $fileName,
+            'signedUrl' => $signedUrl,
         ];
     }
 
@@ -55,7 +54,7 @@ class HazardRiskService
 
     public function updateDocuments($newFile)
     {
-        $newFileName = 'uploads/HazardRisk/' . uniqid() . '_' . $newFile->getClientOriginalName();
+        $newFileName = 'uploads/ExternalAudit/' . uniqid() . '_' . $newFile->getClientOriginalName();
 
         $upload = Storage::disk('gcs')->put($newFileName, file_get_contents($newFile));
 
@@ -74,17 +73,14 @@ class HazardRiskService
         $oldFilePath = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $removeDoc);
 
         $storage = new StorageClient([
-            'keyFilePath' => base_path(env('GOOGLE_CLOUD_KEY_FILE')), 
+            'keyFile' => json_decode(file_get_contents(base_path(env('GOOGLE_CLOUD_KEY_FILE'))), true),
         ]);
 
-        $bucket = $storage->bucket(env('GOOGLE_CLOUD_STORAGE_BUCKET'));
+        $bucket    = $storage->bucket(env('GOOGLE_CLOUD_STORAGE_BUCKET'));
         $oldObject = $bucket->object($oldFilePath);
-
 
         if ($oldObject->exists()) {
             $oldObject->delete();
-        } else {
         }
     }
-
 }
