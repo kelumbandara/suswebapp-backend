@@ -53,19 +53,19 @@ class HazardRiskService
         return Storage::disk('gcs')->delete($filePath);
     }
 
-    public function updateDocuments($newFile, $removeDoc)
+    public function updateDocuments($newFile)
     {
-        if ($removeDoc) {
-            $this->removeOldDocumentFromStorage($removeDoc);
+        $newFileName = 'uploads/HazardRisk/' . uniqid() . '_' . $newFile->getClientOriginalName();
+
+        $upload = Storage::disk('gcs')->put($newFileName, file_get_contents($newFile));
+
+        if (! $upload) {
+            return null;
         }
 
-        $newFileName = 'uploads/HazardRisk/' . uniqid() . '_' . $newFile->getClientOriginalName();
-        Storage::disk('gcs')->put($newFileName, file_get_contents($newFile));
-
-        $newGsutilUri = "gs://" . env('GOOGLE_CLOUD_STORAGE_BUCKET') . "/{$newFileName}";
-
         return [
-            'gsutil_uri' => $newGsutilUri,
+            'gsutil_uri' => "gs://" . env('GOOGLE_CLOUD_STORAGE_BUCKET') . "/{$newFileName}",
+            'file_name'  => $newFile->getClientOriginalName(),
         ];
     }
 
@@ -74,14 +74,16 @@ class HazardRiskService
         $oldFilePath = str_replace('gs://' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/', '', $removeDoc);
 
         $storage = new StorageClient([
-            'keyFile' => json_decode(file_get_contents(base_path(env('GOOGLE_CLOUD_KEY_FILE'))), true),
+            'keyFilePath' => base_path(env('GOOGLE_CLOUD_KEY_FILE')), 
         ]);
 
-        $bucket    = $storage->bucket(env('GOOGLE_CLOUD_STORAGE_BUCKET'));
+        $bucket = $storage->bucket(env('GOOGLE_CLOUD_STORAGE_BUCKET'));
         $oldObject = $bucket->object($oldFilePath);
+
 
         if ($oldObject->exists()) {
             $oldObject->delete();
+        } else {
         }
     }
 
