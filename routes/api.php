@@ -237,13 +237,13 @@ Route::get('external-audit-type', [SaAiExternalAuditTypeController::class, 'inde
 Route::post('external-audit-type', [SaAiExternalAuditTypeController::class, 'store']);
 
 Route::get('external-audit-category', [SaAiExternalAuditCategoryController::class, 'index']);
-Route::post('external-audit-type', [SaAiExternalAuditCategoryController::class, 'store']);
+Route::post('external-audit-category', [SaAiExternalAuditCategoryController::class, 'store']);
 
 Route::get('external-audit-standard', [SaAiExternalAuditStandardController::class, 'index']);
-Route::post('external-audit-type', [SaAiExternalAuditStandardController::class, 'store']);
+Route::post('external-audit-standard', [SaAiExternalAuditStandardController::class, 'store']);
 
 Route::get('external-audit-firm', [SaAiExternalAuditFirmController::class, 'index']);
-Route::post('external-audit-type', [SaAiExternalAuditFirmController::class, 'store']);
+Route::post('external-audit-firm', [SaAiExternalAuditFirmController::class, 'store']);
 
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
 Route::post('upload', [ImageUploadController::class, 'uploadImage']);
