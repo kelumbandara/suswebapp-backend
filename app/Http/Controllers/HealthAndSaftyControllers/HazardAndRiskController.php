@@ -4,7 +4,6 @@ namespace App\Http\Controllers\HealthAndSaftyControllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HazardAndRisk\HazardAndRiskRequest;
 use App\Repositories\All\HazardAndRisk\HazardAndRiskInterface;
-use App\Repositories\All\HRDivision\HRDivisionInterface;
 use App\Repositories\All\User\UserInterface;
 use App\Services\HazardRiskService;
 use Illuminate\Support\Facades\Auth;
@@ -14,14 +13,12 @@ class HazardAndRiskController extends Controller
 
     protected $hazardAndRiskInterface;
     protected $userInterface;
-    protected $HRDivisionInterface;
     protected $hazardAndRiskService;
 
-    public function __construct(HazardAndRiskInterface $hazardAndRiskInterface, UserInterface $userInterface, HRDivisionInterface $HRDivisionInterface, HazardRiskService $hazardAndRiskService)
+    public function __construct(HazardAndRiskInterface $hazardAndRiskInterface, UserInterface $userInterface, HazardRiskService $hazardAndRiskService)
     {
         $this->hazardAndRiskInterface = $hazardAndRiskInterface;
         $this->userInterface          = $userInterface;
-        $this->HRDivisionInterface    = $HRDivisionInterface;
         $this->hazardAndRiskService   = $hazardAndRiskService;
     }
     public function index()
@@ -154,7 +151,7 @@ class HazardAndRiskController extends Controller
         if ($updated) {
             return response()->json([
                 'message'    => 'Hazard and risk record updated successfully!',
-                'hazardRisk' => $this->hazardAndRiskInterface->findById($id), 
+                'hazardRisk' => $this->hazardAndRiskInterface->findById($id),
             ], 200);
         } else {
             return response()->json(['message' => 'Failed to update the hazard and risk record.'], 500);

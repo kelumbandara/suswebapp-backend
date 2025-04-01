@@ -21,5 +21,9 @@ class ExternalAuditRepository extends BaseRepository implements ExternalAuditInt
         $this->model = $model;
     }
 
+    public function getByAssigneeId($assigneeId)
+    {
+        return $this->model->where('assigneeId', $assigneeId)->get();
+    }
 
 }

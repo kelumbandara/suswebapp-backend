@@ -5,7 +5,7 @@ use Google\Cloud\Storage\StorageClient;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 
-class DocumentService
+class ExternalAuditService
 {
     public function uploadImageToGCS($file)
     {

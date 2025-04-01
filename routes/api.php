@@ -44,6 +44,7 @@ use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineTypeController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditCategoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditFirmController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditStandardController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditTypeController;
 use App\Http\Controllers\UserController;
@@ -121,6 +122,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('benefit-request', [OhMrBenefitRequestController::class, 'store']);
     Route::post('benefit-request/{id}/update', [OhMrBenefitRequestController::class, 'update']);
     Route::delete('benefit-request/{id}/delete', [OhMrBenefitRequestController::class, 'destroy']);
+
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('external-audit', [SaAiExternalAuditRecodeController::class, 'index']);
+    Route::post('external-audit', [SaAiExternalAuditRecodeController::class, 'store']);
+    Route::post('external-audit/{id}/update', [SaAiExternalAuditRecodeController::class, 'update']);
+    Route::delete('external-audit/{id}/delete', [SaAiExternalAuditRecodeController::class, 'destroy']);
+    Route::get('external-audit-assign-task', [SaAiExternalAuditRecodeController::class, 'assignTask']);
+    Route::get('external-audit-assignee', [SaAiExternalAuditRecodeController::class, 'assignee']);
+
 });
 
 Route::get('user-permissions', [ComPermissionController::class, 'index']);
