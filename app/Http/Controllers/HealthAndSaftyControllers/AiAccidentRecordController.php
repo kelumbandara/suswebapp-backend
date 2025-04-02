@@ -191,7 +191,26 @@ class AiAccidentRecordController extends Controller
             return response()->json(['message' => 'Failed to update accident record'], 500);
         }
 
-        $updatedRecord = $this->accidentRecordInterface->findById($id);
+        $this->accidentWitnessInterface->deleteByAccidentId($id);
+        $this->accidentPeopleInterface->deleteByAccidentId($id);
+
+        if (! empty($data['witnesses'])) {
+            foreach ($data['witnesses'] as $witness) {
+                $witness['incidentId'] = $id;
+                $this->accidentWitnessInterface->create($witness);
+            }
+        }
+
+        if (! empty($data['effectedIndividuals'])) {
+            foreach ($data['effectedIndividuals'] as $person) {
+                $person['incidentId'] = $id;
+                $this->accidentPeopleInterface->create($person);
+            }
+        }
+
+        $updatedRecord                      = $this->accidentRecordInterface->findById($id);
+        $updatedRecord->witnesses           = $this->accidentWitnessInterface->findByAccidentId($id);
+        $updatedRecord->effectedIndividuals = $this->accidentPeopleInterface->findByAccidentId($id);
 
         if (! $updatedRecord || ! is_object($updatedRecord)) {
             return response()->json(['message' => 'Error fetching updated accident record'], 500);

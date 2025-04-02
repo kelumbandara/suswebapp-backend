@@ -41,6 +41,11 @@ class SaAiExternalAuditRecode extends Model
 
     ];
 
+    protected $casts = [
+        'documents' => 'array',
+    ];
+
+
     protected static function booted()
     {
         static::created(function ($model) {

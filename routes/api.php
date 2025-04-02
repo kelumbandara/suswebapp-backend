@@ -47,6 +47,14 @@ use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditFirmCont
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditStandardController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditTypeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaSrAdditionalSDGController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaSrAlignmentSDGController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaSrIdImpactTypeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaSrMaterialityIssuesController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaSrMaterialityTypeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaSrPillarsController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaSrSDGController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaSrSDGReportingRecodeController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -133,6 +141,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('external-audit/{id}/delete', [SaAiExternalAuditRecodeController::class, 'destroy']);
     Route::get('external-audit-assign-task', [SaAiExternalAuditRecodeController::class, 'assignTask']);
     Route::get('external-audit-assignee', [SaAiExternalAuditRecodeController::class, 'assignee']);
+
+    Route::get('sdg-report', [SaSrSDGReportingRecodeController::class, 'index']);
+    Route::post('sdg-report', [SaSrSDGReportingRecodeController::class, 'store']);
+    Route::post('sdg-report/{id}/update', [SaSrSDGReportingRecodeController::class, 'update']);
+    Route::delete('sdg-report/{id}/delete', [SaSrSDGReportingRecodeController::class, 'destroy']);
+    Route::get('sdg-report-assign-task', [SaSrSDGReportingRecodeController::class, 'assignTask']);
+    Route::get('sdg-report-assignee', [SaSrSDGReportingRecodeController::class, 'assignee']);
+
 
 });
 
@@ -257,6 +273,28 @@ Route::post('external-audit-standard', [SaAiExternalAuditStandardController::cla
 
 Route::get('external-audit-firm', [SaAiExternalAuditFirmController::class, 'index']);
 Route::post('external-audit-firm', [SaAiExternalAuditFirmController::class, 'store']);
+
+Route::get('additional-SDG', [SaSrAdditionalSDGController::class, 'index']);
+Route::post('additional-SDG', [SaSrAdditionalSDGController::class, 'store']);
+
+Route::get('alignment-SDG', [SaSrAlignmentSDGController::class, 'index']);
+Route::post('alignment-SDG', [SaSrAlignmentSDGController::class, 'store']);
+
+Route::get('impact-type', [SaSrIdImpactTypeController::class, 'index']);
+Route::post('impact-type', [SaSrIdImpactTypeController::class, 'store']);
+
+Route::get('materiality-issues', [SaSrMaterialityIssuesController::class, 'index']);
+Route::post('materiality-issues', [SaSrMaterialityIssuesController::class, 'store']);
+
+Route::get('materiality-type', [SaSrMaterialityTypeController::class, 'index']);
+Route::post('materiality-type', [SaSrMaterialityTypeController::class, 'store']);
+
+Route::get('pillars', [SaSrPillarsController::class, 'index']);
+Route::post('pillars', [SaSrPillarsController::class, 'store']);
+
+Route::get('sdg-value', [SaSrSDGController::class, 'index']);
+Route::post('sdg-value ', [SaSrSDGController::class, 'store']);
+
 
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
 Route::post('upload', [ImageUploadController::class, 'uploadImage']);
