@@ -100,6 +100,24 @@ use App\Repositories\All\SaAiEaAuditType\ExternalAuditTypeInterface;
 use App\Repositories\All\SaAiEaAuditType\ExternalAuditTypeRepository;
 use App\Repositories\All\SaAiExternalAudit\ExternalAuditInterface;
 use App\Repositories\All\SaAiExternalAudit\ExternalAuditRepository;
+use App\Repositories\All\SaSDGRecode\SDGRecodeInterface;
+use App\Repositories\All\SaSDGRecode\SDGRecodeRepository;
+use App\Repositories\All\SaSrAdditionalSDG\AdditionalSDGInterface;
+use App\Repositories\All\SaSrAdditionalSDG\AdditionalSDGRepository;
+use App\Repositories\All\SaSrAlignmentSDG\AlignmentSDGInterface;
+use App\Repositories\All\SaSrAlignmentSDG\AlignmentSDGRepository;
+use App\Repositories\All\SaSrImpactDetails\ImpactDetailsInterface;
+use App\Repositories\All\SaSrImpactDetails\ImpactDetailsRepository;
+use App\Repositories\All\SaSrImpactType\ImpactTypeInterface;
+use App\Repositories\All\SaSrImpactType\ImpactTypeRepository;
+use App\Repositories\All\SaSrMaterialityIssues\MaterialityIssuesInterface;
+use App\Repositories\All\SaSrMaterialityIssues\MaterialityIssuesRepository;
+use App\Repositories\All\SaSrMaterialityType\MaterialityTypeInterface;
+use App\Repositories\All\SaSrMaterialityType\MaterialityTypeRepository;
+use App\Repositories\All\SaSrPillars\PillarsInterface;
+use App\Repositories\All\SaSrPillars\PillarsRepository;
+use App\Repositories\All\SaSrSDG\SrSdgInterface;
+use App\Repositories\All\SaSrSDG\SrSdgRepository;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -169,6 +187,16 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ExternalAuditCategoryInterface::class, ExternalAuditCategoryRepository::class);
         $this->app->bind(ExternalAuditStandardInterface::class, ExternalAuditStandardRepository::class);
         $this->app->bind(ExternalAuditFirmInterface::class, ExternalAuditFirmRepository::class);
+        $this->app->bind(SDGRecodeInterface::class, SDGRecodeRepository::class);
+        $this->app->bind(AdditionalSDGInterface::class, AdditionalSDGRepository::class);
+        $this->app->bind(AlignmentSDGInterface::class,AlignmentSDGRepository ::class);
+        $this->app->bind(ImpactDetailsInterface::class,ImpactDetailsRepository ::class);
+        $this->app->bind(ImpactTypeInterface::class,ImpactTypeRepository ::class);
+        $this->app->bind(MaterialityIssuesInterface::class, MaterialityIssuesRepository::class);
+        $this->app->bind(MaterialityTypeInterface::class, MaterialityTypeRepository::class);
+        $this->app->bind(PillarsInterface::class, PillarsRepository::class);
+        $this->app->bind(SrSdgInterface::class, SrSdgRepository::class);
+
 
 
     }

@@ -1,26 +1,25 @@
 <?php
-namespace App\Repositories\All\SaAiExternalAudit;
+namespace App\Repositories\All\SaSDGRecode;
 
-use App\Models\SaAiExternalAuditRecode;
+use App\Models\SaSSdgReportingRecode;
 use App\Repositories\Base\BaseRepository;
 
-class ExternalAuditRepository extends BaseRepository implements ExternalAuditInterface
+class SDGRecodeRepository extends BaseRepository implements SDGRecodeInterface
 {
     /**
-     * @var SaAiExternalAuditRecode
+     * @var SaSSdgReportingRecode
      */
     protected $model;
 
     /**
      * HazardRiskRepository constructor.
      *
-     * @param SaAiExternalAuditRecode $model
+     * @param SaSSdgReportingRecode $model
      */
-    public function __construct(SaAiExternalAuditRecode $model)
+    public function __construct(SaSSdgReportingRecode $model)
     {
         $this->model = $model;
     }
-
     public function getByAssigneeId($assigneeId)
     {
         return $this->model->where('assigneeId', $assigneeId)->get();

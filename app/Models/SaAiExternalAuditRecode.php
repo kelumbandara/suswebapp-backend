@@ -27,19 +27,24 @@ class SaAiExternalAuditRecode extends Model
         'auditorId',
         'remarks',
         'auditorName',
-        'expiryDate',
+        'auditExpiryDate',
         'auditStatus',
         'auditScore',
         'gradePeriod',
         'numberOfNonCom',
         'auditFee',
         'auditGrade',
-        'document',
+        'documents',
         'createdByUser',
         'responsibleSection',
         'assigneeLevel',
 
     ];
+
+    protected $casts = [
+        'documents' => 'array',
+    ];
+
 
     protected static function booted()
     {

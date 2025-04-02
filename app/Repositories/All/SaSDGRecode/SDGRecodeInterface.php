@@ -1,11 +1,11 @@
 <?php
-
-namespace App\Repositories\All\SaAiExternalAudit;
+namespace App\Repositories\All\SaSDGRecode;
 
 use App\Repositories\Base\EloquentRepositoryInterface;
 
 // Interface
-interface ExternalAuditInterface extends EloquentRepositoryInterface {
+interface SDGRecodeInterface extends EloquentRepositoryInterface
+{
     public function getByAssigneeId(int $assigneeId);
 
 }
