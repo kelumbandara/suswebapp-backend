@@ -49,7 +49,7 @@ class SaAiExternalAuditRecode extends Model
     protected static function booted()
     {
         static::created(function ($model) {
-            $model->referenceNumber = 'AUD-' . $model->id;
+            $model->referenceNumber = 'EAUD-' . $model->id;
 
             $model->save();
         });
