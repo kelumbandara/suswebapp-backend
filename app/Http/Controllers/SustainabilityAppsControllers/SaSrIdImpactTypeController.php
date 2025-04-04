@@ -32,4 +32,42 @@ class SaSrIdImpactTypeController extends Controller
             'data'    => $impactType,
         ], 201);
     }
+
+    public function getImpactType()
+    {
+        $type = $this->impactTypeInterface->all(['id', 'impactType']);
+
+        $uniqueTypes = $type->groupBy('impactType')->map(function ($item) {
+            return $item->first();
+        })->values();
+
+        if ($uniqueTypes->isEmpty()) {
+            return response()->json([
+                'message' => 'No type found.',
+            ]);
+        }
+
+        return response()->json($uniqueTypes);
+    }
+
+    public function getImpactUnit($impactType)
+    {
+        $subTypes = $this->impactTypeInterface->getByColumn(['impactType' => $impactType], ['id', 'impactUnit']);
+
+        if ($subTypes->isEmpty()) {
+            return response()->json([
+                'message' => 'No Impact Unit found.',
+            ]);
+        }
+
+
+        $uniqueSubUnits = $subTypes->unique('impactUnit')->values()->map(function ($item) {
+            return [
+                'id'          => (int) $item->id,
+                'impactUnit' => $item->impactUnit,
+            ];
+        });
+
+        return response()->json($uniqueSubUnits);
+    }
 }
