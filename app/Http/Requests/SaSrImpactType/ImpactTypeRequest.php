@@ -22,7 +22,7 @@ class ImpactTypeRequest extends FormRequest
     {
         return [
             'impactType' => 'required|string',
-            'ImpactUnit' => 'required|string',
+            'impactUnit' => 'required|string',
         ];
     }
 }

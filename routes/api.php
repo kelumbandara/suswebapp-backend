@@ -282,6 +282,8 @@ Route::post('alignment-SDG', [SaSrAlignmentSDGController::class, 'store']);
 
 Route::get('impact-type', [SaSrIdImpactTypeController::class, 'index']);
 Route::post('impact-type', [SaSrIdImpactTypeController::class, 'store']);
+Route::get('impact-types', [SaSrIdImpactTypeController::class, 'getImpactType']);
+Route::get('impact-types/{impactType}/impactUnit', [SaSrIdImpactTypeController::class, 'getImpactUnit']);
 
 Route::get('materiality-issues', [SaSrMaterialityIssuesController::class, 'index']);
 Route::post('materiality-issues', [SaSrMaterialityIssuesController::class, 'store']);
