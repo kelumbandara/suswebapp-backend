@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('sa_ai_ia_audit_types', function (Blueprint $table) {
             $table->id();
+            $table->string('auditTypeName')->nullable();
             $table->timestamps();
         });
     }

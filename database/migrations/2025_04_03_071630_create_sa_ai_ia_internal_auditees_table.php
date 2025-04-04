@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sa_ai_ia_f_contact_people', function (Blueprint $table) {
+        Schema::create('sa_ai_ia_internal_auditees', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
+            $table->string('email')->nullable();
             $table->timestamps();
         });
     }
@@ -23,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sa_ai_ia_f_contact_people');
+        Schema::dropIfExists('sa_ai_ia_internal_auditees');
     }
 };
