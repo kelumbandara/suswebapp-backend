@@ -24,7 +24,6 @@ return new class extends Migration
             $table->string('higgId')->nullable();
             $table->string('zdhcId')->nullable();
             $table->string('processType')->nullable();
-            $table->string('status')->nullable();
             $table->string('factoryName')->nullable();
             $table->string('factoryAddress')->nullable();
             $table->string('factoryContactPerson')->nullable();

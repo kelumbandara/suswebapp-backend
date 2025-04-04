@@ -100,6 +100,22 @@ use App\Repositories\All\SaAiEaAuditType\ExternalAuditTypeInterface;
 use App\Repositories\All\SaAiEaAuditType\ExternalAuditTypeRepository;
 use App\Repositories\All\SaAiExternalAudit\ExternalAuditInterface;
 use App\Repositories\All\SaAiExternalAudit\ExternalAuditRepository;
+use App\Repositories\All\SaAiIaAuditTitle\AuditTitleInterface;
+use App\Repositories\All\SaAiIaAuditTitle\AuditTitleRepository;
+use App\Repositories\All\SaAiIaAuditType\AuditTypeInterface;
+use App\Repositories\All\SaAiIaAuditType\AuditTypeRepository;
+use App\Repositories\All\SaAiIaContactPerson\ContactPersonInterface;
+use App\Repositories\All\SaAiIaContactPerson\ContactPersonRepository;
+use App\Repositories\All\SaAiIaInternalAuditee\InternalAuditeeInterface;
+use App\Repositories\All\SaAiIaInternalAuditee\InternalAuditeeRepository;
+use App\Repositories\All\SaAiIaProcessType\ProcessTypeInterface;
+use App\Repositories\All\SaAiIaProcessType\ProcessTypeRepository;
+use App\Repositories\All\SaAiIaSupplierType\SupplierTypeInterface as SaAiIaSupplierTypeSupplierTypeInterface;
+use App\Repositories\All\SaAiIaSupplierType\SupplierTypeRepository as SaAiIaSupplierTypeSupplierTypeRepository;
+use App\Repositories\All\SaAiInternalAuditFactory\InternalAuditFactoryInterface;
+use App\Repositories\All\SaAiInternalAuditFactory\InternalAuditFactoryRepository;
+use App\Repositories\All\SaAiInternalAuditRecode\InternalAuditRecodeInterface;
+use App\Repositories\All\SaAiInternalAuditRecode\InternalAuditRecodeRepository;
 use App\Repositories\All\SaSDGRecode\SDGRecodeInterface;
 use App\Repositories\All\SaSDGRecode\SDGRecodeRepository;
 use App\Repositories\All\SaSrAdditionalSDG\AdditionalSDGInterface;
@@ -196,6 +212,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(MaterialityTypeInterface::class, MaterialityTypeRepository::class);
         $this->app->bind(PillarsInterface::class, PillarsRepository::class);
         $this->app->bind(SrSdgInterface::class, SrSdgRepository::class);
+        $this->app->bind(AuditTitleInterface::class, AuditTitleRepository::class);
+        $this->app->bind(AuditTypeInterface::class, AuditTypeRepository::class);
+        $this->app->bind(ContactPersonInterface::class, ContactPersonRepository::class);
+        $this->app->bind(InternalAuditeeInterface::class, InternalAuditeeRepository::class);
+        $this->app->bind(ProcessTypeInterface::class, ProcessTypeRepository::class);
+        $this->app->bind(SaAiIaSupplierTypeSupplierTypeInterface::class, SaAiIaSupplierTypeSupplierTypeRepository::class);
+        $this->app->bind(InternalAuditFactoryInterface::class, InternalAuditFactoryRepository::class);
+        $this->app->bind(InternalAuditRecodeInterface::class, InternalAuditRecodeRepository::class);
+
 
 
 

@@ -28,10 +28,10 @@ class SaAiExternalAuditRecodeController extends Controller
 
         $externalAudit = $externalAudit->map(function ($audit) {
             try {
-                $assignee        = $this->userInterface->getById($audit->assigneeId);
-                $audit->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
+                $approver        = $this->userInterface->getById($audit->approverId);
+                $audit->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
-                $audit->assignee = ['name' => 'Unknown', 'id' => null];
+                $audit->approver = ['name' => 'Unknown', 'id' => null];
             }
             try {
                 $creator                  = $this->userInterface->getById($audit->createdByUser);
@@ -189,10 +189,10 @@ class SaAiExternalAuditRecodeController extends Controller
 
         $externalAudit = $externalAudit->map(function ($audit) {
             try {
-                $assignee        = $this->userInterface->getById($audit->assigneeId);
-                $audit->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
+                $approver        = $this->userInterface->getById($audit->approverId);
+                $audit->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
-                $audit->assignee = ['name' => 'Unknown', 'id' => null];
+                $audit->approver = ['name' => 'Unknown', 'id' => null];
             }
 
             try {
