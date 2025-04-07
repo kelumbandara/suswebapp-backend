@@ -62,7 +62,7 @@ class SaSrSDGReportingRecodeController extends Controller
             return $risk;
         });
         foreach ($records as $record) {
-            $record->ImpactDetails = $this->impactDetailsInterface->findBySdgId($record->id);
+            $record->impactDetails = $this->impactDetailsInterface->findBySdgId($record->id);
 
         }
 
@@ -184,6 +184,7 @@ class SaSrSDGReportingRecodeController extends Controller
             'record'  => $updatedRecord,
         ], 200);
     }
+    
     public function destroy(string $id)
     {
         $record = $this->sdgRecodeInterface->findById($id);

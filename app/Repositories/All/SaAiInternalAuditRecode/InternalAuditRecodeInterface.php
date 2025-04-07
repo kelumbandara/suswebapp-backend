@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Repositories\All\SaAiExternalAudit;
+namespace App\Repositories\All\SaAiInternalAuditRecode;
 
 use App\Repositories\Base\EloquentRepositoryInterface;
 
 // Interface
-interface ExternalAuditInterface extends EloquentRepositoryInterface {
+interface InternalAuditRecodeInterface extends EloquentRepositoryInterface {
     public function getByApproverId(int $approverId);
 
 }
