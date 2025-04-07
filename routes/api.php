@@ -47,6 +47,14 @@ use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditFirmCont
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditStandardController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditTypeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaAuditTitleController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaAuditTypeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaContactPersonController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaInternalAuditeeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaProcessTypeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaSuplierTypeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaAiInternalAuditFactoryController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaAiInternalAuditRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaSrAdditionalSDGController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaSrAlignmentSDGController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaSrIdImpactTypeController;
@@ -141,6 +149,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('external-audit/{id}/delete', [SaAiExternalAuditRecodeController::class, 'destroy']);
     Route::get('external-audit-assign-task', [SaAiExternalAuditRecodeController::class, 'assignTask']);
     Route::get('external-audit-assignee', [SaAiExternalAuditRecodeController::class, 'assignee']);
+
+    Route::get('internal-audit', [SaAiInternalAuditRecodeController::class, 'index']);
+    Route::post('internal-audit', [SaAiInternalAuditRecodeController::class, 'store']);
+    Route::post('internal-audit/{id}/update', [SaAiInternalAuditRecodeController::class, 'update']);
+    Route::delete('internal-audit/{id}/delete', [SaAiInternalAuditRecodeController::class, 'destroy']);
+    Route::get('internal-audit-assign-task', [SaAiInternalAuditRecodeController::class, 'assignTask']);
+    Route::get('internal-audit-assignee', [SaAiInternalAuditRecodeController::class, 'assignee']);
 
     Route::get('sdg-report', [SaSrSDGReportingRecodeController::class, 'index']);
     Route::post('sdg-report', [SaSrSDGReportingRecodeController::class, 'store']);
@@ -296,6 +311,27 @@ Route::post('pillars', [SaSrPillarsController::class, 'store']);
 
 Route::get('sdg-value', [SaSrSDGController::class, 'index']);
 Route::post('sdg-value ', [SaSrSDGController::class, 'store']);
+
+Route::get('audit-factory', [SaAiInternalAuditFactoryController::class, 'index']);
+Route::post('audit-factory', [SaAiInternalAuditFactoryController::class, 'store']);
+
+Route::get('contact-people', [SaAiIaContactPersonController::class, 'index']);
+Route::post('contact-people', [SaAiIaContactPersonController::class, 'store']);
+
+Route::get('audit-types', [SaAiIaAuditTypeController::class, 'index']);
+Route::post('audit-types', [SaAiIaAuditTypeController::class, 'store']);
+
+Route::get('process-types', [SaAiIaProcessTypeController::class, 'index']);
+Route::post('process-types', [SaAiIaProcessTypeController::class, 'store']);
+
+Route::get('audit-titles', [SaAiIaAuditTitleController::class, 'index']);
+Route::post('audit-titles', [SaAiIaAuditTitleController::class, 'store']);
+
+Route::get('internal-auditee', [SaAiIaInternalAuditeeController::class, 'index']);
+Route::post('internal-auditee', [SaAiIaInternalAuditeeController::class, 'store']);
+
+Route::get('supplier-types', [SaAiIaSuplierTypeController::class, 'index']);
+Route::post('supplier-types', [SaAiIaSuplierTypeController::class, 'store']);
 
 
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);

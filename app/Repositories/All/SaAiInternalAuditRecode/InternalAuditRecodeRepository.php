@@ -20,6 +20,10 @@ class InternalAuditRecodeRepository extends BaseRepository implements InternalAu
     {
         $this->model = $model;
     }
+    public function getByApproverId($approverId)
+    {
+        return $this->model->where('approverId', $approverId)->get();
+    }
 
 
 }

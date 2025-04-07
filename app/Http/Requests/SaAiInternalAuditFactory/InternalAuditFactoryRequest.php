@@ -26,7 +26,7 @@ class InternalAuditFactoryRequest extends FormRequest
             'factoryContactNumber'  => 'required|string',
             'factoryEmail'          => 'required|string',
             'designation'           => 'required|string',
-            'FactoryContactPerson ' => 'required|string',
+            'factoryContactPerson' => 'required|string',
 
         ];
     }

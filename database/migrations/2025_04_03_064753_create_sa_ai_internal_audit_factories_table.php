@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('sa_ai_internal_audit_factories', function (Blueprint $table) {
             $table->id();
-            $table->string('factoryName');
-            $table->string('factoryAddress');
-            $table->string('factoryContactNumber');
-            $table->string('factoryEmail');
-            $table->string('designation');
-            $table->string('FactoryContactPerson');
+            $table->string('factoryName')->nullable();
+            $table->string('factoryAddress')->nullable();
+            $table->string('factoryContactNumber')->nullable();
+            $table->string('factoryEmail')->nullable();
+            $table->string('designation')->nullable();
+            $table->string('factoryContactPerson')->nullable();
 
             $table->timestamps();
         });

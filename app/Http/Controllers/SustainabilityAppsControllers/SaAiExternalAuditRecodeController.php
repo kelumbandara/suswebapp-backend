@@ -89,7 +89,7 @@ class SaAiExternalAuditRecodeController extends Controller
         }
         return response()->json([
             'message'    => 'External audit record created successfully!',
-            'hazardRisk' => $externalAudit,
+            'externalAudit' => $externalAudit,
         ], 201);
     }
 
@@ -185,7 +185,7 @@ class SaAiExternalAuditRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $externalAudit = $this->externalAuditInterface->getByAssigneeId($user->id);
+        $externalAudit = $this->externalAuditInterface->getByApproverId($user->id);
 
         $externalAudit = $externalAudit->map(function ($audit) {
             try {

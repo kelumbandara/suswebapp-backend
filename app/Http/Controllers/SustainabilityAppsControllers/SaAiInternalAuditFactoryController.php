@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\SustainabilityAppsControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaAiInternalAuditFactory\InternalAuditFactoryRequest;
 use App\Repositories\All\SaAiInternalAuditFactory\InternalAuditFactoryInterface;
-use Illuminate\Http\Request;
 
 class SaAiInternalAuditFactoryController extends Controller
 {
@@ -27,8 +25,8 @@ class SaAiInternalAuditFactoryController extends Controller
 
     public function store(InternalAuditFactoryRequest $request)
     {
-        $data = $request->validated();
-        $factory  = $this->internalAuditFactoryInterface->create($data);
+        $data    = $request->validated();
+        $factory = $this->internalAuditFactoryInterface->create($data);
         return response()->json([
             'message' => 'Audit Factory created successfully',
             'data'    => $factory,

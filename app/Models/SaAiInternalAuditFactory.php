@@ -15,6 +15,6 @@ class SaAiInternalAuditFactory extends Model
         'factoryContactNumber',
         'factoryEmail',
         'designation',
-        'FactoryContactPerson',
+        'factoryContactPerson'
     ];
 }

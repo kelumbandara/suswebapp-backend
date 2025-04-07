@@ -10,7 +10,7 @@ class InternalAuditRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -25,24 +25,23 @@ class InternalAuditRequest extends FormRequest
             'auditTitle'                  => 'required|string',
             'auditType'                   => 'required|string',
             'department'                  => 'required|string',
-            'isAuditScheduledForSupplier' => 'required|boolean',
+            'isAuditScheduledForSupplier' => 'nullable|boolean',
             'supplierType'                => 'nullable|string|required_if:isAuditScheduledForSupplier,true',
             'factoryLicenseNo'            => 'nullable|string|required_if:isAuditScheduledForSupplier,true',
-            'higgId'                      => 'nullable|string|required_if:isAuditScheduledForSupplier,true',
-            'zdhcId'                      => 'nullable|string|required_if:isAuditScheduledForSupplier,true',
-            'processType'                 => 'nullable|string|required_if:isAuditScheduledForSupplier,true',
-            'status'                      => 'required|string',
+            'higgId'                      => 'nullable|string',
+            'zdhcId'                      => 'nullable|string',
+            'processType'                 => 'nullable|string',
             'factoryName'                 => 'required|string',
             'factoryAddress'              => 'required|string',
             'factoryContactPerson'        => 'required|string',
             'factoryContactNumber'        => 'required|string',
             'factoryEmail'                => 'required|string',
             'designation'                 => 'required|string',
-            'description'                 => 'required|string',
-            'auditeeId'                   => 'required|string',
-            'approverId'                  => 'required|string',
-            'auditDate'                   => 'required|string',
-            'dateForApproval'             => 'required|string',
+            'description'                 => 'nullable|string',
+            'auditeeId'                   => 'nullable|string',
+            'approverId'                  => 'nullable|string',
+            'auditDate'                   => 'nullable|string',
+            'dateForApproval'             => 'nullable|string',
         ];
     }
 }
