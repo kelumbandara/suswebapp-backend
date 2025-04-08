@@ -31,6 +31,12 @@ class SaAiInternalAuditRecodeController extends Controller
                 $audit->approver = ['name' => 'Unknown', 'id' => null];
             }
             try {
+                $auditee        = $this->userInterface->getById($audit->auditeeId);
+                $audit->auditee = $auditee ? ['name' => $auditee->name, 'id' => $auditee->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $audit->auditee = ['name' => 'Unknown', 'id' => null];
+            }
+            try {
                 $creator                  = $this->userInterface->getById($audit->createdByUser);
                 $audit->createdByUserName = $creator ? $creator->name : 'Unknown';
             } catch (\Exception $e) {
@@ -114,6 +120,12 @@ class SaAiInternalAuditRecodeController extends Controller
                 $audit->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $audit->approver = ['name' => 'Unknown', 'id' => null];
+            }
+            try {
+                $auditee        = $this->userInterface->getById($audit->auditeeId);
+                $audit->auditee = $auditee ? ['name' => $auditee->name, 'id' => $auditee->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $audit->auditee = ['name' => 'Unknown', 'id' => null];
             }
 
             try {
