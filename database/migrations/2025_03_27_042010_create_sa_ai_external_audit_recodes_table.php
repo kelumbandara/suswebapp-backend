@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('auditDate')->nullable();
             $table->string('approvalDate')->nullable();
             $table->string('approverId')->nullable();
-            $table->string('representor')->nullable();
+            $table->string('representorId')->nullable();
             $table->string('announcement')->nullable();
             $table->string('assessmentDate')->nullable();
             $table->string('auditorId')->nullable();
