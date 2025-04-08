@@ -16,7 +16,7 @@ class SaSSrImpactDetails extends Model
         'value',
     ];
 
-    public function incident()
+    public function impact()
     {
         return $this->belongsTo(SaSSdgReportingRecode::class, 'sdgId');
     }
