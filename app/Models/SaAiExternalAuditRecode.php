@@ -21,7 +21,7 @@ class SaAiExternalAuditRecode extends Model
         'auditDate',
         'approvalDate',
         'approverId',
-        'representor',
+        'representorId',
         'announcement',
         'assessmentDate',
         'auditorId',

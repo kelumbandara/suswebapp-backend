@@ -30,7 +30,7 @@ class ExternalAuditRequest extends FormRequest
             'auditDate'       => 'nullable|string',
             'approvalDate'    => 'required|string',
             'approverId'      => 'required|string',
-            'representor'     => 'required|string',
+            'representorId'     => 'required|string',
             'announcement'    => 'nullable|string',
             'assessmentDate'  => 'nullable|string',
             'auditorId'       => 'nullable|string',
