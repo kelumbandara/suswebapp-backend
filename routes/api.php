@@ -52,6 +52,7 @@ use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaAuditTypeController
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaContactPersonController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaInternalAuditeeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaProcessTypeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaQuestionRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaSuplierTypeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiInternalAuditFactoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiInternalAuditRecodeController;
@@ -156,6 +157,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('internal-audit/{id}/delete', [SaAiInternalAuditRecodeController::class, 'destroy']);
     Route::get('internal-audit-assign-task', [SaAiInternalAuditRecodeController::class, 'assignTask']);
     Route::get('internal-audit-assignee', [SaAiInternalAuditRecodeController::class, 'assignee']);
+
+    Route::get('question-reports', [SaAiIaQuestionRecodeController::class, 'index']);
+    Route::post('question-reports', [SaAiIaQuestionRecodeController::class, 'store']);
+    Route::post('question-reports/{id}/update', [SaAiIaQuestionRecodeController::class, 'update']);
+    Route::delete('question-reports/{id}/delete', [SaAiIaQuestionRecodeController::class, 'destroy']);
 
     Route::get('sdg-report', [SaSrSDGReportingRecodeController::class, 'index']);
     Route::post('sdg-report', [SaSrSDGReportingRecodeController::class, 'store']);

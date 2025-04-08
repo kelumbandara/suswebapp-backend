@@ -110,6 +110,12 @@ use App\Repositories\All\SaAiIaInternalAuditee\InternalAuditeeInterface;
 use App\Repositories\All\SaAiIaInternalAuditee\InternalAuditeeRepository;
 use App\Repositories\All\SaAiIaProcessType\ProcessTypeInterface;
 use App\Repositories\All\SaAiIaProcessType\ProcessTypeRepository;
+use App\Repositories\All\SaAiIaQrGroupRecode\GroupRecodeInterface;
+use App\Repositories\All\SaAiIaQrGroupRecode\GroupRecodeRepository;
+use App\Repositories\All\SaAiIaQrQuection\QuestionsInterface;
+use App\Repositories\All\SaAiIaQrQuection\QuestionsRepository;
+use App\Repositories\All\SaAiIaQuestionRecode\QuestionRecodeInterface;
+use App\Repositories\All\SaAiIaQuestionRecode\QuestionRecodeRepository;
 use App\Repositories\All\SaAiIaSupplierType\SupplierTypeInterface as SaAiIaSupplierTypeSupplierTypeInterface;
 use App\Repositories\All\SaAiIaSupplierType\SupplierTypeRepository as SaAiIaSupplierTypeSupplierTypeRepository;
 use App\Repositories\All\SaAiInternalAuditFactory\InternalAuditFactoryInterface;
@@ -220,6 +226,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SaAiIaSupplierTypeSupplierTypeInterface::class, SaAiIaSupplierTypeSupplierTypeRepository::class);
         $this->app->bind(InternalAuditFactoryInterface::class, InternalAuditFactoryRepository::class);
         $this->app->bind(InternalAuditRecodeInterface::class, InternalAuditRecodeRepository::class);
+        $this->app->bind(QuestionRecodeInterface::class, QuestionRecodeRepository::class);
+        $this->app->bind(GroupRecodeInterface::class, GroupRecodeRepository::class);
+        $this->app->bind(QuestionsInterface::class, QuestionsRepository::class);
 
 
 
