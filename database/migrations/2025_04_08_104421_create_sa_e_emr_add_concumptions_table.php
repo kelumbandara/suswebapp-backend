@@ -12,7 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sa_e_emr_add_concumptions', function (Blueprint $table) {
-            $table->id();
+            $table->id('concumptionsId');
+            $table->bigInteger('envirementId')->nullable();
+            $table->string('category')->nullable();
+            $table->string('source')->nullable();
+            $table->string('unit')->nullable();
+            $table->string('quentity')->nullable();
+            $table->string('amount')->nullable();
+            $table->string('ghgInTonnes')->nullable();
+            $table->string('scope')->nullable();
+            $table->string('methodeOfTracking')->nullable();
+            $table->string('usageType')->nullable();
+            $table->boolean('doYouHaveREC')->nullable();
+            $table->string('description')->nullable();
+
             $table->timestamps();
         });
     }

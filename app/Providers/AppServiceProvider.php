@@ -122,6 +122,10 @@ use App\Repositories\All\SaAiInternalAuditFactory\InternalAuditFactoryInterface;
 use App\Repositories\All\SaAiInternalAuditFactory\InternalAuditFactoryRepository;
 use App\Repositories\All\SaAiInternalAuditRecode\InternalAuditRecodeInterface;
 use App\Repositories\All\SaAiInternalAuditRecode\InternalAuditRecodeRepository;
+use App\Repositories\All\SaEmrAddConcumption\AddConcumptionInterface;
+use App\Repositories\All\SaEmrAddConcumption\AddConcumptionRepository;
+use App\Repositories\All\SaEnvirementManagementRecode\EnvirementManagementRecodeInterface;
+use App\Repositories\All\SaEnvirementManagementRecode\EnvirementManagementRecodeRepository;
 use App\Repositories\All\SaSDGRecode\SDGRecodeInterface;
 use App\Repositories\All\SaSDGRecode\SDGRecodeRepository;
 use App\Repositories\All\SaSrAdditionalSDG\AdditionalSDGInterface;
@@ -229,6 +233,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(QuestionRecodeInterface::class, QuestionRecodeRepository::class);
         $this->app->bind(GroupRecodeInterface::class, GroupRecodeRepository::class);
         $this->app->bind(QuestionsInterface::class, QuestionsRepository::class);
+        $this->app->bind(EnvirementManagementRecodeInterface::class, EnvirementManagementRecodeRepository::class);
+        $this->app->bind(AddConcumptionInterface::class, AddConcumptionRepository::class);
 
 
 

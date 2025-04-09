@@ -56,6 +56,7 @@ use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaQuestionRecodeContr
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaSuplierTypeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiInternalAuditFactoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiInternalAuditRecodeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaEnvirementManagementRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaSrAdditionalSDGController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaSrAlignmentSDGController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaSrIdImpactTypeController;
@@ -170,6 +171,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('sdg-report-assign-task', [SaSrSDGReportingRecodeController::class, 'assignTask']);
     Route::get('sdg-report-assignee', [SaSrSDGReportingRecodeController::class, 'assignee']);
 
+    Route::get('envirement-recode', [SaEnvirementManagementRecodeController::class, 'index']);
+    Route::post('envirement-recode', [SaEnvirementManagementRecodeController::class, 'store']);
+    Route::post('envirement-recode/{id}/update', [SaEnvirementManagementRecodeController::class, 'update']);
+    Route::delete('envirement-recode/{id}/delete', [SaEnvirementManagementRecodeController::class, 'destroy']);
+    Route::get('envirement-recode-assign-task', [SaEnvirementManagementRecodeController::class, 'assignTask']);
+    Route::get('envirement-recode-assignee', [SaEnvirementManagementRecodeController::class, 'assignee']);
 
 });
 
