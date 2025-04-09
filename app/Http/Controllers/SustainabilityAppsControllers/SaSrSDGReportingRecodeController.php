@@ -184,13 +184,13 @@ class SaSrSDGReportingRecodeController extends Controller
             'record'  => $updatedRecord,
         ], 200);
     }
-    
+
     public function destroy(string $id)
     {
         $record = $this->sdgRecodeInterface->findById($id);
 
         if (! $record) {
-            return response()->json(['message' => 'Accident record not found'], 404);
+            return response()->json(['message' => 'SDG record not found'], 404);
         }
 
         $this->impactDetailsInterface->deleteBySdgId($id);
