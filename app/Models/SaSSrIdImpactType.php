@@ -10,6 +10,6 @@ class SaSSrIdImpactType extends Model
     use HasFactory;
     protected $fillable = [
         'impactType',
-        'ImpactUnit',
+        'impactUnit',
     ];
 }
