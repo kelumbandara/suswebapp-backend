@@ -25,12 +25,12 @@ class QuestionRecodeRequest extends FormRequest
             'name' => 'required|string',
             'description' => 'nullable|string',
             'createdByUser' => 'nullable|string',
-            'impactGroup' => 'required|array',
-            'impactGroup.*.groupName' => 'required|string',
-            'impactGroup.*.impactQuection' => 'required|array',
-            'impactGroup.*.impactQuection.*.colorCode' => 'required|string',
-            'impactGroup.*.impactQuection.*.question' => 'required|string',
-            'impactGroup.*.impactQuection.*.allocatedScore' => 'required|integer',
+            'questionGroups' => 'nullable|array',
+            'questionGroups.*.groupName' => 'required|string',
+            'questionGroups.*.questions' => 'nullable|array',
+            'questionGroups.*.questions.*.colorCode' => 'required|string',
+            'questionGroups.*.questions.*.question' => 'required|string',
+            'questionGroups.*.questions.*.allocatedScore' => 'required|integer',
         ];
     }
 }
