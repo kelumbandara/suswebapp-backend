@@ -35,6 +35,13 @@ class SaAiInternalAuditRecode extends Model
         'responsibleSection',
         'assigneeLevel',
         'createdByUser',
+        'updatedByUser',
+        'scheduledBy',
+        'draftBy',
+        'draftAt',
+        'scheduledAt',
+        'ongoingAt',
+        'completedAt',
 
     ];
 

@@ -56,6 +56,9 @@ use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaQuestionRecodeContr
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaSuplierTypeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiInternalAuditFactoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiInternalAuditRecodeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionCategoryController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionSourceController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionUnitController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEnvirementManagementRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEnvirementTargetSettingRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaETsCategoryController;
@@ -161,6 +164,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('internal-audit/{id}/delete', [SaAiInternalAuditRecodeController::class, 'destroy']);
     Route::get('internal-audit-assign-task', [SaAiInternalAuditRecodeController::class, 'assignTask']);
     Route::get('internal-audit-assignee', [SaAiInternalAuditRecodeController::class, 'assignee']);
+    Route::post('internal-audit-draft', [SaAiInternalAuditRecodeController::class, 'saveDraft']);
+    Route::post('internal-audit-shedualed', [SaAiInternalAuditRecodeController::class, 'saveShedualed']);
+    Route::post('internal-audit/{id}/action-plan', [SaAiInternalAuditRecodeController::class, 'actionPlanUpdate']);
 
     Route::get('question-reports', [SaAiIaQuestionRecodeController::class, 'index']);
     Route::post('question-reports', [SaAiIaQuestionRecodeController::class, 'store']);
@@ -356,15 +362,23 @@ Route::post('internal-auditee', [SaAiIaInternalAuditeeController::class, 'store'
 Route::get('supplier-types', [SaAiIaSuplierTypeController::class, 'index']);
 Route::post('supplier-types', [SaAiIaSuplierTypeController::class, 'store']);
 
-Route::get('Ts-categories', [SaETsCategoryController::class, 'index']);
-Route::post('Ts-categories', [SaETsCategoryController::class, 'store']);
-Route::get('categories', [SaETsCategoryController::class, 'getCategories']);
+Route::get('ts-categories', [SaETsCategoryController::class, 'index']);
+Route::post('ts-categories', [SaETsCategoryController::class, 'store']);
+Route::get('ts-categories', [SaETsCategoryController::class, 'getCategories']);
 Route::get('categories/{categoryName}/possibilityCategory', [SaETsCategoryController::class, 'getPossibleCategories']);
 Route::get('subcategories/{possibilityCategory}/opertunity', [SaETsCategoryController::class, 'getOppertunities']);
 
-Route::get('Ts-sources', [SaETsSourceController::class, 'index']);
-Route::post('Ts-sources', [SaETsSourceController::class, 'store']);
+Route::get('ts-sources', [SaETsSourceController::class, 'index']);
+Route::post('ts-sources', [SaETsSourceController::class, 'store']);
 
+Route::get('consumption-categories', [SaEmrConsumptionCategoryController::class, 'index']);
+Route::post('consumption-categories', [SaEmrConsumptionCategoryController::class, 'store']);
+
+Route::get('consumption-sources', [SaEmrConsumptionSourceController::class, 'index']);
+Route::post('consumption-sources', [SaEmrConsumptionSourceController::class, 'store']);
+
+Route::get('consumption-units', [SaEmrConsumptionUnitController::class, 'index']);
+Route::post('consumption-units', [SaEmrConsumptionUnitController::class, 'store']);
 
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
 Route::post('upload', [ImageUploadController::class, 'uploadImage']);
