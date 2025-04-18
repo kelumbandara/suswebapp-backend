@@ -56,6 +56,9 @@ use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaQuestionRecodeContr
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaSuplierTypeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiInternalAuditFactoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiInternalAuditRecodeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionCategoryController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionSourceController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionUnitController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEnvirementManagementRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEnvirementTargetSettingRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaETsCategoryController;
@@ -368,6 +371,14 @@ Route::get('subcategories/{possibilityCategory}/opertunity', [SaETsCategoryContr
 Route::get('ts-sources', [SaETsSourceController::class, 'index']);
 Route::post('ts-sources', [SaETsSourceController::class, 'store']);
 
+Route::get('consumption-categories', [SaEmrConsumptionCategoryController::class, 'index']);
+Route::post('consumption-categories', [SaEmrConsumptionCategoryController::class, 'store']);
+
+Route::get('consumption-sources', [SaEmrConsumptionSourceController::class, 'index']);
+Route::post('consumption-sources', [SaEmrConsumptionSourceController::class, 'store']);
+
+Route::get('consumption-units', [SaEmrConsumptionUnitController::class, 'index']);
+Route::post('consumption-units', [SaEmrConsumptionUnitController::class, 'store']);
 
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
 Route::post('upload', [ImageUploadController::class, 'uploadImage']);

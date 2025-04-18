@@ -124,6 +124,12 @@ use App\Repositories\All\SaAiInternalAuditFactory\InternalAuditFactoryInterface;
 use App\Repositories\All\SaAiInternalAuditFactory\InternalAuditFactoryRepository;
 use App\Repositories\All\SaAiInternalAuditRecode\InternalAuditRecodeInterface;
 use App\Repositories\All\SaAiInternalAuditRecode\InternalAuditRecodeRepository;
+use App\Repositories\All\SaEEmrAcCategory\ConsumptionCategoryInterface;
+use App\Repositories\All\SaEEmrAcCategory\ConsumptionCategoryRepository;
+use App\Repositories\All\SaEEmrAcSource\ConsumptionSourceInterface;
+use App\Repositories\All\SaEEmrAcSource\ConsumptionSourceRepository;
+use App\Repositories\All\SaEEmrAcUnit\ConsumptionUnitInterface;
+use App\Repositories\All\SaEEmrAcUnit\ConsumptionUnitRepository;
 use App\Repositories\All\SaEmrAddConcumption\AddConcumptionInterface;
 use App\Repositories\All\SaEmrAddConcumption\AddConcumptionRepository;
 use App\Repositories\All\SaEnvirementManagementRecode\EnvirementManagementRecodeInterface;
@@ -247,6 +253,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TsCategoryInterface::class, TsCategoryRepository::class);
         $this->app->bind(TsSourceInterface::class, TsSourceRepository::class);
         $this->app->bind(ActionPlanInterface::class, ActionPlanRepository::class);
+        $this->app->bind(ConsumptionCategoryInterface::class, ConsumptionCategoryRepository::class);
+        $this->app->bind(ConsumptionSourceInterface::class, ConsumptionSourceRepository::class);
+        $this->app->bind(ConsumptionUnitInterface::class, ConsumptionUnitRepository::class);
 
 
 

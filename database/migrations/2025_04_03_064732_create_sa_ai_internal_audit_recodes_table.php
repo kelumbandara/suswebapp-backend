@@ -35,15 +35,15 @@ return new class extends Migration
             $table->string('approverId')->nullable();
             $table->string('auditDate')->nullable();
             $table->string('dateForApproval')->nullable();
-            $table->enum('status', ['pending', 'approved', 'rejected', 'published', 'ongoing', 'draft', 'sheduled', 'completed'])->default('draft')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected', 'published', 'ongoing', 'draft', 'scheduled', 'completed'])->default('draft')->nullable();
             $table->string('responsibleSection')->nullable()->default('SDGReportingRecodes');
             $table->string('assigneeLevel')->nullable()->default('1');
             $table->string('createdByUser')->nullable();
             $table->string('updatedByUser')->nullable();
-            $table->string('sheduledBy')->nullable();
+            $table->string('scheduledBy')->nullable();
             $table->string('draftBy')->nullable();
             $table->string('draftAt')->nullable();
-            $table->string('shedualedAt')->nullable();
+            $table->string('scheduledAt')->nullable();
             $table->string('ongoingAt')->nullable();
             $table->string('completedAt')->nullable();
 

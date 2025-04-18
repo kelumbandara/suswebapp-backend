@@ -102,7 +102,7 @@ class SaAiInternalAuditRecodeController extends Controller
         ], 201);
     }
 
-    public function saveShedualed(InternalAuditRequest $request)
+    public function saveSchedualed(InternalAuditRequest $request)
     {
         $user = Auth::user();
         if (! $user) {
@@ -112,8 +112,8 @@ class SaAiInternalAuditRecodeController extends Controller
         $userId        = $user->id;
         $validatedData = $request->validated();
 
-        $validatedData['shedualedBy'] = $userId;
-        $validatedData['status']      = 'shedualed';
+        $validatedData['scheduledBy'] = $userId;
+        $validatedData['status']      = 'scheduled';
 
         $internalAudit = $this->internalAuditRecodeInterface->create($validatedData);
 
@@ -122,7 +122,7 @@ class SaAiInternalAuditRecodeController extends Controller
         }
 
         return response()->json([
-            'message'       => 'Shedualed saved successfully!',
+            'message'       => 'Scheduled saved successfully!',
             'internalAudit' => $internalAudit,
         ], 201);
     }

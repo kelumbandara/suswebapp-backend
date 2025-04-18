@@ -36,10 +36,10 @@ class SaAiInternalAuditRecode extends Model
         'assigneeLevel',
         'createdByUser',
         'updatedByUser',
-        'sheduledBy',
+        'scheduledBy',
         'draftBy',
         'draftAt',
-        'shedualedAt',
+        'scheduledAt',
         'ongoingAt',
         'completedAt',
 
