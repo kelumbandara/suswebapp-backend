@@ -126,6 +126,12 @@ use App\Repositories\All\SaEmrAddConcumption\AddConcumptionInterface;
 use App\Repositories\All\SaEmrAddConcumption\AddConcumptionRepository;
 use App\Repositories\All\SaEnvirementManagementRecode\EnvirementManagementRecodeInterface;
 use App\Repositories\All\SaEnvirementManagementRecode\EnvirementManagementRecodeRepository;
+use App\Repositories\All\SaETargetSetting\TargetSettingRecodeInterface;
+use App\Repositories\All\SaETargetSetting\TargetSettingRecodeRepository;
+use App\Repositories\All\SaETsCategory\TsCategoryInterface;
+use App\Repositories\All\SaETsCategory\TsCategoryRepository;
+use App\Repositories\All\SaETsSource\TsSourceInterface;
+use App\Repositories\All\SaETsSource\TsSourceRepository;
 use App\Repositories\All\SaSDGRecode\SDGRecodeInterface;
 use App\Repositories\All\SaSDGRecode\SDGRecodeRepository;
 use App\Repositories\All\SaSrAdditionalSDG\AdditionalSDGInterface;
@@ -235,6 +241,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(QuestionsInterface::class, QuestionsRepository::class);
         $this->app->bind(EnvirementManagementRecodeInterface::class, EnvirementManagementRecodeRepository::class);
         $this->app->bind(AddConcumptionInterface::class, AddConcumptionRepository::class);
+        $this->app->bind(TargetSettingRecodeInterface::class, TargetSettingRecodeRepository::class);
+        $this->app->bind(TsCategoryInterface::class, TsCategoryRepository::class);
+        $this->app->bind(TsSourceInterface::class, TsSourceRepository::class);
 
 
 
