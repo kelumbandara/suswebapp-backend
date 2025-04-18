@@ -57,6 +57,9 @@ use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaSuplierTypeControll
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiInternalAuditFactoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiInternalAuditRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEnvirementManagementRecodeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaEnvirementTargetSettingRecodeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaETsCategoryController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaETsSourceController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaSrAdditionalSDGController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaSrAlignmentSDGController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaSrIdImpactTypeController;
@@ -177,6 +180,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('envirement-recode/{id}/delete', [SaEnvirementManagementRecodeController::class, 'destroy']);
     Route::get('envirement-recode-assign-task', [SaEnvirementManagementRecodeController::class, 'assignTask']);
     Route::get('envirement-recode-assignee', [SaEnvirementManagementRecodeController::class, 'assignee']);
+
+    Route::get('target-setting', [SaEnvirementTargetSettingRecodeController::class, 'index']);
+    Route::post('target-setting', [SaEnvirementTargetSettingRecodeController::class, 'store']);
+    Route::post('target-setting/{id}/update', [SaEnvirementTargetSettingRecodeController::class, 'update']);
+    Route::delete('target-setting/{id}/delete', [SaEnvirementTargetSettingRecodeController::class, 'destroy']);
+    Route::get('target-setting-assign-task', [SaEnvirementTargetSettingRecodeController::class, 'assignTask']);
+    Route::get('target-setting-assignee', [SaEnvirementTargetSettingRecodeController::class, 'assignee']);
 
 });
 
@@ -345,6 +355,15 @@ Route::post('internal-auditee', [SaAiIaInternalAuditeeController::class, 'store'
 
 Route::get('supplier-types', [SaAiIaSuplierTypeController::class, 'index']);
 Route::post('supplier-types', [SaAiIaSuplierTypeController::class, 'store']);
+
+Route::get('Ts-categories', [SaETsCategoryController::class, 'index']);
+Route::post('Ts-categories', [SaETsCategoryController::class, 'store']);
+Route::get('categories', [SaETsCategoryController::class, 'getCategories']);
+Route::get('categories/{categoryName}/possibilityCategory', [SaETsCategoryController::class, 'getPossibleCategories']);
+Route::get('subcategories/{possibilityCategory}/opertunity', [SaETsCategoryController::class, 'getOppertunities']);
+
+Route::get('Ts-sources', [SaETsSourceController::class, 'index']);
+Route::post('Ts-sources', [SaETsSourceController::class, 'store']);
 
 
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
