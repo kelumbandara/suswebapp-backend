@@ -100,6 +100,8 @@ use App\Repositories\All\SaAiEaAuditType\ExternalAuditTypeInterface;
 use App\Repositories\All\SaAiEaAuditType\ExternalAuditTypeRepository;
 use App\Repositories\All\SaAiExternalAudit\ExternalAuditInterface;
 use App\Repositories\All\SaAiExternalAudit\ExternalAuditRepository;
+use App\Repositories\All\SaAiIaActionPlan\ActionPlanInterface;
+use App\Repositories\All\SaAiIaActionPlan\ActionPlanRepository;
 use App\Repositories\All\SaAiIaAuditTitle\AuditTitleInterface;
 use App\Repositories\All\SaAiIaAuditTitle\AuditTitleRepository;
 use App\Repositories\All\SaAiIaAuditType\AuditTypeInterface;
@@ -244,6 +246,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TargetSettingRecodeInterface::class, TargetSettingRecodeRepository::class);
         $this->app->bind(TsCategoryInterface::class, TsCategoryRepository::class);
         $this->app->bind(TsSourceInterface::class, TsSourceRepository::class);
+        $this->app->bind(ActionPlanInterface::class, ActionPlanRepository::class);
 
 
 

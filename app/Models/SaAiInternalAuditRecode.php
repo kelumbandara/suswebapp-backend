@@ -38,6 +38,10 @@ class SaAiInternalAuditRecode extends Model
         'updatedByUser',
         'sheduledBy',
         'draftBy',
+        'draftAt',
+        'shedualedAt',
+        'ongoingAt',
+        'completedAt',
 
     ];
 

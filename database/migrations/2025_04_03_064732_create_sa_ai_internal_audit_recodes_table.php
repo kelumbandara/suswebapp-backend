@@ -42,6 +42,10 @@ return new class extends Migration
             $table->string('updatedByUser')->nullable();
             $table->string('sheduledBy')->nullable();
             $table->string('draftBy')->nullable();
+            $table->string('draftAt')->nullable();
+            $table->string('shedualedAt')->nullable();
+            $table->string('ongoingAt')->nullable();
+            $table->string('completedAt')->nullable();
 
 
             $table->timestamps();

@@ -163,6 +163,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('internal-audit-assignee', [SaAiInternalAuditRecodeController::class, 'assignee']);
     Route::post('internal-audit-draft', [SaAiInternalAuditRecodeController::class, 'saveDraft']);
     Route::post('internal-audit-shedualed', [SaAiInternalAuditRecodeController::class, 'saveShedualed']);
+    Route::post('internal-audit/{id}/action-plan', [SaAiInternalAuditRecodeController::class, 'actionPlanUpdate']);
 
     Route::get('question-reports', [SaAiIaQuestionRecodeController::class, 'index']);
     Route::post('question-reports', [SaAiIaQuestionRecodeController::class, 'store']);
@@ -358,14 +359,14 @@ Route::post('internal-auditee', [SaAiIaInternalAuditeeController::class, 'store'
 Route::get('supplier-types', [SaAiIaSuplierTypeController::class, 'index']);
 Route::post('supplier-types', [SaAiIaSuplierTypeController::class, 'store']);
 
-Route::get('Ts-categories', [SaETsCategoryController::class, 'index']);
-Route::post('Ts-categories', [SaETsCategoryController::class, 'store']);
-Route::get('categories', [SaETsCategoryController::class, 'getCategories']);
+Route::get('ts-categories', [SaETsCategoryController::class, 'index']);
+Route::post('ts-categories', [SaETsCategoryController::class, 'store']);
+Route::get('ts-categories', [SaETsCategoryController::class, 'getCategories']);
 Route::get('categories/{categoryName}/possibilityCategory', [SaETsCategoryController::class, 'getPossibleCategories']);
 Route::get('subcategories/{possibilityCategory}/opertunity', [SaETsCategoryController::class, 'getOppertunities']);
 
-Route::get('Ts-sources', [SaETsSourceController::class, 'index']);
-Route::post('Ts-sources', [SaETsSourceController::class, 'store']);
+Route::get('ts-sources', [SaETsSourceController::class, 'index']);
+Route::post('ts-sources', [SaETsSourceController::class, 'store']);
 
 
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);

@@ -28,7 +28,7 @@ class TargetSettingRecodeRequest extends FormRequest
             'baselineConsumption' => 'required|numeric',
             'ghgEmission'         => 'required|numeric',
             'problem'             => 'nullable|string',
-            'documents'           => 'required|array',
+            'documents'           => 'nullable|array',
             'documents.*'         => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
             'responsibleId'       => 'required|string',
             'approverId'          => 'required|string',
