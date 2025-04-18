@@ -71,6 +71,56 @@ class SaAiInternalAuditRecodeController extends Controller
         ], 201);
     }
 
+    public function saveDraft(InternalAuditRequest $request)
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $userId        = $user->id;
+        $validatedData = $request->validated();
+
+        $validatedData['draftBy'] = $userId;
+        $validatedData['status']  = 'draft';
+
+        $internalAudit = $this->internalAuditRecodeInterface->create($validatedData);
+
+        if (! $internalAudit) {
+            return response()->json(['message' => 'Failed to save draft'], 500);
+        }
+
+        return response()->json([
+            'message'       => 'Draft saved successfully!',
+            'internalAudit' => $internalAudit,
+        ], 201);
+    }
+
+    public function saveShedualed(InternalAuditRequest $request)
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $userId        = $user->id;
+        $validatedData = $request->validated();
+
+        $validatedData['shedualedBy'] = $userId;
+        $validatedData['status']        = 'shedualed';
+
+        $internalAudit = $this->internalAuditRecodeInterface->create($validatedData);
+
+        if (! $internalAudit) {
+            return response()->json(['message' => 'Failed to save shedualed'], 500);
+        }
+
+        return response()->json([
+            'message'       => 'Shedualed saved successfully!',
+            'internalAudit' => $internalAudit,
+        ], 201);
+    }
+
     public function update($id, InternalAuditRequest $request)
     {
         $internalAudit = $this->internalAuditRecodeInterface->findById($id);

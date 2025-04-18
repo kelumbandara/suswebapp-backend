@@ -161,6 +161,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('internal-audit/{id}/delete', [SaAiInternalAuditRecodeController::class, 'destroy']);
     Route::get('internal-audit-assign-task', [SaAiInternalAuditRecodeController::class, 'assignTask']);
     Route::get('internal-audit-assignee', [SaAiInternalAuditRecodeController::class, 'assignee']);
+    Route::post('internal-audit-draft', [SaAiInternalAuditRecodeController::class, 'saveDraft']);
+    Route::post('internal-audit-shedualed', [SaAiInternalAuditRecodeController::class, 'saveShedualed']);
 
     Route::get('question-reports', [SaAiIaQuestionRecodeController::class, 'index']);
     Route::post('question-reports', [SaAiIaQuestionRecodeController::class, 'store']);
