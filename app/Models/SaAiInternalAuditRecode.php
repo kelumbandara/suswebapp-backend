@@ -11,7 +11,7 @@ class SaAiInternalAuditRecode extends Model
     protected $fillable = [
         'referenceNumber',
         'division',
-        'auditTitle',
+        'auditId',
         'auditType',
         'department',
         'isAuditScheduledForSupplier',
@@ -47,7 +47,6 @@ class SaAiInternalAuditRecode extends Model
 
     protected $casts = [
         'department' => 'array',
-        'auditTitle' => 'array',
         'isAuditScheduledForSupplier' => 'boolean',
     ];
 

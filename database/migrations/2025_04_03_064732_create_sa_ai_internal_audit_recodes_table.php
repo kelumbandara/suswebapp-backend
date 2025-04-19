@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('referenceNumber')->nullable();
             $table->string('division')->nullable();
-            $table->json('auditTitle')->nullable();
+            $table->string('auditId')->nullable();
             $table->string('auditType')->nullable();
             $table->json('department')->nullable();
             $table->boolean('isAuditScheduledForSupplier')->nullable();
@@ -41,6 +41,8 @@ return new class extends Migration
             $table->string('createdByUser')->nullable();
             $table->string('updatedByUser')->nullable();
             $table->string('scheduledBy')->nullable();
+            $table->string('ongoingBy')->nullable();
+            $table->string('completedBy')->nullable();
             $table->string('draftBy')->nullable();
             $table->string('draftAt')->nullable();
             $table->string('scheduledAt')->nullable();

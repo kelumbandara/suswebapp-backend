@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('sa_ai_ia_answer_recodes', function (Blueprint $table) {
             $table->id('answerId');
             $table->bigInteger('intarnalAuditId')->nullable();
-            $table->bigInteger('scheduledId')->nullable();
+            $table->bigInteger('quectionRecoId')->nullable();
             $table->bigInteger('queGroupId')->nullable();
+            $table->bigInteger('quectionId')->nullable();
             $table->string('score');
             $table->integer('status');
             $table->string('rating');
