@@ -22,7 +22,7 @@ class InternalAuditRequest extends FormRequest
     {
         return [
             'division'                                   => 'required|string',
-            'auditTitle'                                 => 'required|string',
+            'auditId'                                    => 'required|string',
             'auditType'                                  => 'required|string',
             'department'                                 => 'required|string',
             'isAuditScheduledForSupplier'                => 'nullable|boolean',
@@ -48,6 +48,11 @@ class InternalAuditRequest extends FormRequest
             'actionPlans.*.approverId'                   => 'nullable|string',
             'actionPlans.*.dueDate'                      => 'nullable|string',
             'actionPlans.*.date'                         => 'nullable|string',
+            'answers'                                    => 'nullable|array',
+            'answers.*.score'                            => 'required|string',
+            'answers.*.rating'                           => 'required|string',
+            'answers.*.status'                           => 'nullable|string',
+
         ];
     }
 }

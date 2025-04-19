@@ -14,13 +14,15 @@ class SaAiIaAnswerRecode extends Model
     protected $table = 'sa_ai_ia_answer_recode';
     protected $fillable = [
         'intarnalAuditId',
-        'scheduledId',
+        'quectionRecoId',
+        'queGroupId',
+        'quectionId',
         'rating',
         'score',
         'status',
 
     ];
-    public function questionRecode()
+    public function questionGroup()
     {
         return $this->belongsTo(SaAiIaQrGroupRecode::class, 'queGroupId');
     }
@@ -28,8 +30,13 @@ class SaAiIaAnswerRecode extends Model
     {
         return $this->belongsTo(SaAiInternalAuditRecode::class, 'intarnalAuditId');
     }
-    // public function scheduled()
-    // {
-    //     return $this->belongsTo(SaAiIaQuestionRecode::class, 'quectionRecoId');
-    // }
+    public function question()
+    {
+        return $this->belongsTo(SaAiIaQrQuestions::class, 'quectionId');
+    }
+
+    public function questionRecode()
+    {
+        return $this->belongsTo(SaAiIaQuestionRecode::class, 'quectionRecoId');
+    }
 }

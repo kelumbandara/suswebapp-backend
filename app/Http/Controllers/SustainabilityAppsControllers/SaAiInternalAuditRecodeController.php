@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SustainabilityAppsControllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaAiInternalAuditRecode\InternalAuditRequest;
 use App\Repositories\All\SaAiIaActionPlan\ActionPlanInterface;
+use App\Repositories\All\SaAiIaAnswerRecode\AnswerRecodeInterface;
 use App\Repositories\All\SaAiInternalAuditRecode\InternalAuditRecodeInterface;
 use App\Repositories\All\User\UserInterface;
 use Illuminate\Support\Facades\Auth;
@@ -14,12 +15,14 @@ class SaAiInternalAuditRecodeController extends Controller
     protected $internalAuditRecodeInterface;
     protected $userInterface;
     protected $actionPlanInterface;
+    protected $answerRecodeInterface;
 
-    public function __construct(InternalAuditRecodeInterface $internalAuditRecodeInterface, UserInterface $userInterface, ActionPlanInterface $actionPlanInterface)
+    public function __construct(InternalAuditRecodeInterface $internalAuditRecodeInterface, UserInterface $userInterface, ActionPlanInterface $actionPlanInterface, AnswerRecodeInterface $answerRecodeInterface)
     {
         $this->internalAuditRecodeInterface = $internalAuditRecodeInterface;
         $this->userInterface                = $userInterface;
         $this->actionPlanInterface          = $actionPlanInterface;
+        $this->answerRecodeInterface        = $answerRecodeInterface;
     }
 
     public function index()
@@ -53,6 +56,51 @@ class SaAiInternalAuditRecodeController extends Controller
         }
 
         return response()->json($internalAudit, 200);
+    }
+
+    public function getFinalAuditers()
+    {
+        try {
+            $internalAudits = $this->internalAuditRecodeInterface->All();
+
+            $internalAudits = $internalAudits->map(function ($audit) {
+                try {
+                    $approver        = $this->userInterface->getById($audit->approverId);
+                    $audit->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
+                } catch (\Exception $e) {
+                    $audit->approver = ['name' => 'Unknown', 'id' => null];
+                }
+
+                try {
+                    $auditee        = $this->userInterface->getById($audit->auditeeId);
+                    $audit->auditee = $auditee ? ['name' => $auditee->name, 'id' => $auditee->id] : ['name' => 'Unknown', 'id' => null];
+                } catch (\Exception $e) {
+                    $audit->auditee = ['name' => 'Unknown', 'id' => null];
+                }
+
+                try {
+                    $creator                  = $this->userInterface->getById($audit->createdByUser);
+                    $audit->createdByUserName = $creator ? $creator->name : 'Unknown';
+                } catch (\Exception $e) {
+                    $audit->createdByUserName = 'Unknown';
+                }
+
+                return $audit;
+            });
+
+            foreach ($internalAudits as $audit) {
+                $audit->actionPlan = $this->actionPlanInterface->findByIntarnalAuditId($audit->id);
+                $audit->answers    = $this->answerRecodeInterface->findByIntarnalAuditId($audit->id);
+            }
+
+            return response()->json([
+                'message' => 'Internal audits fetched successfully.',
+                'data'    => $internalAudits,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Something went wrong', 'error' => $e->getMessage()], 500);
+        }
     }
 
     public function store(InternalAuditRequest $request)
@@ -102,6 +150,37 @@ class SaAiInternalAuditRecodeController extends Controller
         ], 201);
     }
 
+    public function updateDraft(InternalAuditRequest $request, $id)
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $userId        = $user->id;
+        $validatedData = $request->validated();
+
+        $draft = $this->internalAuditRecodeInterface->findById($id);
+
+        if (! $draft || $draft->draftBy !== $userId || $draft->status !== 'draft') {
+            return response()->json(['message' => 'Draft not found or access denied'], 404);
+        }
+
+        $validatedData['draftBy'] = $userId;
+        $validatedData['status']  = 'draft';
+
+        $updatedDraft = $this->internalAuditRecodeInterface->update($id, $validatedData);
+
+        if (! $updatedDraft) {
+            return response()->json(['message' => 'Failed to update draft'], 500);
+        }
+
+        return response()->json([
+            'message'       => 'Draft updated successfully!',
+            'internalAudit' => $updatedDraft,
+        ]);
+    }
+
     public function saveSchedualed(InternalAuditRequest $request)
     {
         $user = Auth::user();
@@ -127,6 +206,88 @@ class SaAiInternalAuditRecodeController extends Controller
         ], 201);
     }
 
+    public function updateOngoing(InternalAuditRequest $request, $id)
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $userId        = $user->id;
+        $validatedData = $request->validated();
+
+        $validatedData['ongoingBy'] = $userId;
+        $validatedData['status']    = 'ongoing';
+
+        $record = $this->internalAuditRecodeInterface->findById($id);
+        if (! $record) {
+            return response()->json(['message' => 'Record not found'], 404);
+        }
+
+        $updateSuccess = $this->internalAuditRecodeInterface->update($id, $validatedData);
+        if (! $updateSuccess) {
+            return response()->json(['message' => 'Failed to update internal audit'], 500);
+        }
+
+        $this->answerRecodeInterface->deleteByIntarnalAuditId($id);
+
+        if (! empty($validatedData['answers'])) {
+            foreach ($validatedData['answers'] as $answer) {
+                $answer['internalAuditId'] = $id;
+                $this->answerRecodeInterface->create($answer);
+            }
+        }
+
+        $updatedRecord                = $this->internalAuditRecodeInterface->findById($id);
+        $updatedRecord->impactDetails = $this->answerRecodeInterface->findByIntarnalAuditId($id);
+
+        return response()->json([
+            'message'       => 'Ongoing audit updated successfully!',
+            'internalAudit' => $updatedRecord,
+        ], 200);
+    }
+
+    public function complete(InternalAuditRequest $request, $id)
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $userId        = $user->id;
+        $validatedData = $request->validated();
+
+        $validatedData['completedBy'] = $userId;
+        $validatedData['status']      = 'completedBy';
+
+        $record = $this->internalAuditRecodeInterface->findById($id);
+        if (! $record) {
+            return response()->json(['message' => 'Record not found'], 404);
+        }
+
+        $updateSuccess = $this->internalAuditRecodeInterface->update($id, $validatedData);
+        if (! $updateSuccess) {
+            return response()->json(['message' => 'Failed to update internal audit'], 500);
+        }
+
+        $this->answerRecodeInterface->deleteByIntarnalAuditId($id);
+
+        if (! empty($validatedData['answers'])) {
+            foreach ($validatedData['answers'] as $answer) {
+                $answer['internalAuditId'] = $id;
+                $this->answerRecodeInterface->create($answer);
+            }
+        }
+
+        $updatedRecord                = $this->internalAuditRecodeInterface->findById($id);
+        $updatedRecord->impactDetails = $this->answerRecodeInterface->findByIntarnalAuditId($id);
+
+        return response()->json([
+            'message'       => 'Ongoing audit updated successfully!',
+            'internalAudit' => $updatedRecord,
+        ], 200);
+    }
+
     public function actionPlanUpdate($id, InternalAuditRequest $request)
     {
         $user = Auth::user();
@@ -136,31 +297,41 @@ class SaAiInternalAuditRecodeController extends Controller
         }
 
         $internalAudit = $this->internalAuditRecodeInterface->findById($id);
-
         if (! $internalAudit) {
             return response()->json(['message' => 'Internal audit record not found.'], 404);
         }
 
-        $data                = $request->validated();
-        $data['completedBy'] = $user->id;
+        $validatedData                = $request->validated();
+        $validatedData['completedBy'] = $user->id;
 
-        $updated = $internalAudit->update($data);
-
+        $updated = $this->internalAuditRecodeInterface->update($id, $validatedData);
         if (! $updated) {
             return response()->json(['message' => 'Failed to update internal audit record'], 500);
         }
 
+        $this->answerRecodeInterface->deleteByIntarnalAuditId($id);
+        if (! empty($validatedData['answers'])) {
+            foreach ($validatedData['answers'] as $answer) {
+                $answer['internalAuditId'] = $id;
+                $this->answerRecodeInterface->create($answer);
+            }
+        }
+
         $this->actionPlanInterface->deleteByIntarnalAuditId($id);
-        if (! empty($data['actionPlans'])) {
-            foreach ($data['actionPlans'] as $actionPlan) {
+        if (! empty($validatedData['actionPlans'])) {
+            foreach ($validatedData['actionPlans'] as $actionPlan) {
                 $actionPlan['internalAuditId'] = $id;
                 $this->actionPlanInterface->create($actionPlan);
             }
         }
 
+        $updatedRecord              = $this->internalAuditRecodeInterface->findById($id);
+        $updatedRecord->answers     = $this->answerRecodeInterface->findByIntarnalAuditId($id);
+        $updatedRecord->actionPlans = $this->actionPlanInterface->findByIntarnalAuditId($id);
+
         return response()->json([
-            'message' => 'Internal audit record and action plans updated successfully',
-            'record'  => $this->internalAuditRecodeInterface->findById($id),
+            'message'       => 'Action plan and audit updated successfully!',
+            'internalAudit' => $updatedRecord,
         ], 200);
     }
 

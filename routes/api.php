@@ -165,8 +165,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('internal-audit-assign-task', [SaAiInternalAuditRecodeController::class, 'assignTask']);
     Route::get('internal-audit-assignee', [SaAiInternalAuditRecodeController::class, 'assignee']);
     Route::post('internal-audit-draft', [SaAiInternalAuditRecodeController::class, 'saveDraft']);
+    Route::post('internal-audit-draft/{id}/update', [SaAiInternalAuditRecodeController::class, 'updateDraft']);
     Route::post('internal-audit-shedualed', [SaAiInternalAuditRecodeController::class, 'saveShedualed']);
-    Route::post('internal-audit/{id}/action-plan', [SaAiInternalAuditRecodeController::class, 'actionPlanUpdate']);
+    Route::post('internal-audit-ongoing/{id}/update', [SaAiInternalAuditRecodeController::class, 'saveOngoing']);
+    Route::post('internal-audit-action-plan/{id}/update', [SaAiInternalAuditRecodeController::class, 'actionPlanUpdate']);
+    Route::post('internal-audit-completed/{id}/update', [SaAiInternalAuditRecodeController::class, 'complete']);
+    Route::get('internal-audit-completed', [SaAiInternalAuditRecodeController::class, 'getFinalAuditers']);
 
     Route::get('question-reports', [SaAiIaQuestionRecodeController::class, 'index']);
     Route::post('question-reports', [SaAiIaQuestionRecodeController::class, 'store']);
