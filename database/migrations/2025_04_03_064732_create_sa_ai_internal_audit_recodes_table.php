@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('processType')->nullable();
             $table->string('factoryName')->nullable();
             $table->string('factoryAddress')->nullable();
-            $table->string('factoryContactPerson')->nullable();
+            $table->string('factoryContactPersonId')->nullable();
             $table->string('factoryContactNumber')->nullable();
             $table->string('factoryEmail')->nullable();
             $table->string('designation')->nullable();

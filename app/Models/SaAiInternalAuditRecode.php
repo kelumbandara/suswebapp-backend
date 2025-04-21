@@ -23,7 +23,7 @@ class SaAiInternalAuditRecode extends Model
         'status',
         'factoryName',
         'factoryAddress',
-        'factoryContactPerson',
+        'factoryContactPersonId',
         'factoryContactNumber',
         'factoryEmail',
         'designation',
