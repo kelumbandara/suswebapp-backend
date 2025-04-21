@@ -35,7 +35,7 @@ return new class extends Migration
             $table->integer('paybackPeriod')->nullable();
             $table->integer('projectLifespan')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected', 'published', 'shipped', 'draft'])->default('draft')->nullable();
-            $table->string('responsibleSection')->nullable()->default('EnvirementManagement');
+            $table->string('responsibleSection')->nullable()->default('TargetSettings');
             $table->string('assigneeLevel')->nullable()->default('1');
             $table->string('createdByUser')->nullable();
             $table->timestamps();
