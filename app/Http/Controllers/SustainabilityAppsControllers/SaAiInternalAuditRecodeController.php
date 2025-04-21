@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SaAiInternalAuditRecode\InternalAuditRequest;
 use App\Repositories\All\SaAiIaActionPlan\ActionPlanInterface;
 use App\Repositories\All\SaAiIaAnswerRecode\AnswerRecodeInterface;
+use App\Repositories\All\SaAiIaContactPerson\ContactPersonInterface;
 use App\Repositories\All\SaAiInternalAuditRecode\InternalAuditRecodeInterface;
 use App\Repositories\All\User\UserInterface;
 use Illuminate\Support\Facades\Auth;
@@ -16,13 +17,15 @@ class SaAiInternalAuditRecodeController extends Controller
     protected $userInterface;
     protected $actionPlanInterface;
     protected $answerRecodeInterface;
+    protected $contactPersonInterface;
 
-    public function __construct(InternalAuditRecodeInterface $internalAuditRecodeInterface, UserInterface $userInterface, ActionPlanInterface $actionPlanInterface, AnswerRecodeInterface $answerRecodeInterface)
+    public function __construct(InternalAuditRecodeInterface $internalAuditRecodeInterface, UserInterface $userInterface, ActionPlanInterface $actionPlanInterface, AnswerRecodeInterface $answerRecodeInterface, ContactPersonInterface $contactPersonInterface)
     {
         $this->internalAuditRecodeInterface = $internalAuditRecodeInterface;
         $this->userInterface                = $userInterface;
         $this->actionPlanInterface          = $actionPlanInterface;
         $this->answerRecodeInterface        = $answerRecodeInterface;
+        $this->contactPersonInterface       = $contactPersonInterface;
     }
 
     public function index()
@@ -47,6 +50,14 @@ class SaAiInternalAuditRecodeController extends Controller
                 $audit->createdByUserName = $creator ? $creator->name : 'Unknown';
             } catch (\Exception $e) {
                 $audit->createdByUserName = 'Unknown';
+            }
+            try {
+                $contactPerson = $this->contactPersonInterface->getById($audit->factoryContactPersonId);
+                $audit->factoryContactPerson = $contactPerson
+                    ? ['name' => $contactPerson->name, 'id' => $contactPerson->id]
+                    : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $audit->factoryContactPerson = ['name' => 'Unknown', 'id' => null];
             }
 
             return $audit;
@@ -84,6 +95,15 @@ class SaAiInternalAuditRecodeController extends Controller
                 } catch (\Exception $e) {
                     $audit->createdByUserName = 'Unknown';
                 }
+                try {
+                    $contactPerson = $this->contactPersonInterface->getById($audit->factoryContactPersonId);
+                    $audit->factoryContactPerson = $contactPerson
+                        ? ['name' => $contactPerson->name, 'id' => $contactPerson->id]
+                        : ['name' => 'Unknown', 'id' => null];
+                } catch (\Exception $e) {
+                    $audit->factoryContactPerson = ['name' => 'Unknown', 'id' => null];
+                }
+
 
                 return $audit;
             });

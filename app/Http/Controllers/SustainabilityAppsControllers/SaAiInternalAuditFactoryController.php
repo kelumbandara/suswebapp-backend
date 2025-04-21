@@ -3,15 +3,18 @@ namespace App\Http\Controllers\SustainabilityAppsControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaAiInternalAuditFactory\InternalAuditFactoryRequest;
+use App\Repositories\All\SaAiIaContactPerson\ContactPersonInterface;
 use App\Repositories\All\SaAiInternalAuditFactory\InternalAuditFactoryInterface;
 
 class SaAiInternalAuditFactoryController extends Controller
 {
     protected $internalAuditFactoryInterface;
+    protected $contactPersonInterface;
 
-    public function __construct(InternalAuditFactoryInterface $internalAuditFactoryInterface)
+    public function __construct(InternalAuditFactoryInterface $internalAuditFactoryInterface, ContactPersonInterface $contactPersonInterface)
     {
         $this->internalAuditFactoryInterface = $internalAuditFactoryInterface;
+        $this->contactPersonInterface        = $contactPersonInterface;
     }
 
     /**
@@ -19,9 +22,24 @@ class SaAiInternalAuditFactoryController extends Controller
      */
     public function index()
     {
-        $factory = $this->internalAuditFactoryInterface->all();
-        return response()->json($factory);
+        $factories = $this->internalAuditFactoryInterface->all();
+
+        $result = $factories->map(function ($factory) {
+            try {
+                $contactPerson = $this->contactPersonInterface->getById($factory->factoryContactPerson);
+                $factory->factoryContactPerson = $contactPerson
+                    ? ['name' => $contactPerson->name, 'factoryContactPersonId' => $contactPerson->id]
+                    : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $factory->factoryContactPerson = ['name' => 'Unknown', 'factoryContactPersonId' => null];
+            }
+
+            return $factory;
+        });
+
+        return response()->json($result);
     }
+
 
     public function store(InternalAuditFactoryRequest $request)
     {

@@ -33,7 +33,7 @@ class InternalAuditRequest extends FormRequest
             'processType'                                => 'nullable|string',
             'factoryName'                                => 'required|string',
             'factoryAddress'                             => 'required|string',
-            'factoryContactPerson'                       => 'required|string',
+            'factoryContactPersonId'                     => 'required|string',
             'factoryContactNumber'                       => 'required|string',
             'factoryEmail'                               => 'required|string',
             'designation'                                => 'required|string',
