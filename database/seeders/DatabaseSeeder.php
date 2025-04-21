@@ -459,6 +459,25 @@ class DatabaseSeeder extends Seeder
             'sectionCode'   => 'MRS',
             'responsibleId' => '4',
         ]);
+        ComResponsibleSection::factory()->create([
+            'id'            => 5,
+            'sectionName'   => 'Environment Management Section',
+            'sectionCode'   => 'EMS',
+            'responsibleId' => '5',
+        ]);
+
+        ComResponsibleSection::factory()->create([
+            'id'            => 6,
+            'sectionName'   => 'Target Setting Section',
+            'sectionCode'   => 'TSS',
+            'responsibleId' => '6',
+        ]);
+        ComResponsibleSection::factory()->create([
+            'id'            => 7,
+            'sectionName'   => 'Chemical Management Section',
+            'sectionCode'   => 'CMS',
+            'responsibleId' => '7',
+        ]);
     }
 
 }

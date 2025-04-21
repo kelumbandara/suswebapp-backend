@@ -182,7 +182,7 @@ class SaEnvirementManagementRecodeController extends Controller
 
         $targetLevel = $user->assigneeLevel + 1;
 
-        $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Envirement Management Section')
+        $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Environment Management Section')
             ->where('availability', 1)
             ->values();
         return response()->json($assignees);

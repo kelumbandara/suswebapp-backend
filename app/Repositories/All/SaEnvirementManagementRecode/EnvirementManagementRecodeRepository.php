@@ -24,9 +24,9 @@ class EnvirementManagementRecodeRepository extends BaseRepository implements Env
     {
         return $this->model->where('approverId', $approverId)->get();
     }
-    public function getByReviewerId($approverId)
+    public function getByReviewerId($reviewerId)
     {
-        return $this->model->where('approverId', $approverId)->get();
+        return $this->model->where('reviewerId', $reviewerId)->get();
     }
 
 

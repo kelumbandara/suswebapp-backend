@@ -126,6 +126,16 @@ use App\Repositories\All\SaAiInternalAuditFactory\InternalAuditFactoryInterface;
 use App\Repositories\All\SaAiInternalAuditFactory\InternalAuditFactoryRepository;
 use App\Repositories\All\SaAiInternalAuditRecode\InternalAuditRecodeInterface;
 use App\Repositories\All\SaAiInternalAuditRecode\InternalAuditRecodeRepository;
+use App\Repositories\All\SaCmChemicalManagementRecode\ChemicalManagementRecodeInterface;
+use App\Repositories\All\SaCmChemicalManagementRecode\ChemicalManagementRecodeRepository;
+use App\Repositories\All\SaCmCmrChemicalFormType\ChemicalFormTypeInterface;
+use App\Repositories\All\SaCmCmrChemicalFormType\ChemicalFormTypeRepository;
+use App\Repositories\All\SaCmCmrCommercialName\CommercialNameInterface;
+use App\Repositories\All\SaCmCmrCommercialName\CommercialNameRepository;
+use App\Repositories\All\SaCmCmrProductStandard\ProductStandardInterface;
+use App\Repositories\All\SaCmCmrProductStandard\ProductStandardRepository;
+use App\Repositories\All\SaCmCmrZdhcCategory\ZdhcCategoryInterface;
+use App\Repositories\All\SaCmCmrZdhcCategory\ZdhcCategoryRepository;
 use App\Repositories\All\SaEEmrAcCategory\ConsumptionCategoryInterface;
 use App\Repositories\All\SaEEmrAcCategory\ConsumptionCategoryRepository;
 use App\Repositories\All\SaEEmrAcSource\ConsumptionSourceInterface;
@@ -259,7 +269,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ConsumptionSourceInterface::class, ConsumptionSourceRepository::class);
         $this->app->bind(ConsumptionUnitInterface::class, ConsumptionUnitRepository::class);
         $this->app->bind(AnswerRecodeInterface::class, AnswerRecodeRepository::class);
-
+        $this->app->bind(ChemicalManagementRecodeInterface::class, ChemicalManagementRecodeRepository::class);
+        $this->app->bind(CommercialNameInterface::class, CommercialNameRepository::class);
+        $this->app->bind(ChemicalFormTypeInterface::class, ChemicalFormTypeRepository::class);
+        $this->app->bind(ZdhcCategoryInterface::class, ZdhcCategoryRepository::class);
+        $this->app->bind(ProductStandardInterface::class, ProductStandardRepository::class);
 
 
 
