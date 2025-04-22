@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\SaCmCmrCommercialName;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,7 +21,19 @@ class CmrCommercialNameRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'commercialName' => 'required|string',
+            'commercialName'          => 'required|string',
+            'substanceName'           => 'required|string',
+            'molecularFormula'        => 'required|string',
+            'chemicalFormType'        => 'required|string',
+            'reachRegistrationNumber' => 'required|string',
+            'whareAndWhyUse'          => 'required|string',
+            'zdhcCategory'            => 'required|string',
+            'zdhcLevel'               => 'required|string',
+            'casNumber'               => 'required|string',
+            'colourIndex'             => 'required|string',
+            'useOfPPE'                => 'required|array',
+            'hazardType'              => 'required|array',
+            'ghsClassification'       => 'required|string',
         ];
     }
 }

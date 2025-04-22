@@ -11,5 +11,22 @@ class SaCmCmrCommercialName extends Model
 
     protected $fillable = [
         'commercialName',
+        'substanceName',
+        'molecularFormula',
+        'chemicalFormType',
+        'reachRegistrationNumber',
+        'whareAndWhyUse',
+        'zdhcCategory',
+        'zdhcLevel',
+        'casNumber',
+        'colourIndex',
+        'useOfPPE',
+        'hazardType',
+        'ghsClassification',
     ];
+    protected $casts = [
+        'useOfPPE' => 'array',
+        'hazardType' => 'array',
+    ];
+
 }

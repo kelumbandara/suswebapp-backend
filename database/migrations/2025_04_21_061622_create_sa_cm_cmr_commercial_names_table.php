@@ -14,6 +14,18 @@ return new class extends Migration
         Schema::create('sa_cm_cmr_commercial_names', function (Blueprint $table) {
             $table->id();
             $table->string('commercialName')->nullable();
+            $table->string('substanceName')->nullable();
+            $table->string('molecularFormula')->nullable();
+            $table->string('chemicalFormType')->nullable();
+            $table->string('reachRegistrationNumber')->nullable();
+            $table->string('whareAndWhyUse')->nullable();
+            $table->string('zdhcCategory')->nullable();
+            $table->string('zdhcLevel')->nullable();
+            $table->string('casNumber')->nullable();
+            $table->string('colourIndex')->nullable();
+            $table->json('useOfPPE')->nullable();
+            $table->json('hazardType')->nullable();
+            $table->string('ghsClassification')->nullable();
             $table->timestamps();
         });
     }

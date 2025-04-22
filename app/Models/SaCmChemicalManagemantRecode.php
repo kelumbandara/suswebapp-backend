@@ -22,6 +22,9 @@ class SaCmChemicalManagemantRecode extends Model
         'whareAndWhyUse',
         'productStandard',
         'doYouHaveMSDSorSDS',
+        'documents',
+        'msdsorsdsIssuedDate',
+        'msdsorsdsExpiryDate',
         'division',
         'requestedCustomer',
         'requestedMerchandiser',
@@ -38,6 +41,7 @@ class SaCmChemicalManagemantRecode extends Model
 
     protected $casts = [
         'doYouHaveMSDSorSDS' => 'boolean',
+        'documents' => 'array',
     ];
 
     protected static function booted()

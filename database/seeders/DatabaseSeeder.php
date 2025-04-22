@@ -461,22 +461,45 @@ class DatabaseSeeder extends Seeder
         ]);
         ComResponsibleSection::factory()->create([
             'id'            => 5,
-            'sectionName'   => 'Environment Management Section',
-            'sectionCode'   => 'EMS',
+            'sectionName'   => 'Internal Audit Section',
+            'sectionCode'   => 'IAS',
             'responsibleId' => '5',
         ]);
-
         ComResponsibleSection::factory()->create([
             'id'            => 6,
-            'sectionName'   => 'Target Setting Section',
-            'sectionCode'   => 'TSS',
+            'sectionName'   => 'External Audit Section',
+            'sectionCode'   => 'EAS',
             'responsibleId' => '6',
         ]);
         ComResponsibleSection::factory()->create([
             'id'            => 7,
+            'sectionName'   => 'Internal Question Section',
+            'sectionCode'   => 'EQS',
+            'responsibleId' => '7',
+        ]);
+        ComResponsibleSection::factory()->create([
+            'id'            => 8,
+            'sectionName'   => 'SDG Reporting Section',
+            'sectionCode'   => 'SRS',
+            'responsibleId' => '8',
+        ]);
+        ComResponsibleSection::factory()->create([
+            'id'            => 9,
+            'sectionName'   => 'Environment Management Section',
+            'sectionCode'   => 'EMS',
+            'responsibleId' => '9',
+        ]);
+        ComResponsibleSection::factory()->create([
+            'id'            => 10,
+            'sectionName'   => 'Target Setting Section',
+            'sectionCode'   => 'TSS',
+            'responsibleId' => '10',
+        ]);
+        ComResponsibleSection::factory()->create([
+            'id'            => 11,
             'sectionName'   => 'Chemical Management Section',
             'sectionCode'   => 'CMS',
-            'responsibleId' => '7',
+            'responsibleId' => '11',
         ]);
     }
 

@@ -132,8 +132,12 @@ use App\Repositories\All\SaCmCmrChemicalFormType\ChemicalFormTypeInterface;
 use App\Repositories\All\SaCmCmrChemicalFormType\ChemicalFormTypeRepository;
 use App\Repositories\All\SaCmCmrCommercialName\CommercialNameInterface;
 use App\Repositories\All\SaCmCmrCommercialName\CommercialNameRepository;
+use App\Repositories\All\SaCmCmrHazardType\CmrHazardTypeInterface;
+use App\Repositories\All\SaCmCmrHazardType\CmrHazardTypeRepository;
 use App\Repositories\All\SaCmCmrProductStandard\ProductStandardInterface;
 use App\Repositories\All\SaCmCmrProductStandard\ProductStandardRepository;
+use App\Repositories\All\SaCmCmrUseOfPPE\CmrUseOfPPEInterface;
+use App\Repositories\All\SaCmCmrUseOfPPE\CmrUseOfPPERepository;
 use App\Repositories\All\SaCmCmrZdhcCategory\ZdhcCategoryInterface;
 use App\Repositories\All\SaCmCmrZdhcCategory\ZdhcCategoryRepository;
 use App\Repositories\All\SaEEmrAcCategory\ConsumptionCategoryInterface;
@@ -274,6 +278,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ChemicalFormTypeInterface::class, ChemicalFormTypeRepository::class);
         $this->app->bind(ZdhcCategoryInterface::class, ZdhcCategoryRepository::class);
         $this->app->bind(ProductStandardInterface::class, ProductStandardRepository::class);
+        $this->app->bind(CmrHazardTypeInterface::class, CmrHazardTypeRepository::class);
+        $this->app->bind(CmrUseOfPPEInterface::class, CmrUseOfPPERepository::class);
 
 
 

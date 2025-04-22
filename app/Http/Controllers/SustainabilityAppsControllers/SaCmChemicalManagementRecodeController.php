@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SaCmChemicalManagementRecode\ChemicalManagementRecodeRequest;
 use App\Repositories\All\SaCmChemicalManagementRecode\ChemicalManagementRecodeInterface;
 use App\Repositories\All\User\UserInterface;
-use Illuminate\Http\Request;
+use App\Services\ChemicalManagementService;
 use Illuminate\Support\Facades\Auth;
 
 class SaCmChemicalManagementRecodeController extends Controller
@@ -14,11 +14,13 @@ class SaCmChemicalManagementRecodeController extends Controller
 
     protected $chemicalManagementRecodeInterface;
     protected $userInterface;
+    protected $chemicalManagementService;
 
-    public function __construct(ChemicalManagementRecodeInterface $chemicalManagementRecodeInterface, UserInterface $userInterface)
+    public function __construct(ChemicalManagementRecodeInterface $chemicalManagementRecodeInterface, UserInterface $userInterface, ChemicalManagementService $chemicalManagementService)
     {
         $this->chemicalManagementRecodeInterface = $chemicalManagementRecodeInterface;
         $this->userInterface          = $userInterface;
+        $this->chemicalManagementService = $chemicalManagementService;
     }
 
     public function index()
@@ -39,6 +41,22 @@ class SaCmChemicalManagementRecodeController extends Controller
             } catch (\Exception $e) {
                 $chemical->createdByUserName = 'Unknown';
             }
+            if (! empty($chemical->documents) && is_string($chemical->documents)) {
+                $decodedDocuments = json_decode($chemical->documents, true);
+                $documents        = is_array($decodedDocuments) ? $decodedDocuments : [];
+            } else {
+                $documents = is_array($chemical->documents) ? $chemical->documents : [];
+            }
+
+            foreach ($documents as &$item) {
+                if (isset($item['gsutil_uri'])) {
+                    $imageData        = $this->chemicalManagementService->getImageUrl($item['gsutil_uri']);
+                    $item['fileName'] = $imageData['fileName'];
+                    $item['imageUrl'] = $imageData['signedUrl'];
+                }
+            }
+
+            $chemical->documents = $documents;
             return $chemical;
         });
 
@@ -61,6 +79,28 @@ class SaCmChemicalManagementRecodeController extends Controller
         if (! $chemical) {
             return response()->json(['message' => 'Failed to create Chemical Management Recode'], 500);
         }
+        $uploadedFiles = [];
+        if ($request->hasFile('documents')) {
+            foreach ($request->file('documents') as $file) {
+                $uploadedFiles[] = $this->chemicalManagementService->uploadImageToGCS($file);
+            }
+        }
+
+        if (! empty($uploadedFiles)) {
+            $decodedDocuments = (! empty($record->documents) && is_string($chemical->documents))
+            ? json_decode($chemical->documents, true)
+            : [];
+
+            if (! is_array($decodedDocuments)) {
+                $decodedDocuments = [];
+            }
+
+            $mergedDocuments = array_merge($decodedDocuments, $uploadedFiles);
+
+            $this->chemicalManagementRecodeInterface->update($chemical->id, [
+                'documents' => json_encode($mergedDocuments),
+            ]);
+        }
         return response()->json([
             'message'    => 'Chemical Management Recode created successfully!',
             'externalAudit' => $chemical,
@@ -70,12 +110,42 @@ class SaCmChemicalManagementRecodeController extends Controller
     public function update($id, ChemicalManagementRecodeRequest $request)
     {
         $chemical = $this->chemicalManagementRecodeInterface->findById($id);
+        $validatedData = $request->validated();
 
-        if (! $chemical) {
-            return response()->json(['message' => 'Chemical Management Recode not found.'], 404);
+        $documents = json_decode($chemical->documents, true) ?? [];
+
+        if ($request->has('removeDoc')) {
+            $removeDocs = $request->input('removeDoc');
+
+            if (is_array($removeDocs)) {
+                foreach ($removeDocs as $removeDoc) {
+                    $this->chemicalManagementService->removeOldDocumentFromStorage($removeDoc);
+                }
+
+                $documents = array_values(array_filter($documents, function ($evidenceItem) use ($removeDocs) {
+                    return ! in_array($evidenceItem['gsutil_uri'], $removeDocs);
+                }));
+            }
         }
 
-        $validatedData = $request->validated();
+        if ($request->hasFile('documents')) {
+            $newEvidence = [];
+            $newFiles    = $request->file('documents');
+
+            foreach ($newFiles as $newFile) {
+                $uploadResult = $this->chemicalManagementService->updateDocuments($newFile);
+                if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
+                    $newEvidence[] = [
+                        'gsutil_uri' => $uploadResult['gsutil_uri'],
+                        'file_name'  => $uploadResult['file_name'],
+                    ];
+                }
+            }
+
+            $documents = array_merge($documents, $newEvidence);
+        }
+
+        $data['documents'] = json_encode($documents);
 
         $updated = $chemical->update($validatedData);
 
@@ -96,6 +166,17 @@ class SaCmChemicalManagementRecodeController extends Controller
         $chemical = $this->chemicalManagementRecodeInterface->findById((int) $id);
 
         $deleted = $this->chemicalManagementRecodeInterface->deleteById($id);
+        if ($chemical->documents) {
+            $documents = json_decode($chemical->documents, true);
+
+            if (is_array($documents)) {
+                foreach ($documents as $item) {
+                    if (isset($item['gsutil_uri'])) {
+                        $this->chemicalManagementService->deleteImageFromGCS($item['gsutil_uri']);
+                    }
+                }
+            }
+        }
 
         return response()->json([
             'message' => $deleted ? 'Record deleted successfully!' : 'Failed to delete record.',
@@ -127,6 +208,23 @@ class SaCmChemicalManagementRecodeController extends Controller
             } catch (\Exception $e) {
                 $chemical->createdByUserName = 'Unknown';
             }
+            if (! empty($chemical->documents) && is_string($chemical->documents)) {
+                $decodedEvidence = json_decode($chemical->documents, true);
+                $documents       = is_array($decodedEvidence) ? $decodedEvidence : [];
+            } else {
+                $documents = is_array($chemical->documents) ? $chemical->documents : [];
+            }
+
+            foreach ($documents as &$item) {
+                if (isset($item['gsutil_uri'])) {
+                    $imageData        = $this->chemicalManagementService->getImageUrl($item['gsutil_uri']);
+                    $item['fileName'] = $imageData['fileName'];
+                    $item['imageUrl'] = $imageData['signedUrl'];
+                }
+            }
+
+            return $chemical;
+
         });
 
         return response()->json($chemical, 200);
