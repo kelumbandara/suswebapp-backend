@@ -9,8 +9,6 @@ class HsHrCategory extends Model
 {
     use HasFactory;
 
-    protected $table = 'hs_hr_categories';
-
     protected $fillable = [
         'categoryName',
         'subCategory',
