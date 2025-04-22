@@ -11,7 +11,7 @@ class SaAiInternalAuditRecode extends Model
     protected $fillable = [
         'referenceNumber',
         'division',
-        'auditTitle',
+        'auditId',
         'auditType',
         'department',
         'isAuditScheduledForSupplier',
@@ -23,7 +23,7 @@ class SaAiInternalAuditRecode extends Model
         'status',
         'factoryName',
         'factoryAddress',
-        'factoryContactPerson',
+        'factoryContactPersonId',
         'factoryContactNumber',
         'factoryEmail',
         'designation',
@@ -35,12 +35,18 @@ class SaAiInternalAuditRecode extends Model
         'responsibleSection',
         'assigneeLevel',
         'createdByUser',
+        'updatedByUser',
+        'scheduledBy',
+        'draftBy',
+        'draftAt',
+        'scheduledAt',
+        'ongoingAt',
+        'completedAt',
 
     ];
 
     protected $casts = [
         'department' => 'array',
-        'auditTitle' => 'array',
         'isAuditScheduledForSupplier' => 'boolean',
     ];
 

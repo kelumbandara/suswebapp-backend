@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('referenceNumber')->nullable();
             $table->string('division')->nullable();
-            $table->json('auditTitle')->nullable();
+            $table->string('auditId')->nullable();
             $table->string('auditType')->nullable();
             $table->json('department')->nullable();
             $table->boolean('isAuditScheduledForSupplier')->nullable();
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('processType')->nullable();
             $table->string('factoryName')->nullable();
             $table->string('factoryAddress')->nullable();
-            $table->string('factoryContactPerson')->nullable();
+            $table->string('factoryContactPersonId')->nullable();
             $table->string('factoryContactNumber')->nullable();
             $table->string('factoryEmail')->nullable();
             $table->string('designation')->nullable();
@@ -35,10 +35,21 @@ return new class extends Migration
             $table->string('approverId')->nullable();
             $table->string('auditDate')->nullable();
             $table->string('dateForApproval')->nullable();
-            $table->enum('status', ['pending', 'approved', 'rejected', 'published', 'shipped', 'draft'])->default('draft')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected', 'published', 'ongoing', 'draft', 'scheduled', 'completed'])->default('draft')->nullable();
             $table->string('responsibleSection')->nullable()->default('SDGReportingRecodes');
             $table->string('assigneeLevel')->nullable()->default('1');
             $table->string('createdByUser')->nullable();
+            $table->string('updatedByUser')->nullable();
+            $table->string('scheduledBy')->nullable();
+            $table->string('ongoingBy')->nullable();
+            $table->string('completedBy')->nullable();
+            $table->string('draftBy')->nullable();
+            $table->string('draftAt')->nullable();
+            $table->string('scheduledAt')->nullable();
+            $table->string('ongoingAt')->nullable();
+            $table->string('completedAt')->nullable();
+
+
             $table->timestamps();
         });
     }

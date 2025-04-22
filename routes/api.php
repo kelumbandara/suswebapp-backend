@@ -56,7 +56,18 @@ use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaQuestionRecodeContr
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiIaSuplierTypeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiInternalAuditFactoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiInternalAuditRecodeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaCmChemicalFormTypeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaCmChemicalManagementRecodeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrCommercialNameController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrProductStandardController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrZdhcCategoryController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionCategoryController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionSourceController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionUnitController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEnvirementManagementRecodeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaEnvirementTargetSettingRecodeController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaETsCategoryController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaETsSourceController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaSrAdditionalSDGController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaSrAlignmentSDGController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaSrIdImpactTypeController;
@@ -66,6 +77,8 @@ use App\Http\Controllers\SustainabilityAppsControllers\SaSrPillarsController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaSrSDGController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaSrSDGReportingRecodeController;
 use App\Http\Controllers\UserController;
+use App\Models\SaCmCmrChemicalFormType;
+use App\Models\SaCmCmrCommercialName;
 use Illuminate\Support\Facades\Route;
 
 Route::post('calculate', [CalculationController::class, 'store']);
@@ -158,6 +171,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('internal-audit/{id}/delete', [SaAiInternalAuditRecodeController::class, 'destroy']);
     Route::get('internal-audit-assign-task', [SaAiInternalAuditRecodeController::class, 'assignTask']);
     Route::get('internal-audit-assignee', [SaAiInternalAuditRecodeController::class, 'assignee']);
+    Route::post('internal-audit-draft', [SaAiInternalAuditRecodeController::class, 'saveDraft']);
+    Route::post('internal-audit-draft/{id}/update', [SaAiInternalAuditRecodeController::class, 'updateDraft']);
+    Route::post('internal-audit-shedualed', [SaAiInternalAuditRecodeController::class, 'saveShedualed']);
+    Route::post('internal-audit-ongoing/{id}/update', [SaAiInternalAuditRecodeController::class, 'saveOngoing']);
+    Route::post('internal-audit-action-plan/{id}/update', [SaAiInternalAuditRecodeController::class, 'actionPlanUpdate']);
+    Route::post('internal-audit-completed/{id}/update', [SaAiInternalAuditRecodeController::class, 'complete']);
+    Route::get('internal-audit-completed', [SaAiInternalAuditRecodeController::class, 'getFinalAuditers']);
 
     Route::get('question-reports', [SaAiIaQuestionRecodeController::class, 'index']);
     Route::post('question-reports', [SaAiIaQuestionRecodeController::class, 'store']);
@@ -178,6 +198,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('envirement-recode-assign-task', [SaEnvirementManagementRecodeController::class, 'assignTask']);
     Route::get('envirement-recode-assignee', [SaEnvirementManagementRecodeController::class, 'assignee']);
 
+    Route::get('target-setting', [SaEnvirementTargetSettingRecodeController::class, 'index']);
+    Route::post('target-setting', [SaEnvirementTargetSettingRecodeController::class, 'store']);
+    Route::post('target-setting/{id}/update', [SaEnvirementTargetSettingRecodeController::class, 'update']);
+    Route::delete('target-setting/{id}/delete', [SaEnvirementTargetSettingRecodeController::class, 'destroy']);
+    Route::get('target-setting-assign-task', [SaEnvirementTargetSettingRecodeController::class, 'assignTask']);
+    Route::get('target-setting-assignee', [SaEnvirementTargetSettingRecodeController::class, 'assignee']);
+
+    Route::get('chemical-records', [SaCmChemicalManagementRecodeController::class, 'index']);
+    Route::post('chemical-records', [SaCmChemicalManagementRecodeController::class, 'store']);
+    Route::post('chemical-records/{id}/update', [SaCmChemicalManagementRecodeController::class, 'update']);
+    Route::delete('chemical-records/{id}/delete', [SaCmChemicalManagementRecodeController::class, 'destroy']);
+    Route::get('chemical-records-assign-task', [SaCmChemicalManagementRecodeController::class, 'assignTask']);
+    Route::get('chemical-records-assignee', [SaCmChemicalManagementRecodeController::class, 'assignee']);
 });
 
 Route::get('user-permissions', [ComPermissionController::class, 'index']);
@@ -346,6 +379,35 @@ Route::post('internal-auditee', [SaAiIaInternalAuditeeController::class, 'store'
 Route::get('supplier-types', [SaAiIaSuplierTypeController::class, 'index']);
 Route::post('supplier-types', [SaAiIaSuplierTypeController::class, 'store']);
 
+Route::get('ts-categories', [SaETsCategoryController::class, 'index']);
+Route::post('ts-categories', [SaETsCategoryController::class, 'store']);
+Route::get('ts-categories', [SaETsCategoryController::class, 'getCategories']);
+Route::get('categories/{categoryName}/possibilityCategory', [SaETsCategoryController::class, 'getPossibleCategories']);
+Route::get('subcategories/{possibilityCategory}/opertunity', [SaETsCategoryController::class, 'getOppertunities']);
+
+Route::get('ts-sources', [SaETsSourceController::class, 'index']);
+Route::post('ts-sources', [SaETsSourceController::class, 'store']);
+
+Route::get('consumption-categories', [SaEmrConsumptionCategoryController::class, 'index']);
+Route::post('consumption-categories', [SaEmrConsumptionCategoryController::class, 'store']);
+
+Route::get('consumption-sources', [SaEmrConsumptionSourceController::class, 'index']);
+Route::post('consumption-sources', [SaEmrConsumptionSourceController::class, 'store']);
+
+Route::get('consumption-units', [SaEmrConsumptionUnitController::class, 'index']);
+Route::post('consumption-units', [SaEmrConsumptionUnitController::class, 'store']);
+
+Route::get('commercial-names', [SaCmCmrCommercialNameController::class, 'index']);
+Route::post('commercial-names', [SaCmCmrCommercialNameController::class, 'store']);
+
+Route::get('chemical-form-types', [SaCmChemicalFormTypeController::class, 'index']);
+Route::post('chemical-form-types', [SaCmChemicalFormTypeController::class, 'store']);
+
+Route::get('zdhc-categories', [SaCmCmrZdhcCategoryController::class, 'index']);
+Route::post('zdhc-categories', [SaCmCmrZdhcCategoryController::class, 'store']);
+
+Route::get('product-standard', [SaCmCmrProductStandardController::class, 'index']);
+Route::post('product-standard', [SaCmCmrProductStandardController::class, 'store']);
 
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
 Route::post('upload', [ImageUploadController::class, 'uploadImage']);

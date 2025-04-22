@@ -24,17 +24,26 @@ class SaEnvirementManagementRecodeController extends Controller
     public function index()
     {
         $records = $this->envirementManagementRecodeInterface->All();
+
         $records = $records->map(function ($risk) {
             try {
-                $approver       = $this->userInterface->getById($risk->approverId);
-                $risk->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
+                $approver = $this->userInterface->getById($risk->approverId);
+                if ($approver) {
+                    $risk->approver = ['name' => $approver->name, 'id' => $approver->id];
+                } else {
+                    $risk->approver = ['name' => 'Unknown', 'id' => null];
+                }
             } catch (\Exception $e) {
                 $risk->approver = ['name' => 'Unknown', 'id' => null];
             }
 
             try {
-                $reviewer       = $this->userInterface->getById($risk->reviewerId);
-                $risk->reviewer = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
+                $reviewer = $this->userInterface->getById($risk->reviewerId);
+                if ($reviewer) {
+                    $risk->reviewer = ['name' => $reviewer->name, 'id' => $reviewer->id];
+                } else {
+                    $risk->reviewer = ['name' => 'Unknown', 'id' => null];
+                }
             } catch (\Exception $e) {
                 $risk->reviewer = ['name' => 'Unknown', 'id' => null];
             }
@@ -46,10 +55,11 @@ class SaEnvirementManagementRecodeController extends Controller
                 $risk->createdByUserName = 'Unknown';
             }
 
+            return $risk;
         });
+
         foreach ($records as $record) {
             $record->impactConsumption = $this->addConcumptionInterface->findByEnvirementId($record->id);
-
         }
 
         return response()->json($records, 200);
@@ -72,7 +82,6 @@ class SaEnvirementManagementRecodeController extends Controller
             return response()->json(['message' => 'Failed to create enviroment management report'], 500);
         }
 
-
         if (! empty($data['impactConsumption'])) {
             foreach ($data['impactConsumption'] as $impactConsumption) {
                 $impactConsumption['envirementId'] = $record->id;
@@ -90,7 +99,6 @@ class SaEnvirementManagementRecodeController extends Controller
     {
         $data   = $request->validated();
         $record = $this->envirementManagementRecodeInterface->findById($id);
-
 
         $updateSuccess = $record->update($data);
         if (! $updateSuccess) {
@@ -143,20 +151,20 @@ class SaEnvirementManagementRecodeController extends Controller
 
         $record = $record->map(function ($impactConsumption) {
             try {
-                $approver                = $this->userInterface->getById($impactConsumption->approverId);
+                $approver                    = $this->userInterface->getById($impactConsumption->approverId);
                 $impactConsumption->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $impactConsumption->approver = ['name' => 'Unknown', 'id' => null];
             }
             try {
-                $reviewer                = $this->userInterface->getById($impactConsumption->reviewerId);
+                $reviewer                    = $this->userInterface->getById($impactConsumption->reviewerId);
                 $impactConsumption->reviewer = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $impactConsumption->reviewer = ['name' => 'Unknown', 'id' => null];
             }
 
             try {
-                $creator                          = $this->userInterface->getById($impactConsumption->createdByUser);
+                $creator                              = $this->userInterface->getById($impactConsumption->createdByUser);
                 $impactConsumption->createdByUserName = $creator ? $creator->name : 'Unknown';
             } catch (\Exception $e) {
                 $impactConsumption->createdByUserName = 'Unknown';
@@ -174,7 +182,7 @@ class SaEnvirementManagementRecodeController extends Controller
 
         $targetLevel = $user->assigneeLevel + 1;
 
-        $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Envirement Management Section')
+        $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Environment Management Section')
             ->where('availability', 1)
             ->values();
         return response()->json($assignees);

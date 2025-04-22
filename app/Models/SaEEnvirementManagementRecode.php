@@ -13,7 +13,6 @@ class SaEEnvirementManagementRecode extends Model
         'referenceNumber',
         'totalWorkForce',
         'numberOfDaysWorked',
-        'areaInSquereMeter',
         'totalProuctProducedPcs',
         'totalProuctProducedkg',
         'division',
