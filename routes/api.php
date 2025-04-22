@@ -59,7 +59,9 @@ use App\Http\Controllers\SustainabilityAppsControllers\SaAiInternalAuditRecodeCo
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmChemicalFormTypeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmChemicalManagementRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrCommercialNameController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrHazardTypeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrProductStandardController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrUseOfPPEController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrZdhcCategoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionCategoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionSourceController;
@@ -183,6 +185,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('question-reports', [SaAiIaQuestionRecodeController::class, 'store']);
     Route::post('question-reports/{id}/update', [SaAiIaQuestionRecodeController::class, 'update']);
     Route::delete('question-reports/{id}/delete', [SaAiIaQuestionRecodeController::class, 'destroy']);
+    Route::get('question-reports-assignee', [SaAiIaQuestionRecodeController::class, 'assignee']);
 
     Route::get('sdg-report', [SaSrSDGReportingRecodeController::class, 'index']);
     Route::post('sdg-report', [SaSrSDGReportingRecodeController::class, 'store']);
@@ -408,6 +411,12 @@ Route::post('zdhc-categories', [SaCmCmrZdhcCategoryController::class, 'store']);
 
 Route::get('product-standard', [SaCmCmrProductStandardController::class, 'index']);
 Route::post('product-standard', [SaCmCmrProductStandardController::class, 'store']);
+
+Route::get('hazard-types', [SaCmCmrHazardTypeController::class, 'index']);
+Route::post('hazard-types', [SaCmCmrHazardTypeController::class, 'store']);
+
+Route::get('use-of-ppes', [SaCmCmrUseOfPPEController::class, 'index']);
+Route::post('use-of-ppes', [SaCmCmrUseOfPPEController::class, 'store']);
 
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
 Route::post('upload', [ImageUploadController::class, 'uploadImage']);

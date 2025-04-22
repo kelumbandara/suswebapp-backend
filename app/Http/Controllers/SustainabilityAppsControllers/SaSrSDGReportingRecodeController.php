@@ -265,7 +265,7 @@ class SaSrSDGReportingRecodeController extends Controller
 
         $targetLevel = $user->assigneeLevel + 1;
 
-        $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'SDG Reporting')
+        $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'SDG Reporting Section')
             ->where('availability', 1)
             ->values();
         return response()->json($assignees);

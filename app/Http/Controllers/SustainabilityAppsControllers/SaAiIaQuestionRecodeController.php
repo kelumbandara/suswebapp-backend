@@ -6,6 +6,7 @@ use App\Http\Requests\SaAiIaQuestionRecode\QuestionRecodeRequest;
 use App\Repositories\All\SaAiIaQrGroupRecode\GroupRecodeInterface;
 use App\Repositories\All\SaAiIaQrQuection\QuestionsInterface;
 use App\Repositories\All\SaAiIaQuestionRecode\QuestionRecodeInterface;
+use App\Repositories\All\User\UserInterface;
 use Illuminate\Support\Facades\Auth;
 
 class SaAiIaQuestionRecodeController extends Controller
@@ -13,12 +14,15 @@ class SaAiIaQuestionRecodeController extends Controller
     protected $questionRecodeInterface;
     protected $questionsInterface;
     protected $groupRecodeInterface;
+    protected $userInterface;
 
-    public function __construct(QuestionRecodeInterface $questionRecodeInterface, QuestionsInterface $questionsInterface, GroupRecodeInterface $groupRecodeInterface)
+
+    public function __construct(QuestionRecodeInterface $questionRecodeInterface, UserInterface $userInterface, QuestionsInterface $questionsInterface, GroupRecodeInterface $groupRecodeInterface)
     {
         $this->questionRecodeInterface = $questionRecodeInterface;
         $this->questionsInterface      = $questionsInterface;
         $this->groupRecodeInterface    = $groupRecodeInterface;
+        $this->userInterface           = $userInterface;
     }
 
     public function index()
@@ -157,6 +161,18 @@ class SaAiIaQuestionRecodeController extends Controller
         $this->questionRecodeInterface->deleteById($id);
 
         return response()->json(['message' => 'Internal audit Question report deleted successfully'], 200);
+    }
+
+    public function assignee()
+    {
+        $user        = Auth::user();
+        $targetLevel = $user->assigneeLevel + 1;
+
+        $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Internal Question Section')
+            ->where('availability', 1)
+            ->values();
+
+        return response()->json($assignees);
     }
 
 }
