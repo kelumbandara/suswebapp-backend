@@ -63,7 +63,6 @@ class HrCategoryController extends Controller
             ]);
         }
 
-        // Filter out duplicate subcategories
         $uniqueSubcategories = $subcategories->unique('subCategory')->values()->map(function ($item) {
             return [
                 'id'          => (int) $item->id,
@@ -98,21 +97,10 @@ class HrCategoryController extends Controller
     public function storeObservation(Request $request)
     {
         $validated = $request->validate([
-            'categoryName'    => 'required|string|exists:hr_categories,categoryName',
-            'subCategory'     => 'required|string|exists:hr_categories,subCategory',
-            'observationType' => 'required|string|unique:hr_categories,observationType',
+            'categoryName'    => 'required|string',
+            'subCategory'     => 'required|string',
+            'observationType' => 'required|string|unique:hs_hr_categories,observationType',
         ]);
-
-        $existingCategory = $this->hrCategoryInterface->getByColumn([
-            'categoryName' => $validated['categoryName'],
-            'subCategory'  => $validated['subCategory'],
-        ])->first();
-
-        if (! $existingCategory) {
-            return response()->json([
-                'message' => 'The selected category and subcategory do not match.',
-            ], 400);
-        }
 
         $observation = $this->hrCategoryInterface->create([
             'categoryName'    => $validated['categoryName'],
@@ -125,5 +113,6 @@ class HrCategoryController extends Controller
             'observation' => $observation,
         ], 201);
     }
+
 
 }
