@@ -14,7 +14,7 @@ class SaEEnvirementManagementRecode extends Model
         'totalWorkForce',
         'numberOfDaysWorked',
         'totalProductProducedPcs',
-        'totalProductProducedkg',
+        'totalProductProducedKg',
         'division',
         'year',
         'month',
