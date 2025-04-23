@@ -1,22 +1,22 @@
 <?php
 namespace App\Repositories\All\SaEmrAddConcumption;
 
-use App\Models\SaEEmrAddConcumption;
+use App\Models\SaEEmrAddConsumption;
 use App\Repositories\Base\BaseRepository;
 
 class AddConcumptionRepository extends BaseRepository implements AddConcumptionInterface
 {
     /**
-     * @var SaEEmrAddConcumption
+     * @var SaEEmrAddConsumption
      */
     protected $model;
 
     /**
      * HazardRiskRepository constructor.
      *
-     * @param SaEEmrAddConcumption $model
+     * @param SaEEmrAddConsumption $model
      */
-    public function __construct(SaEEmrAddConcumption $model)
+    public function __construct(SaEEmrAddConsumption $model)
     {
         $this->model = $model;
     }

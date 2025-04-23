@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -30,6 +29,13 @@ class SaCmChemicalManagemantRecode extends Model
         'requestedMerchandiser',
         'requestDate',
         'reviewerId',
+        'approverId',
+        'hazardType',
+        'useOfPPE',
+        'ghsClassification',
+        'zdhcLevel',
+        'casNumber',
+        'colourIndex',
         'status',
         'createdByUser',
         'updatedBy',
@@ -41,7 +47,9 @@ class SaCmChemicalManagemantRecode extends Model
 
     protected $casts = [
         'doYouHaveMSDSorSDS' => 'boolean',
-        'documents' => 'array',
+        'documents'          => 'array',
+        'hazardType'         => 'array',
+        'useOfPPE'           => 'array',
     ];
 
     protected static function booted()
