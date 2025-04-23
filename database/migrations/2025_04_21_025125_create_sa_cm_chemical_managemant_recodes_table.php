@@ -33,6 +33,13 @@ return new class extends Migration
             $table->string('requestedMerchandiser')->nullable();
             $table->string('requestDate')->nullable();
             $table->string('reviewerId')->nullable();
+            $table->string('approverId')->nullable();
+            $table->json('hazardType')->nullable();
+            $table->json('useOfPPE')->nullable();
+            $table->string('ghsClassification')->nullable();
+            $table->string('zdhcLevel')->nullable();
+            $table->string('casNumber')->nullable();
+            $table->string('colourIndex')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected', 'published', 'ongoing', 'draft', 'scheduled', 'completed', 'reviewed'])->default('draft')->nullable();
             $table->string('createdByUser')->nullable();
             $table->string('updatedBy')->nullable();
