@@ -3,6 +3,7 @@ namespace App\Http\Controllers\SustainabilityAppsControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaAiInternalAuditRecode\InternalAuditRequest;
+use App\Repositories\All\ComDepartment\DepartmentInterface;
 use App\Repositories\All\SaAiIaActionPlan\ActionPlanInterface;
 use App\Repositories\All\SaAiIaAnswerRecode\AnswerRecodeInterface;
 use App\Repositories\All\SaAiIaContactPerson\ContactPersonInterface;
@@ -18,14 +19,16 @@ class SaAiInternalAuditRecodeController extends Controller
     protected $actionPlanInterface;
     protected $answerRecodeInterface;
     protected $contactPersonInterface;
+    protected $departmentInterface;
 
-    public function __construct(InternalAuditRecodeInterface $internalAuditRecodeInterface, UserInterface $userInterface, ActionPlanInterface $actionPlanInterface, AnswerRecodeInterface $answerRecodeInterface, ContactPersonInterface $contactPersonInterface)
+    public function __construct(InternalAuditRecodeInterface $internalAuditRecodeInterface, DepartmentInterface $departmentInterface, UserInterface $userInterface, ActionPlanInterface $actionPlanInterface, AnswerRecodeInterface $answerRecodeInterface, ContactPersonInterface $contactPersonInterface)
     {
         $this->internalAuditRecodeInterface = $internalAuditRecodeInterface;
         $this->userInterface                = $userInterface;
         $this->actionPlanInterface          = $actionPlanInterface;
         $this->answerRecodeInterface        = $answerRecodeInterface;
         $this->contactPersonInterface       = $contactPersonInterface;
+        $this->departmentInterface          = $departmentInterface;
     }
 
     public function index()
@@ -52,18 +55,37 @@ class SaAiInternalAuditRecodeController extends Controller
                 $audit->createdByUserName = 'Unknown';
             }
             try {
-                $contactPerson = $this->contactPersonInterface->getById($audit->factoryContactPersonId);
+                $contactPerson               = $this->contactPersonInterface->getById($audit->factoryContactPersonId);
                 $audit->factoryContactPerson = $contactPerson
-                    ? ['name' => $contactPerson->name, 'id' => $contactPerson->id]
-                    : ['name' => 'Unknown', 'id' => null];
+                ? ['name' => $contactPerson->name, 'id' => $contactPerson->id]
+                : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $audit->factoryContactPerson = ['name' => 'Unknown', 'id' => null];
             }
+            try {
+                $departments = [];
+                if (is_array($audit->department)) {
+                    foreach ($audit->department as $dept) {
+                        $deptId = is_array($dept) && isset($dept['id']) ? $dept['id'] : $dept;
+
+                        $department = $this->departmentInterface->getById($deptId);
+
+                        $departments[] = $department
+                            ? ['department' => $department->department, 'id' => $department->id]
+                            : ['department' => 'Unknown', 'id' => $deptId];
+                    }
+                }
+                $audit->department = $departments;
+            } catch (\Exception $e) {
+                $audit->department = [['department' => 'Unknown', 'id' => null]];
+            }
+
+
 
             return $audit;
         });
         foreach ($internalAudit as $internalAudit) {
-            $internalAudit->actionPlan = $this->actionPlanInterface->findByIntarnalAuditId($internalAudit->id);
+            $internalAudit->actionPlan = $this->actionPlanInterface->findByInternalAuditId($internalAudit->id);
         }
 
         return response()->json($internalAudit, 200);
@@ -96,21 +118,37 @@ class SaAiInternalAuditRecodeController extends Controller
                     $audit->createdByUserName = 'Unknown';
                 }
                 try {
-                    $contactPerson = $this->contactPersonInterface->getById($audit->factoryContactPersonId);
+                    $contactPerson               = $this->contactPersonInterface->getById($audit->factoryContactPersonId);
                     $audit->factoryContactPerson = $contactPerson
-                        ? ['name' => $contactPerson->name, 'id' => $contactPerson->id]
-                        : ['name' => 'Unknown', 'id' => null];
+                    ? ['name' => $contactPerson->name, 'id' => $contactPerson->id]
+                    : ['name' => 'Unknown', 'id' => null];
                 } catch (\Exception $e) {
                     $audit->factoryContactPerson = ['name' => 'Unknown', 'id' => null];
                 }
+                try {
+                    $departments = [];
+                    if (is_array($audit->department)) {
+                        foreach ($audit->department as $dept) {
+                            $deptId = is_array($dept) && isset($dept['id']) ? $dept['id'] : $dept;
 
+                            $department = $this->departmentInterface->getById($deptId);
+
+                            $departments[] = $department
+                                ? ['department' => $department->department, 'id' => $department->id]
+                                : ['department' => 'Unknown', 'id' => $deptId];
+                        }
+                    }
+                    $audit->department = $departments;
+                } catch (\Exception $e) {
+                    $audit->department = [['department' => 'Unknown', 'id' => null]];
+                }
 
                 return $audit;
             });
 
             foreach ($internalAudits as $audit) {
-                $audit->actionPlan = $this->actionPlanInterface->findByIntarnalAuditId($audit->id);
-                $audit->answers    = $this->answerRecodeInterface->findByIntarnalAuditId($audit->id);
+                $audit->actionPlan = $this->actionPlanInterface->findByInternalAuditId($audit->id);
+                $audit->answers    = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
             }
 
             return response()->json([
@@ -249,7 +287,7 @@ class SaAiInternalAuditRecodeController extends Controller
             return response()->json(['message' => 'Failed to update internal audit'], 500);
         }
 
-        $this->answerRecodeInterface->deleteByIntarnalAuditId($id);
+        $this->answerRecodeInterface->deleteByInternalAuditId($id);
 
         if (! empty($validatedData['answers'])) {
             foreach ($validatedData['answers'] as $answer) {
@@ -259,7 +297,7 @@ class SaAiInternalAuditRecodeController extends Controller
         }
 
         $updatedRecord                = $this->internalAuditRecodeInterface->findById($id);
-        $updatedRecord->impactDetails = $this->answerRecodeInterface->findByIntarnalAuditId($id);
+        $updatedRecord->impactDetails = $this->answerRecodeInterface->findByInternalAuditId($id);
 
         return response()->json([
             'message'       => 'Ongoing audit updated successfully!',
@@ -290,7 +328,7 @@ class SaAiInternalAuditRecodeController extends Controller
             return response()->json(['message' => 'Failed to update internal audit'], 500);
         }
 
-        $this->answerRecodeInterface->deleteByIntarnalAuditId($id);
+        $this->answerRecodeInterface->deleteByInternalAuditId($id);
 
         if (! empty($validatedData['answers'])) {
             foreach ($validatedData['answers'] as $answer) {
@@ -300,7 +338,7 @@ class SaAiInternalAuditRecodeController extends Controller
         }
 
         $updatedRecord                = $this->internalAuditRecodeInterface->findById($id);
-        $updatedRecord->impactDetails = $this->answerRecodeInterface->findByIntarnalAuditId($id);
+        $updatedRecord->impactDetails = $this->answerRecodeInterface->findByInternalAuditId($id);
 
         return response()->json([
             'message'       => 'Ongoing audit updated successfully!',
@@ -329,7 +367,7 @@ class SaAiInternalAuditRecodeController extends Controller
             return response()->json(['message' => 'Failed to update internal audit record'], 500);
         }
 
-        $this->answerRecodeInterface->deleteByIntarnalAuditId($id);
+        $this->answerRecodeInterface->deleteByInternalAuditId($id);
         if (! empty($validatedData['answers'])) {
             foreach ($validatedData['answers'] as $answer) {
                 $answer['internalAuditId'] = $id;
@@ -337,7 +375,7 @@ class SaAiInternalAuditRecodeController extends Controller
             }
         }
 
-        $this->actionPlanInterface->deleteByIntarnalAuditId($id);
+        $this->actionPlanInterface->deleteByInternalAuditId($id);
         if (! empty($validatedData['actionPlans'])) {
             foreach ($validatedData['actionPlans'] as $actionPlan) {
                 $actionPlan['internalAuditId'] = $id;
@@ -346,8 +384,8 @@ class SaAiInternalAuditRecodeController extends Controller
         }
 
         $updatedRecord              = $this->internalAuditRecodeInterface->findById($id);
-        $updatedRecord->answers     = $this->answerRecodeInterface->findByIntarnalAuditId($id);
-        $updatedRecord->actionPlans = $this->actionPlanInterface->findByIntarnalAuditId($id);
+        $updatedRecord->answers     = $this->answerRecodeInterface->findByInternalAuditId($id);
+        $updatedRecord->actionPlans = $this->actionPlanInterface->findByInternalAuditId($id);
 
         return response()->json([
             'message'       => 'Action plan and audit updated successfully!',
@@ -417,6 +455,23 @@ class SaAiInternalAuditRecodeController extends Controller
                 $audit->createdByUserName = $creator ? $creator->name : 'Unknown';
             } catch (\Exception $e) {
                 $audit->createdByUserName = 'Unknown';
+            }
+            try {
+                $departments = [];
+                if (is_array($audit->department)) {
+                    foreach ($audit->department as $dept) {
+                        $deptId = is_array($dept) && isset($dept['id']) ? $dept['id'] : $dept;
+
+                        $department = $this->departmentInterface->getById($deptId);
+
+                        $departments[] = $department
+                            ? ['department' => $department->department, 'id' => $department->id]
+                            : ['department' => 'Unknown', 'id' => $deptId];
+                    }
+                }
+                $audit->department = $departments;
+            } catch (\Exception $e) {
+                $audit->department = [['department' => 'Unknown', 'id' => null]];
             }
             return $audit;
         });

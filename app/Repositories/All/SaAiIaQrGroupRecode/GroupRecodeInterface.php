@@ -6,6 +6,6 @@ use App\Repositories\Base\EloquentRepositoryInterface;
 
 // Interface
 interface GroupRecodeInterface extends EloquentRepositoryInterface {
-    public function findByQuectionRecoId(int $quectionRecoId);
-    public function deleteByQuectionRecoId(int $quectionRecoId);
+    public function findByQuestionRecoId(int $questionRecoId);
+    public function deleteByQuestionRecoId(int $questionRecoId);
 }

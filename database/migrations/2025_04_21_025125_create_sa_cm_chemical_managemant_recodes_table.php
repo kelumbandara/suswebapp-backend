@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('requestUnit')->nullable();
             $table->string('zdhcCategory')->nullable();
             $table->string('chemicalFormType')->nullable();
-            $table->string('whareAndWhyUse')->nullable();
+            $table->string('whereAndWhyUse')->nullable();
             $table->string('productStandard')->nullable();
             $table->boolean('doYouHaveMSDSorSDS')->nullable();
             $table->string('msdsorsdsIssuedDate')->nullable();

@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('approverId')->nullable();
             $table->string('action')->nullable();
             $table->string('possibilityCategory')->nullable();
-            $table->string('opertunity')->nullable();
+            $table->string('opportunity')->nullable();
             $table->integer('implementationCost')->nullable();
             $table->integer('expectedSavings')->nullable();
             $table->integer('targetGHGReduction')->nullable();

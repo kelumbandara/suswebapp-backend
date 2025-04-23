@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('sa_ai_ia_qr_group_recodes', function (Blueprint $table) {
             $table->id("queGroupId");
-            $table->bigInteger('quectionRecoId')->nullable();
+            $table->bigInteger('questionRecoId')->nullable();
             $table->string('groupName')->nullable();
             $table->timestamps();
         });

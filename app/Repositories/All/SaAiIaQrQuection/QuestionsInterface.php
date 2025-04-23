@@ -7,10 +7,10 @@ use App\Repositories\Base\EloquentRepositoryInterface;
 interface QuestionsInterface extends EloquentRepositoryInterface
 {
 
-    public function findByQuectionRecoId(int $quectionRecoId);
-    public function deleteByQuectionRecoId(int $quectionRecoId);
+    public function findByQuestionRecoId(int $questionRecoId);
+    public function deleteByQuestionRecoId(int $questionRecoId);
     public function findByQueGroupId(int $queGroupId);
     public function deleteByQueGroupId(int $queGroupId);
-    public function findByQueGroupIdAndQuectionRecoId(int $queGroupId, int $quectionRecoId);
+    public function findByQueGroupIdAndQuestionRecoId(int $queGroupId, int $questionRecoId);
 
 }

@@ -26,7 +26,7 @@ class CmrCommercialNameRequest extends FormRequest
             'molecularFormula'        => 'required|string',
             'chemicalFormType'        => 'required|string',
             'reachRegistrationNumber' => 'required|string',
-            'whareAndWhyUse'          => 'required|string',
+            'whereAndWhyUse'          => 'required|string',
             'zdhcCategory'            => 'required|string',
             'zdhcLevel'               => 'required|string',
             'casNumber'               => 'required|string',

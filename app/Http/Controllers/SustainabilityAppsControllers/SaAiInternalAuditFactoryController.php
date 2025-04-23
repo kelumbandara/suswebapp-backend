@@ -28,10 +28,10 @@ class SaAiInternalAuditFactoryController extends Controller
             try {
                 $contactPerson = $this->contactPersonInterface->getById($factory->factoryContactPerson);
                 $factory->factoryContactPerson = $contactPerson
-                    ? ['name' => $contactPerson->name, 'factoryContactPersonId' => $contactPerson->id]
+                    ? ['name' => $contactPerson->name, 'id' => $contactPerson->id]
                     : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
-                $factory->factoryContactPerson = ['name' => 'Unknown', 'factoryContactPersonId' => null];
+                $factory->factoryContactPerson = ['name' => 'Unknown', 'id' => null];
             }
 
             return $factory;

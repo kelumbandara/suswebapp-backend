@@ -79,8 +79,6 @@ use App\Http\Controllers\SustainabilityAppsControllers\SaSrPillarsController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaSrSDGController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaSrSDGReportingRecodeController;
 use App\Http\Controllers\UserController;
-use App\Models\SaCmCmrChemicalFormType;
-use App\Models\SaCmCmrCommercialName;
 use Illuminate\Support\Facades\Route;
 
 Route::post('calculate', [CalculationController::class, 'store']);
@@ -175,7 +173,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('internal-audit-assignee', [SaAiInternalAuditRecodeController::class, 'assignee']);
     Route::post('internal-audit-draft', [SaAiInternalAuditRecodeController::class, 'saveDraft']);
     Route::post('internal-audit-draft/{id}/update', [SaAiInternalAuditRecodeController::class, 'updateDraft']);
-    Route::post('internal-audit-shedualed', [SaAiInternalAuditRecodeController::class, 'saveShedualed']);
+    Route::post('internal-audit-scheduled', [SaAiInternalAuditRecodeController::class, 'saveShedualed']);
     Route::post('internal-audit-ongoing/{id}/update', [SaAiInternalAuditRecodeController::class, 'saveOngoing']);
     Route::post('internal-audit-action-plan/{id}/update', [SaAiInternalAuditRecodeController::class, 'actionPlanUpdate']);
     Route::post('internal-audit-completed/{id}/update', [SaAiInternalAuditRecodeController::class, 'complete']);
@@ -194,12 +192,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('sdg-report-assign-task', [SaSrSDGReportingRecodeController::class, 'assignTask']);
     Route::get('sdg-report-assignee', [SaSrSDGReportingRecodeController::class, 'assignee']);
 
-    Route::get('envirement-recode', [SaEnvirementManagementRecodeController::class, 'index']);
-    Route::post('envirement-recode', [SaEnvirementManagementRecodeController::class, 'store']);
-    Route::post('envirement-recode/{id}/update', [SaEnvirementManagementRecodeController::class, 'update']);
-    Route::delete('envirement-recode/{id}/delete', [SaEnvirementManagementRecodeController::class, 'destroy']);
-    Route::get('envirement-recode-assign-task', [SaEnvirementManagementRecodeController::class, 'assignTask']);
-    Route::get('envirement-recode-assignee', [SaEnvirementManagementRecodeController::class, 'assignee']);
+    Route::get('environment-recode', [SaEnvirementManagementRecodeController::class, 'index']);
+    Route::post('environment-recode', [SaEnvirementManagementRecodeController::class, 'store']);
+    Route::post('environment-recode/{id}/update', [SaEnvirementManagementRecodeController::class, 'update']);
+    Route::delete('environment-recode/{id}/delete', [SaEnvirementManagementRecodeController::class, 'destroy']);
+    Route::get('environment-recode-assign-task', [SaEnvirementManagementRecodeController::class, 'assignTask']);
+    Route::get('environment-recode-assignee', [SaEnvirementManagementRecodeController::class, 'assignee']);
 
     Route::get('target-setting', [SaEnvirementTargetSettingRecodeController::class, 'index']);
     Route::post('target-setting', [SaEnvirementTargetSettingRecodeController::class, 'store']);
@@ -386,7 +384,7 @@ Route::get('ts-categories', [SaETsCategoryController::class, 'index']);
 Route::post('ts-categories', [SaETsCategoryController::class, 'store']);
 Route::get('ts-categories', [SaETsCategoryController::class, 'getCategories']);
 Route::get('categories/{categoryName}/possibilityCategory', [SaETsCategoryController::class, 'getPossibleCategories']);
-Route::get('subcategories/{possibilityCategory}/opertunity', [SaETsCategoryController::class, 'getOppertunities']);
+Route::get('subcategories/{possibilityCategory}/opportunities', [SaETsCategoryController::class, 'getOppertunities']);
 
 Route::get('ts-sources', [SaETsSourceController::class, 'index']);
 Route::post('ts-sources', [SaETsSourceController::class, 'store']);

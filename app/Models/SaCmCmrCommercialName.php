@@ -15,7 +15,7 @@ class SaCmCmrCommercialName extends Model
         'molecularFormula',
         'chemicalFormType',
         'reachRegistrationNumber',
-        'whareAndWhyUse',
+        'whereAndWhyUse',
         'zdhcCategory',
         'zdhcLevel',
         'casNumber',

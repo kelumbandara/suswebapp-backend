@@ -34,7 +34,7 @@ class TargetSettingRecodeRequest extends FormRequest
             'approverId'          => 'required|string',
             'action'              => 'nullable|string',
             'possibilityCategory' => 'required|string',
-            'opertunity'          => 'nullable|string',
+            'opportunity'          => 'nullable|string',
             'implementationCost'  => 'required|numeric',
             'expectedSavings'     => 'required|numeric',
             'targetGHGReduction'  => 'required|numeric',

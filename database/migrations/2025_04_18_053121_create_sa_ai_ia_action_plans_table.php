@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('sa_ai_ia_action_plans', function (Blueprint $table) {
             $table->id('acctionPlanId');
-            $table->bigInteger('intarnalAuditId')->nullable();
+            $table->bigInteger('internalAuditId')->nullable();
             $table->string('correctiveOrPreventiveAction')->nullable();
             $table->string('priority')->nullable();
             $table->string('approverId')->nullable();

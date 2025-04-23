@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('sa_ai_ia_qr_questions', function (Blueprint $table) {
             $table->id('queId');
             $table->bigInteger('queGroupId')->nullable();
-            $table->bigInteger('quectionRecoId')->nullable();
+            $table->bigInteger('questionRecoId')->nullable();
             $table->string('colorCode')->nullable();
             $table->string('question')->nullable();
             $table->integer('allocatedScore')->nullable();
