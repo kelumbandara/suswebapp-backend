@@ -13,8 +13,8 @@ class SaAiIaAnswerRecode extends Model
 
     protected $table = 'sa_ai_ia_answer_recode';
     protected $fillable = [
-        'intarnalAuditId',
-        'quectionRecoId',
+        'internalAuditId',
+        'questionRecoId',
         'queGroupId',
         'quectionId',
         'rating',
@@ -28,7 +28,7 @@ class SaAiIaAnswerRecode extends Model
     }
     public function group()
     {
-        return $this->belongsTo(SaAiInternalAuditRecode::class, 'intarnalAuditId');
+        return $this->belongsTo(SaAiInternalAuditRecode::class, 'internalAuditId');
     }
     public function question()
     {

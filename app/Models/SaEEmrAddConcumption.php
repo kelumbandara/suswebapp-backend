@@ -5,22 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SaEEmrAddConcumption extends Model
+class SaEEmrAddconsumption extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'concumptionsId';
+    protected $primaryKey = 'consumptionId';
 
     protected $fillable = [
         'envirementId',
         'category',
         'source',
         'unit',
-        'quentity',
+        'quantity',
         'amount',
         'ghgInTonnes',
         'scope',
-        'methodeOfTracking',
+        'methodOfTracking',
         'usageType',
         'doYouHaveREC',
         'description',

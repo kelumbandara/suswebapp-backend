@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('molecularFormula')->nullable();
             $table->string('chemicalFormType')->nullable();
             $table->string('reachRegistrationNumber')->nullable();
-            $table->string('whareAndWhyUse')->nullable();
+            $table->string('whereAndWhyUse')->nullable();
             $table->string('zdhcCategory')->nullable();
             $table->string('zdhcLevel')->nullable();
             $table->string('casNumber')->nullable();

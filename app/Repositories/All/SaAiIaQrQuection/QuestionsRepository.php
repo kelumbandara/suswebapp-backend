@@ -20,14 +20,14 @@ class QuestionsRepository extends BaseRepository implements QuestionsInterface
     {
         $this->model = $model;
     }
-    public function findByQuectionRecoId($quectionRecoId)
+    public function findByQuestionRecoId($questionRecoId)
     {
-        return $this->model->where('quectionRecoId', $quectionRecoId)->get();
+        return $this->model->where('questionRecoId', $questionRecoId)->get();
     }
 
-    public function deleteByQuectionRecoId($quectionRecoId)
+    public function deleteByQuestionRecoId($questionRecoId)
     {
-        return $this->model->where('quectionRecoId', $quectionRecoId)->delete();
+        return $this->model->where('questionRecoId', $questionRecoId)->delete();
     }
 
     public function findByQueGroupId($queGroupIds)
@@ -44,11 +44,11 @@ class QuestionsRepository extends BaseRepository implements QuestionsInterface
         return $this->model->where('queGroupId', $queGroupId)->delete();
     }
 
-    public function findByQueGroupIdAndQuectionRecoId(int $queGroupId, int $quectionRecoId)
+    public function findByQueGroupIdAndQuestionRecoId(int $queGroupId, int $questionRecoId)
     {
         return $this->model->where('queGroupId', $queGroupId)
-            ->where('quectionRecoId', $quectionRecoId)
-            ->first(); 
+            ->where('questionRecoId', $questionRecoId)
+            ->first();
     }
 
 }

@@ -20,14 +20,14 @@ class GroupRecodeRepository extends BaseRepository implements GroupRecodeInterfa
     {
         $this->model = $model;
     }
-    public function findByQuectionRecoId($quectionRecoId)
+    public function findByQuestionRecoId($questionRecoId)
     {
-        return $this->model->where('quectionRecoId', $quectionRecoId)->get();
+        return $this->model->where('questionRecoId', $questionRecoId)->get();
     }
 
-    public function deleteByQuectionRecoId($quectionRecoId)
+    public function deleteByQuestionRecoId($questionRecoId)
     {
-        return $this->model->where('quectionRecoId', $quectionRecoId)->delete();
+        return $this->model->where('questionRecoId', $questionRecoId)->delete();
     }
 
 }

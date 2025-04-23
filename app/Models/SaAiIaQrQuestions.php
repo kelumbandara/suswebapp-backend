@@ -9,11 +9,11 @@ class SaAiIaQrQuestions extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'queid';
+    protected $primaryKey = 'queId';
 
     protected $fillable = [
         'queGroupId',
-        'quectionRecoId',
+        'questionRecoId',
         'colorCode',
         'question',
         'allocatedScore',
@@ -26,7 +26,7 @@ class SaAiIaQrQuestions extends Model
 
     public function questionRecode()
     {
-        return $this->belongsTo(SaAiIaQuestionRecode::class, 'quectionRecoId');
+        return $this->belongsTo(SaAiIaQuestionRecode::class, 'questionRecoId');
     }
 
 }

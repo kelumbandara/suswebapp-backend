@@ -33,7 +33,7 @@ class SaAiIaQuestionRecodeController extends Controller
             $totalQuestions = 0;
             $totalScore = 0;
 
-            $groups = $this->groupRecodeInterface->findByQuectionRecoId($record->id);
+            $groups = $this->groupRecodeInterface->findByQuestionRecoId($record->id);
 
             $groups = collect($groups)->map(function ($group) use (&$totalQuestions, &$totalScore) {
                 $questions = $this->questionsInterface->findByQueGroupId($group->queGroupId);
@@ -77,7 +77,7 @@ class SaAiIaQuestionRecodeController extends Controller
 
         foreach ($data['questionGroups'] as $group) {
             $groupData = [
-                'quectionRecoId' => $record->id,
+                'questionRecoId' => $record->id,
                 'groupName'      => $group['groupName'],
             ];
 
@@ -87,7 +87,7 @@ class SaAiIaQuestionRecodeController extends Controller
                 foreach ($group['questions'] as $question) {
                     $questionData = [
                         'queGroupId'     => $savedGroup->queGroupId,
-                        'quectionRecoId' => $record->id,
+                        'questionRecoId' => $record->id,
                         'colorCode'      => $question['colorCode'],
                         'question'       => $question['question'],
                         'allocatedScore' => $question['allocatedScore'],
@@ -119,18 +119,18 @@ class SaAiIaQuestionRecodeController extends Controller
             return response()->json(['message' => 'Failed to update Internal audit Question report'], 500);
         }
 
-        $this->groupRecodeInterface->deleteByQuectionRecoId($id);
-        $this->questionsInterface->deleteByQuectionRecoId($id);
+        $this->groupRecodeInterface->deleteByQuestionRecoId($id);
+        $this->questionsInterface->deleteByQuestionRecoId($id);
 
         if (! empty($data['questionGroups'])) {
             foreach ($data['questionGroups'] as $questionGroups) {
-                $questionGroups['quectionRecoId'] = $record->id;
+                $questionGroups['questionRecoId'] = $record->id;
                 $savedGroup                    = $this->groupRecodeInterface->create($questionGroups);
 
                 if (! empty($questionGroups['questions'])) {
                     foreach ($questionGroups['questions'] as $questions) {
                         $questions['queGroupId']     = $savedGroup->queGroupId;
-                        $questions['quectionRecoId'] = $record->id;
+                        $questions['questionRecoId'] = $record->id;
                         $this->questionsInterface->create($questions);
                     }
                 }
@@ -138,8 +138,8 @@ class SaAiIaQuestionRecodeController extends Controller
         }
 
         $updatedRecord                 = $this->questionRecodeInterface->findById($id);
-        $updatedRecord->questionGroups    = $this->groupRecodeInterface->findByQuectionRecoId($id);
-        $updatedRecord->questions = $this->questionsInterface->findByQuectionRecoId($id);
+        $updatedRecord->questionGroups    = $this->groupRecodeInterface->findByQuestionRecoId($id);
+        $updatedRecord->questions = $this->questionsInterface->findByQuestionRecoId($id);
 
         return response()->json([
             'message' => 'Internal audit Question report updated successfully',
@@ -155,8 +155,8 @@ class SaAiIaQuestionRecodeController extends Controller
             return response()->json(['message' => 'Internal audit Question report not found'], 404);
         }
 
-        $this->groupRecodeInterface->deleteByQuectionRecoId($id);
-        $this->questionsInterface->deleteByQuectionRecoId($id);
+        $this->groupRecodeInterface->deleteByQuestionRecoId($id);
+        $this->questionsInterface->deleteByQuestionRecoId($id);
 
         $this->questionRecodeInterface->deleteById($id);
 

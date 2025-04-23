@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('sa_ai_ia_answer_recodes', function (Blueprint $table) {
             $table->id('answerId');
-            $table->bigInteger('intarnalAuditId')->nullable();
-            $table->bigInteger('quectionRecoId')->nullable();
+            $table->bigInteger('internalAuditId')->nullable();
+            $table->bigInteger('questionRecoId')->nullable();
             $table->bigInteger('queGroupId')->nullable();
-            $table->bigInteger('quectionId')->nullable();
+            $table->bigInteger('questionId')->nullable();
             $table->string('score');
             $table->integer('status');
             $table->string('rating');

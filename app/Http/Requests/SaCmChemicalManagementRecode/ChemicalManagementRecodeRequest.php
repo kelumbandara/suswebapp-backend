@@ -29,7 +29,7 @@ class ChemicalManagementRecodeRequest extends FormRequest
             'requestUnit'             => 'required|string',
             'zdhcCategory'            => 'required|string',
             'chemicalFormType'        => 'required|string',
-            'whareAndWhyUse'          => 'required|string',
+            'whereAndWhyUse'          => 'required|string',
             'productStandard'         => 'required|string',
             'doYouHaveMSDSorSDS'      => 'nullable|boolean',
             'msdsorsdsIssuedDate'     => 'nullable|string',

@@ -20,14 +20,14 @@ class ActionPlanRepository extends BaseRepository implements ActionPlanInterface
     {
         $this->model = $model;
     }
-    public function findByIntarnalAuditId($intarnalAuditId)
+    public function findByInternalAuditId($internalAuditId)
     {
-        return $this->model->where('intarnalAuditId', $intarnalAuditId)->get();
+        return $this->model->where('internalAuditId', $internalAuditId)->get();
     }
 
-    public function deleteByIntarnalAuditId($intarnalAuditId)
+    public function deleteByInternalAuditId($internalAuditId)
     {
-        return $this->model->where('intarnalAuditId', $intarnalAuditId)->delete();
+        return $this->model->where('internalAuditId', $internalAuditId)->delete();
     }
 
 }

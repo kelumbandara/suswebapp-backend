@@ -19,7 +19,7 @@ class SaCmChemicalManagemantRecode extends Model
         'requestUnit',
         'zdhcCategory',
         'chemicalFormType',
-        'whareAndWhyUse',
+        'whereAndWhyUse',
         'productStandard',
         'doYouHaveMSDSorSDS',
         'documents',

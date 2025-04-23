@@ -6,6 +6,6 @@ use App\Repositories\Base\EloquentRepositoryInterface;
 
 // Interface
 interface AnswerRecodeInterface extends EloquentRepositoryInterface {
-    public function findByIntarnalAuditId(int $intarnalAuditId);
-    public function deleteByIntarnalAuditId(int $intarnalAuditId);
+    public function findByInternalAuditId(int $internalAuditId);
+    public function deleteByInternalAuditId(int $internalAuditId);
 }

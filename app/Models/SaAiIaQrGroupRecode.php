@@ -13,14 +13,14 @@ class SaAiIaQrGroupRecode extends Model
 
     protected $fillable = [
 
-        'quectionRecoId',
+        'questionRecoId',
         'groupName',
 
     ];
 
     public function questionRecode()
     {
-        return $this->belongsTo(SaAiIaQuestionRecode::class, 'quectionRecoId');
+        return $this->belongsTo(SaAiIaQuestionRecode::class, 'questionRecoId');
     }
 
 

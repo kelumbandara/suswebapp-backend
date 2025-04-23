@@ -12,7 +12,7 @@ class SaAiIaActionPlan extends Model
     protected $primaryKey = "acctionPlanId";
 
     protected $fillable = [
-        'intarnalAuditId',
+        'internalAuditId',
         'correctiveOrPreventiveAction',
         'priority',
         'approverId',
@@ -23,7 +23,7 @@ class SaAiIaActionPlan extends Model
     ];
     public function questionRecode()
     {
-        return $this->belongsTo(SaAiInternalAuditRecode::class, 'intarnalAuditId');
+        return $this->belongsTo(SaAiInternalAuditRecode::class, 'internalAuditId');
     }
 
 

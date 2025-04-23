@@ -22,7 +22,7 @@ class SaETargetSettingRecode extends Model
         'approverId',
         'action',
         'possibilityCategory',
-        'opertunity',
+        'opportunity',
         'implementationCost',
         'expectedSavings',
         'targetGHGReduction',

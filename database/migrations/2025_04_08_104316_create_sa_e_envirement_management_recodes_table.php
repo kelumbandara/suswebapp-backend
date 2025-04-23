@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('referenceNumber')->nullable();
             $table->integer('totalWorkForce')->nullable();
             $table->integer('numberOfDaysWorked')->nullable();
-            $table->integer('totalProuctProducedPcs')->nullable();
-            $table->integer('totalProuctProducedkg')->nullable();
+            $table->integer('totalProductProducedPcs')->nullable();
+            $table->integer('totalProductProducedkg')->nullable();
             $table->string('division')->nullable();
             $table->string('year')->nullable();
             $table->string('month')->nullable();
