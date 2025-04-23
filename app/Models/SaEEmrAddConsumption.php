@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SaEEmrAddconsumption extends Model
+class SaEEmrAddConsumption extends Model
 {
     use HasFactory;
 
     protected $primaryKey = 'consumptionId';
+
+    protected $table = 'sa_e_emr_add_consumption';
 
     protected $fillable = [
         'envirementId',

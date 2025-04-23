@@ -24,7 +24,7 @@ class EnvirementManagementRecodeRequest extends FormRequest
             'totalWorkForce'                       => 'required|numeric',
             'numberOfDaysWorked'                   => 'required|numeric',
             'totalProductProducedPcs'              => 'required|numeric',
-            'totalProductProducedkg'               => 'required|numeric',
+            'totalProductProducedKg'               => 'required|numeric',
             'division'                             => 'required|string',
             'year'                                 => 'nullable|string',
             'month'                                => 'nullable|string',
