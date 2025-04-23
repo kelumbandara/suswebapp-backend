@@ -192,12 +192,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('sdg-report-assign-task', [SaSrSDGReportingRecodeController::class, 'assignTask']);
     Route::get('sdg-report-assignee', [SaSrSDGReportingRecodeController::class, 'assignee']);
 
-    Route::get('environment-recode', [SaEnvirementManagementRecodeController::class, 'index']);
-    Route::post('environment-recode', [SaEnvirementManagementRecodeController::class, 'store']);
-    Route::post('environment-recode/{id}/update', [SaEnvirementManagementRecodeController::class, 'update']);
-    Route::delete('environment-recode/{id}/delete', [SaEnvirementManagementRecodeController::class, 'destroy']);
-    Route::get('environment-recode-assign-task', [SaEnvirementManagementRecodeController::class, 'assignTask']);
-    Route::get('environment-recode-assignee', [SaEnvirementManagementRecodeController::class, 'assignee']);
+    Route::get('environment-record', [SaEnvirementManagementRecodeController::class, 'index']);
+    Route::post('environment-record', [SaEnvirementManagementRecodeController::class, 'store']);
+    Route::post('environment-record/{id}/update', [SaEnvirementManagementRecodeController::class, 'update']);
+    Route::delete('environment-record/{id}/delete', [SaEnvirementManagementRecodeController::class, 'destroy']);
+    Route::get('environment-record-assign-task', [SaEnvirementManagementRecodeController::class, 'assignTask']);
+    Route::get('environment-record-assignee', [SaEnvirementManagementRecodeController::class, 'assignee']);
 
     Route::get('target-setting', [SaEnvirementTargetSettingRecodeController::class, 'index']);
     Route::post('target-setting', [SaEnvirementTargetSettingRecodeController::class, 'store']);
