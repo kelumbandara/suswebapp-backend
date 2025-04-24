@@ -21,12 +21,13 @@ class InternalAuditFactoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'factoryName'           => 'required|string',
-            'factoryAddress'        => 'required|string',
-            'factoryContactNumber'  => 'required|string',
-            'factoryEmail'          => 'required|string',
-            'designation'           => 'required|string',
-            'factoryContactPerson' => 'required|numeric',
+            'factoryName'              => 'required|string',
+            'factoryAddress'           => 'required|string',
+            'factoryContactNumber'     => 'required|string',
+            'factoryEmail'             => 'required|string',
+            'designation'              => 'required|string',
+            'factoryContactPersonId'   => 'required|numeric',
+            'factoryContactPersonName' => 'required|string',
 
         ];
     }

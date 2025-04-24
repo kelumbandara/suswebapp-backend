@@ -162,21 +162,21 @@ class SaCmChemicalManagementRecodeController extends Controller
         }
     }
 
-    public function approvedStatus($id, ChemicalManagementRecodeRequest $request){
-        $medicineRequest = $this->chemicalManagementRecodeInterface->findById($id);
+    public function approvedStatus($id, ChemicalManagementRecodeRequest $request)
+    {
+        $chemicalRecord = $this->chemicalManagementRecodeInterface->findById($id);
 
         $inventoryData = $request->validated();
 
         $this->chemicalManagementRecodeInterface->update($id, ['status' => 'approved']);
 
-
         $this->purchaseInventoryInterface->create($inventoryData);
 
         return response()->json([
-            'message' => 'Medicine request approved and added to inventory.',
+            'message' => 'Chemical record approved and added to inventory.',
         ], 200);
-
     }
+
 
 
 

@@ -26,7 +26,7 @@ class SaAiInternalAuditFactoryController extends Controller
 
         $result = $factories->map(function ($factory) {
             try {
-                $contactPerson = $this->contactPersonInterface->getById($factory->factoryContactPerson);
+                $contactPerson = $this->contactPersonInterface->getById($factory->factoryContactPersonId);
                 $factory->factoryContactPerson = $contactPerson
                     ? ['name' => $contactPerson->name, 'id' => $contactPerson->id]
                     : ['name' => 'Unknown', 'id' => null];

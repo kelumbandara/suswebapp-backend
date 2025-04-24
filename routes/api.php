@@ -214,6 +214,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('chemical-records/{id}/delete', [SaCmChemicalManagementRecodeController::class, 'destroy']);
     Route::get('chemical-records-assign-task', [SaCmChemicalManagementRecodeController::class, 'assignTask']);
     Route::get('chemical-records-assignee', [SaCmChemicalManagementRecodeController::class, 'assignee']);
+    Route::post('chemical-records/{id}/approve', [SaCmChemicalManagementRecodeController::class, 'approvedStatus']);
+
 });
 
 Route::get('user-permissions', [ComPermissionController::class, 'index']);
