@@ -6,5 +6,5 @@ use App\Repositories\Base\EloquentRepositoryInterface;
 
 // Interface
 interface TargetSettingRecodeInterface extends EloquentRepositoryInterface {
-    public function getByAssigneeId(int $assigneeId);
+    public function getByApproverId(int $approverId);
 }

@@ -190,7 +190,7 @@ class SaEnvirementTargetSettingRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $targetSetting = $this->targetSettingRecodeInterface->getByAssigneeId($user->id);
+        $targetSetting = $this->targetSettingRecodeInterface->getByApproverId($user->id);
 
         $targetSetting = $targetSetting->map(function ($risk) {
             try {
@@ -200,12 +200,6 @@ class SaEnvirementTargetSettingRecodeController extends Controller
                 $risk->approver = ['name' => 'Unknown', 'id' => null];
             }
 
-            try {
-                $responsible       = $this->userInterface->getById($risk->responsibleId);
-                $risk->responsible = $responsible ? ['name' => $responsible->name, 'id' => $responsible->id] : ['name' => 'Unknown', 'id' => null];
-            } catch (\Exception $e) {
-                $risk->responsible = ['name' => 'Unknown', 'id' => null];
-            }
             try {
                 $creator                 = $this->userInterface->getById($risk->createdByUser);
                 $risk->createdByUserName = $creator ? $creator->name : 'Unknown';

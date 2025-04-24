@@ -21,9 +21,9 @@ class TargetSettingRecodeRepository extends BaseRepository implements TargetSett
         $this->model = $model;
     }
 
-    public function getByAssigneeId($assigneeId)
+    public function getByApproverId($approverId)
     {
-        return $this->model->where('assigneeId', $assigneeId)->get();
+        return $this->model->where('approverId', $approverId)->get();
     }
 
 }
