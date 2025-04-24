@@ -37,39 +37,41 @@ class SaAiInternalAuditRecodeController extends Controller
 
         $internalAudit = $internalAudit->map(function ($audit) {
             try {
-                $approver        = $this->userInterface->getById($audit->approverId);
+                $approver = $this->userInterface->getById($audit->approverId);
                 $audit->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $audit->approver = ['name' => 'Unknown', 'id' => null];
             }
+
             try {
-                $auditee        = $this->userInterface->getById($audit->auditeeId);
+                $auditee = $this->userInterface->getById($audit->auditeeId);
                 $audit->auditee = $auditee ? ['name' => $auditee->name, 'id' => $auditee->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $audit->auditee = ['name' => 'Unknown', 'id' => null];
             }
+
             try {
-                $creator                  = $this->userInterface->getById($audit->createdByUser);
+                $creator = $this->userInterface->getById($audit->createdByUser);
                 $audit->createdByUserName = $creator ? $creator->name : 'Unknown';
             } catch (\Exception $e) {
                 $audit->createdByUserName = 'Unknown';
             }
+
             try {
-                $contactPerson               = $this->contactPersonInterface->getById($audit->factoryContactPersonId);
+                $contactPerson = $this->contactPersonInterface->getById($audit->factoryContactPersonId);
                 $audit->factoryContactPerson = $contactPerson
-                ? ['name' => $contactPerson->name, 'id' => $contactPerson->id]
-                : ['name' => 'Unknown', 'id' => null];
+                    ? ['name' => $contactPerson->name, 'id' => $contactPerson->id]
+                    : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $audit->factoryContactPerson = ['name' => 'Unknown', 'id' => null];
             }
+
             try {
                 $departments = [];
                 if (is_array($audit->department)) {
                     foreach ($audit->department as $dept) {
                         $deptId = is_array($dept) && isset($dept['id']) ? $dept['id'] : $dept;
-
                         $department = $this->departmentInterface->getById($deptId);
-
                         $departments[] = $department
                             ? ['department' => $department->department, 'id' => $department->id]
                             : ['department' => 'Unknown', 'id' => $deptId];
@@ -80,16 +82,16 @@ class SaAiInternalAuditRecodeController extends Controller
                 $audit->department = [['department' => 'Unknown', 'id' => null]];
             }
 
-
-
             return $audit;
         });
-        foreach ($internalAudit as $internalAudit) {
-            $internalAudit->actionPlan = $this->actionPlanInterface->findByInternalAuditId($internalAudit->id);
+
+        foreach ($internalAudit as $audit) {
+            $audit->actionPlan = $this->actionPlanInterface->findByInternalAuditId($audit->id);
         }
 
-        return response()->json($internalAudit, 200);
+        return response()->json($internalAudit->values());
     }
+
 
     public function getFinalAuditers()
     {
