@@ -63,6 +63,8 @@ use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrHazardTypeControll
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrProductStandardController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrUseOfPPEController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrZdhcCategoryController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaCmPirPositiveListController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaCmPirTestingLabController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionCategoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionSourceController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionUnitController;
@@ -415,6 +417,12 @@ Route::post('hazard-types', [SaCmCmrHazardTypeController::class, 'store']);
 
 Route::get('use-of-ppes', [SaCmCmrUseOfPPEController::class, 'index']);
 Route::post('use-of-ppes', [SaCmCmrUseOfPPEController::class, 'store']);
+
+Route::get('testing-labs', [SaCmPirTestingLabController::class, 'index']);
+Route::post('testing-labs', [SaCmPirTestingLabController::class, 'store']);
+
+Route::get('positive-list', [SaCmPirPositiveListController::class, 'index']);
+Route::post('positive-list', [SaCmPirPositiveListController::class, 'store']);
 
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
 Route::post('upload', [ImageUploadController::class, 'uploadImage']);

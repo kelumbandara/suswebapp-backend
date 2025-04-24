@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SustainabilityAppsControllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaCmChemicalManagementRecode\ChemicalManagementRecodeRequest;
 use App\Repositories\All\SaCmChemicalManagementRecode\ChemicalManagementRecodeInterface;
+use App\Repositories\All\SaCmPurchaseInventory\PurchaseInventoryInterface;
 use App\Repositories\All\User\UserInterface;
 use App\Services\ChemicalManagementService;
 use Illuminate\Support\Facades\Auth;
@@ -15,12 +16,14 @@ class SaCmChemicalManagementRecodeController extends Controller
     protected $chemicalManagementRecodeInterface;
     protected $userInterface;
     protected $chemicalManagementService;
+    protected $purchaseInventoryInterface;
 
-    public function __construct(ChemicalManagementRecodeInterface $chemicalManagementRecodeInterface, UserInterface $userInterface, ChemicalManagementService $chemicalManagementService)
+    public function __construct(ChemicalManagementRecodeInterface $chemicalManagementRecodeInterface, UserInterface $userInterface, ChemicalManagementService $chemicalManagementService, PurchaseInventoryInterface $purchaseInventoryInterface)
     {
         $this->chemicalManagementRecodeInterface = $chemicalManagementRecodeInterface;
         $this->userInterface          = $userInterface;
         $this->chemicalManagementService = $chemicalManagementService;
+        $this->purchaseInventoryInterface = $purchaseInventoryInterface;
     }
 
     public function index()
@@ -157,6 +160,22 @@ class SaCmChemicalManagementRecodeController extends Controller
         } else {
             return response()->json(['message' => 'Failed to update the Chemical Management Recode.'], 500);
         }
+    }
+
+    public function approvedStatus($id, ChemicalManagementRecodeRequest $request){
+        $medicineRequest = $this->chemicalManagementRecodeInterface->findById($id);
+
+        $inventoryData = $request->validated();
+
+        $this->chemicalManagementRecodeInterface->update($id, ['status' => 'approved']);
+
+
+        $this->purchaseInventoryInterface->create($inventoryData);
+
+        return response()->json([
+            'message' => 'Medicine request approved and added to inventory.',
+        ], 200);
+
     }
 
 
