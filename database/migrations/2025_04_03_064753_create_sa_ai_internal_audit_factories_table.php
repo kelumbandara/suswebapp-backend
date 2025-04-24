@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('factoryContactNumber')->nullable();
             $table->string('factoryEmail')->nullable();
             $table->string('designation')->nullable();
-            $table->string('factoryContactPerson')->nullable();
+            $table->integer('factoryContactPerson')->nullable();
 
             $table->timestamps();
         });
