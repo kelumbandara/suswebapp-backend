@@ -78,22 +78,22 @@ class SaETsCategoryController extends Controller
 
     public function getOppertunities($possibilityCategory)
     {
-        $opertunity = $this->categoryInterface->getByColumn(['possibilityCategory' => $possibilityCategory], ['id', 'opertunity']);
+        $opportunity = $this->categoryInterface->getByColumn(['possibilityCategory' => $possibilityCategory], ['id', 'opportunity']);
 
-        if ($opertunity->isEmpty()) {
+        if ($opportunity->isEmpty()) {
             return response()->json([
-                'message' => 'No observations found.',
+                'message' => 'No opportunity found.',
             ]);
         }
 
-        $uniqueOpertunity = $opertunity->map(function ($item) {
+        $uniqueOpportunity = $opportunity->map(function ($item) {
             return [
                 'id'              => $item->id,
-                'opertunity' => $item->opertunity,
+                'opportunity' => $item->opportunity,
             ];
         });
 
-        return response()->json($uniqueOpertunity);
+        return response()->json($uniqueOpportunity);
     }
 
     // public function storeObservation(Request $request)
