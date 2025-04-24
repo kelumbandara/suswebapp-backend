@@ -140,6 +140,14 @@ use App\Repositories\All\SaCmCmrUseOfPPE\CmrUseOfPPEInterface;
 use App\Repositories\All\SaCmCmrUseOfPPE\CmrUseOfPPERepository;
 use App\Repositories\All\SaCmCmrZdhcCategory\ZdhcCategoryInterface;
 use App\Repositories\All\SaCmCmrZdhcCategory\ZdhcCategoryRepository;
+use App\Repositories\All\SaCmPirCertificateRecord\CertificateRecordInterface;
+use App\Repositories\All\SaCmPirCertificateRecord\CertificateRecordRepository;
+use App\Repositories\All\SaCmPirPositiveList\PositiveListInterface;
+use App\Repositories\All\SaCmPirPositiveList\PositiveListRepository;
+use App\Repositories\All\SaCmPirTestingLab\TestingLabInterface;
+use App\Repositories\All\SaCmPirTestingLab\TestingLabRepository;
+use App\Repositories\All\SaCmPurchaseInventory\PurchaseInventoryInterface;
+use App\Repositories\All\SaCmPurchaseInventory\PurchaseInventoryRepository;
 use App\Repositories\All\SaEEmrAcCategory\ConsumptionCategoryInterface;
 use App\Repositories\All\SaEEmrAcCategory\ConsumptionCategoryRepository;
 use App\Repositories\All\SaEEmrAcSource\ConsumptionSourceInterface;
@@ -280,6 +288,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ProductStandardInterface::class, ProductStandardRepository::class);
         $this->app->bind(CmrHazardTypeInterface::class, CmrHazardTypeRepository::class);
         $this->app->bind(CmrUseOfPPEInterface::class, CmrUseOfPPERepository::class);
+        $this->app->bind(PurchaseInventoryInterface::class, PurchaseInventoryRepository::class);
+        $this->app->bind(CertificateRecordInterface::class, CertificateRecordRepository::class);
+        $this->app->bind(TestingLabInterface::class, TestingLabRepository::class);
+        $this->app->bind(PositiveListInterface::class, PositiveListRepository::class);
 
 
 

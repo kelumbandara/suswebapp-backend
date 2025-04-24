@@ -12,7 +12,7 @@ class SaETsCategory extends Model
     protected $fillable = [
         'categoryName',
         'possibilityCategory',
-        'opertunity',
+        'opportunity',
     ];
 
 }

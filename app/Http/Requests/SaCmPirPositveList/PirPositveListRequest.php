@@ -1,9 +1,10 @@
 <?php
-namespace App\Http\Requests\SaETsCategory;
+
+namespace App\Http\Requests\SaCmPirPositveList;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TsCategoryRequest extends FormRequest
+class PirPositveListRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,9 +22,7 @@ class TsCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'categoryName'        => 'required|string',
-            'possibilityCategory' => 'required|string',
-            'opportunity'          => 'required|string',
+            'name' => 'required|string',
         ];
     }
 }

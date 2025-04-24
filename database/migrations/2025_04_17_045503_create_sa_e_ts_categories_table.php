@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('categoryName');
             $table->string('possibilityCategory');
-            $table->string('opertunity');
+            $table->string('opportunity');
             $table->timestamps();
         });
     }
 
-   
+
     public function down(): void
     {
         Schema::dropIfExists('sa_e_ts_categories');
