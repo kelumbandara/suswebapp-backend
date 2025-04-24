@@ -70,6 +70,19 @@ class PurchaseInventoryRecordRequest extends FormRequest
             'storageConditionRequirements'               => 'nullable|string',
             'storagePlace'                               => 'nullable|string',
             'lotNumber'                                  => 'nullable|string',
+            'certificate'                                => 'nullable|array',
+            'certificate.*.inventoryId'                  => 'nullable|numeric',
+            'certificate.*.testName'                     => 'required|string',
+            'certificate.*.testDate'                     => 'required|string',
+            'certificate.*.testLab'                      => 'required|string',
+            'certificate.*.issuedDate'                   => 'required|string',
+            'certificate.*.expiryDate'                   => 'required|string',
+            'certificate.*.positiveList'                 => 'required|string',
+            'certificate.*.description'                  => 'required|string',
+            'certificate.*.documents'                    => 'nullable|array',
+            'certificate.*.documents.*'                  => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
+            'certificate.*.removeDoc'                    => 'nullable|string',
+
         ];
     }
 }

@@ -32,8 +32,8 @@ return new class extends Migration
             $table->string('requestedCustomer')->nullable();
             $table->string('requestedMerchandiser')->nullable();
             $table->string('requestDate')->nullable();
-            $table->string('reviewerId')->nullable();
-            $table->string('approverId')->nullable();
+            $table->integer('reviewerId')->nullable();
+            $table->integer('approverId')->nullable();
             $table->json('hazardType')->nullable();
             $table->json('useOfPPE')->nullable();
             $table->string('ghsClassification')->nullable();
@@ -41,10 +41,10 @@ return new class extends Migration
             $table->string('casNumber')->nullable();
             $table->string('colourIndex')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected', 'published', 'ongoing', 'draft', 'scheduled', 'completed', 'reviewed'])->default('draft')->nullable();
-            $table->string('createdByUser')->nullable();
-            $table->string('updatedBy')->nullable();
-            $table->string('approvedBy')->nullable();
-            $table->string('rejectedBy')->nullable();
+            $table->integer('createdByUser')->nullable();
+            $table->integer('updatedBy')->nullable();
+            $table->integer('approvedBy')->nullable();
+            $table->integer('rejectedBy')->nullable();
             $table->string('responsibleSection')->nullable()->default('ChemicalManagement');
             $table->string('assigneeLevel')->nullable()->default('1');
             $table->timestamps();
