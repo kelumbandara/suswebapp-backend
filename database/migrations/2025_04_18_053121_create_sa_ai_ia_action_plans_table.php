@@ -16,7 +16,7 @@ return new class extends Migration
             $table->bigInteger('internalAuditId')->nullable();
             $table->string('correctiveOrPreventiveAction')->nullable();
             $table->string('priority')->nullable();
-            $table->string('approverId')->nullable();
+            $table->integer('approverId')->nullable();
             $table->string('targetCompletionDate')->nullable();
             $table->string('dueDate')->nullable();
             $table->string('date')->nullable();
