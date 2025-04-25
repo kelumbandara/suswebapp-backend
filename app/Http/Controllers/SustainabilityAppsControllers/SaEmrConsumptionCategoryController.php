@@ -54,18 +54,19 @@ class SaEmrConsumptionCategoryController extends Controller
 
     public function getUnit($categoryName)
     {
-        $unit = $this->consumptionCategoryInterface->getByColumn(['categoryName' => $categoryName], ['id', 'unitName']);
+        $unit = $this->consumptionCategoryInterface->getByColumn(
+            ['categoryName' => $categoryName],
+            ['id', 'unitName']
+        );
 
         if ($unit->isEmpty()) {
-            return response()->json([
-                'message' => 'No unit found.',
-            ]);
+            return response()->json([]);
         }
 
-        $uniqueUnit = $unit->unique('unit')->values()->map(function ($item) {
+        $uniqueUnit = $unit->unique('unitName')->values()->map(function ($item) {
             return [
-                'id'          => (int) $item->id,
-                'unit' => $item->unit,
+                'id'   => (int) $item->id,
+                'unit' => $item->unitName, 
             ];
         });
 
