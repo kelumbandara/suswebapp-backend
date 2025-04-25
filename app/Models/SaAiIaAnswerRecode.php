@@ -11,7 +11,6 @@ class SaAiIaAnswerRecode extends Model
 
     protected $primaryKey = 'answerId';
 
-    protected $table = 'sa_ai_ia_answer_recode';
     protected $fillable = [
         'internalAuditId',
         'questionRecoId',
