@@ -49,7 +49,7 @@ class InternalAuditRequest extends FormRequest
             'actionPlans.*.dueDate'                      => 'nullable|string',
             'actionPlans.*.date'                         => 'nullable|string',
             'answers'                                    => 'nullable|array',
-            'answers.*.score'                            => 'required|string',
+            'answers.*.score'                            => 'required|numeric',
             'answers.*.rating'                           => 'required|string',
             'answers.*.status'                           => 'nullable|string',
 

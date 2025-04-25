@@ -17,8 +17,8 @@ return new class extends Migration
             $table->bigInteger('questionRecoId')->nullable();
             $table->bigInteger('queGroupId')->nullable();
             $table->bigInteger('questionId')->nullable();
-            $table->string('score');
-            $table->integer('status');
+            $table->integer('score');
+            $table->string('status');
             $table->string('rating');
 
             $table->timestamps();
