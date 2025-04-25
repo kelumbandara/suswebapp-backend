@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('sa_e_emr_ac_categories', function (Blueprint $table) {
             $table->id();
             $table->string('categoryName');
+            $table->string('unitName');
             $table->timestamps();
         });
     }

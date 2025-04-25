@@ -400,12 +400,11 @@ Route::post('ts-sources', [SaETsSourceController::class, 'store']);
 
 Route::get('consumption-categories', [SaEmrConsumptionCategoryController::class, 'index']);
 Route::post('consumption-categories', [SaEmrConsumptionCategoryController::class, 'store']);
+Route::get('consumption-get-categories', [SaEmrConsumptionCategoryController::class, 'getcategories']);
+Route::get('consumption-get/{categoryName}/units', [SaEmrConsumptionCategoryController::class, 'getUnit']);
 
 Route::get('consumption-sources', [SaEmrConsumptionSourceController::class, 'index']);
 Route::post('consumption-sources', [SaEmrConsumptionSourceController::class, 'store']);
-
-Route::get('consumption-units', [SaEmrConsumptionUnitController::class, 'index']);
-Route::post('consumption-units', [SaEmrConsumptionUnitController::class, 'store']);
 
 Route::get('commercial-names', [SaCmCmrCommercialNameController::class, 'index']);
 Route::post('commercial-names', [SaCmCmrCommercialNameController::class, 'store']);
