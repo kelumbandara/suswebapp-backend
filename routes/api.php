@@ -65,6 +65,7 @@ use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrUseOfPPEController
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrZdhcCategoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmPirPositiveListController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmPirTestingLabController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaCmPurchaseInventoryRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionCategoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionSourceController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionUnitController;
@@ -215,6 +216,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('chemical-records-assign-task', [SaCmChemicalManagementRecodeController::class, 'assignTask']);
     Route::get('chemical-records-assignee', [SaCmChemicalManagementRecodeController::class, 'assignee']);
     Route::post('chemical-records/{id}/approve', [SaCmChemicalManagementRecodeController::class, 'approvedStatus']);
+
+    Route::get('purchase-inventory-records', [SaCmPurchaseInventoryRecodeController::class, 'index']);
+    Route::post('purchase-inventory-records/{id}/update', [SaCmPurchaseInventoryRecodeController::class, 'publishStatus']);
 
 });
 

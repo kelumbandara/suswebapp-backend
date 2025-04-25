@@ -1,65 +1,162 @@
 <?php
-
 namespace App\Http\Controllers\SustainabilityAppsControllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\SaCmPurchaseInventoryRecord\PurchaseInventoryRecordRequest;
+use App\Repositories\All\SaCmPirCertificateRecord\CertificateRecordInterface;
+use App\Repositories\All\SaCmPurchaseInventory\PurchaseInventoryInterface;
+use App\Repositories\All\User\UserInterface;
+use App\Services\ChemicalManagementService;
+use App\Services\PirCertificationRecodeService;
 
 class SaCmPurchaseInventoryRecodeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
+    protected $purchaseInventoryInterface;
+    protected $userInterface;
+    protected $chemicalManagementService;
+    protected $certificationRecodeService;
+    protected $certificateRecordInterface;
+
+    public function __construct(PurchaseInventoryInterface $purchaseInventoryInterface, ChemicalManagementService $chemicalManagementService, PirCertificationRecodeService $certificationRecodeService,  UserInterface $userInterface, CertificateRecordInterface $certificateRecordInterface)
+    {
+        $this->purchaseInventoryInterface = $purchaseInventoryInterface;
+        $this->userInterface              = $userInterface;
+        $this->chemicalManagementService        = $chemicalManagementService;
+        $this->certificationRecodeService = $certificationRecodeService;
+        $this->certificateRecordInterface = $certificateRecordInterface;
+
+    }
     public function index()
-    {
-        //
+{
+    $records = $this->purchaseInventoryInterface->All();
+
+    foreach ($records as &$record) {
+        $documents = [];
+        if (!empty($record->documents) && is_string($record->documents)) {
+            $documents = json_decode($record->documents, true);
+        } elseif (is_array($record->documents)) {
+            $documents = $record->documents;
+        }
+
+        foreach ($documents as &$doc) {
+            if (isset($doc['gsutil_uri'])) {
+                $urlData = $this->chemicalManagementService->getImageUrl($doc['gsutil_uri']);
+                $doc['imageUrl'] = $urlData['signedUrl'];
+                $doc['fileName'] = $urlData['fileName'];
+            }
+        }
+        $record->documents = $documents;
+
+        $certificates = $this->certificateRecordInterface->findByInventoryId($record->id);
+
+        foreach ($certificates as &$certificate) {
+            $certificateDocs = [];
+
+            if (!empty($certificate->documents) && is_string($certificate->documents)) {
+                $certificateDocs = json_decode($certificate->documents, true);
+            } elseif (is_array($certificate->documents)) {
+                $certificateDocs = $certificate->documents;
+            }
+
+            foreach ($certificateDocs as &$doc) {
+                if (isset($doc['gsutil_uri'])) {
+                    $urlData = $this->certificationRecodeService->getImageUrl($doc['gsutil_uri']);
+                    $doc['imageUrl'] = $urlData['signedUrl'];
+                    $doc['fileName'] = $urlData['fileName'];
+                }
+            }
+
+            $certificate->documents = $certificateDocs;
+        }
+
+        // Attach to record
+        $record->certificates = $certificates;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    return response()->json([
+        'message' => 'All purchase inventory records fetched successfully.',
+        'data'    => $records,
+    ]);
+}
+
+
+public function publishStatus($id, PurchaseInventoryRecordRequest $request)
+{
+    $validatedData = $request->validated();
+    $validatedData['status'] = 'published';
+
+    $targetSetting = $this->purchaseInventoryInterface->findById($id);
+    $documents     = json_decode($targetSetting->documents, true) ?? [];
+
+    if ($request->has('removeDoc')) {
+        $removeDocs = $request->input('removeDoc');
+        if (is_array($removeDocs)) {
+            foreach ($removeDocs as $removeDoc) {
+                $this->chemicalManagementService->removeOldDocumentFromStorage($removeDoc);
+            }
+
+            $documents = array_values(array_filter($documents, function ($doc) use ($removeDocs) {
+                return !in_array($doc['gsutil_uri'], $removeDocs);
+            }));
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    if ($request->hasFile('documents')) {
+        $newDocuments = [];
+        foreach ($request->file('documents') as $newFile) {
+            $uploadResult = $this->chemicalManagementService->updateDocuments($newFile);
+            if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
+                $newDocuments[] = [
+                    'gsutil_uri' => $uploadResult['gsutil_uri'],
+                    'file_name'  => $uploadResult['file_name'],
+                ];
+            }
+        }
+
+        $documents = array_merge($documents, $newDocuments);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+    $validatedData['documents'] = json_encode($documents);
+
+    $updatedRecord = $this->purchaseInventoryInterface->update($id, $validatedData);
+
+    if (!$updatedRecord) {
+        return response()->json([
+            'message' => 'Failed to publish purchase inventory record.',
+        ], 500);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+    $updatedRecord = $this->purchaseInventoryInterface->findById($id);
+
+    if (!empty($validatedData['certificate'])) {
+        foreach ($validatedData['certificate'] as $index => $certificateData) {
+            $certDocs = [];
+
+            if ($request->hasFile("certificate.{$index}.documents")) {
+                foreach ($request->file("certificate.{$index}.documents") as $certFile) {
+                    $uploadResult = $this->certificationRecodeService->uploadImageToGCS($certFile);
+                    if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
+                        $certDocs[] = [
+                            'gsutil_uri' => $uploadResult['gsutil_uri'],
+                            'file_name'  => $uploadResult['file_name'],
+                        ];
+                    }
+                }
+            }
+
+            $certificateData['inventoryId'] = $updatedRecord->id;
+            $certificateData['documents'] = $certDocs;
+
+            $this->certificateRecordInterface->create($certificateData);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+    return response()->json([
+        'message' => 'Purchase inventory record published successfully.',
+        'data'    => $updatedRecord,
+    ]);
+}
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+
 }
