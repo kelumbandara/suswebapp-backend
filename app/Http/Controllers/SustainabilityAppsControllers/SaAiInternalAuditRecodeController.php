@@ -104,7 +104,6 @@ class SaAiInternalAuditRecodeController extends Controller
                 $audit->audit = $questionRecode;
 
             } catch (\Exception $e) {
-                // Optionally log error or set $audit->audit = null;
                 $audit->audit = null;
             }
 
@@ -169,6 +168,36 @@ class SaAiInternalAuditRecodeController extends Controller
                 } catch (\Exception $e) {
                     $audit->factoryContactPerson = ['name' => 'Unknown', 'id' => null];
                 }
+
+                try {
+                    $questionRecode = $this->questionRecodeInterface->getById($audit->auditId);
+
+                    $totalQuestions = 0;
+                    $totalScore = 0;
+
+                    $groups = $this->groupRecodeInterface->findByQuestionRecoId($questionRecode->id);
+
+                    $groups = collect($groups)->map(function ($group) use (&$totalQuestions, &$totalScore) {
+                        $questions = $this->questionsInterface->findByQueGroupId($group->queGroupId);
+
+                        $group->questions = $questions;
+
+                        $totalQuestions += count($questions);
+                        $totalScore += collect($questions)->sum('allocatedScore');
+
+                        return $group;
+                    });
+
+                    $questionRecode->questionGroups = $groups;
+                    $questionRecode->totalNumberOfQuestions = $totalQuestions;
+                    $questionRecode->achievableScore = $totalScore;
+
+                    $audit->audit = $questionRecode;
+
+                } catch (\Exception $e) {
+                    $audit->audit = null;
+                }
+
                 try {
                     $departments = [];
                     if (is_array($audit->department)) {
