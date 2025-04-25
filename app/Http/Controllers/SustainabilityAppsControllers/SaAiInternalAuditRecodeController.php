@@ -8,6 +8,9 @@ use App\Repositories\All\SaAiIaActionPlan\ActionPlanInterface;
 use App\Repositories\All\SaAiIaAnswerRecode\AnswerRecodeInterface;
 use App\Repositories\All\SaAiIaAuditTitle\AuditTitleInterface;
 use App\Repositories\All\SaAiIaContactPerson\ContactPersonInterface;
+use App\Repositories\All\SaAiIaQrGroupRecode\GroupRecodeInterface;
+use App\Repositories\All\SaAiIaQrQuection\QuestionsInterface;
+use App\Repositories\All\SaAiIaQuestionRecode\QuestionRecodeInterface;
 use App\Repositories\All\SaAiInternalAuditRecode\InternalAuditRecodeInterface;
 use App\Repositories\All\User\UserInterface;
 use Illuminate\Support\Facades\Auth;
@@ -22,8 +25,11 @@ class SaAiInternalAuditRecodeController extends Controller
     protected $contactPersonInterface;
     protected $departmentInterface;
     protected $auditTitleInterface;
+    protected $questionRecodeInterface;
+    protected $questionsInterface;
+    protected $groupRecodeInterface;
 
-    public function __construct(InternalAuditRecodeInterface $internalAuditRecodeInterface, DepartmentInterface $departmentInterface, UserInterface $userInterface, ActionPlanInterface $actionPlanInterface, AnswerRecodeInterface $answerRecodeInterface, ContactPersonInterface $contactPersonInterface, AuditTitleInterface $auditTitleInterface)
+    public function __construct(InternalAuditRecodeInterface $internalAuditRecodeInterface, DepartmentInterface $departmentInterface, UserInterface $userInterface, ActionPlanInterface $actionPlanInterface, AnswerRecodeInterface $answerRecodeInterface, ContactPersonInterface $contactPersonInterface, AuditTitleInterface $auditTitleInterface, QuestionRecodeInterface $questionRecodeInterface, QuestionsInterface $questionsInterface, GroupRecodeInterface $groupRecodeInterface)
     {
         $this->internalAuditRecodeInterface = $internalAuditRecodeInterface;
         $this->userInterface                = $userInterface;
@@ -32,6 +38,9 @@ class SaAiInternalAuditRecodeController extends Controller
         $this->contactPersonInterface       = $contactPersonInterface;
         $this->departmentInterface          = $departmentInterface;
         $this->auditTitleInterface          = $auditTitleInterface;
+        $this->questionRecodeInterface      = $questionRecodeInterface;
+        $this->questionsInterface           = $questionsInterface;
+        $this->groupRecodeInterface         = $groupRecodeInterface;
     }
 
     public function index()
@@ -70,12 +79,33 @@ class SaAiInternalAuditRecodeController extends Controller
             }
 
             try {
-                $auditName = $this->auditTitleInterface->getById($audit->auditId);
-                $audit->audit = $auditName
-                    ? ['name' => $auditName->auditTitle, 'id' => $auditName->id]
-                    : ['name' => 'Unknown', 'id' => null];
+                $questionRecode = $this->questionRecodeInterface->getById($audit->auditId);
+
+                $totalQuestions = 0;
+                $totalScore = 0;
+
+                $groups = $this->groupRecodeInterface->findByQuestionRecoId($questionRecode->id);
+
+                $groups = collect($groups)->map(function ($group) use (&$totalQuestions, &$totalScore) {
+                    $questions = $this->questionsInterface->findByQueGroupId($group->queGroupId);
+
+                    $group->questions = $questions;
+
+                    $totalQuestions += count($questions);
+                    $totalScore += collect($questions)->sum('allocatedScore');
+
+                    return $group;
+                });
+
+                $questionRecode->questionGroups = $groups;
+                $questionRecode->totalNumberOfQuestions = $totalQuestions;
+                $questionRecode->achievableScore = $totalScore;
+
+                $audit->audit = $questionRecode;
+
             } catch (\Exception $e) {
-                $audit->audit = ['name' => 'Unknown', 'id' => null];
+                // Optionally log error or set $audit->audit = null;
+                $audit->audit = null;
             }
 
             try {
