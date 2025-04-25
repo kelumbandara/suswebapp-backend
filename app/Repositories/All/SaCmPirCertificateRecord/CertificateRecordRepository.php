@@ -20,6 +20,15 @@ class CertificateRecordRepository extends BaseRepository implements CertificateR
     {
         $this->model = $model;
     }
+    public function findByInventoryId($inventoryId)
+    {
+        return $this->model->where('inventoryId', $inventoryId)->get();
+    }
+
+    public function deleteByInventoryId($inventoryId)
+    {
+        return $this->model->where('inventoryId', $inventoryId)->delete();
+    }
 
 
 }
