@@ -293,9 +293,6 @@ class SaAiInternalAuditRecodeController extends Controller
 
         $draft = $this->internalAuditRecodeInterface->findById($id);
 
-        if (! $draft || $draft->draftBy !== $userId || $draft->status !== 'draft') {
-            return response()->json(['message' => 'Draft not found or access denied'], 404);
-        }
 
         $validatedData['draftBy'] = $userId;
         $validatedData['status']  = 'draft';
@@ -309,6 +306,34 @@ class SaAiInternalAuditRecodeController extends Controller
         return response()->json([
             'message'       => 'Draft updated successfully!',
             'internalAudit' => $updatedDraft,
+        ]);
+    }
+
+    public function shedualedUpdate(InternalAuditRequest $request, $id)
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $userId        = $user->id;
+        $validatedData = $request->validated();
+
+        $shedualed = $this->internalAuditRecodeInterface->findById($id);
+
+
+        $validatedData['scheduledBy'] = $userId;
+        $validatedData['status']  = 'scheduled';
+
+        $updatedShedualed = $this->internalAuditRecodeInterface->update($id, $validatedData);
+
+        if (! $updatedShedualed) {
+            return response()->json(['message' => 'Failed to update shedualed'], 500);
+        }
+
+        return response()->json([
+            'message'       => 'Shedualed updated successfully!',
+            'internalAudit' => $updatedShedualed,
         ]);
     }
 
