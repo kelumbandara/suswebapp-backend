@@ -35,5 +35,42 @@ class SaEmrConsumptionCategoryController extends Controller
         ], 201);
     }
 
+    public function getcategories()
+    {
+        $categories = $this->consumptionCategoryInterface->all(['id', 'categoryName']);
+
+        $uniqueCategories = $categories->groupBy('categoryName')->map(function ($item) {
+            return $item->first();
+        })->values();
+
+        if ($uniqueCategories->isEmpty()) {
+            return response()->json([
+                'message' => 'No category found.',
+            ]);
+        }
+
+        return response()->json($uniqueCategories);
+    }
+
+    public function getUnit($categoryName)
+    {
+        $unit = $this->consumptionCategoryInterface->getByColumn(['categoryName' => $categoryName], ['id', 'unitName']);
+
+        if ($unit->isEmpty()) {
+            return response()->json([
+                'message' => 'No unit found.',
+            ]);
+        }
+
+        $uniqueUnit = $unit->unique('unit')->values()->map(function ($item) {
+            return [
+                'id'          => (int) $item->id,
+                'unit' => $item->unit,
+            ];
+        });
+
+        return response()->json($uniqueUnit);
+    }
+
 
 }

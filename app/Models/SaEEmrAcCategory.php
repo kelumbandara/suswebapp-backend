@@ -11,6 +11,7 @@ class SaEEmrAcCategory extends Model
 
     protected $fillable = [
         'categoryName',
+        'unitName',
     ];
 
 }
