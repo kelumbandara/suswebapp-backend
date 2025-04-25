@@ -6,6 +6,7 @@ use App\Http\Requests\SaAiInternalAuditRecode\InternalAuditRequest;
 use App\Repositories\All\ComDepartment\DepartmentInterface;
 use App\Repositories\All\SaAiIaActionPlan\ActionPlanInterface;
 use App\Repositories\All\SaAiIaAnswerRecode\AnswerRecodeInterface;
+use App\Repositories\All\SaAiIaAuditTitle\AuditTitleInterface;
 use App\Repositories\All\SaAiIaContactPerson\ContactPersonInterface;
 use App\Repositories\All\SaAiInternalAuditRecode\InternalAuditRecodeInterface;
 use App\Repositories\All\User\UserInterface;
@@ -20,8 +21,9 @@ class SaAiInternalAuditRecodeController extends Controller
     protected $answerRecodeInterface;
     protected $contactPersonInterface;
     protected $departmentInterface;
+    protected $auditTitleInterface;
 
-    public function __construct(InternalAuditRecodeInterface $internalAuditRecodeInterface, DepartmentInterface $departmentInterface, UserInterface $userInterface, ActionPlanInterface $actionPlanInterface, AnswerRecodeInterface $answerRecodeInterface, ContactPersonInterface $contactPersonInterface)
+    public function __construct(InternalAuditRecodeInterface $internalAuditRecodeInterface, DepartmentInterface $departmentInterface, UserInterface $userInterface, ActionPlanInterface $actionPlanInterface, AnswerRecodeInterface $answerRecodeInterface, ContactPersonInterface $contactPersonInterface, AuditTitleInterface $auditTitleInterface)
     {
         $this->internalAuditRecodeInterface = $internalAuditRecodeInterface;
         $this->userInterface                = $userInterface;
@@ -29,6 +31,7 @@ class SaAiInternalAuditRecodeController extends Controller
         $this->answerRecodeInterface        = $answerRecodeInterface;
         $this->contactPersonInterface       = $contactPersonInterface;
         $this->departmentInterface          = $departmentInterface;
+        $this->auditTitleInterface          = $auditTitleInterface;
     }
 
     public function index()
@@ -64,6 +67,15 @@ class SaAiInternalAuditRecodeController extends Controller
                     : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $audit->factoryContactPerson = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $auditName = $this->auditTitleInterface->getById($audit->auditId);
+                $audit->audit = $auditName
+                    ? ['name' => $auditName->auditTitle, 'id' => $auditName->id]
+                    : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $audit->audit = ['name' => 'Unknown', 'id' => null];
             }
 
             try {
