@@ -28,6 +28,13 @@ class EnvirementManagementRecodeRepository extends BaseRepository implements Env
     {
         return $this->model->where('reviewerId', $reviewerId)->get();
     }
-
+    public function filterByYearMonthDivision($year, $month, $division)
+    {
+        return $this->model
+            ->where('year', $year)
+            ->where('month', $month)
+            ->where('division', $division)
+            ->get();
+    }
 
 }
