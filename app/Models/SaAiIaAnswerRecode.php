@@ -15,7 +15,7 @@ class SaAiIaAnswerRecode extends Model
         'internalAuditId',
         'questionRecoId',
         'queGroupId',
-        'quectionId',
+        'questionId',
         'rating',
         'score',
         'status',
@@ -31,11 +31,11 @@ class SaAiIaAnswerRecode extends Model
     }
     public function question()
     {
-        return $this->belongsTo(SaAiIaQrQuestions::class, 'quectionId');
+        return $this->belongsTo(SaAiIaQrQuestions::class, 'questionId');
     }
 
     public function questionRecode()
     {
-        return $this->belongsTo(SaAiIaQuestionRecode::class, 'quectionRecoId');
+        return $this->belongsTo(SaAiIaQuestionRecode::class, 'questionRecoId');
     }
 }
