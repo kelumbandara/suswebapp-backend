@@ -21,6 +21,7 @@ class ActionPlaneRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'internalAuditId'              => 'required|numeric',
             'correctiveOrPreventiveAction' => 'required|string',
             'priority'                     => 'required|string',
             'approverId'                   => 'required|numeric',
