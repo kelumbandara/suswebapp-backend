@@ -23,7 +23,7 @@ class ActionPlaneRequest extends FormRequest
         return [
             'correctiveOrPreventiveAction' => 'required|string',
             'priority'                     => 'required|string',
-            'approverId'                   => 'required|string',
+            'approverId'                   => 'required|numeric',
             'targetCompletionDate'         => 'nullable|string',
             'dueDate'                      => 'nullable|string',
         ];
