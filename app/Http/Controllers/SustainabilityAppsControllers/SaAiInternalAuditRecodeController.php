@@ -133,10 +133,7 @@ class SaAiInternalAuditRecodeController extends Controller
                 $audit->answers    = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
             }
 
-            return response()->json([
-                'message' => 'Internal audits fetched successfully.',
-                'data'    => $internalAudits,
-            ], 200);
+            return response()->json( $internalAudits, 200);
 
         } catch (\Exception $e) {
             return response()->json(['message' => 'Something went wrong', 'error' => $e->getMessage()], 500);
