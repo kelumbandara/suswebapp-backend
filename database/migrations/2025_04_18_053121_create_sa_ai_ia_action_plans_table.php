@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('targetCompletionDate')->nullable();
             $table->string('dueDate')->nullable();
             $table->string('date')->nullable();
-
             $table->timestamps();
         });
     }
