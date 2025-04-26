@@ -178,8 +178,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('internal-audit-draft/{id}/update', [SaAiInternalAuditRecodeController::class, 'updateDraft']);
     Route::post('internal-audit-scheduled', [SaAiInternalAuditRecodeController::class, 'saveSchedualed']);
     Route::post('internal-audit-scheduled/{id}/update', [SaAiInternalAuditRecodeController::class, 'shedualedUpdate']);
-    Route::post('internal-audit-ongoing/{id}/update', [SaAiInternalAuditRecodeController::class, 'saveOngoing']);
-    Route::get('internal-audit-ongoing/{id}/update', [SaAiInternalAuditRecodeController::class, 'ongoingUpdate']);
+    Route::post('internal-audit-ongoing/{id}/update', [SaAiInternalAuditRecodeController::class, 'updateOngoing']);
     Route::post('internal-audit-action-plan/{id}/update', [SaAiInternalAuditRecodeController::class, 'actionPlanUpdate']);
     Route::post('internal-audit-completed/{id}/update', [SaAiInternalAuditRecodeController::class, 'complete']);
     Route::get('internal-audit-completed', [SaAiInternalAuditRecodeController::class, 'getFinalAuditers']);

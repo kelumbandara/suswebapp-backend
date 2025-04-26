@@ -395,7 +395,7 @@ class SaAiInternalAuditRecodeController extends Controller
         }
 
         $updatedRecord                = $this->internalAuditRecodeInterface->findById($id);
-        $updatedRecord->impactDetails = $this->answerRecodeInterface->findByInternalAuditId($id);
+        $updatedRecord->answers = $this->answerRecodeInterface->findByInternalAuditId($id);
 
         return response()->json([
             'message'       => 'Ongoing audit updated successfully!',
