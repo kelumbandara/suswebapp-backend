@@ -8,4 +8,5 @@ use App\Repositories\Base\EloquentRepositoryInterface;
 interface EnvirementManagementRecodeInterface extends EloquentRepositoryInterface {
     public function getByApproverId(int $approverId);
     public function getByReviewerId(int $reviewerId);
+    public function filterByYearMonthDivision(int $year, int $month, int $division);
 }

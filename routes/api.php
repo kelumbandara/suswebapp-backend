@@ -202,6 +202,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('environment-record/{id}/delete', [SaEnvirementManagementRecodeController::class, 'destroy']);
     Route::get('environment-record-assign-task', [SaEnvirementManagementRecodeController::class, 'assignTask']);
     Route::get('environment-record-assignee', [SaEnvirementManagementRecodeController::class, 'assignee']);
+    Route::get('environment-record/{year}/{month}/{division}/category-sum', [SaEnvirementManagementRecodeController::class, 'monthlyCategorySum']);
+
 
     Route::get('target-setting', [SaEnvirementTargetSettingRecodeController::class, 'index']);
     Route::post('target-setting', [SaEnvirementTargetSettingRecodeController::class, 'store']);

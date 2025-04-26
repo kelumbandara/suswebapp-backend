@@ -7,6 +7,7 @@ use App\Repositories\All\SaEmrAddConcumption\AddConcumptionInterface;
 use App\Repositories\All\SaEnvirementManagementRecode\EnvirementManagementRecodeInterface;
 use App\Repositories\All\User\UserInterface;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class SaEnvirementManagementRecodeController extends Controller
 {
@@ -186,6 +187,53 @@ class SaEnvirementManagementRecodeController extends Controller
             ->where('availability', 1)
             ->values();
         return response()->json($assignees);
+    }
+
+    public function monthlyCategorySum($year, $month, $division)
+    {
+        $filteredRecords = $this->envirementManagementRecodeInterface->filterByYearMonthDivision($year, $month, $division);
+
+        $categorySums = [
+            'wasteWater'  => 0,
+            'energy'      => 0,
+            'water'       => 0,
+            'waste'       => 0,
+            'ghgEmission' => 0,
+        ];
+
+        foreach ($filteredRecords as $record) {
+            $impacts = $this->addConcumptionInterface->findByEnvirementId($record->id);
+
+            foreach ($impacts as $impact) {
+                $category = strtolower($impact->category);
+
+                switch ($category) {
+                    case 'wastewater':
+                        $categorySums['wasteWater'] += (float) $impact->amount;
+                        break;
+                    case 'energy':
+                        $categorySums['energy'] += (float) $impact->amount;
+                        break;
+                    case 'water':
+                        $categorySums['water'] += (float) $impact->amount;
+                        break;
+                    case 'waste':
+                        $categorySums['waste'] += (float) $impact->amount;
+                        break;
+                    case 'ghg':
+                    case 'ghg emission':
+                        $categorySums['ghgEmission'] += (float) $impact->amount;
+                        break;
+                }
+            }
+        }
+
+        return response()->json([
+            'year'        => $year,
+            'month'       => $month,
+            'division'    => $division,
+            'categorySum' => $categorySums,
+        ]);
     }
 
 }
