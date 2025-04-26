@@ -416,7 +416,7 @@ class SaAiInternalAuditRecodeController extends Controller
         $validatedData = $request->validated();
 
         $validatedData['completedBy'] = $userId;
-        $validatedData['status']      = 'completedBy';
+        $validatedData['status']      = 'completed';
 
         $record = $this->internalAuditRecodeInterface->findById($id);
         if (! $record) {
