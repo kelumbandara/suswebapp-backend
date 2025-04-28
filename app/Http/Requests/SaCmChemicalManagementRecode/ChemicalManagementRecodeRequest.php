@@ -28,6 +28,7 @@ class ChemicalManagementRecodeRequest extends FormRequest
             'requestQuantity'         => 'required|numeric',
             'requestUnit'             => 'required|string',
             'zdhcCategory'            => 'required|string',
+            'status'                  => 'nullable|string',
             'chemicalFormType'        => 'required|string',
             'whereAndWhyUse'          => 'required|string',
             'productStandard'         => 'required|string',

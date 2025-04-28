@@ -36,6 +36,8 @@ class BenefitRequest extends FormRequest
             'applicationDate'                                  => 'required|string',
             'expectedDeliveryDate'                             => 'nullable|string',
             'leaveStatus'                                      => 'required|string',
+            'status'                                           => 'nullable|string',
+
             'leaveStartDate'                                   => 'required|string',
             'leaveEndDate'                                     => 'required|string',
             'actualDeliveryDate'                               => 'required|string',

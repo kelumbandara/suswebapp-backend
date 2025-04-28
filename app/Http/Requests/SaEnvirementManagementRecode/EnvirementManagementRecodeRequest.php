@@ -28,6 +28,7 @@ class EnvirementManagementRecodeRequest extends FormRequest
             'division'                             => 'required|string',
             'year'                                 => 'nullable|string',
             'month'                                => 'nullable|string',
+            'status'                               => 'nullable|string',
             'reviewerId'                           => 'required|string',
             'approverId'                           => 'nullable|string',
             'area'                                 => 'required|string',
