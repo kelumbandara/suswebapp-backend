@@ -23,7 +23,7 @@ class OsMiMedicineRequestController extends Controller
 
     public function index()
     {
-        $medicineStock = $this->medicineRequestInterface->All();
+        $medicineStock = $this->medicineRequestInterface->All()->sortByDesc('updated_at')->values();
         $medicineStock = $medicineStock->map(function ($medicine) {
             try {
                 $approver           = $this->userInterface->getById($medicine->approverId);
@@ -106,7 +106,7 @@ class OsMiMedicineRequestController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $medicine = $this->medicineRequestInterface->getByAssigneeId($user->id);
+        $medicine = $this->medicineRequestInterface->getByAssigneeId($user->id)->sortByDesc('updated_at')->values();
 
         $medicine = $medicine->map(function ($risk) {
             try {

@@ -27,7 +27,7 @@ class SaAiIaQuestionRecodeController extends Controller
 
     public function index()
     {
-        $records = $this->questionRecodeInterface->All();
+        $records = $this->questionRecodeInterface->All()->sortByDesc('updated_at')->values();
 
         $records = $records->map(function ($record) {
             $totalQuestions = 0;

@@ -16,10 +16,13 @@ class DepartmentController extends Controller
 
     public function index()
     {
-        $department = $this->departmentInterface->All();
-       
+        $department = $this->departmentInterface->all()
+                        ->sortByDesc('updated_at')
+                        ->values();
+
         return response()->json($department);
     }
+
 
     public function store(DepartmentRequest $request)
     {

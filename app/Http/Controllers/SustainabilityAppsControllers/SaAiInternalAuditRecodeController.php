@@ -47,7 +47,7 @@ class SaAiInternalAuditRecodeController extends Controller
     public function index()
     {
         try {
-            $internalAudits = $this->internalAuditRecodeInterface->All();
+            $internalAudits = $this->internalAuditRecodeInterface->All()->sortByDesc('updated_at')->values();
 
             $internalAudits = $internalAudits->map(function ($audit) {
                 try {
@@ -240,7 +240,7 @@ class SaAiInternalAuditRecodeController extends Controller
     public function getFinalAuditers()
     {
         try {
-            $internalAudits = $this->internalAuditRecodeInterface->All();
+            $internalAudits = $this->internalAuditRecodeInterface->All()->sortByDesc('updated_at')->values();
 
             $internalAudits = $internalAudits->map(function ($audit) {
                 try {
@@ -629,7 +629,7 @@ class SaAiInternalAuditRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $internalAudit = $this->internalAuditRecodeInterface->getByApproverId($user->id);
+        $internalAudit = $this->internalAuditRecodeInterface->getByApproverId($user->id)->sortByDesc('updated_at')->values();
 
         $internalAudit = $internalAudit->map(function ($audit) {
             try {

@@ -24,7 +24,7 @@ class SaAiExternalAuditRecodeController extends Controller
 
     public function index()
     {
-        $externalAudit = $this->externalAuditInterface->All();
+        $externalAudit = $this->externalAuditInterface->All()->sortByDesc('updated_at')->values();
 
         $externalAudit = $externalAudit->map(function ($audit) {
             try {
@@ -191,7 +191,7 @@ class SaAiExternalAuditRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $externalAudit = $this->externalAuditInterface->getByApproverId($user->id);
+        $externalAudit = $this->externalAuditInterface->getByApproverId($user->id)->sortByDesc('updated_at')->values();
 
         $externalAudit = $externalAudit->map(function ($audit) {
             try {
