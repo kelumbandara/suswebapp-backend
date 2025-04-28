@@ -169,6 +169,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('external-audit-assignee', [SaAiExternalAuditRecodeController::class, 'assignee']);
 
     Route::get('internal-audit', [SaAiInternalAuditRecodeController::class, 'index']);
+    Route::get('internal-audit/{id}', [SaAiInternalAuditRecodeController::class, 'show']);
     Route::post('internal-audit', [SaAiInternalAuditRecodeController::class, 'store']);
     Route::post('internal-audit/{id}/update', [SaAiInternalAuditRecodeController::class, 'update']);
     Route::delete('internal-audit/{id}/delete', [SaAiInternalAuditRecodeController::class, 'destroy']);
