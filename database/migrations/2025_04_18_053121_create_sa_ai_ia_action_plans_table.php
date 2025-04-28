@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sa_ai_ia_action_plans', function (Blueprint $table) {
-            $table->id('acctionPlanId');
+            $table->id('actionPlanId');
             $table->bigInteger('internalAuditId')->nullable();
             $table->string('correctiveOrPreventiveAction')->nullable();
             $table->string('priority')->nullable();

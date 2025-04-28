@@ -477,6 +477,14 @@ class SaAiInternalAuditRecodeController extends Controller
 
     }
 
+    public function actionPlanDelete ($id){
+        $actionplan = $this-> actionPlanInterface->deleteById($id);
+        return response()->json([
+            'message' => $actionplan ? 'Record deleted successfully!' : 'Failed to delete record.',
+        ], $actionplan ? 200 : 500);
+
+    }
+
     public function update($id, InternalAuditRequest $request)
     {
         $internalAudit = $this->internalAuditRecodeInterface->findById($id);
@@ -501,7 +509,6 @@ class SaAiInternalAuditRecodeController extends Controller
 
     public function destroy($id)
     {
-        $internalAudit = $this->internalAuditRecodeInterface->findById((int) $id);
 
         $deleted = $this->internalAuditRecodeInterface->deleteById($id);
 
