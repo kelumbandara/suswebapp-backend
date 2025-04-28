@@ -19,8 +19,8 @@ class SaAiIaActionPlan extends Model
         'targetCompletionDate',
         'dueDate',
         'date',
-
     ];
+    
     public function questionRecode()
     {
         return $this->belongsTo(SaAiInternalAuditRecode::class, 'internalAuditId');

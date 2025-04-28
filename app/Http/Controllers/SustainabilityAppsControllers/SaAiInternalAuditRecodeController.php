@@ -601,12 +601,24 @@ class SaAiInternalAuditRecodeController extends Controller
 
     public function destroy($id)
     {
+        try {
+            $audit = $this->internalAuditRecodeInterface->getById($id);
 
-        $deleted = $this->internalAuditRecodeInterface->deleteById($id);
+            if (! $audit) {
+                return response()->json(['message' => 'Internal Audit record not found'], 404);
+            }
 
-        return response()->json([
-            'message' => $deleted ? 'Record deleted successfully!' : 'Failed to delete record.',
-        ], $deleted ? 200 : 500);
+            $this->actionPlanInterface->deleteByInternalAuditId($id);
+
+            $this->answerRecodeInterface->deleteByInternalAuditId($id);
+
+            $this->internalAuditRecodeInterface->deleteById($id);
+
+            return response()->json(['message' => 'Internal Audit record and related data deleted successfully'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Something went wrong', 'error' => $e->getMessage()], 500);
+        }
     }
 
     public function assignTask()
