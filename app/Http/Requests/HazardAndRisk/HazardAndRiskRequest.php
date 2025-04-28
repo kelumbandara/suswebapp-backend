@@ -5,7 +5,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class HazardAndRiskRequest extends FormRequest
 {
-    
+
     public function authorize(): bool
     {
         return true;
@@ -23,6 +23,7 @@ class HazardAndRiskRequest extends FormRequest
             'subLocation'          => 'nullable|string|max:255',
             'description'          => 'nullable|string|max:1025',
             'removeDoc'            => 'nullable|array',
+            'status'               => 'nullable|string',
             'documents'            => 'nullable|array',
             'documents.*'          => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
             'dueDate'              => 'nullable|string',

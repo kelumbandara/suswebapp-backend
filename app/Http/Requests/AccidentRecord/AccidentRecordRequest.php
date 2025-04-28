@@ -34,6 +34,7 @@ class AccidentRecordRequest extends FormRequest
             'description'                              => 'nullable|string',
             'accidentDate'                             => 'required|string',
             'reportedDate'                             => 'nullable|string',
+            'status'                                   => 'nullable|string',
             'affectedPrimaryRegion'                    => 'nullable|string',
             'affectedSecondaryRegion'                  => 'nullable|string',
             'affectedTertiaryRegion'                   => 'nullable|string',

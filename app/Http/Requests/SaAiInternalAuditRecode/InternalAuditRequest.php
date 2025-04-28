@@ -37,6 +37,7 @@ class InternalAuditRequest extends FormRequest
             'factoryContactNumber'                       => 'required|string',
             'factoryEmail'                               => 'required|string',
             'designation'                                => 'required|string',
+            'status'                                     => 'nullable|string',
             'description'                                => 'nullable|string',
             'auditeeId'                                  => 'nullable|numeric',
             'approverId'                                 => 'nullable|numeric',

@@ -44,6 +44,7 @@ class PurchaseInventoryRecordRequest extends FormRequest
             'useOfPPE'                                   => 'nullable|array',
             'ghsClassification'                          => 'nullable|string',
             'zdhcLevel'                                  => 'nullable|string',
+            'status'                                     => 'nullable|string',
             'casNumber'                                  => 'nullable|string',
             'colourIndex'                                => 'nullable|string',
             'removeDoc'                                  => 'nullable|array',

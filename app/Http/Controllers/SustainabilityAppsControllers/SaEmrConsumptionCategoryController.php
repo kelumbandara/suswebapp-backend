@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\SustainabilityAppsControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaEmrAcConsumpionCategory\ConsumpionCategoryRequest;
 use App\Repositories\All\SaEEmrAcCategory\ConsumptionCategoryInterface;
-use Illuminate\Http\Request;
 
 class SaEmrConsumptionCategoryController extends Controller
 {
@@ -27,8 +25,8 @@ class SaEmrConsumptionCategoryController extends Controller
 
     public function store(ConsumpionCategoryRequest $request)
     {
-        $data = $request->validated();
-        $category  = $this->consumptionCategoryInterface->create($data);
+        $data     = $request->validated();
+        $category = $this->consumptionCategoryInterface->create($data);
         return response()->json([
             'message' => 'Category created successfully',
             'data'    => $category,
@@ -66,12 +64,32 @@ class SaEmrConsumptionCategoryController extends Controller
         $uniqueUnit = $unit->unique('unitName')->values()->map(function ($item) {
             return [
                 'id'   => (int) $item->id,
-                'unit' => $item->unitName, 
+                'unit' => $item->unitName,
             ];
         });
 
         return response()->json($uniqueUnit);
     }
 
+    public function getSource($categoryName){
+
+        $source = $this->consumptionCategoryInterface->getByColumn(
+            ['categoryName' => $categoryName],
+            ['id', 'unitName']
+        );
+
+        if ($unit->isEmpty()) {
+            return response()->json([]);
+        }
+
+        $uniqueUnit = $unit->unique('unitName')->values()->map(function ($item) {
+            return [
+                'id'   => (int) $item->id,
+                'unit' => $item->unitName,
+            ];
+        });
+
+        return response()->json($uniqueUnit);
+    }
 
 }
