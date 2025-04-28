@@ -9,7 +9,7 @@ class SaAiIaActionPlan extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = "acctionPlanId";
+    protected $primaryKey = "actionPlanId";
 
     protected $fillable = [
         'internalAuditId',
