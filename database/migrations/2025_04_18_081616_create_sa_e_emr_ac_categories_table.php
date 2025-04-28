@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('categoryName');
             $table->string('unitName');
+            $table->string('sourceName')->nullable();
             $table->timestamps();
         });
     }
