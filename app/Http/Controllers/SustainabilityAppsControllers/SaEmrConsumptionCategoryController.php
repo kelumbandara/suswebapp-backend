@@ -75,17 +75,17 @@ class SaEmrConsumptionCategoryController extends Controller
 
         $source = $this->consumptionCategoryInterface->getByColumn(
             ['categoryName' => $categoryName],
-            ['id', 'unitName']
+            ['id', 'sourceName']
         );
 
-        if ($unit->isEmpty()) {
+        if ($source->isEmpty()) {
             return response()->json([]);
         }
 
-        $uniqueUnit = $unit->unique('unitName')->values()->map(function ($item) {
+        $uniqueUnit = $source->unique('sourceName')->values()->map(function ($item) {
             return [
                 'id'   => (int) $item->id,
-                'unit' => $item->unitName,
+                'sourceName' => $item->sourceName,
             ];
         });
 

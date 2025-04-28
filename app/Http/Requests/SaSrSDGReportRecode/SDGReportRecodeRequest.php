@@ -35,6 +35,7 @@ class SDGReportRecodeRequest extends FormRequest
             'organizer'                  => 'required|string',
             'volunteer'                  => 'required|string',
             'priority'                   => 'nullable|string',
+            'status'                     => 'nullable|string',
             'contributing'               => 'nullable|string',
             'removeDoc'                  => 'nullable|array',
             'documents'                  => 'nullable|array',

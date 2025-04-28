@@ -24,6 +24,7 @@ class ConsumpionCategoryRequest extends FormRequest
         return [
             'categoryName' => 'required|string',
             'unitName' => 'required|string',
+            'sourceName' => 'required|string',
         ];
     }
 }
