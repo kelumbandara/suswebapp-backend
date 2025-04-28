@@ -278,7 +278,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TsSourceInterface::class, TsSourceRepository::class);
         $this->app->bind(ActionPlanInterface::class, ActionPlanRepository::class);
         $this->app->bind(ConsumptionCategoryInterface::class, ConsumptionCategoryRepository::class);
-        $this->app->bind(ConsumptionSourceInterface::class, ConsumptionSourceRepository::class);
         $this->app->bind(AnswerRecodeInterface::class, AnswerRecodeRepository::class);
         $this->app->bind(ChemicalManagementRecodeInterface::class, ChemicalManagementRecodeRepository::class);
         $this->app->bind(CommercialNameInterface::class, CommercialNameRepository::class);

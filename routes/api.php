@@ -409,9 +409,6 @@ Route::get('consumption-get-categories', [SaEmrConsumptionCategoryController::cl
 Route::get('consumption-get/{categoryName}/units', [SaEmrConsumptionCategoryController::class, 'getUnit']);
 Route::get('consumption-get/{categoryName}/sources', [SaEmrConsumptionCategoryController::class, 'getSource']);
 
-Route::get('consumption-sources', [SaEmrConsumptionSourceController::class, 'index']);
-Route::post('consumption-sources', [SaEmrConsumptionSourceController::class, 'store']);
-
 Route::get('commercial-names', [SaCmCmrCommercialNameController::class, 'index']);
 Route::post('commercial-names', [SaCmCmrCommercialNameController::class, 'store']);
 

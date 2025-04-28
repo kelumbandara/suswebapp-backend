@@ -30,7 +30,7 @@ class OhMrBenefitRequestController extends Controller
     }
     public function index()
     {
-        $records = $this->benefitRequestInterface->All();
+        $records = $this->benefitRequestInterface->All()->sortByDesc('updated_at')->values();
         $records = $records->map(function ($record) {
             try {
                 $creator                   = $this->userInterface->getById($record->createdByUser);
@@ -149,7 +149,7 @@ class OhMrBenefitRequestController extends Controller
                     $uploadedDocument = $this->benefitDocumentService->uploadImageToGCS($request->file("medicalDocuments.{$index}.document"));
                     $document['document'] = $uploadedDocument['gsutil_uri'];
                 } else {
-                    $document['document'] = null; 
+                    $document['document'] = null;
                 }
 
                 $this->benefitDocumentInterface->create($document);

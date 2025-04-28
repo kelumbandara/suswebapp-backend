@@ -28,7 +28,7 @@ class SaCmChemicalManagementRecodeController extends Controller
 
     public function index()
     {
-        $chemical = $this->chemicalManagementRecodeInterface->All();
+        $chemical = $this->chemicalManagementRecodeInterface->All()->sortByDesc('updated_at')->values();
 
         $chemical = $chemical->map(function ($chemical) {
             try {
@@ -210,7 +210,7 @@ class SaCmChemicalManagementRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $chemical = $this->chemicalManagementRecodeInterface->getByReviewerId($user->id);
+        $chemical = $this->chemicalManagementRecodeInterface->getByReviewerId($user->id)->sortByDesc('updated_at')->values();
 
         $chemical = $chemical->map(function ($chemical) {
             try {

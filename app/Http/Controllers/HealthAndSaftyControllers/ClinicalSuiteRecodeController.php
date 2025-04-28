@@ -20,7 +20,7 @@ class ClinicalSuiteRecodeController extends Controller
 
     public function index()
     {
-        $clinicalSuite = $this->clinicalSuiteInterface->All();
+        $clinicalSuite = $this->clinicalSuiteInterface->All()->sortByDesc('updated_at')->values();
         $clinicalSuite = $clinicalSuite->map(function ($risk) {
 
             try {
