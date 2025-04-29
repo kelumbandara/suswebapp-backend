@@ -23,7 +23,7 @@ class HazardAndRiskController extends Controller
     }
     public function index()
     {
-        $hazardRisks = $this->hazardAndRiskInterface->All()->sortByDesc('updated_at')->values();
+        $hazardRisks = $this->hazardAndRiskInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         $hazardRisks = $hazardRisks->map(function ($risk) {
             try {
@@ -192,7 +192,7 @@ class HazardAndRiskController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $hazardRisks = $this->hazardAndRiskInterface->getByAssigneeId($user->id)->sortByDesc('updated_at')->values();
+        $hazardRisks = $this->hazardAndRiskInterface->getByAssigneeId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         $hazardRisks = $hazardRisks->map(function ($risk) {
             try {

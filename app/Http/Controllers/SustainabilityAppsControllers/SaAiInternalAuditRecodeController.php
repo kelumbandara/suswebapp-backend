@@ -47,7 +47,7 @@ class SaAiInternalAuditRecodeController extends Controller
     public function index()
     {
         try {
-            $internalAudits = $this->internalAuditRecodeInterface->All()->sortByDesc('updated_at')->values();
+            $internalAudits = $this->internalAuditRecodeInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
             $internalAudits = $internalAudits->map(function ($audit) {
                 try {
@@ -130,9 +130,24 @@ class SaAiInternalAuditRecodeController extends Controller
             });
 
             foreach ($internalAudits as $audit) {
-                $audit->actionPlan = $this->actionPlanInterface->findByInternalAuditId($audit->id);
+                $actionPlans = $this->actionPlanInterface->findByInternalAuditId($audit->id);
+                $actionPlans = collect($actionPlans)->map(function ($actionPlan) {
+                    try {
+                        $approver = $this->userInterface->getById($actionPlan->approverId);
+                        $actionPlan->approver = $approver
+                            ? ['name' => $approver->name, 'id' => $approver->id]
+                            : ['name' => 'Unknown', 'id' => null];
+                    } catch (\Exception $e) {
+                        $actionPlan->approver = ['name' => 'Unknown', 'id' => null];
+                    }
+
+                    return $actionPlan;
+                });
+
+                $audit->actionPlan = $actionPlans;
                 $audit->answers    = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
             }
+
 
             return response()->json($internalAudits, 200);
 
@@ -240,7 +255,7 @@ class SaAiInternalAuditRecodeController extends Controller
     public function getFinalAuditers()
     {
         try {
-            $internalAudits = $this->internalAuditRecodeInterface->All()->sortByDesc('updated_at')->values();
+            $internalAudits = $this->internalAuditRecodeInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
             $internalAudits = $internalAudits->map(function ($audit) {
                 try {
@@ -629,7 +644,7 @@ class SaAiInternalAuditRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $internalAudit = $this->internalAuditRecodeInterface->getByApproverId($user->id)->sortByDesc('updated_at')->values();
+        $internalAudit = $this->internalAuditRecodeInterface->getByApproverId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         $internalAudit = $internalAudit->map(function ($audit) {
             try {

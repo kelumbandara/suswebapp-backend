@@ -24,7 +24,7 @@ class DocumentRecodeController extends Controller
 
     public function index()
     {
-        $document = $this->documentInterface->All()->sortByDesc('updated_at')->values();
+        $document = $this->documentInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         $document = $document->map(function ($risk) {
             try {

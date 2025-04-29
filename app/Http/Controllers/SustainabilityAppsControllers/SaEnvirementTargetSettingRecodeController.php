@@ -24,7 +24,7 @@ class SaEnvirementTargetSettingRecodeController extends Controller
     }
     public function index()
     {
-        $targetSetting = $this->targetSettingRecodeInterface->All()->sortByDesc('updated_at')->values();
+        $targetSetting = $this->targetSettingRecodeInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         $targetSetting = $targetSetting->map(function ($risk) {
             try {
@@ -190,7 +190,7 @@ class SaEnvirementTargetSettingRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $targetSetting = $this->targetSettingRecodeInterface->getByApproverId($user->id)->sortByDesc('updated_at')->values();
+        $targetSetting = $this->targetSettingRecodeInterface->getByApproverId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         $targetSetting = $targetSetting->map(function ($risk) {
             try {

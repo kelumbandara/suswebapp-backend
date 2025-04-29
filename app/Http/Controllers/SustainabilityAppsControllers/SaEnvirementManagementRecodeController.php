@@ -24,7 +24,7 @@ class SaEnvirementManagementRecodeController extends Controller
 
     public function index()
     {
-        $records = $this->envirementManagementRecodeInterface->All()->sortByDesc('updated_at')->values();
+        $records = $this->envirementManagementRecodeInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
         $records = $records->map(function ($risk) {
             try {
                 $approver = $this->userInterface->getById($risk->approverId);
@@ -146,8 +146,8 @@ class SaEnvirementManagementRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $record = $this->envirementManagementRecodeInterface->getByApproverId($user->id)->sortByDesc('updated_at')->values();
-        $record = $this->envirementManagementRecodeInterface->getByReviewerId($user->id)->sortByDesc('updated_at')->values();
+        $record = $this->envirementManagementRecodeInterface->getByApproverId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+        $record = $this->envirementManagementRecodeInterface->getByReviewerId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         $record = $record->map(function ($impactConsumption) {
             try {

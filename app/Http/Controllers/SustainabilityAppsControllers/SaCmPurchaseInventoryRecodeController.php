@@ -29,7 +29,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
     }
     public function index()
 {
-    $records = $this->purchaseInventoryInterface->All()->sortByDesc('updated_at')->values();
+    $records = $this->purchaseInventoryInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
     foreach ($records as &$record) {
         $documents = [];
