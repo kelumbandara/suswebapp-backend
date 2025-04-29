@@ -205,7 +205,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('environment-record/{id}/delete', [SaEnvirementManagementRecodeController::class, 'destroy']);
     Route::get('environment-record-assign-task', [SaEnvirementManagementRecodeController::class, 'assignTask']);
     Route::get('environment-record-assignee', [SaEnvirementManagementRecodeController::class, 'assignee']);
-    Route::get('environment-record/{year}/{month}/{division}/category-sum', [SaEnvirementManagementRecodeController::class, 'monthlyCategorySum']);
+    Route::get('environment-record/{year}/{month}/{division}/category-quantity-sum', [SaEnvirementManagementRecodeController::class, 'monthlyCategoryQuantitySum']);
+    Route::get('environment-record/{year}/{month}/{division}/category-source-quantity-sum', [SaEnvirementManagementRecodeController::class, 'categorySourceQuantitySum']);
+    Route::get('environment-record/{year}/{month}/{division}/scope-quantity-sum', [SaEnvirementManagementRecodeController::class, 'scopeQuantitySumByFilter']);
+    Route::get('environment-record/{year}/{month}/{division}/water-to-waste-water-percentage', [SaEnvirementManagementRecodeController::class, 'categoryWaterToWastePercentage']);
+    Route::get('environment-record/{year}/{month}/{division}/waste-water-details', [SaEnvirementManagementRecodeController::class, 'categoryWasteWaterDetails']);
+    Route::get('environment-record/{year}/{month}/{division}/energy-renewable-details', [SaEnvirementManagementRecodeController::class, 'categoryEnergyRenewableDetails']);
+    Route::get('environment-record/{year}/{month}/{division}/category-record-count', [SaEnvirementManagementRecodeController::class, 'categoryRecordCount']);
 
 
     Route::get('target-setting', [SaEnvirementTargetSettingRecodeController::class, 'index']);

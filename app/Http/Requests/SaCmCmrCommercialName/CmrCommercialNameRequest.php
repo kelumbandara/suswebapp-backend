@@ -21,19 +21,19 @@ class CmrCommercialNameRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'commercialName'          => 'required|string',
-            'substanceName'           => 'required|string',
-            'molecularFormula'        => 'required|string',
-            'chemicalFormType'        => 'required|string',
-            'reachRegistrationNumber' => 'required|string',
-            'whereAndWhyUse'          => 'required|string',
-            'zdhcCategory'            => 'required|string',
-            'zdhcLevel'               => 'required|string',
-            'casNumber'               => 'required|string',
-            'colourIndex'             => 'required|string',
-            'useOfPPE'                => 'required|array',
-            'hazardType'              => 'required|array',
-            'ghsClassification'       => 'required|string',
+            'commercialName'          => 'nullable|string',
+            'substanceName'           => 'nullable|string',
+            'molecularFormula'        => 'nullable|string',
+            'chemicalFormType'        => 'nullable|string',
+            'reachRegistrationNumber' => 'nullable|string',
+            'whereAndWhyUse'          => 'nullable|string',
+            'zdhcCategory'            => 'nullable|string',
+            'zdhcLevel'               => 'nullable|string',
+            'casNumber'               => 'nullable|string',
+            'colourIndex'             => 'nullable|string',
+            'useOfPPE'                => 'nullable|array',
+            'hazardType'              => 'nullable|array',
+            'ghsClassification'       => 'nullable|string',
         ];
     }
 }

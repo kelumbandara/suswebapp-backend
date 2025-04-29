@@ -7,7 +7,6 @@ use App\Repositories\All\SaEmrAddConcumption\AddConcumptionInterface;
 use App\Repositories\All\SaEnvirementManagementRecode\EnvirementManagementRecodeInterface;
 use App\Repositories\All\User\UserInterface;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 
 class SaEnvirementManagementRecodeController extends Controller
 {
@@ -188,7 +187,24 @@ class SaEnvirementManagementRecodeController extends Controller
         return response()->json($assignees);
     }
 
-    public function monthlyCategorySum($year, $month, $division)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function monthlyCategoryQuantitySum($year, $month, $division)
     {
         $filteredRecords = $this->envirementManagementRecodeInterface->filterByYearMonthDivision($year, $month, $division);
 
@@ -206,22 +222,24 @@ class SaEnvirementManagementRecodeController extends Controller
             foreach ($impacts as $impact) {
                 $category = strtolower($impact->category);
 
+                $quantity = is_numeric($impact->quantity) ? (float) $impact->quantity : 0;
+
                 switch ($category) {
                     case 'wastewater':
-                        $categorySums['wasteWater'] += (float) $impact->amount;
+                        $categorySums['wasteWater'] += $quantity;
                         break;
                     case 'energy':
-                        $categorySums['energy'] += (float) $impact->amount;
+                        $categorySums['energy'] += $quantity;
                         break;
                     case 'water':
-                        $categorySums['water'] += (float) $impact->amount;
+                        $categorySums['water'] += $quantity;
                         break;
                     case 'waste':
-                        $categorySums['waste'] += (float) $impact->amount;
+                        $categorySums['waste'] += $quantity;
                         break;
                     case 'ghg':
                     case 'ghg emission':
-                        $categorySums['ghgEmission'] += (float) $impact->amount;
+                        $categorySums['ghgEmission'] += $quantity;
                         break;
                 }
             }
@@ -234,5 +252,212 @@ class SaEnvirementManagementRecodeController extends Controller
             'categorySum' => $categorySums,
         ]);
     }
+
+    public function categorySourceQuantitySum($year, $month, $division)
+    {
+        $filteredRecords = $this->envirementManagementRecodeInterface->filterByYearMonthDivision($year, $month, $division);
+
+        $result = [];
+
+        foreach ($filteredRecords as $record) {
+            $impacts = $this->addConcumptionInterface->findByEnvirementId($record->id);
+
+            foreach ($impacts as $impact) {
+                $category = $impact->category;
+                $source   = $impact->source;
+                $quantity = is_numeric($impact->quantity) ? (float) $impact->quantity : 0;
+
+                if (! isset($result[$category])) {
+                    $result[$category] = [];
+                }
+
+                if (! isset($result[$category][$source])) {
+                    $result[$category][$source] = 0;
+                }
+
+                $result[$category][$source] += $quantity;
+            }
+        }
+
+        return response()->json([
+            'year'     => $year,
+            'month'    => $month,
+            'division' => $division,
+            'data'     => $result,
+        ]);
+    }
+
+    public function scopeQuantitySumByFilter($year, $month, $division)
+    {
+        $filteredRecords = $this->envirementManagementRecodeInterface->filterByYearMonthDivision($year, $month, $division);
+
+        $scopeSums = [];
+
+        foreach ($filteredRecords as $record) {
+            $impacts = $this->addConcumptionInterface->findByEnvirementId($record->id);
+
+            foreach ($impacts as $impact) {
+                $scope    = $impact->scope;
+                $quantity = is_numeric($impact->quantity) ? (float) $impact->quantity : 0;
+
+                if (! isset($scopeSums[$scope])) {
+                    $scopeSums[$scope] = 0;
+                }
+
+                $scopeSums[$scope] += $quantity;
+            }
+        }
+
+        return response()->json([
+            'year'             => $year,
+            'month'            => $month,
+            'division'         => $division,
+            'scopeQuantitySum' => $scopeSums,
+        ]);
+    }
+
+    public function categoryWaterToWastePercentage($year, $month, $division)
+    {
+        $filteredRecords = $this->envirementManagementRecodeInterface->filterByYearMonthDivision($year, $month, $division);
+
+        $totalWater = 0;
+        $totalWaste = 0;
+
+        foreach ($filteredRecords as $record) {
+            $impacts = $this->addConcumptionInterface->findByEnvirementId($record->id);
+
+            foreach ($impacts as $impact) {
+                $category = strtolower($impact->category);
+                $quantity = is_numeric($impact->quantity) ? (float) $impact->quantity : 0;
+
+                if ($category === 'water') {
+                    $totalWater += $quantity;
+                } elseif ($category === 'Waste Water') {
+                    $totalWaste += $quantity;
+                }
+            }
+        }
+
+        $percentage = 0;
+        if ($totalWaste > 0) {
+            $percentage = ($totalWaste / $totalWater) * 100;
+        }
+
+        return response()->json([
+            'year'                   => $year,
+            'month'                  => $month,
+            'division'               => $division,
+            'totalWater'             => $totalWater,
+            'totalWasteWater'        => $totalWaste,
+            'waterToWastePercentage' => $percentage,
+        ]);
+    }
+
+    public function categoryWasteWaterDetails($year, $month, $division)
+    {
+        $filteredRecords = $this->envirementManagementRecodeInterface->filterByYearMonthDivision($year, $month, $division);
+
+        $totalWasteWater = 0;
+        $totalReused     = 0;
+        $totalRecycled   = 0;
+
+        foreach ($filteredRecords as $record) {
+            $impacts = $this->addConcumptionInterface->findByEnvirementId($record->id);
+
+            foreach ($impacts as $impact) {
+                $category = strtolower($impact->category);
+                $source   = strtolower($impact->source);
+                $quantity = is_numeric($impact->quantity) ? (float) $impact->quantity : 0;
+
+                if ($category === 'waste water') {
+                    $totalWasteWater += $quantity;
+
+                    if ($source === 'reuse') {
+                        $totalReused += $quantity;
+                    } elseif ($source === 'recycle') {
+                        $totalRecycled += $quantity;
+                    }
+                }
+            }
+        }
+        $reusePercentage    = $totalWasteWater > 0 ? ($totalReused / $totalWasteWater) * 100 : 0;
+        $recyclePercentage  = $totalWasteWater > 0 ? ($totalRecycled / $totalWasteWater) * 100 : 0;
+
+        return response()->json([
+            'year'            => $year,
+            'month'           => $month,
+            'division'        => $division,
+            'totalWasteWater' => $totalWasteWater,
+            'totalReused'     => $totalReused,
+            'totalRecycled'   => $totalRecycled,
+            'reusePercentage'     => round($reusePercentage, 2),
+            'recyclePercentage'   => round($recyclePercentage, 2),
+        ]);
+    }
+
+    public function categoryEnergyRenewableDetails($year, $month, $division)
+{
+    $filteredRecords = $this->envirementManagementRecodeInterface->filterByYearMonthDivision($year, $month, $division);
+
+    $totalEnergy = 0;
+    $totalRenewable = 0;
+
+    foreach ($filteredRecords as $record) {
+        $impacts = $this->addConcumptionInterface->findByEnvirementId($record->id);
+
+        foreach ($impacts as $impact) {
+            $category = strtolower($impact->category);
+            $source   = strtolower($impact->source);
+            $quantity = is_numeric($impact->quantity) ? (float) $impact->quantity : 0;
+
+            if ($category === 'energy') {
+                $totalEnergy += $quantity;
+
+                if ($source === 'renewable energy') {
+                    $totalRenewable += $quantity;
+                }
+            }
+        }
+    }
+
+    $renewablePercentage = $totalEnergy > 0 ? ($totalRenewable / $totalEnergy) * 100 : 0;
+
+    return response()->json([
+        'year'                 => $year,
+        'month'                => $month,
+        'division'             => $division,
+        'totalEnergy'          => $totalEnergy,
+        'totalRenewableEnergy' => $totalRenewable,
+        'renewablePercentage'  => round($renewablePercentage, 2),
+    ]);
+}
+
+public function categoryRecordCount($year, $month, $division)
+{
+    $filteredRecords = $this->envirementManagementRecodeInterface->filterByYearMonthDivision($year, $month, $division);
+
+    $categoryCounts = [];
+
+    foreach ($filteredRecords as $record) {
+        $impacts = $this->addConcumptionInterface->findByEnvirementId($record->id);
+
+        foreach ($impacts as $impact) {
+            $category = strtolower($impact->category);
+
+            if (! isset($categoryCounts[$category])) {
+                $categoryCounts[$category] = 0;
+            }
+
+            $categoryCounts[$category]++;
+        }
+    }
+
+    return response()->json([
+        'year'           => $year,
+        'month'          => $month,
+        'division'       => $division,
+        'categoryCounts' => $categoryCounts,
+    ]);
+}
 
 }
