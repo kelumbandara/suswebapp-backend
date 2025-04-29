@@ -26,7 +26,7 @@ class OhMiPiMedicineInventoryController extends Controller
 
     public function index()
     {
-        $records = $this->medicineInventoryInterface->All()->sortByDesc('updated_at')->values();
+        $records = $this->medicineInventoryInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
         $records = $records->map(function ($risk) {
 
             try {
@@ -170,7 +170,7 @@ class OhMiPiMedicineInventoryController extends Controller
 
     public function published()
 {
-    $records = $this->medicineInventoryInterface->All()->sortByDesc('updated_at')->values();
+    $records = $this->medicineInventoryInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
     $records = $records->filter(function ($record) {
         return $record->status === 'published';

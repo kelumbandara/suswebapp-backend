@@ -30,7 +30,7 @@ class OhMrBenefitRequestController extends Controller
     }
     public function index()
     {
-        $records = $this->benefitRequestInterface->All()->sortByDesc('updated_at')->values();
+        $records = $this->benefitRequestInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
         $records = $records->map(function ($record) {
             try {
                 $creator                   = $this->userInterface->getById($record->createdByUser);

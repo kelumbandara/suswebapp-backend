@@ -16,9 +16,7 @@ class DepartmentController extends Controller
 
     public function index()
     {
-        $department = $this->departmentInterface->all()
-                        ->sortByDesc('updated_at')
-                        ->values();
+        $department = $this->departmentInterface->all()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         return response()->json($department);
     }

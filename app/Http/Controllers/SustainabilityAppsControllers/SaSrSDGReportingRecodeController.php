@@ -26,7 +26,7 @@ class SaSrSDGReportingRecodeController extends Controller
 
     public function index()
     {
-        $records = $this->sdgRecodeInterface->All()->sortByDesc('updated_at')->values();
+        $records = $this->sdgRecodeInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
         $records = $records->map(function ($risk) {
             try {
                 $assignee       = $this->userInterface->getById($risk->assigneeId);
@@ -220,7 +220,7 @@ class SaSrSDGReportingRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $record = $this->sdgRecodeInterface->getByAssigneeId($user->id)->sortByDesc('updated_at')->values();
+        $record = $this->sdgRecodeInterface->getByAssigneeId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         $record = $record->map(function ($impactDetails) {
             try {

@@ -29,7 +29,7 @@ class AiAccidentRecordController extends Controller
 
     public function index()
     {
-        $records = $this->accidentRecordInterface->All()->sortByDesc('updated_at')->values();
+        $records = $this->accidentRecordInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
         $records = $records->map(function ($risk) {
             try {
                 $assignee       = $this->userInterface->getById($risk->assigneeId);
@@ -258,7 +258,7 @@ class AiAccidentRecordController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $record = $this->accidentRecordInterface->getByAssigneeId($user->id)->sortByDesc('updated_at')->values();
+        $record = $this->accidentRecordInterface->getByAssigneeId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         $record = $record->map(function ($accident) {
             try {

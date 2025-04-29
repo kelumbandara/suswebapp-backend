@@ -30,7 +30,7 @@ class AiIncidentRecodeController extends Controller
 
     public function index()
     {
-        $records = $this->incidentRecordInterface->All()->sortByDesc('updated_at')->values();
+        $records = $this->incidentRecordInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
         $records = $records->map(function ($risk) {
             try {
                 $assignee       = $this->userInterface->getById($risk->assigneeId);
@@ -247,7 +247,7 @@ class AiIncidentRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $record = $this->incidentRecordInterface->getByAssigneeId($user->id)->sortByDesc('updated_at')->values();
+        $record = $this->incidentRecordInterface->getByAssigneeId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         $record = $record->map(function ($incident) {
             try {
