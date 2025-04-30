@@ -9,4 +9,7 @@ interface EnvirementManagementRecodeInterface extends EloquentRepositoryInterfac
     public function getByApproverId(int $approverId);
     public function getByReviewerId(int $reviewerId);
     public function filterByYearMonthDivision(int $year, int $month, int $division);
+    public function filterByYear($year);
+    public function filterByYearAndMonth($year, $month);
+
 }
