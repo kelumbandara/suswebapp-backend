@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('chemicalFormType')->nullable();
             $table->string('whereAndWhyUse')->nullable();
             $table->string('productStandard')->nullable();
-            $table->boolean('doYouHaveMSDSorSDS')->nullable();
+            $table->string('doYouHaveMSDSorSDS')->nullable();
             $table->string('msdsorsdsIssuedDate')->nullable();
             $table->string('msdsorsdsExpiryDate')->nullable();
             $table->json('documents')->nullable();
@@ -54,8 +54,8 @@ return new class extends Migration
             $table->string('contactNumber')->nullable();
             $table->string('emailId')->nullable();
             $table->string('location')->nullable();
-            $table->boolean('compliantWithTheLatestVersionOfZDHCandMRSL')->nullable();
-            $table->boolean('apeoOrNpeFreeComplianceStatement')->nullable();
+            $table->string('compliantWithTheLatestVersionOfZDHCandMRSL')->nullable();
+            $table->string('apeoOrNpeFreeComplianceStatement')->nullable();
             $table->string('manufacturingDate')->nullable();
             $table->string('expiryDate')->nullable();
             $table->string('deliveryDate')->nullable();

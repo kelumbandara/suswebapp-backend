@@ -46,7 +46,6 @@ class SaCmChemicalManagemantRecode extends Model
     ];
 
     protected $casts = [
-        'doYouHaveMSDSorSDS' => 'boolean',
         'documents'          => 'array',
         'hazardType'         => 'array',
         'useOfPPE'           => 'array',
