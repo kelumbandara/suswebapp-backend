@@ -32,7 +32,7 @@ class ChemicalManagementRecodeRequest extends FormRequest
             'chemicalFormType'        => 'required|string',
             'whereAndWhyUse'          => 'required|string',
             'productStandard'         => 'required|string',
-            'doYouHaveMSDSorSDS'      => 'nullable|boolean',
+            'doYouHaveMSDSorSDS'      => 'nullable|string',
             'msdsorsdsIssuedDate'     => 'nullable|string',
             'msdsorsdsExpiryDate'     => 'nullable|string',
             'division'                => 'required|string',

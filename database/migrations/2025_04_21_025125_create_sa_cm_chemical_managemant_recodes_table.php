@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('chemicalFormType')->nullable();
             $table->string('whereAndWhyUse')->nullable();
             $table->string('productStandard')->nullable();
-            $table->boolean('doYouHaveMSDSorSDS')->nullable();
+            $table->string('doYouHaveMSDSorSDS')->nullable();
             $table->string('msdsorsdsIssuedDate')->nullable();
             $table->string('msdsorsdsExpiryDate')->nullable();
             $table->json('documents')->nullable();

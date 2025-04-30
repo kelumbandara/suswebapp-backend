@@ -68,12 +68,10 @@ class SaCmPurchaseInventoryRecord extends Model
         'lotNumber',
     ];
     protected $casts = [
-        'doYouHaveMSDSorSDS' => 'boolean',
         'documents'          => 'array',
         'hazardType'         => 'array',
         'useOfPPE'           => 'array',
-        'compliantWithTheLatestVersionOfZDHCandMRSL' => 'boolean',
-        'apeoOrNpeFreeComplianceStatement' => 'boolean',
+
 
     ];
 
