@@ -213,6 +213,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('environment-record/{year}/{month}/{division}/water-to-waste-water-percentage', [SaEnvirementManagementRecodeController::class, 'categoryWaterToWastePercentage']);
     Route::get('environment-record/{year}/{month}/{division}/waste-water-details', [SaEnvirementManagementRecodeController::class, 'categoryWasteWaterDetails']);
     Route::get('environment-record/{year}/{month}/{division}/energy-renewable-details', [SaEnvirementManagementRecodeController::class, 'categoryEnergyRenewableDetails']);
+    Route::get('environment-record/{year}/{division}/energy-record-count-monthly', [SaEnvirementManagementRecodeController::class, 'yearlyEnergyRecordCountMonthlyBreakdown']);
     Route::get('environment-record/{year}/{month}/{division}/category-record-count', [SaEnvirementManagementRecodeController::class, 'categoryRecordCount']);
     Route::get('environment-record/{year}/category-record-count-all', [SaEnvirementManagementRecodeController::class, 'allSummaryData']);
 

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\SustainabilityAppsControllers;
 
 use App\Http\Controllers\Controller;
@@ -21,9 +20,9 @@ class SaCmChemicalManagementRecodeController extends Controller
     public function __construct(ChemicalManagementRecodeInterface $chemicalManagementRecodeInterface, UserInterface $userInterface, ChemicalManagementService $chemicalManagementService, PurchaseInventoryInterface $purchaseInventoryInterface)
     {
         $this->chemicalManagementRecodeInterface = $chemicalManagementRecodeInterface;
-        $this->userInterface          = $userInterface;
-        $this->chemicalManagementService = $chemicalManagementService;
-        $this->purchaseInventoryInterface = $purchaseInventoryInterface;
+        $this->userInterface                     = $userInterface;
+        $this->chemicalManagementService         = $chemicalManagementService;
+        $this->purchaseInventoryInterface        = $purchaseInventoryInterface;
     }
 
     public function index()
@@ -32,14 +31,14 @@ class SaCmChemicalManagementRecodeController extends Controller
 
         $chemical = $chemical->map(function ($chemical) {
             try {
-                $reviewer        = $this->userInterface->getById($chemical->reviewerId);
+                $reviewer           = $this->userInterface->getById($chemical->reviewerId);
                 $chemical->reviewer = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $chemical->reviewer = ['name' => 'Unknown', 'id' => null];
             }
 
             try {
-                $creator                  = $this->userInterface->getById($chemical->createdByUser);
+                $creator                     = $this->userInterface->getById($chemical->createdByUser);
                 $chemical->createdByUserName = $creator ? $creator->name : 'Unknown';
             } catch (\Exception $e) {
                 $chemical->createdByUserName = 'Unknown';
@@ -105,14 +104,14 @@ class SaCmChemicalManagementRecodeController extends Controller
             ]);
         }
         return response()->json([
-            'message'    => 'Chemical Management Recode created successfully!',
+            'message'       => 'Chemical Management Recode created successfully!',
             'externalAudit' => $chemical,
         ], 201);
     }
 
     public function update($id, ChemicalManagementRecodeRequest $request)
     {
-        $chemical = $this->chemicalManagementRecodeInterface->findById($id);
+        $chemical      = $this->chemicalManagementRecodeInterface->findById($id);
         $validatedData = $request->validated();
 
         $documents = json_decode($chemical->documents, true) ?? [];
@@ -154,7 +153,7 @@ class SaCmChemicalManagementRecodeController extends Controller
 
         if ($updated) {
             return response()->json([
-                'message'       => 'Chemical Management Recode updated successfully!',
+                'message'  => 'Chemical Management Recode updated successfully!',
                 'chemical' => $this->chemicalManagementRecodeInterface->findById($id),
             ], 200);
         } else {
@@ -162,13 +161,47 @@ class SaCmChemicalManagementRecodeController extends Controller
         }
     }
 
-    public function approvedStatus($id, ChemicalManagementRecodeRequest $request)
+    public function approvedStatus($id)
     {
+        // Get chemical record by ID
         $chemicalRecord = $this->chemicalManagementRecodeInterface->findById($id);
 
-        $inventoryData = $request->validated();
+        if (! $chemicalRecord) {
+            return response()->json(['message' => 'Chemical record not found.'], 404);
+        }
 
+        // Update status only
         $this->chemicalManagementRecodeInterface->update($id, ['status' => 'approved']);
+
+        $inventoryData = [
+            'commercialName'          => $chemicalRecord->commercialName,
+            'substanceName'           => $chemicalRecord->substanceName,
+            'reachRegistrationNumber' => $chemicalRecord->reachRegistrationNumber,
+            'molecularFormula'        => $chemicalRecord->molecularFormula,
+            'requestQuantity'         => $chemicalRecord->requestQuantity,
+            'requestUnit'             => $chemicalRecord->requestUnit,
+            'zdhcCategory'            => $chemicalRecord->zdhcCategory,
+            'status'                  => 'approved', // explicitly approved
+            'chemicalFormType'        => $chemicalRecord->chemicalFormType,
+            'whereAndWhyUse'          => $chemicalRecord->whereAndWhyUse,
+            'productStandard'         => $chemicalRecord->productStandard,
+            'doYouHaveMSDSorSDS'      => $chemicalRecord->doYouHaveMSDSorSDS,
+            'msdsorsdsIssuedDate'     => $chemicalRecord->msdsorsdsIssuedDate,
+            'msdsorsdsExpiryDate'     => $chemicalRecord->msdsorsdsExpiryDate,
+            'division'                => $chemicalRecord->division,
+            'requestedCustomer'       => $chemicalRecord->requestedCustomer,
+            'requestedMerchandiser'   => $chemicalRecord->requestedMerchandiser,
+            'requestDate'             => $chemicalRecord->requestDate,
+            'reviewerId'              => $chemicalRecord->reviewerId,
+            'approverId'              => $chemicalRecord->approverId,
+            'hazardType'              => $chemicalRecord->hazardType,
+            'useOfPPE'                => $chemicalRecord->useOfPPE,
+            'ghsClassification'       => $chemicalRecord->ghsClassification,
+            'zdhcLevel'               => $chemicalRecord->zdhcLevel,
+            'casNumber'               => $chemicalRecord->casNumber,
+            'colourIndex'             => $chemicalRecord->colourIndex,
+            'documents'               => $chemicalRecord->documents,
+        ];
 
         $this->purchaseInventoryInterface->create($inventoryData);
 
@@ -176,9 +209,6 @@ class SaCmChemicalManagementRecodeController extends Controller
             'message' => 'Chemical record approved and added to inventory.',
         ], 200);
     }
-
-
-
 
     public function destroy($id)
     {
@@ -214,15 +244,14 @@ class SaCmChemicalManagementRecodeController extends Controller
 
         $chemical = $chemical->map(function ($chemical) {
             try {
-                $reviewer        = $this->userInterface->getById($chemical->reviewerId);
+                $reviewer           = $this->userInterface->getById($chemical->reviewerId);
                 $chemical->reviewer = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $chemical->reviewer = ['name' => 'Unknown', 'id' => null];
             }
 
-
             try {
-                $creator                  = $this->userInterface->getById($chemical->createdByUser);
+                $creator                     = $this->userInterface->getById($chemical->createdByUser);
                 $chemical->createdByUserName = $creator ? $creator->name : 'Unknown';
             } catch (\Exception $e) {
                 $chemical->createdByUserName = 'Unknown';

@@ -70,14 +70,11 @@ class SaCmPurchaseInventoryRecodeController extends Controller
             $certificate->documents = $certificateDocs;
         }
 
-        // Attach to record
+
         $record->certificates = $certificates;
     }
 
-    return response()->json([
-        'message' => 'All purchase inventory records fetched successfully.',
-        'data'    => $records,
-    ]);
+    return response()->json( $records, 200);
 }
 
 
