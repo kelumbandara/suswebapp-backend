@@ -539,7 +539,7 @@ class SaEnvirementManagementRecodeController extends Controller
             10 => 'October', 11 => 'November', 12 => 'December',
         ];
 
-        $monthlyCounts = [];
+        $monthlyEnergySources = [];
 
         for ($month = 1; $month <= 12; $month++) {
             $fullMonthName = $monthNames[$month];
@@ -547,30 +547,34 @@ class SaEnvirementManagementRecodeController extends Controller
 
             $filteredRecords = $this->envirementManagementRecodeInterface->filterByYearMonthDivision($year, $fullMonthName, $division);
 
-            $count = 0;
+            $energySourceCounts = [];
 
             foreach ($filteredRecords as $record) {
                 $impacts = $this->addConcumptionInterface->findByEnvirementId($record->id);
 
                 foreach ($impacts as $impact) {
                     $category = strtolower(trim($impact->category));
+                    $source = strtolower(trim($impact->source));
 
                     if (str_contains($category, 'energy')) {
-                        $count++;
+                        if (!isset($energySourceCounts[$source])) {
+                            $energySourceCounts[$source] = 0;
+                        }
+                        $energySourceCounts[$source]++;
                     }
                 }
             }
 
-            $monthlyCounts[] = [
+            $monthlyEnergySources[] = [
                 'month' => $shortMonth,
-                'energyCount' => $count,
+                'energySourceCounts' => $energySourceCounts,
             ];
         }
 
         return response()->json([
-            'year'          => $year,
-            'division'      => $division,
-            'monthlyCounts' => $monthlyCounts,
+            'year'                 => $year,
+            'division'             => $division,
+            'monthlyEnergySources' => $monthlyEnergySources,
         ]);
     }
 
@@ -627,11 +631,20 @@ class SaEnvirementManagementRecodeController extends Controller
         $totalReused     = 0;
         $totalRecycled   = 0;
 
-        $monthlyEnergyCounts = []; 
+        $statusCountYear = []; // Count status per year
 
+        // Loop through all records for the given year
         foreach ($allRecords as $record) {
             $impacts = $this->addConcumptionInterface->findByEnvirementId($record->id);
 
+            // Count status of the record itself, not each individual impact
+            $status = strtolower(trim($record->status ?? 'unknown'));
+            if (!isset($statusCountYear[$status])) {
+                $statusCountYear[$status] = 0;
+            }
+            $statusCountYear[$status]++;
+
+            // Process each impact record related to the environment record
             foreach ($impacts as $impact) {
                 $category = strtolower($impact->category);
                 $source   = strtolower($impact->source);
@@ -693,6 +706,7 @@ class SaEnvirementManagementRecodeController extends Controller
             }
         }
 
+        // Calculate percentage values
         $renewablePercentage = $totalEnergy > 0 ? ($totalRenewable / $totalEnergy) * 100 : 0;
         $reusePercentage     = $totalWasteWater > 0 ? ($totalReused / $totalWasteWater) * 100 : 0;
         $recyclePercentage   = $totalWasteWater > 0 ? ($totalRecycled / $totalWasteWater) * 100 : 0;
@@ -707,8 +721,7 @@ class SaEnvirementManagementRecodeController extends Controller
 
         $yearlyScopeMonthly    = [];
         $yearlyCategoryMonthly = [];
-
-        $monthlyEnergyCounts = [];
+        $monthlyEnergySources  = [];
 
         for ($month = 1; $month <= 12; $month++) {
             $fullMonthName  = $monthNames[$month];
@@ -727,7 +740,7 @@ class SaEnvirementManagementRecodeController extends Controller
                 'amount'      => 0,
             ];
 
-            $monthlyEnergyCount = 0;
+            $energySourceCounts = [];
 
             foreach ($records as $record) {
                 $impacts = $this->addConcumptionInterface->findByEnvirementId($record->id);
@@ -735,11 +748,15 @@ class SaEnvirementManagementRecodeController extends Controller
                 foreach ($impacts as $impact) {
                     $scope    = $impact->scope;
                     $category = strtolower($impact->category);
+                    $source   = strtolower($impact->source);
                     $quantity = is_numeric($impact->quantity) ? (float) $impact->quantity : 0;
                     $amount   = is_numeric($impact->amount) ? (float) $impact->amount : 0;
 
                     if (str_contains($category, 'energy')) {
-                        $monthlyEnergyCount++;
+                        if (!isset($energySourceCounts[$source])) {
+                            $energySourceCounts[$source] = 0;
+                        }
+                        $energySourceCounts[$source]++;
                     }
 
                     if (!isset($scopeSumsPerMonth[$scope])) {
@@ -771,9 +788,9 @@ class SaEnvirementManagementRecodeController extends Controller
                 }
             }
 
-            $monthlyEnergyCounts[] = [
-                'month'        => $shortMonthName,
-                'energyCount'  => $monthlyEnergyCount,
+            $monthlyEnergySources[] = [
+                'month' => $shortMonthName,
+                'energySourceCounts' => $energySourceCounts,
             ];
 
             $yearlyScopeMonthly[] = [
@@ -784,31 +801,34 @@ class SaEnvirementManagementRecodeController extends Controller
             $yearlyCategoryMonthly[] = $categorySumsPerMonth;
         }
 
+        // Status count for the whole year
+        $statusSummary = [];
+        foreach ($statusCountYear as $status => $count) {
+            $statusSummary[$status] = $count;
+        }
+
         return response()->json([
             'year'                   => $year,
             'categoryCounts'         => $categoryCounts,
             'categorySum'            => $categorySums,
             'categorySourceSummary'  => $result,
             'scopeQuantitySum'       => $scopeSums,
-
             'totalEnergy'            => $totalEnergy,
             'totalRenewableEnergy'   => $totalRenewable,
             'renewablePercentage'    => round($renewablePercentage, 2),
-
             'totalWater'             => $totalWater,
             'totalWasteWater'        => $totalWasteWater,
             'waterToWastePercentage' => round($waterToWastePercent, 2),
-
             'totalReused'            => $totalReused,
             'totalRecycled'          => $totalRecycled,
             'reusePercentage'        => round($reusePercentage, 2),
             'recyclePercentage'      => round($recyclePercentage, 2),
-
             'yearlyScopeSummary'     => $yearlyScopeMonthly,
             'yearlyCategorySummary'  => $yearlyCategoryMonthly,
-
-            'monthlyEnergyCounts'    => $monthlyEnergyCounts,
+            'monthlyEnergyCounts'    => $monthlyEnergySources,
+            'statusSummary'          => $statusSummary,
         ]);
     }
+
 
 }
