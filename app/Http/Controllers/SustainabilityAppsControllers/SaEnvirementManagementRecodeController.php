@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SaEnvirementManagementRecode\EnvirementManagementRecodeRequest;
 use App\Repositories\All\SaEmrAddConcumption\AddConcumptionInterface;
 use App\Repositories\All\SaEnvirementManagementRecode\EnvirementManagementRecodeInterface;
+use App\Repositories\All\SaETargetSetting\TargetSettingRecodeInterface;
 use App\Repositories\All\User\UserInterface;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,12 +14,14 @@ class SaEnvirementManagementRecodeController extends Controller
     protected $envirementManagementRecodeInterface;
     protected $addConcumptionInterface;
     protected $userInterface;
+    protected $targetSettingRecodeInterface;
 
-    public function __construct(EnvirementManagementRecodeInterface $envirementManagementRecodeInterface, AddConcumptionInterface $addConcumptionInterface, UserInterface $userInterface)
+    public function __construct(EnvirementManagementRecodeInterface $envirementManagementRecodeInterface, AddConcumptionInterface $addConcumptionInterface, UserInterface $userInterface, TargetSettingRecodeInterface $targetSettingRecodeInterface)
     {
         $this->envirementManagementRecodeInterface = $envirementManagementRecodeInterface;
         $this->addConcumptionInterface             = $addConcumptionInterface;
         $this->userInterface                       = $userInterface;
+        $this->targetSettingRecodeInterface        = $targetSettingRecodeInterface;
     }
 
     public function index()
@@ -534,8 +537,8 @@ class SaEnvirementManagementRecodeController extends Controller
     {
         $monthNames = [
             1  => 'January', 2  => 'February', 3  => 'March',
-            4  => 'April',   5  => 'May',      6  => 'June',
-            7  => 'July',    8  => 'August',   9  => 'September',
+            4  => 'April', 5    => 'May', 6       => 'June',
+            7  => 'July', 8     => 'August', 9    => 'September',
             10 => 'October', 11 => 'November', 12 => 'December',
         ];
 
@@ -543,7 +546,7 @@ class SaEnvirementManagementRecodeController extends Controller
 
         for ($month = 1; $month <= 12; $month++) {
             $fullMonthName = $monthNames[$month];
-            $shortMonth = substr($fullMonthName, 0, 3);
+            $shortMonth    = substr($fullMonthName, 0, 3);
 
             $filteredRecords = $this->envirementManagementRecodeInterface->filterByYearMonthDivision($year, $fullMonthName, $division);
 
@@ -554,10 +557,10 @@ class SaEnvirementManagementRecodeController extends Controller
 
                 foreach ($impacts as $impact) {
                     $category = strtolower(trim($impact->category));
-                    $source = strtolower(trim($impact->source));
+                    $source   = strtolower(trim($impact->source));
 
                     if (str_contains($category, 'energy')) {
-                        if (!isset($energySourceCounts[$source])) {
+                        if (! isset($energySourceCounts[$source])) {
                             $energySourceCounts[$source] = 0;
                         }
                         $energySourceCounts[$source]++;
@@ -566,7 +569,7 @@ class SaEnvirementManagementRecodeController extends Controller
             }
 
             $monthlyEnergySources[] = [
-                'month' => $shortMonth,
+                'month'              => $shortMonth,
                 'energySourceCounts' => $energySourceCounts,
             ];
         }
@@ -577,7 +580,6 @@ class SaEnvirementManagementRecodeController extends Controller
             'monthlyEnergySources' => $monthlyEnergySources,
         ]);
     }
-
 
     public function categoryRecordCount($year, $month, $division)
     {
@@ -604,6 +606,63 @@ class SaEnvirementManagementRecodeController extends Controller
             'month'          => $month,
             'division'       => $division,
             'categoryCounts' => $categoryCounts,
+        ]);
+    }
+
+    public function statusSummaryByYearMonthDivision($year, $month, $division)
+    {
+        $records = $this->envirementManagementRecodeInterface->filterByYearMonthDivision($year, $month, $division);
+
+        $statusSummary = [];
+
+        foreach ($records as $record) {
+            $status = strtolower(trim($record->status ?? 'unknown'));
+
+            if (! isset($statusSummary[$status])) {
+                $statusSummary[$status] = 0;
+            }
+
+            $statusSummary[$status]++;
+        }
+
+        return response()->json([
+            'year'          => $year,
+            'month'         => $month,
+            'division'      => $division,
+            'statusSummary' => $statusSummary,
+        ]);
+    }
+
+    public function waterGhgBySource($year, $month, $division)
+    {
+        $records = $this->targetSettingRecodeInterface->filterByYearMonthDivision($year, $month, $division);
+
+        $hazardGhg    = 0;
+        $nonHazardGhg = 0;
+
+        foreach ($records as $record) {
+            $category = strtolower(trim($record->category));
+            $source   = strtolower(trim($record->source));
+            $ghg      = is_numeric($record->ghgEmission) ? (float) $record->ghgEmission : 0;
+            if (strtolower(trim($record->division)) !== strtolower(trim($division))) {
+                continue;
+            }
+
+            if ($category === 'water') {
+                if ($source === 'hazard') {
+                    $hazardGhg += $ghg;
+                } elseif ($source === 'non hazard') {
+                    $nonHazardGhg += $ghg;
+                }
+            }
+        }
+
+        return response()->json([
+            'year'         => $year,
+            'month'        => $month,
+            'division'     => $division,
+            'hazardGhg'    => $hazardGhg,
+            'nonHazardGhg' => $nonHazardGhg,
         ]);
     }
 
@@ -639,7 +698,7 @@ class SaEnvirementManagementRecodeController extends Controller
 
             // Count status of the record itself, not each individual impact
             $status = strtolower(trim($record->status ?? 'unknown'));
-            if (!isset($statusCountYear[$status])) {
+            if (! isset($statusCountYear[$status])) {
                 $statusCountYear[$status] = 0;
             }
             $statusCountYear[$status]++;
@@ -686,20 +745,20 @@ class SaEnvirementManagementRecodeController extends Controller
 
                 $categorySums['amount'] += $amount;
 
-                if (!isset($categoryCounts[$category])) {
+                if (! isset($categoryCounts[$category])) {
                     $categoryCounts[$category] = 0;
                 }
                 $categoryCounts[$category]++;
 
-                if (!isset($scopeSums[$scope])) {
+                if (! isset($scopeSums[$scope])) {
                     $scopeSums[$scope] = 0;
                 }
                 $scopeSums[$scope] += $quantity;
 
-                if (!isset($result[$category])) {
+                if (! isset($result[$category])) {
                     $result[$category] = [];
                 }
-                if (!isset($result[$category][$source])) {
+                if (! isset($result[$category][$source])) {
                     $result[$category][$source] = 0;
                 }
                 $result[$category][$source] += $quantity;
@@ -714,8 +773,8 @@ class SaEnvirementManagementRecodeController extends Controller
 
         $monthNames = [
             1  => 'January', 2  => 'February', 3  => 'March',
-            4  => 'April', 5  => 'May', 6  => 'June',
-            7  => 'July', 8  => 'August', 9  => 'September',
+            4  => 'April', 5    => 'May', 6       => 'June',
+            7  => 'July', 8     => 'August', 9    => 'September',
             10 => 'October', 11 => 'November', 12 => 'December',
         ];
 
@@ -753,13 +812,13 @@ class SaEnvirementManagementRecodeController extends Controller
                     $amount   = is_numeric($impact->amount) ? (float) $impact->amount : 0;
 
                     if (str_contains($category, 'energy')) {
-                        if (!isset($energySourceCounts[$source])) {
+                        if (! isset($energySourceCounts[$source])) {
                             $energySourceCounts[$source] = 0;
                         }
                         $energySourceCounts[$source]++;
                     }
 
-                    if (!isset($scopeSumsPerMonth[$scope])) {
+                    if (! isset($scopeSumsPerMonth[$scope])) {
                         $scopeSumsPerMonth[$scope] = 0;
                     }
                     $scopeSumsPerMonth[$scope] += $quantity;
@@ -789,7 +848,7 @@ class SaEnvirementManagementRecodeController extends Controller
             }
 
             $monthlyEnergySources[] = [
-                'month' => $shortMonthName,
+                'month'              => $shortMonthName,
                 'energySourceCounts' => $energySourceCounts,
             ];
 
@@ -829,6 +888,5 @@ class SaEnvirementManagementRecodeController extends Controller
             'statusSummary'          => $statusSummary,
         ]);
     }
-
 
 }

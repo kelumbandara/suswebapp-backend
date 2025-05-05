@@ -25,5 +25,14 @@ class TargetSettingRecodeRepository extends BaseRepository implements TargetSett
     {
         return $this->model->where('approverId', $approverId)->get();
     }
+    public function filterByYearMonthDivision($year, $month, $division)
+    {
+        return $this->model
+            ->whereYear('updated_at', $year)
+            ->whereMonth('updated_at', date('m', strtotime($month))) 
+            ->where('division', $division)
+            ->get();
+    }
+
 
 }
