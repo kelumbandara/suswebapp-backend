@@ -64,11 +64,10 @@ use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrProductStandardCon
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrUseOfPPEController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrZdhcCategoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmPirPositiveListController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaCmPirSuplierNameController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmPirTestingLabController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmPurchaseInventoryRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionCategoryController;
-use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionSourceController;
-use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionUnitController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEnvirementManagementRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEnvirementTargetSettingRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaETsCategoryController;
@@ -423,6 +422,9 @@ Route::get('consumption-get/{categoryName}/sources', [SaEmrConsumptionCategoryCo
 
 Route::get('commercial-names', [SaCmCmrCommercialNameController::class, 'index']);
 Route::post('commercial-names', [SaCmCmrCommercialNameController::class, 'store']);
+
+Route::get('chemical-supplier-names', [SaCmPirSuplierNameController::class, 'index']);
+Route::post('chemical-supplier-names', [SaCmPirSuplierNameController::class, 'store']);
 
 Route::get('chemical-form-types', [SaCmChemicalFormTypeController::class, 'index']);
 Route::post('chemical-form-types', [SaCmChemicalFormTypeController::class, 'store']);
