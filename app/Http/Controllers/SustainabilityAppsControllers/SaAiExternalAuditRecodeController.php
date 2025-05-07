@@ -94,7 +94,7 @@ class SaAiExternalAuditRecodeController extends Controller
             return response()->json(['message' => 'Failed to create external audit record'], 500);
         }
         return response()->json([
-            'message'    => 'External audit record created successfully!',
+            'message'       => 'External audit record created successfully!',
             'externalAudit' => $externalAudit,
         ], 201);
     }
@@ -108,7 +108,7 @@ class SaAiExternalAuditRecodeController extends Controller
         }
 
         $validatedData = $request->validated();
-        $documents = json_decode($externalAudit->documents, true) ?? [];
+        $documents     = json_decode($externalAudit->documents, true) ?? [];
 
         if ($request->has('removeDoc')) {
             $removeDocs = $request->input('removeDoc');
@@ -119,7 +119,7 @@ class SaAiExternalAuditRecodeController extends Controller
                 }
 
                 $documents = array_values(array_filter($documents, function ($doc) use ($removeDocs) {
-                    return isset($doc['gsutil_uri']) && !in_array($doc['gsutil_uri'], $removeDocs);
+                    return isset($doc['gsutil_uri']) && ! in_array($doc['gsutil_uri'], $removeDocs);
                 }));
 
                 $externalAudit->update(['documents' => json_encode($documents)]);
@@ -144,7 +144,7 @@ class SaAiExternalAuditRecodeController extends Controller
         }
 
         $validatedData['documents'] = json_encode($documents);
-        $updated = $externalAudit->update($validatedData);
+        $updated                    = $externalAudit->update($validatedData);
 
         if ($updated) {
             return response()->json([
@@ -155,8 +155,6 @@ class SaAiExternalAuditRecodeController extends Controller
             return response()->json(['message' => 'Failed to update the external audit record.'], 500);
         }
     }
-
-
 
     public function destroy($id)
     {
@@ -246,4 +244,42 @@ class SaAiExternalAuditRecodeController extends Controller
 
         return response()->json($assignees);
     }
+
+    
+    public function getStatusCountByMonth($year, $division)
+    {
+        $monthNames = [
+            1  => 'January', 2  => 'February', 3  => 'March',
+            4  => 'April', 5    => 'May', 6       => 'June',
+            7  => 'July', 8     => 'August', 9    => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December',
+        ];
+
+        $monthlyStatusCounts = [];
+
+        for ($month = 1; $month <= 12; $month++) {
+            $statusSummary = [];
+
+            $records = $this->externalAuditInterface->filterByYearMonthDivision($year, $month, $division);
+
+            foreach ($records as $record) {
+                $status = strtolower(trim($record->status ?? 'unknown'));
+
+                if (! isset($statusSummary[$status])) {
+                    $statusSummary[$status] = 0;
+                }
+
+                $statusSummary[$status]++;
+            }
+
+            $monthlyStatusCounts[$monthNames[$month]] = $statusSummary;
+        }
+
+        return response()->json([
+            'year'     => (int) $year,
+            'division' => $division,
+            'data'     => $monthlyStatusCounts,
+        ]);
+    }
+
 }
