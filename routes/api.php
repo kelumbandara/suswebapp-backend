@@ -97,7 +97,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('users-assignee', [UserController::class, 'assignee']);
     Route::post('user-change-password', [UserController::class, 'changePassword']);
     Route::post('user/{id}/profile-update', [UserController::class, 'profileUpdate']);
-
+    Route::post('user/{id}/email-change', [UserController::class, 'emailChangeInitiate']);
+    Route::post('user/{id}/email-change-verify', [UserController::class, 'emailChangeVerify']);
+    Route::post('user/{id}/email-change-confirm', [UserController::class, 'emailChangeConfirm']);
+    
     Route::get('users', [AdminController::class, 'index']);
     Route::post('users/{id}/update', [AdminController::class, 'update']);
     Route::get('users-assignee-level', [AdminController::class, 'assigneeLevel']);
