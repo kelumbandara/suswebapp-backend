@@ -29,20 +29,26 @@ class UserController extends Controller
             return response()->json(['message' => 'User not available'], 403);
         }
 
-        $userType = $user->userType;
-        $permission = $this->comPermissionInterface->getById($userType);
         $userData = $user->toArray();
 
-        if ($permission) {
-            $userData['permissionObject'] = (array) $permission->permissionObject;
-        }
+        $permission = $this->comPermissionInterface->getById($user->userType);
+        $userData['userType'] = $permission ? [
+            'id'          => $permission->id,
+            'userType'    => $permission->userType,
+            'description' => $permission->description,
+            'permissionObject' => $permission->permissionObject,
+        ] : null;
+
+
+        $assigneeLevel = $this->assigneeLevelInterface->getById($user->assigneeLevel);
+        $userData['userLevel'] = $assigneeLevel ? [
+            'id'        => $assigneeLevel->id,
+            'levelId'   => $assigneeLevel->levelId,
+            'levelName' => $assigneeLevel->levelName,
+        ] : null;
 
         return response()->json($userData, 200);
     }
-
-
-
-
 
 
 

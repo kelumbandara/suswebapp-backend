@@ -4,14 +4,17 @@ namespace App\Http\Controllers\CommonControllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ComPermission\ComPermissionRequest;
 use App\Repositories\All\ComPermission\ComPermissionInterface;
+use App\Repositories\All\User\UserInterface;
 
 class ComPermissionController extends Controller
 {
     protected $comPermissionInterface;
+    protected $userInterface;
 
-    public function __construct(ComPermissionInterface $comPermissionInterface)
+    public function __construct(ComPermissionInterface $comPermissionInterface, UserInterface $userInterface)
     {
         $this->comPermissionInterface = $comPermissionInterface;
+        $this->userInterface          = $userInterface;
     }
 
     /**
@@ -79,7 +82,21 @@ class ComPermissionController extends Controller
 
     public function destroy(string $id)
     {
+        $permission = $this->comPermissionInterface->getById($id);
+
+        if (!$permission) {
+            return response()->json(['error' => 'Permission not found'], 404);
+        }
+
+        $userInUse = $this->userInterface->getByUserType($permission->userType);
+
+        if ($userInUse->isNotEmpty()) {
+            return response()->json(['error' => 'Cannot delete: This userType is currently in use by one or more users.'], 400);
+        }
+
+
         $this->comPermissionInterface->deleteById($id);
         return response()->json(['message' => 'Permission deleted successfully'], 200);
     }
+
 }
