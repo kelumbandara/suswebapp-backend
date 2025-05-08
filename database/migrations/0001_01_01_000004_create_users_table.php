@@ -26,14 +26,14 @@ return new class extends Migration
             $table->string('department')->nullable();
             $table->string('jobPosition')->nullable();
             $table->json('responsibleSection')->nullable();
+            $table->string('gender')->nullable();
             $table->integer('assigneeLevel')->default(2)->nullable();
-            $table->string('profileImage')->nullable();
+            $table->json('profileImage')->nullable();
             $table->boolean('availability')->default(true);
             $table->json('assignedFactory')->nullable();
             $table->timestamps();
         });
 
-        // Create the password_reset_tokens table
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email');
             $table->string('token');

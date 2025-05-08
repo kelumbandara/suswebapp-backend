@@ -96,6 +96,7 @@ Route::post('change-password', [ForgotPasswordController::class, 'changePassword
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('users-assignee', [UserController::class, 'assignee']);
     Route::post('user-change-password', [UserController::class, 'changePassword']);
+    Route::post('user/{id}/profile-update', [UserController::class, 'profileUpdate']);
 
     Route::get('users', [AdminController::class, 'index']);
     Route::post('users/{id}/update', [AdminController::class, 'update']);

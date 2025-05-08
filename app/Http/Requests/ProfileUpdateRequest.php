@@ -1,12 +1,14 @@
 <?php
 namespace App\Http\Requests;
 
-use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class ProfileUpdateRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        return true;
+    }
     /**
      * Get the validation rules that apply to the request.
      *
@@ -15,23 +17,13 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'  => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'lowercase',
-                'email',
-                'max:255',
-                Rule::unique(User::class)->ignore($this->user()->id),
-            ],
+            'name'           => 'nullable|string',
+            'mobile'         => 'nullable|string',
+            'gender'         => 'nullable|string',
+            'removeDoc'      => 'nullable|array',
+            'profileImage'   => 'nullable|array',
+            'profileImage.*' => 'file|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
     }
-    public function massage()
-    {
-        return [
-            'name.required'  => 'Name is required',
-            'email.required' => 'Email is required',
-            'email.unique'   => 'Email already exists',
-        ];
-    }
+
 }
