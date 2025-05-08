@@ -245,7 +245,7 @@ class SaAiExternalAuditRecodeController extends Controller
         return response()->json($assignees);
     }
 
-    
+
     public function getStatusCountByMonth($year, $division)
     {
         $monthNames = [
@@ -281,5 +281,45 @@ class SaAiExternalAuditRecodeController extends Controller
             'data'     => $monthlyStatusCounts,
         ]);
     }
+
+    public function getAuditScoresByYearDivision($year, $division)
+    {
+        $monthNames = [
+            1  => 'January', 2  => 'February', 3  => 'March',
+            4  => 'April',   5  => 'May',      6  => 'June',
+            7  => 'July',    8  => 'August',   9  => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December',
+        ];
+
+        $monthlyAuditScores = array_combine(array_values($monthNames), array_fill(0, 12, []));
+
+        for ($month = 1; $month <= 12; $month++) {
+            $records = $this->externalAuditInterface->filterByYearMonthDivision($year, $month, $division);
+
+            $statusSummary = [];
+
+            foreach ($records as $record) {
+                $category = $record->auditCategory;
+                $score = is_numeric($record->auditScore) ? floatval($record->auditScore) : 0;
+
+                if (!isset($statusSummary[$category])) {
+                    $statusSummary[$category] = 0;
+                }
+
+                $statusSummary[$category] += $score;
+            }
+
+            $monthName = $monthNames[$month];
+            $monthlyAuditScores[$monthName] = $statusSummary;
+        }
+
+        return response()->json([
+            'year'     => (int) $year,
+            'division' => $division,
+            'data'     => $monthlyAuditScores,
+        ]);
+    }
+
+
 
 }

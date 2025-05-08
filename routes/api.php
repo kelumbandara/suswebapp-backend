@@ -100,7 +100,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('user/{id}/email-change', [UserController::class, 'emailChangeInitiate']);
     Route::post('user/{id}/email-change-verify', [UserController::class, 'emailChangeVerify']);
     Route::post('user/{id}/email-change-confirm', [UserController::class, 'emailChangeConfirm']);
-    
+
     Route::get('users', [AdminController::class, 'index']);
     Route::post('users/{id}/update', [AdminController::class, 'update']);
     Route::get('users-assignee-level', [AdminController::class, 'assigneeLevel']);
@@ -171,7 +171,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('external-audit/{id}/delete', [SaAiExternalAuditRecodeController::class, 'destroy']);
     Route::get('external-audit-assign-task', [SaAiExternalAuditRecodeController::class, 'assignTask']);
     Route::get('external-audit-assignee', [SaAiExternalAuditRecodeController::class, 'assignee']);
-    Route::post('external-audit/{year}/{division}/status', [SaAiExternalAuditRecodeController::class, 'getStatusCountByMonth']);
+    Route::get('external-audit/{year}/{division}/status', [SaAiExternalAuditRecodeController::class, 'getStatusCountByMonth']);
+    Route::get('external-audit/{year}/{division}/audit-scores', [SaAiExternalAuditRecodeController::class, 'getAuditScoresByYearDivision']);
+
 
     Route::get('internal-audit', [SaAiInternalAuditRecodeController::class, 'index']);
     Route::get('internal-audit/{id}', [SaAiInternalAuditRecodeController::class, 'show']);
@@ -190,6 +192,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('internal-audit-action-plan', [SaAiInternalAuditRecodeController::class, 'actionPlanStore']);
     Route::post('internal-audit-completed/{id}/update', [SaAiInternalAuditRecodeController::class, 'complete']);
     Route::get('internal-audit-completed', [SaAiInternalAuditRecodeController::class, 'getFinalAuditers']);
+    Route::get('internal-audit/{year}/{division}/status', [SaAiInternalAuditRecodeController::class, 'getStatusCountByMonth']);
+    Route::get('internal-audit/{year}/{month}/{division}/audit-scores', [SaAiInternalAuditRecodeController::class, 'getAuditScoresByYearMonthDivision']);
+    Route::get('internal-audit/{year}/{division}/audit-scores', [SaAiInternalAuditRecodeController::class, 'getAuditScoresByYearDivision']);
+
+
+
 
     Route::get('question-reports', [SaAiIaQuestionRecodeController::class, 'index']);
     Route::post('question-reports', [SaAiIaQuestionRecodeController::class, 'store']);
