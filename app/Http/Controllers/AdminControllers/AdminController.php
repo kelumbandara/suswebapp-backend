@@ -89,7 +89,7 @@ class AdminController extends Controller
         // Apply these rules only when availability is 1
         if ($request->input('availability', $user->availability) == 1) {
             $rules = array_merge($rules, [
-                'userType'         => 'required|string',
+                'userType'         => 'required|numeric',
                 'department'       => 'nullable|string',
                 'assignedFactory'  => 'nullable|array',
                 'assigneeLevel'    => 'required|string',

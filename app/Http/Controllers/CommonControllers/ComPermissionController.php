@@ -81,22 +81,45 @@ class ComPermissionController extends Controller
 
 
     public function destroy(string $id)
-    {
+{
+    try {
         $permission = $this->comPermissionInterface->getById($id);
 
         if (!$permission) {
-            return response()->json(['error' => 'Permission not found'], 404);
+            return response()->json(['error' => 'Permission not found.'], 404);
         }
 
         $userInUse = $this->userInterface->getByUserType($permission->userType);
 
         if ($userInUse->isNotEmpty()) {
-            return response()->json(['error' => 'Cannot delete: This userType is currently in use by one or more users.'], 400);
+            return response()->json([
+                'error' => 'Cannot delete the permission because it is being used by one or more users.',
+                'message' => 'Please remove or update users referencing this permission before deleting.',
+                'affected_users' => $userInUse->count(),
+            ], 400);
         }
 
-
         $this->comPermissionInterface->deleteById($id);
-        return response()->json(['message' => 'Permission deleted successfully'], 200);
+
+        return response()->json([
+            'message' => 'Permission deleted successfully.'
+        ], 200);
+
+    } catch (\Illuminate\Database\QueryException $e) {
+        if ($e->getCode() === '23000') {
+            return response()->json([
+                'error' => 'Unable to delete the permission due to a foreign key constraint violation.',
+                'message' => 'This permission is currently in use by one or more users. Please ensure no users are assigned this permission before attempting deletion.',
+            ], 400);
+        }
+
+        return response()->json([
+            'error' => 'An unexpected error occurred while deleting the permission.',
+            'message' => $e->getMessage(),
+        ], 500);
     }
+}
+
+
 
 }
