@@ -7,6 +7,8 @@ use App\Repositories\All\ComPermission\ComPermissionInterface;
 use App\Repositories\All\User\UserInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -80,6 +82,33 @@ class UserController extends Controller
 
         return response()->json($userData, 200);
     }
+
+    public function changePassword(Request $request)
+    {
+        $user = $this->userInterface->getById($request->user()->id);
+
+        $validator = Validator::make($request->all(), [
+            'currentPassword' => 'required|string',
+            'newPassword'     => 'required|string|min:8|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        if (!Hash::check($request->currentPassword, $user->password)) {
+            return response()->json(['message' => 'Current password is incorrect'], 400);
+        }
+
+        $user->password = Hash::make($request->newPassword);
+
+        $user->save();
+
+        return response()->json(['message' => 'Password changed successfully'], 200);
+    }
+
+
+
 
 
 }
