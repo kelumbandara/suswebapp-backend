@@ -1,12 +1,12 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProfileUpdateRequest;
 use App\Repositories\All\AssigneeLevel\AssigneeLevelInterface;
 use App\Repositories\All\ComPermission\ComPermissionInterface;
 use App\Repositories\All\User\UserInterface;
+use App\Services\ProfileImageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -15,33 +15,50 @@ class UserController extends Controller
     protected $userInterface;
     protected $comPermissionInterface;
     protected $assigneeLevelInterface;
+    protected $profileImageService;
 
-    public function __construct(UserInterface $userInterface, ComPermissionInterface $comPermissionInterface, AssigneeLevelInterface $assigneeLevelInterface)
+    public function __construct(UserInterface $userInterface, ComPermissionInterface $comPermissionInterface, AssigneeLevelInterface $assigneeLevelInterface, ProfileImageService $profileImageService)
     {
-        $this->userInterface = $userInterface;
+        $this->userInterface          = $userInterface;
         $this->comPermissionInterface = $comPermissionInterface;
         $this->assigneeLevelInterface = $assigneeLevelInterface;
+        $this->profileImageService    = $profileImageService;
     }
 
     public function show(Request $request)
 {
     $user = $request->user();
 
-    if (!$user || $user->availability != 1) {
+    if (! $user || $user->availability != 1) {
         return response()->json(['message' => 'User not available'], 403);
     }
 
     $permission = $this->comPermissionInterface->getById($user->userType);
-    $userData = $user->toArray(); // keep all original fields, including userType: int
+    $userData   = $user->toArray();
+
+    // Decode profileImage (array of gs:// URIs)
+    $profileImages = is_array($user->profileImage) ? $user->profileImage : json_decode($user->profileImage, true) ?? [];
+
+    $signedImages = [];
+    foreach ($profileImages as $uri) {
+        $signed = $this->profileImageService->getImageUrl($uri);
+        $signedImages[] = [
+            'gsutil_uri' => $uri,
+            'file_name'  => $signed['fileName'] ?? null,
+            'signed_url' => $signed['signedUrl'] ?? null,
+        ];
+    }
+
+    $userData['profileImage'] = $signedImages;
 
     if ($permission) {
         $userData['permissionObject'] = (array) $permission->permissionObject;
-
         $userData['userTypeObject'] = [
-            'id' => $permission->id,
+            'id'   => $permission->id,
             'name' => $permission->userType ?? null,
         ];
     }
+
     $userData['assigneeLevelObject'] = $this->assigneeLevelInterface->getById($user->assigneeLevel);
 
     return response()->json($userData, 200);
@@ -83,14 +100,14 @@ class UserController extends Controller
 
         $validator = Validator::make($request->all(), [
             'currentPassword' => 'required|string',
-            'newPassword'     => 'required|string|min:8|confirmed',
+            'newPassword'     => 'required|string|confirmed',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        if (!Hash::check($request->currentPassword, $user->password)) {
+        if (! Hash::check($request->currentPassword, $user->password)) {
             return response()->json(['message' => 'Current password is incorrect'], 400);
         }
 
@@ -101,8 +118,46 @@ class UserController extends Controller
         return response()->json(['message' => 'Password changed successfully'], 200);
     }
 
+    public function profileUpdate(ProfileUpdateRequest $request, $id)
+    {
+        $user = $this->userInterface->getById($id);
 
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
 
+        $existingImages = is_array($user->profileImage)
+            ? $user->profileImage
+            : json_decode($user->profileImage, true) ?? [];
+
+        if ($request->filled('removeDoc')) {
+            foreach ($request->removeDoc as $removeDoc) {
+                $this->profileImageService->deleteImageFromGCS($removeDoc);
+                $existingImages = array_filter($existingImages, fn($img) => $img !== $removeDoc);
+            }
+        }
+
+        if ($request->hasFile('profileImage')) {
+            foreach ($request->file('profileImage') as $file) {
+                $uploadResult = $this->profileImageService->uploadImageToGCS($file);
+                if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
+                    $existingImages[] = $uploadResult['gsutil_uri'];
+                }
+            }
+        }
+
+        $user->name         = $request->input('name', $user->name);
+        $user->mobile       = $request->input('mobile', $user->mobile);
+        $user->gender       = $request->input('gender', $user->gender);
+        $user->profileImage = $existingImages;
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'user'    => $user,
+        ], 200);
+    }
 
 
 }
