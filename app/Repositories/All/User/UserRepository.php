@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Repositories\All\User;
 
 use App\Models\User;
@@ -21,12 +20,15 @@ class UserRepository extends BaseRepository implements UserInterface
         $this->model = $model;
     }
     public function getUsersByAssigneeLevelAndSection(int $level, string $section)
-{
-    return User::where('assigneeLevel', $level)
-        ->whereJsonContains('responsibleSection', $section)
-        ->get();
-}
+    {
+        return User::where('assigneeLevel', $level)
+            ->whereJsonContains('responsibleSection', $section)
+            ->get();
+    }
 
-
+    public function getByUserType($userType)
+    {
+        return User::where('userType', $userType)->get();
+    }
 
 }
