@@ -14,22 +14,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
-            'name'          => 'Admin User',
-            'email'         => 'admin@suswebapp.com',
-            'password'      => Hash::make('Admin@1234'),
-            'userType'      => '1',
-            'assigneeLevel' => '1',
-        ]);
 
-        User::factory()->create([
-            'name'          => 'Super Admin',
-            'email'         => 'supperadmin@suswebapp.com',
-            'password'      => Hash::make('Supperadmin@1234'),
-            'userType'      => '1',
-            'assigneeLevel' => '1',
-
-        ]);
 
         ComPermission::factory()->create([
             'id'               => 1,
@@ -435,6 +420,24 @@ class DatabaseSeeder extends Seeder
                 "OCCUPATIONAL_HEALTH_MEDICINE_INVENTORY_PURCHASE_INVENTORY_DELETE" => false,
             ]),
         ]);
+
+        User::factory()->create([
+            'name'          => 'Admin User',
+            'email'         => 'admin@suswebapp.com',
+            'password'      => Hash::make('Admin@1234'),
+            'userType'      => '1',
+            'assigneeLevel' => '1',
+        ]);
+
+        User::factory()->create([
+            'name'          => 'Super Admin',
+            'email'         => 'supperadmin@suswebapp.com',
+            'password'      => Hash::make('Supperadmin@1234'),
+            'userType'      => '1',
+            'assigneeLevel' => '1',
+
+        ]);
+        
         ComResponsibleSection::factory()->create([
             'id'            => 1,
             'sectionName'   => 'Hazard And Risk Section',
