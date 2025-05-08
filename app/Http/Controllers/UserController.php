@@ -24,34 +24,28 @@ class UserController extends Controller
     }
 
     public function show(Request $request)
-    {
-        $user = $request->user();
+{
+    $user = $request->user();
 
-        if (!$user || $user->availability != 1) {
-            return response()->json(['message' => 'User not available'], 403);
-        }
-
-        $userData = $user->toArray();
-
-        $permission = $this->comPermissionInterface->getById($user->userType);
-        $userData['userType'] = $permission ? [
-            'id'          => $permission->id,
-            'userType'    => $permission->userType,
-            'description' => $permission->description,
-            'permissionObject' => $permission->permissionObject,
-        ] : null;
-
-
-        $assigneeLevel = $this->assigneeLevelInterface->getById($user->assigneeLevel);
-        $userData['userLevel'] = $assigneeLevel ? [
-            'id'        => $assigneeLevel->id,
-            'levelId'   => $assigneeLevel->levelId,
-            'levelName' => $assigneeLevel->levelName,
-        ] : null;
-
-        return response()->json($userData, 200);
+    if (!$user || $user->availability != 1) {
+        return response()->json(['message' => 'User not available'], 403);
     }
 
+    $permission = $this->comPermissionInterface->getById($user->userType);
+    $userData = $user->toArray(); // keep all original fields, including userType: int
+
+    if ($permission) {
+        $userData['permissionObject'] = (array) $permission->permissionObject;
+
+        $userData['userTypeObject'] = [
+            'id' => $permission->id,
+            'name' => $permission->userType ?? null,
+        ];
+    }
+    $userData['assigneeLevelObject'] = $this->assigneeLevelInterface->getById($user->assigneeLevel);
+
+    return response()->json($userData, 200);
+}
 
 
     public function index()
