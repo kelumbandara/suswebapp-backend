@@ -27,22 +27,25 @@ class InternalAuditRecodeRepository extends BaseRepository implements InternalAu
     public function filterByYearMonthDivision($year, $month, $division)
     {
         return $this->model
-            ->where('year', $year)
-            ->where('month', $month)
+            ->whereYear('auditDate', $year)
+            ->whereMonth('auditDate', $month)
             ->where('division', $division)
             ->get();
     }
+
     public function filterByYear($year)
     {
-        return $this->model->where('year', $year)->get();
-    }
-    public function filterByYearAndMonth($year, $month)
-    {
         return $this->model
-            ->where('year', $year)
-            ->where('month', $month)
+            ->whereYear('auditDate', $year)
             ->get();
     }
 
+    public function filterByYearAndMonth($year, $month)
+    {
+        return $this->model
+            ->whereYear('auditDate', $year)
+            ->whereMonth('auditDate', $month)
+            ->get();
+    }
 
 }
