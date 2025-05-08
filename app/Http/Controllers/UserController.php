@@ -2,12 +2,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Notifications\EmailChangeOTPsend\SendOtpEmailChange;
 use App\Repositories\All\AssigneeLevel\AssigneeLevelInterface;
 use App\Repositories\All\ComPermission\ComPermissionInterface;
 use App\Repositories\All\User\UserInterface;
 use App\Services\ProfileImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -26,44 +28,43 @@ class UserController extends Controller
     }
 
     public function show(Request $request)
-{
-    $user = $request->user();
+    {
+        $user = $request->user();
 
-    if (! $user || $user->availability != 1) {
-        return response()->json(['message' => 'User not available'], 403);
+        if (! $user || $user->availability != 1) {
+            return response()->json(['message' => 'User not available'], 403);
+        }
+
+        $permission = $this->comPermissionInterface->getById($user->userType);
+        $userData   = $user->toArray();
+
+        // Decode profileImage (array of gs:// URIs)
+        $profileImages = is_array($user->profileImage) ? $user->profileImage : json_decode($user->profileImage, true) ?? [];
+
+        $signedImages = [];
+        foreach ($profileImages as $uri) {
+            $signed         = $this->profileImageService->getImageUrl($uri);
+            $signedImages[] = [
+                'gsutil_uri' => $uri,
+                'file_name'  => $signed['fileName'] ?? null,
+                'signed_url' => $signed['signedUrl'] ?? null,
+            ];
+        }
+
+        $userData['profileImage'] = $signedImages;
+
+        if ($permission) {
+            $userData['permissionObject'] = (array) $permission->permissionObject;
+            $userData['userTypeObject']   = [
+                'id'   => $permission->id,
+                'name' => $permission->userType ?? null,
+            ];
+        }
+
+        $userData['assigneeLevelObject'] = $this->assigneeLevelInterface->getById($user->assigneeLevel);
+
+        return response()->json($userData, 200);
     }
-
-    $permission = $this->comPermissionInterface->getById($user->userType);
-    $userData   = $user->toArray();
-
-    // Decode profileImage (array of gs:// URIs)
-    $profileImages = is_array($user->profileImage) ? $user->profileImage : json_decode($user->profileImage, true) ?? [];
-
-    $signedImages = [];
-    foreach ($profileImages as $uri) {
-        $signed = $this->profileImageService->getImageUrl($uri);
-        $signedImages[] = [
-            'gsutil_uri' => $uri,
-            'file_name'  => $signed['fileName'] ?? null,
-            'signed_url' => $signed['signedUrl'] ?? null,
-        ];
-    }
-
-    $userData['profileImage'] = $signedImages;
-
-    if ($permission) {
-        $userData['permissionObject'] = (array) $permission->permissionObject;
-        $userData['userTypeObject'] = [
-            'id'   => $permission->id,
-            'name' => $permission->userType ?? null,
-        ];
-    }
-
-    $userData['assigneeLevelObject'] = $this->assigneeLevelInterface->getById($user->assigneeLevel);
-
-    return response()->json($userData, 200);
-}
-
 
     public function index()
     {
@@ -122,13 +123,13 @@ class UserController extends Controller
     {
         $user = $this->userInterface->getById($id);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
         $existingImages = is_array($user->profileImage)
-            ? $user->profileImage
-            : json_decode($user->profileImage, true) ?? [];
+        ? $user->profileImage
+        : json_decode($user->profileImage, true) ?? [];
 
         if ($request->filled('removeDoc')) {
             foreach ($request->removeDoc as $removeDoc) {
@@ -159,5 +160,77 @@ class UserController extends Controller
         ], 200);
     }
 
+    public function emailChangeInitiate(Request $request, $id)
+    {
+        $request->validate([
+            'currentEmail' => 'required|email|exists:users,email',
+        ]);
+
+        $user = $this->userInterface->findById($id);
+
+        if (! $user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        if ($user->email !== $request->currentEmail) {
+            return response()->json(['message' => 'Current email does not match this user.'], 400);
+        }
+
+        $otp                  = rand(100000, 999999);
+        $user->otp            = $otp;
+        $user->otp_expires_at = now()->addMinutes(10);
+        $user->save();
+
+        try {
+            Notification::route('mail', $user->email)->notify(new SendOtpEmailChange($otp, $user->email));
+            return response()->json(['message' => 'OTP has been sent to your email.'], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to send OTP. Please try again later.'], 500);
+        }
+    }
+
+
+    public function emailChangeVerify(Request $request, $id)
+    {
+        $request->validate([
+            'otp' => 'required|digits:6',
+        ]);
+
+        $user = $this->userInterface->findById($id);
+
+        if (! $user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        if ($user->otp !== $request->otp) {
+            return response()->json(['message' => 'Invalid OTP.'], 400);
+        }
+
+        if (now()->greaterThan($user->otp_expires_at)) {
+            return response()->json(['message' => 'OTP has expired.'], 400);
+        }
+
+        return response()->json(['message' => 'OTP verified successfully. Proceed to change email.'], 200);
+    }
+
+    public function emailChangeConfirm(Request $request, $id)
+    {
+        $request->validate([
+            'newEmail' => 'required|email|unique:users,email',
+        ]);
+
+        $user = $this->userInterface->findById($id);
+
+        if (! $user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        $user->email          = $request->newEmail;
+        $user->otp            = null;
+        $user->otp_expires_at = null;
+        $user->save();
+
+        return response()->json(['message' => 'Email changed successfully.'], 200);
+    }
 
 }
