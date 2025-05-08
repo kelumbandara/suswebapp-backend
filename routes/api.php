@@ -96,7 +96,7 @@ Route::post('change-password', [ForgotPasswordController::class, 'changePassword
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('users-assignee', [UserController::class, 'assignee']);
 
-    Route::get('users', [AdminController::class, 'index']);
+    Route::get('users', [AdminController::class, 'index']); // get all users
     Route::post('users/{id}/update', [AdminController::class, 'update']);
     Route::get('users-assignee-level', [AdminController::class, 'assigneeLevel']);
 
@@ -166,6 +166,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('external-audit/{id}/delete', [SaAiExternalAuditRecodeController::class, 'destroy']);
     Route::get('external-audit-assign-task', [SaAiExternalAuditRecodeController::class, 'assignTask']);
     Route::get('external-audit-assignee', [SaAiExternalAuditRecodeController::class, 'assignee']);
+    Route::post('external-audit/{year}/{division}/status', [SaAiExternalAuditRecodeController::class, 'getStatusCountByMonth']);
 
     Route::get('internal-audit', [SaAiInternalAuditRecodeController::class, 'index']);
     Route::get('internal-audit/{id}', [SaAiInternalAuditRecodeController::class, 'show']);

@@ -42,7 +42,7 @@ class AdminController extends Controller
                 'id'        => $assigneeLevel->id,
                 'levelId'   => $assigneeLevel->levelId,
                 'levelName' => $assigneeLevel->levelName,
-            ] : null;
+            ] : [];
 
             return $userArray;
         });
