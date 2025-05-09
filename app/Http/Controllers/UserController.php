@@ -38,17 +38,24 @@ class UserController extends Controller
         $permission = $this->comPermissionInterface->getById($user->userType);
         $userData   = $user->toArray();
 
-        // Decode profileImage (array of gs:// URIs)
+ 
         $profileImages = is_array($user->profileImage) ? $user->profileImage : json_decode($user->profileImage, true) ?? [];
 
         $signedImages = [];
         foreach ($profileImages as $uri) {
             $signed         = $this->profileImageService->getImageUrl($uri);
             $signedImages[] = [
-                'gsutil_uri' => $uri,
-                'file_name'  => $signed['fileName'] ?? null,
-                'signed_url' => $signed['signedUrl'] ?? null,
+                'fileName'  => $signed['fileName'] ?? null,
+                'imageUrl' => $signed['signedUrl'] ?? null,
             ];
+        }
+
+        foreach ($profileImages as &$uri) {
+            if (isset($document['gsutil_uri'])) {
+                $imageData            = $this->profileImageService->getImageUrl($document['gsutil_uri']);
+                $document['imageUrl'] = $imageData['signedUrl'];
+                $document['fileName'] = $imageData['fileName'];
+            }
         }
 
         $userData['profileImage'] = $signedImages;
