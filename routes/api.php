@@ -249,7 +249,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('chemical-records/{id}/approve', [SaCmChemicalManagementRecodeController::class, 'approvedStatus']);
 
     Route::get('purchase-inventory-records', [SaCmPurchaseInventoryRecodeController::class, 'index']);
-    Route::post('purchase-inventory-records/{id}/update', [SaCmPurchaseInventoryRecodeController::class, 'publishStatus']);
+    Route::post('purchase-inventory-records/{id}/update', [SaCmPurchaseInventoryRecodeController::class, 'update']);
+    Route::post('purchase-inventory-records/{id}/publish-update', [SaCmPurchaseInventoryRecodeController::class, 'publishStatus']);
 
 });
 
