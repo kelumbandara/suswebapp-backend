@@ -158,7 +158,7 @@ public function publishStatus($id, PurchaseInventoryRecordRequest $request)
 public function update($id, PurchaseInventoryRecordRequest $request)
 {
     $validatedData = $request->validated();
-    $validatedData['status'] = 'draft'; 
+    $validatedData['status'] = 'draft';
 
     $targetSetting = $this->purchaseInventoryInterface->findById($id);
     $documents     = json_decode($targetSetting->documents, true) ?? [];
@@ -205,6 +205,48 @@ public function update($id, PurchaseInventoryRecordRequest $request)
         'message' => 'Purchase inventory record saved as draft successfully.',
         'data'    => $updatedRecord,
     ]);
+}
+
+public function destroy($id)
+{
+    $record = $this->purchaseInventoryInterface->findById($id);
+
+    if (!$record) {
+        return response()->json([
+            'message' => 'Purchase inventory record not found.',
+        ], 404);
+    }
+
+    $documents = json_decode($record->documents, true) ?? [];
+    foreach ($documents as $doc) {
+        if (isset($doc['gsutil_uri'])) {
+            $this->chemicalManagementService->removeOldDocumentFromStorage($doc['gsutil_uri']);
+        }
+    }
+
+    $certificates = $this->certificateRecordInterface->findByInventoryId($id);
+    foreach ($certificates as $certificate) {
+        $certDocs = json_decode($certificate->documents, true) ?? [];
+        foreach ($certDocs as $doc) {
+            if (isset($doc['gsutil_uri'])) {
+                $this->certificationRecodeService->removeOldDocumentFromStorage($doc['gsutil_uri']);
+            }
+        }
+
+        $this->certificateRecordInterface->deleteById($certificate->id);
+    }
+
+    $deleted = $this->purchaseInventoryInterface->deleteById($id);
+
+    if (!$deleted) {
+        return response()->json([
+            'message' => 'Failed to delete purchase inventory record.',
+        ], 500);
+    }
+
+    return response()->json([
+        'message' => 'Purchase inventory record deleted successfully.',
+    ], 200);
 }
 
 
