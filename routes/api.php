@@ -93,6 +93,8 @@ Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkE
 Route::post('reset-password', [ForgotPasswordController::class, 'otpVerifyFunction']);
 Route::post('change-password', [ForgotPasswordController::class, 'changePassword']);
 
+Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('users-assignee', [UserController::class, 'assignee']);
     Route::post('user-change-password', [UserController::class, 'changePassword']);
@@ -467,4 +469,4 @@ Route::post('upload', [ImageUploadController::class, 'uploadImage']);
 Route::delete('image/{imageId}', [ImageUploadController::class, 'deleteImage']);
 Route::post('image/update/{imageId}', [ImageUploadController::class, 'updateImage']);
 
-Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);
+
