@@ -27,7 +27,7 @@ class SendOtpEmailChange extends Notification
     public function toMail($notifiable) :MailMessage
     {
         return (new MailMessage)
-            ->subject('Your OTP for Password Change')
+            ->subject('Your OTP for Email Change')
             ->markdown('mail.email_change.change-email-notification', [
                 'otp' => $this->otp,
             ]);
