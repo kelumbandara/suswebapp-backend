@@ -174,8 +174,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('external-audit-assign-task', [SaAiExternalAuditRecodeController::class, 'assignTask']);
     Route::get('external-audit-assignee', [SaAiExternalAuditRecodeController::class, 'assignee']);
     Route::get('external-audit/{year}/{division}/status', [SaAiExternalAuditRecodeController::class, 'getStatusCountByMonth']);
+    Route::get('audit-status-count/{year}/{month}/{division}/status-count', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCountByMonth']);
     Route::get('external-audit/{year}/{division}/audit-scores', [SaAiExternalAuditRecodeController::class, 'getAuditScoresByYearDivision']);
-
 
     Route::get('internal-audit', [SaAiInternalAuditRecodeController::class, 'index']);
     Route::get('internal-audit/{id}', [SaAiInternalAuditRecodeController::class, 'show']);
@@ -197,9 +197,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('internal-audit/{year}/{division}/status', [SaAiInternalAuditRecodeController::class, 'getStatusCountByMonth']);
     Route::get('internal-audit/{year}/{month}/{division}/audit-scores', [SaAiInternalAuditRecodeController::class, 'getAuditScoresByYearMonthDivision']);
     Route::get('internal-audit/{year}/{division}/audit-scores', [SaAiInternalAuditRecodeController::class, 'getAuditScoresByYearDivision']);
-
-
-
 
     Route::get('question-reports', [SaAiIaQuestionRecodeController::class, 'index']);
     Route::post('question-reports', [SaAiIaQuestionRecodeController::class, 'store']);
@@ -223,7 +220,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('environment-record/{year}/{month}/{division}/category-quantity-sum', [SaEnvirementManagementRecodeController::class, 'monthlyCategoryQuantitySum']);
     Route::get('environment-record/{year}/{division}/category-quantity-sum', [SaEnvirementManagementRecodeController::class, 'yearlyCategoryQuantitySum']);
     Route::get('environment-record/{year}/{month}/{division}/category-source-quantity-sum', [SaEnvirementManagementRecodeController::class, 'categorySourceQuantitySum']);
-    Route::get('environment-record/{year}/{month}/{division}/scope-quantity-sum', [SaEnvirementManagementRecodeController::class, 'scopeQuantitySumByFilter']);//
+    Route::get('environment-record/{year}/{month}/{division}/scope-quantity-sum', [SaEnvirementManagementRecodeController::class, 'scopeQuantitySumByFilter']); //
     Route::get('environment-record/{year}/{division}/scope-quantity-sum', [SaEnvirementManagementRecodeController::class, 'yearlyScopeQuantitySum']);
     Route::get('environment-record/{year}/{month}/{division}/water-to-waste-water-percentage', [SaEnvirementManagementRecodeController::class, 'categoryWaterToWastePercentage']);
     Route::get('environment-record/{year}/{month}/{division}/waste-water-details', [SaEnvirementManagementRecodeController::class, 'categoryWasteWaterDetails']);
@@ -233,7 +230,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('environment-record/{year}/{month}/{division}/status-summary', [SaEnvirementManagementRecodeController::class, 'statusSummaryByYearMonthDivision']);
     Route::get('environment-record/{year}/{month}/{division}/water-ghg-by-source', [SaEnvirementManagementRecodeController::class, 'waterGhgBySource']);
     Route::get('environment-record/{year}/category-record-count-all', [SaEnvirementManagementRecodeController::class, 'allSummaryData']);
-
 
     Route::get('target-setting', [SaEnvirementTargetSettingRecodeController::class, 'index']);
     Route::post('target-setting', [SaEnvirementTargetSettingRecodeController::class, 'store']);
@@ -468,5 +464,3 @@ Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
 Route::post('upload', [ImageUploadController::class, 'uploadImage']);
 Route::delete('image/{imageId}', [ImageUploadController::class, 'deleteImage']);
 Route::post('image/update/{imageId}', [ImageUploadController::class, 'updateImage']);
-
-

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SustainabilityAppsControllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaAiExternalAudit\ExternalAuditRequest;
 use App\Repositories\All\SaAiExternalAudit\ExternalAuditInterface;
+use App\Repositories\All\SaAiInternalAuditRecode\InternalAuditRecodeInterface;
 use App\Repositories\All\User\UserInterface;
 use App\Services\ExternalAuditService;
 use Illuminate\Support\Facades\Auth;
@@ -14,12 +15,14 @@ class SaAiExternalAuditRecodeController extends Controller
     protected $externalAuditInterface;
     protected $userInterface;
     protected $externalAuditService;
+    protected $internalAuditRecodeInterface;
 
-    public function __construct(ExternalAuditInterface $externalAuditInterface, UserInterface $userInterface, ExternalAuditService $externalAuditService)
+    public function __construct(ExternalAuditInterface $externalAuditInterface, UserInterface $userInterface, ExternalAuditService $externalAuditService, InternalAuditRecodeInterface $internalAuditRecodeInterface)
     {
-        $this->externalAuditInterface = $externalAuditInterface;
-        $this->userInterface          = $userInterface;
-        $this->externalAuditService   = $externalAuditService;
+        $this->externalAuditInterface       = $externalAuditInterface;
+        $this->userInterface                = $userInterface;
+        $this->externalAuditService         = $externalAuditService;
+        $this->internalAuditRecodeInterface = $internalAuditRecodeInterface;
     }
 
     public function index()
@@ -245,6 +248,44 @@ class SaAiExternalAuditRecodeController extends Controller
         return response()->json($assignees);
     }
 
+    public function getCombinedStatusCountByMonth($year, $month, $division)
+    {
+        $monthNames = [
+            1  => 'January', 2  => 'February', 3  => 'March',
+            4  => 'April', 5    => 'May', 6       => 'June',
+            7  => 'July', 8     => 'August', 9    => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December',
+        ];
+
+        $monthNumber = array_search(ucfirst(strtolower($month)), $monthNames);
+
+        if (! $monthNumber) {
+            return response()->json([
+                'error' => 'Invalid month name provided.',
+            ], 400);
+        }
+
+        $statusSummary = [];
+
+        $externalRecords = $this->externalAuditInterface->filterByYearMonthDivision($year, $monthNumber, $division);
+        foreach ($externalRecords as $record) {
+            $status                 = strtolower(trim($record->status ?? 'unknown'));
+            $statusSummary[$status] = ($statusSummary[$status] ?? 0) + 1;
+        }
+
+        $internalRecords = $this->internalAuditRecodeInterface->filterByYearMonthDivision($year, $monthNumber, $division);
+        foreach ($internalRecords as $record) {
+            $status                 = strtolower(trim($record->status ?? 'unknown'));
+            $statusSummary[$status] = ($statusSummary[$status] ?? 0) + 1;
+        }
+
+        return response()->json([
+            'year'     => (int) $year,
+            'month'    => $monthNames[$monthNumber],
+            'division' => $division,
+            'data'     => $statusSummary,
+        ]);
+    }
 
     public function getStatusCountByMonth($year, $division)
     {
@@ -286,8 +327,8 @@ class SaAiExternalAuditRecodeController extends Controller
     {
         $monthNames = [
             1  => 'January', 2  => 'February', 3  => 'March',
-            4  => 'April',   5  => 'May',      6  => 'June',
-            7  => 'July',    8  => 'August',   9  => 'September',
+            4  => 'April', 5    => 'May', 6       => 'June',
+            7  => 'July', 8     => 'August', 9    => 'September',
             10 => 'October', 11 => 'November', 12 => 'December',
         ];
 
@@ -300,16 +341,16 @@ class SaAiExternalAuditRecodeController extends Controller
 
             foreach ($records as $record) {
                 $category = $record->auditCategory;
-                $score = is_numeric($record->auditScore) ? floatval($record->auditScore) : 0;
+                $score    = is_numeric($record->auditScore) ? floatval($record->auditScore) : 0;
 
-                if (!isset($statusSummary[$category])) {
+                if (! isset($statusSummary[$category])) {
                     $statusSummary[$category] = 0;
                 }
 
                 $statusSummary[$category] += $score;
             }
 
-            $monthName = $monthNames[$month];
+            $monthName                      = $monthNames[$month];
             $monthlyAuditScores[$monthName] = $statusSummary;
         }
 
@@ -319,7 +360,5 @@ class SaAiExternalAuditRecodeController extends Controller
             'data'     => $monthlyAuditScores,
         ]);
     }
-
-
 
 }
