@@ -738,8 +738,22 @@ class SaAiInternalAuditRecodeController extends Controller
 
     public function getAuditScoresByYearMonthDivision($year, $month, $division)
     {
+        $monthNames = [
+            1  => 'January', 2  => 'February', 3  => 'March',
+            4  => 'April', 5    => 'May', 6       => 'June',
+            7  => 'July', 8     => 'August', 9    => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December',
+        ];
 
-        $audits = $this->internalAuditRecodeInterface->filterByYearMonthDivision($year, $month, $division);
+        $monthNumber = array_search(ucfirst(strtolower($month)), $monthNames);
+
+        if (! $monthNumber) {
+            return response()->json([
+                'error' => 'Invalid month name provided.',
+            ], 400);
+        }
+
+        $audits  = $this->internalAuditRecodeInterface->filterByYearMonthDivision($year, $monthNumber, $division);
         $results = [];
 
         foreach ($audits as $audit) {
@@ -749,7 +763,7 @@ class SaAiInternalAuditRecodeController extends Controller
                     continue;
                 }
 
-                $answers = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
+                $answers    = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
                 $totalScore = collect($answers)->sum('score');
 
                 $results[] = [
@@ -758,7 +772,6 @@ class SaAiInternalAuditRecodeController extends Controller
                     'totalScore'      => $totalScore,
                     'questionRecode'  => $questionRecode,
                 ];
-
             } catch (\Exception $e) {
                 continue;
             }
@@ -766,59 +779,56 @@ class SaAiInternalAuditRecodeController extends Controller
 
         return response()->json([
             'year'     => (int) $year,
-            'month'    => $month,
+            'month'    => $monthNames[$monthNumber],
             'division' => $division,
             'data'     => $results,
         ]);
     }
 
     public function getAuditScoresByYearDivision($year, $division)
-{
-    $monthNames = [
-        1  => 'January', 2  => 'February', 3  => 'March',
-        4  => 'April',   5  => 'May',      6  => 'June',
-        7  => 'July',    8  => 'August',   9  => 'September',
-        10 => 'October', 11 => 'November', 12 => 'December',
-    ];
+    {
+        $monthNames = [
+            1  => 'January', 2  => 'February', 3  => 'March',
+            4  => 'April', 5    => 'May', 6       => 'June',
+            7  => 'July', 8     => 'August', 9    => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December',
+        ];
 
-    $monthlyAuditScores = array_combine(array_values($monthNames), array_fill(0, 12, []));
+        $monthlyAuditScores = array_combine(array_values($monthNames), array_fill(0, 12, []));
 
-    for ($month = 1; $month <= 12; $month++) {
-        $audits = $this->internalAuditRecodeInterface->filterByYearMonthDivision($year, $month, $division);
-        $results = [];
+        for ($month = 1; $month <= 12; $month++) {
+            $audits  = $this->internalAuditRecodeInterface->filterByYearMonthDivision($year, $month, $division);
+            $results = [];
 
-        foreach ($audits as $audit) {
-            try {
-                $questionRecode = $this->questionRecodeInterface->getById($audit->auditId);
-                if (!$questionRecode) {
+            foreach ($audits as $audit) {
+                try {
+                    $questionRecode = $this->questionRecodeInterface->getById($audit->auditId);
+                    if (! $questionRecode) {
+                        continue;
+                    }
+
+                    $answers    = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
+                    $totalScore = collect($answers)->sum('score');
+
+                    $results[] = [
+                        'internalAuditId' => $audit->id,
+                        'auditId'         => $audit->auditId,
+                        'totalScore'      => $totalScore,
+                        'questionRecode'  => $questionRecode,
+                    ];
+                } catch (\Exception $e) {
                     continue;
                 }
-
-                $answers = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
-                $totalScore = collect($answers)->sum('score');
-
-                $results[] = [
-                    'internalAuditId' => $audit->id,
-                    'auditId'         => $audit->auditId,
-                    'totalScore'      => $totalScore,
-                    'questionRecode'  => $questionRecode,
-                ];
-            } catch (\Exception $e) {
-                continue;
             }
+
+            $monthlyAuditScores[$monthNames[$month]] = $results;
         }
 
-        $monthlyAuditScores[$monthNames[$month]] = $results;
+        return response()->json([
+            'year'     => (int) $year,
+            'division' => $division,
+            'data'     => $monthlyAuditScores,
+        ]);
     }
-
-    return response()->json([
-        'year'     => (int) $year,
-        'division' => $division,
-        'data'     => $monthlyAuditScores,
-    ]);
-}
-
-
-
 
 }
