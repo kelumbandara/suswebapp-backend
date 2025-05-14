@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Providers;
 
 use App\Repositories\All\AccidentCategory\AccidentCategoryInterface;
@@ -22,14 +21,14 @@ use App\Repositories\All\ComDepartment\DepartmentInterface;
 use App\Repositories\All\ComDepartment\DepartmentRepository;
 use App\Repositories\All\ComJobPosition\JobPositionInterface;
 use App\Repositories\All\ComJobPosition\JobPositionRepository;
+use App\Repositories\All\ComOrganization\ComOrganizationInterface;
+use App\Repositories\All\ComOrganization\ComOrganizationRepository;
 use App\Repositories\All\ComPermission\ComPermissionInterface;
 use App\Repositories\All\ComPermission\ComPermissionRepository;
 use App\Repositories\All\ComPersonType\PersonTypeInterface;
 use App\Repositories\All\ComPersonType\PersonTypeRepository;
 use App\Repositories\All\ComResponsibleSection\ComResponsibleSectionInterface;
 use App\Repositories\All\ComResponsibleSection\ComResponsibleSectionRepository;
-use App\Repositories\All\User\UserInterface;
-use App\Repositories\All\User\UserRepository;
 use App\Repositories\All\ComUserType\UserTypeInterface;
 use App\Repositories\All\ComUserType\UserTypeRepository;
 use App\Repositories\All\CsConsultingDoctor\ConsultingInterface;
@@ -74,10 +73,10 @@ use App\Repositories\All\MedicineDisposal\MedicineDisposalInterface;
 use App\Repositories\All\MedicineDisposal\MedicineDisposalRepository;
 use App\Repositories\All\MedicineInventory\MedicineInventoryInterface;
 use App\Repositories\All\MedicineInventory\MedicineInventoryRepository;
-use App\Repositories\All\MiMedicineName\MedicineNameInterface;
-use App\Repositories\All\MiMedicineName\MedicineNameRepository;
 use App\Repositories\All\MiMedicineNameForm\MedicineFormInterface;
 use App\Repositories\All\MiMedicineNameForm\MedicineFormRepository;
+use App\Repositories\All\MiMedicineName\MedicineNameInterface;
+use App\Repositories\All\MiMedicineName\MedicineNameRepository;
 use App\Repositories\All\MiMedicineRequest\MedicineRequestInterface;
 use App\Repositories\All\MiMedicineRequest\MedicineRequestRepository;
 use App\Repositories\All\MiMedicineType\MedicineTypeInterface;
@@ -152,10 +151,6 @@ use App\Repositories\All\SaCmPurchaseInventory\PurchaseInventoryInterface;
 use App\Repositories\All\SaCmPurchaseInventory\PurchaseInventoryRepository;
 use App\Repositories\All\SaEEmrAcCategory\ConsumptionCategoryInterface;
 use App\Repositories\All\SaEEmrAcCategory\ConsumptionCategoryRepository;
-use App\Repositories\All\SaEEmrAcSource\ConsumptionSourceInterface;
-use App\Repositories\All\SaEEmrAcSource\ConsumptionSourceRepository;
-use App\Repositories\All\SaEEmrAcUnit\ConsumptionUnitInterface;
-use App\Repositories\All\SaEEmrAcUnit\ConsumptionUnitRepository;
 use App\Repositories\All\SaEmrAddConcumption\AddConcumptionInterface;
 use App\Repositories\All\SaEmrAddConcumption\AddConcumptionRepository;
 use App\Repositories\All\SaEnvirementManagementRecode\EnvirementManagementRecodeInterface;
@@ -184,6 +179,8 @@ use App\Repositories\All\SaSrPillars\PillarsInterface;
 use App\Repositories\All\SaSrPillars\PillarsRepository;
 use App\Repositories\All\SaSrSDG\SrSdgInterface;
 use App\Repositories\All\SaSrSDG\SrSdgRepository;
+use App\Repositories\All\User\UserInterface;
+use App\Repositories\All\User\UserRepository;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -255,9 +252,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ExternalAuditFirmInterface::class, ExternalAuditFirmRepository::class);
         $this->app->bind(SDGRecodeInterface::class, SDGRecodeRepository::class);
         $this->app->bind(AdditionalSDGInterface::class, AdditionalSDGRepository::class);
-        $this->app->bind(AlignmentSDGInterface::class,AlignmentSDGRepository ::class);
-        $this->app->bind(ImpactDetailsInterface::class,ImpactDetailsRepository ::class);
-        $this->app->bind(ImpactTypeInterface::class,ImpactTypeRepository ::class);
+        $this->app->bind(AlignmentSDGInterface::class, AlignmentSDGRepository::class);
+        $this->app->bind(ImpactDetailsInterface::class, ImpactDetailsRepository::class);
+        $this->app->bind(ImpactTypeInterface::class, ImpactTypeRepository::class);
         $this->app->bind(MaterialityIssuesInterface::class, MaterialityIssuesRepository::class);
         $this->app->bind(MaterialityTypeInterface::class, MaterialityTypeRepository::class);
         $this->app->bind(PillarsInterface::class, PillarsRepository::class);
@@ -293,8 +290,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TestingLabInterface::class, TestingLabRepository::class);
         $this->app->bind(PositiveListInterface::class, PositiveListRepository::class);
         $this->app->bind(SuplierNameInterface::class, SuplierNameRepository::class);
-
-
+        $this->app->bind(ComOrganizationInterface::class, ComOrganizationRepository::class);
 
     }
 }

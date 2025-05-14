@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,11 +11,15 @@ class ComOrganization extends Model
     protected $fillable = [
         'organizationName',
         'logoUrl',
+        'colorPallet',
+        'insightImage',
+        'insightDescription',
+        'status',
         'createdByUser',
         'updatedBy',
     ];
 
     protected $casts = [
-        'documents' => 'array',
+        'colorPallet' => 'array',
     ];
 }
