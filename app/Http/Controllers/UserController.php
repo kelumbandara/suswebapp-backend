@@ -38,14 +38,13 @@ class UserController extends Controller
         $permission = $this->comPermissionInterface->getById($user->userType);
         $userData   = $user->toArray();
 
- 
         $profileImages = is_array($user->profileImage) ? $user->profileImage : json_decode($user->profileImage, true) ?? [];
 
         $signedImages = [];
         foreach ($profileImages as $uri) {
             $signed         = $this->profileImageService->getImageUrl($uri);
             $signedImages[] = [
-                'fileName'  => $signed['fileName'] ?? null,
+                'fileName' => $signed['fileName'] ?? null,
                 'imageUrl' => $signed['signedUrl'] ?? null,
             ];
         }
@@ -78,23 +77,34 @@ class UserController extends Controller
         $users = $this->userInterface->All();
 
         $userData = $users->map(function ($user) {
-            $permission = $this->comPermissionInterface->getById($user->userType);
-
-            $assigneeLevel = $this->assigneeLevelInterface->getById($user->assigneeLevel);
-
             $userArray = $user->toArray();
 
+            $permission            = $this->comPermissionInterface->getById($user->userType);
             $userArray['userType'] = [
                 'id'          => $permission->id ?? null,
                 'userType'    => $permission->userType ?? null,
                 'description' => $permission->description ?? null,
             ];
 
+            $assigneeLevel          = $this->assigneeLevelInterface->getById($user->assigneeLevel);
             $userArray['userLevel'] = $assigneeLevel ? [
                 'id'        => $assigneeLevel->id,
                 'levelId'   => $assigneeLevel->levelId,
                 'levelName' => $assigneeLevel->levelName,
-            ] : null;
+            ] : [];
+
+            $profileImages = is_array($user->profileImage) ? $user->profileImage : json_decode($user->profileImage, true) ?? [];
+            $signedImages  = [];
+
+            foreach ($profileImages as $uri) {
+                $signed         = $this->profileImageService->getImageUrl($uri);
+                $signedImages[] = [
+                    'fileName' => $signed['fileName'] ?? null,
+                    'imageUrl' => $signed['signedUrl'] ?? null,
+                ];
+            }
+
+            $userArray['profileImage'] = $signedImages;
 
             return $userArray;
         });
@@ -195,7 +205,6 @@ class UserController extends Controller
             return response()->json(['error' => 'Failed to send OTP. Please try again later.'], 500);
         }
     }
-
 
     public function emailChangeVerify(Request $request, $id)
     {

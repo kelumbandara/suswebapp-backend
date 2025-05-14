@@ -29,10 +29,8 @@ class AdminController extends Controller
         $users = $this->userInterface->All();
 
         $userData = $users->map(function ($user) {
-            // Base user data
             $userArray = $user->toArray();
 
-            // Get related userType/permission
             $permission = $this->comPermissionInterface->getById($user->userType);
             $userArray['userType'] = [
                 'id'          => $permission->id ?? null,
@@ -40,7 +38,6 @@ class AdminController extends Controller
                 'description' => $permission->description ?? null,
             ];
 
-            // Get related assigneeLevel
             $assigneeLevel = $this->assigneeLevelInterface->getById($user->assigneeLevel);
             $userArray['userLevel'] = $assigneeLevel ? [
                 'id'        => $assigneeLevel->id,
@@ -48,7 +45,6 @@ class AdminController extends Controller
                 'levelName' => $assigneeLevel->levelName,
             ] : [];
 
-            // Process profile images
             $profileImages = is_array($user->profileImage) ? $user->profileImage : json_decode($user->profileImage, true) ?? [];
             $signedImages = [];
 
