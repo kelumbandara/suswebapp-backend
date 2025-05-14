@@ -14,7 +14,11 @@ return new class extends Migration
         Schema::create('com_organizations', function (Blueprint $table) {
             $table->id();
             $table->string('organizationName');
-            $table->json('documents')->nullable();
+            $table->string('logoUrl')->nullable();
+            $table->json('colorPallet')->nullable();
+            $table->string('insightImage')->nullable();
+            $table->string('insightDescription')->nullable();
+            $table->string('status')->nullable();
             $table->integer('createdByUser')->nullable();
             $table->integer('updatedBy')->nullable();
             $table->timestamps();
