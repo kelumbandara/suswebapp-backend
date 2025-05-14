@@ -163,14 +163,13 @@ class SaCmChemicalManagementRecodeController extends Controller
 
     public function approvedStatus($id)
     {
-        // Get chemical record by ID
+
         $chemicalRecord = $this->chemicalManagementRecodeInterface->findById($id);
 
         if (! $chemicalRecord) {
             return response()->json(['message' => 'Chemical record not found.'], 404);
         }
 
-        // Update status only
         $this->chemicalManagementRecodeInterface->update($id, ['status' => 'approved']);
 
         $inventoryData = [
@@ -181,7 +180,7 @@ class SaCmChemicalManagementRecodeController extends Controller
             'requestQuantity'         => $chemicalRecord->requestQuantity,
             'requestUnit'             => $chemicalRecord->requestUnit,
             'zdhcCategory'            => $chemicalRecord->zdhcCategory,
-            'status'                  => 'approved', // explicitly approved
+            'status'                  => 'approved', 
             'chemicalFormType'        => $chemicalRecord->chemicalFormType,
             'whereAndWhyUse'          => $chemicalRecord->whereAndWhyUse,
             'productStandard'         => $chemicalRecord->productStandard,

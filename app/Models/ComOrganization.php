@@ -11,7 +11,7 @@ class ComOrganization extends Model
 
     protected $fillable = [
         'organizationName',
-        'documents',
+        'logoUrl',
         'createdByUser',
         'updatedBy',
     ];
