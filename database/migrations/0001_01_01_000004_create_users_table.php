@@ -21,18 +21,19 @@ return new class extends Migration
             $table->string('otp')->nullable();
             $table->timestamp('otp_expires_at')->nullable();
             $table->boolean('emailVerifiedAt')->default(false);
-            $table->string('userType')->nullable()->default('2');
+            $table->unsignedBigInteger('userType')->nullable()->default(2);
+            $table->foreign('userType')->references('id')->on('com_permissions')->onDelete('restrict');
             $table->string('department')->nullable();
             $table->string('jobPosition')->nullable();
             $table->json('responsibleSection')->nullable();
+            $table->string('gender')->nullable();
             $table->integer('assigneeLevel')->default(2)->nullable();
-            $table->string('profileImage')->nullable();
+            $table->json('profileImage')->nullable();
             $table->boolean('availability')->default(true);
             $table->json('assignedFactory')->nullable();
             $table->timestamps();
         });
 
-        // Create the password_reset_tokens table
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email');
             $table->string('token');

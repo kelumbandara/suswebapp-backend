@@ -133,10 +133,10 @@ class SaAiInternalAuditRecodeController extends Controller
                 $actionPlans = $this->actionPlanInterface->findByInternalAuditId($audit->id);
                 $actionPlans = collect($actionPlans)->map(function ($actionPlan) {
                     try {
-                        $approver = $this->userInterface->getById($actionPlan->approverId);
+                        $approver             = $this->userInterface->getById($actionPlan->approverId);
                         $actionPlan->approver = $approver
-                            ? ['name' => $approver->name, 'id' => $approver->id]
-                            : ['name' => 'Unknown', 'id' => null];
+                        ? ['name' => $approver->name, 'id' => $approver->id]
+                        : ['name' => 'Unknown', 'id' => null];
                     } catch (\Exception $e) {
                         $actionPlan->approver = ['name' => 'Unknown', 'id' => null];
                     }
@@ -147,7 +147,6 @@ class SaAiInternalAuditRecodeController extends Controller
                 $audit->actionPlan = $actionPlans;
                 $audit->answers    = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
             }
-
 
             return response()->json($internalAudits, 200);
 
@@ -700,4 +699,136 @@ class SaAiInternalAuditRecodeController extends Controller
 
         return response()->json($assignees);
     }
+
+    public function getStatusCountByMonth($year, $division)
+    {
+        $monthNames = [
+            1  => 'January', 2  => 'February', 3  => 'March',
+            4  => 'April', 5    => 'May', 6       => 'June',
+            7  => 'July', 8     => 'August', 9    => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December',
+        ];
+
+        $monthlyStatusCounts = [];
+
+        for ($month = 1; $month <= 12; $month++) {
+            $statusSummary = [];
+
+            $records = $this->internalAuditRecodeInterface->filterByYearMonthDivision($year, $month, $division);
+
+            foreach ($records as $record) {
+                $status = strtolower(trim($record->status ?? 'unknown'));
+
+                if (! isset($statusSummary[$status])) {
+                    $statusSummary[$status] = 0;
+                }
+
+                $statusSummary[$status]++;
+            }
+
+            $monthlyStatusCounts[$monthNames[$month]] = $statusSummary;
+        }
+
+        return response()->json([
+            'year'     => (int) $year,
+            'division' => $division,
+            'data'     => $monthlyStatusCounts,
+        ]);
+    }
+
+    public function getAuditScoresByYearMonthDivision($year, $month, $division)
+    {
+        $monthNames = [
+            1  => 'January', 2  => 'February', 3  => 'March',
+            4  => 'April', 5    => 'May', 6       => 'June',
+            7  => 'July', 8     => 'August', 9    => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December',
+        ];
+
+        $monthNumber = array_search(ucfirst(strtolower($month)), $monthNames);
+
+        if (! $monthNumber) {
+            return response()->json([
+                'error' => 'Invalid month name provided.',
+            ], 400);
+        }
+
+        $audits  = $this->internalAuditRecodeInterface->filterByYearMonthDivision($year, $monthNumber, $division);
+        $results = [];
+
+        foreach ($audits as $audit) {
+            try {
+                $questionRecode = $this->questionRecodeInterface->getById($audit->auditId);
+                if (! $questionRecode) {
+                    continue;
+                }
+
+                $answers    = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
+                $totalScore = collect($answers)->sum('score');
+
+                $results[] = [
+                    'internalAuditId' => $audit->id,
+                    'auditId'         => $audit->auditId,
+                    'totalScore'      => $totalScore,
+                    'questionRecode'  => $questionRecode,
+                ];
+            } catch (\Exception $e) {
+                continue;
+            }
+        }
+
+        return response()->json([
+            'year'     => (int) $year,
+            'month'    => $monthNames[$monthNumber],
+            'division' => $division,
+            'data'     => $results,
+        ]);
+    }
+
+    public function getAuditScoresByYearDivision($year, $division)
+    {
+        $monthNames = [
+            1  => 'January', 2  => 'February', 3  => 'March',
+            4  => 'April', 5    => 'May', 6       => 'June',
+            7  => 'July', 8     => 'August', 9    => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December',
+        ];
+
+        $monthlyAuditScores = array_combine(array_values($monthNames), array_fill(0, 12, []));
+
+        for ($month = 1; $month <= 12; $month++) {
+            $audits  = $this->internalAuditRecodeInterface->filterByYearMonthDivision($year, $month, $division);
+            $results = [];
+
+            foreach ($audits as $audit) {
+                try {
+                    $questionRecode = $this->questionRecodeInterface->getById($audit->auditId);
+                    if (! $questionRecode) {
+                        continue;
+                    }
+
+                    $answers    = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
+                    $totalScore = collect($answers)->sum('score');
+
+                    $results[] = [
+                        'internalAuditId' => $audit->id,
+                        'auditId'         => $audit->auditId,
+                        'totalScore'      => $totalScore,
+                        'questionRecode'  => $questionRecode,
+                    ];
+                } catch (\Exception $e) {
+                    continue;
+                }
+            }
+
+            $monthlyAuditScores[$monthNames[$month]] = $results;
+        }
+
+        return response()->json([
+            'year'     => (int) $year,
+            'division' => $division,
+            'data'     => $monthlyAuditScores,
+        ]);
+    }
+
 }

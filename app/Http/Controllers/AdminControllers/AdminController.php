@@ -6,6 +6,7 @@ use App\Models\ComAssigneeLevel;
 use App\Repositories\All\AssigneeLevel\AssigneeLevelInterface;
 use App\Repositories\All\ComPermission\ComPermissionInterface;
 use App\Repositories\All\User\UserInterface;
+use App\Services\ProfileImageService;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -13,12 +14,14 @@ class AdminController extends Controller
     protected $userInterface;
     protected $comPermissionInterface;
     protected $assigneeLevelInterface;
+    protected $profileImageService;
 
-    public function __construct(UserInterface $userInterface, ComPermissionInterface $comPermissionInterface, AssigneeLevelInterface $assigneeLevelInterface)
+    public function __construct(UserInterface $userInterface, ComPermissionInterface $comPermissionInterface, AssigneeLevelInterface $assigneeLevelInterface, ProfileImageService $profileImageService)
     {
         $this->userInterface          = $userInterface;
         $this->comPermissionInterface = $comPermissionInterface;
         $this->assigneeLevelInterface = $assigneeLevelInterface;
+        $this->profileImageService    = $profileImageService;
     }
 
     public function index()
@@ -26,29 +29,41 @@ class AdminController extends Controller
         $users = $this->userInterface->All();
 
         $userData = $users->map(function ($user) {
-            $permission = $this->comPermissionInterface->getById($user->userType);
-
-            $assigneeLevel = $this->assigneeLevelInterface->getById($user->assigneeLevel);
-
             $userArray = $user->toArray();
 
+            $permission = $this->comPermissionInterface->getById($user->userType);
             $userArray['userType'] = [
                 'id'          => $permission->id ?? null,
                 'userType'    => $permission->userType ?? null,
                 'description' => $permission->description ?? null,
             ];
 
+            $assigneeLevel = $this->assigneeLevelInterface->getById($user->assigneeLevel);
             $userArray['userLevel'] = $assigneeLevel ? [
                 'id'        => $assigneeLevel->id,
                 'levelId'   => $assigneeLevel->levelId,
                 'levelName' => $assigneeLevel->levelName,
-            ] : null;
+            ] : [];
+
+            $profileImages = is_array($user->profileImage) ? $user->profileImage : json_decode($user->profileImage, true) ?? [];
+            $signedImages = [];
+
+            foreach ($profileImages as $uri) {
+                $signed         = $this->profileImageService->getImageUrl($uri);
+                $signedImages[] = [
+                    'fileName'  => $signed['fileName'] ?? null,
+                    'imageUrl' => $signed['signedUrl'] ?? null,
+                ];
+            }
+
+            $userArray['profileImage'] = $signedImages;
 
             return $userArray;
         });
 
         return response()->json($userData, 200);
     }
+
 
     public function show(Request $request)
     {
@@ -89,7 +104,7 @@ class AdminController extends Controller
         // Apply these rules only when availability is 1
         if ($request->input('availability', $user->availability) == 1) {
             $rules = array_merge($rules, [
-                'userType'         => 'required|string',
+                'userType'         => 'required|numeric',
                 'department'       => 'nullable|string',
                 'assignedFactory'  => 'nullable|array',
                 'assigneeLevel'    => 'required|string',

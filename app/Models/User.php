@@ -1,8 +1,6 @@
 <?php
-
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -24,6 +22,7 @@ class User extends Authenticatable
         'emailVerifiedAt',
         'otp',
         'userType',
+        'gender',
         'department',
         'jobPosition',
         'responsibleSection',
@@ -31,7 +30,7 @@ class User extends Authenticatable
         'profileImage',
         'availability',
         'assignedFactory',
-        
+
     ];
 
     protected $hidden = [
@@ -39,13 +38,13 @@ class User extends Authenticatable
         'remember_token',
     ];
     protected $casts = [
-        'isCompanyEmployee' => 'boolean',
+        'isCompanyEmployee'  => 'boolean',
         'ResponsibleSection' => 'array',
-        'assignedFactory' => 'array',
+        'assignedFactory'    => 'array',
     ];
     public function setAssignFactoryAttribute($value)
     {
-        $this->attributes['assignedFactory'] = json_encode($value);
+        $this->attributes['assignedFactory']    = json_encode($value);
         $this->attributes['ResponsibleSection'] = json_encode($value);
     }
 
@@ -53,5 +52,9 @@ class User extends Authenticatable
     public function getAssignFactoryAttribute($value)
     {
         return json_decode($value, true);
+    }
+    public function comPermission()
+    {
+        return $this->hasOne(ComPermission::class, 'userType', 'userType');
     }
 }

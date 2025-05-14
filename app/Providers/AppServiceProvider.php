@@ -144,6 +144,8 @@ use App\Repositories\All\SaCmPirCertificateRecord\CertificateRecordInterface;
 use App\Repositories\All\SaCmPirCertificateRecord\CertificateRecordRepository;
 use App\Repositories\All\SaCmPirPositiveList\PositiveListInterface;
 use App\Repositories\All\SaCmPirPositiveList\PositiveListRepository;
+use App\Repositories\All\SaCmPirSuplierName\SuplierNameInterface;
+use App\Repositories\All\SaCmPirSuplierName\SuplierNameRepository;
 use App\Repositories\All\SaCmPirTestingLab\TestingLabInterface;
 use App\Repositories\All\SaCmPirTestingLab\TestingLabRepository;
 use App\Repositories\All\SaCmPurchaseInventory\PurchaseInventoryInterface;
@@ -290,6 +292,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CertificateRecordInterface::class, CertificateRecordRepository::class);
         $this->app->bind(TestingLabInterface::class, TestingLabRepository::class);
         $this->app->bind(PositiveListInterface::class, PositiveListRepository::class);
+        $this->app->bind(SuplierNameInterface::class, SuplierNameRepository::class);
 
 
 

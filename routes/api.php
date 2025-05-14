@@ -64,11 +64,10 @@ use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrProductStandardCon
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrUseOfPPEController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmCmrZdhcCategoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmPirPositiveListController;
+use App\Http\Controllers\SustainabilityAppsControllers\SaCmPirSuplierNameController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmPirTestingLabController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaCmPurchaseInventoryRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionCategoryController;
-use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionSourceController;
-use App\Http\Controllers\SustainabilityAppsControllers\SaEmrConsumptionUnitController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEnvirementManagementRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaEnvirementTargetSettingRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaETsCategoryController;
@@ -94,8 +93,15 @@ Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkE
 Route::post('reset-password', [ForgotPasswordController::class, 'otpVerifyFunction']);
 Route::post('change-password', [ForgotPasswordController::class, 'changePassword']);
 
+Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('users-assignee', [UserController::class, 'assignee']);
+    Route::post('user-change-password', [UserController::class, 'changePassword']);
+    Route::post('user/{id}/profile-update', [UserController::class, 'profileUpdate']);
+    Route::post('user/{id}/email-change', [UserController::class, 'emailChangeInitiate']);
+    Route::post('user/{id}/email-change-verify', [UserController::class, 'emailChangeVerify']);
+    Route::post('user/{id}/email-change-confirm', [UserController::class, 'emailChangeConfirm']);
 
     Route::get('users', [AdminController::class, 'index']);
     Route::post('users/{id}/update', [AdminController::class, 'update']);
@@ -167,6 +173,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('external-audit/{id}/delete', [SaAiExternalAuditRecodeController::class, 'destroy']);
     Route::get('external-audit-assign-task', [SaAiExternalAuditRecodeController::class, 'assignTask']);
     Route::get('external-audit-assignee', [SaAiExternalAuditRecodeController::class, 'assignee']);
+    Route::get('external-audit/{year}/{division}/status', [SaAiExternalAuditRecodeController::class, 'getStatusCountByMonth']);
+    Route::get('audit-status-count/{year}/{month}/{division}/status-count', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCountByMonth']);
+    Route::get('external-audit/{year}/{division}/audit-scores', [SaAiExternalAuditRecodeController::class, 'getAuditScoresByYearDivision']);
 
     Route::get('internal-audit', [SaAiInternalAuditRecodeController::class, 'index']);
     Route::get('internal-audit/{id}', [SaAiInternalAuditRecodeController::class, 'show']);
@@ -185,6 +194,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('internal-audit-action-plan', [SaAiInternalAuditRecodeController::class, 'actionPlanStore']);
     Route::post('internal-audit-completed/{id}/update', [SaAiInternalAuditRecodeController::class, 'complete']);
     Route::get('internal-audit-completed', [SaAiInternalAuditRecodeController::class, 'getFinalAuditers']);
+    Route::get('internal-audit/{year}/{division}/status', [SaAiInternalAuditRecodeController::class, 'getStatusCountByMonth']);
+    Route::get('internal-audit/{year}/{month}/{division}/audit-scores', [SaAiInternalAuditRecodeController::class, 'getAuditScoresByYearMonthDivision']);
+    Route::get('internal-audit/{year}/{division}/audit-scores', [SaAiInternalAuditRecodeController::class, 'getAuditScoresByYearDivision']);
 
     Route::get('question-reports', [SaAiIaQuestionRecodeController::class, 'index']);
     Route::post('question-reports', [SaAiIaQuestionRecodeController::class, 'store']);
@@ -208,7 +220,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('environment-record/{year}/{month}/{division}/category-quantity-sum', [SaEnvirementManagementRecodeController::class, 'monthlyCategoryQuantitySum']);
     Route::get('environment-record/{year}/{division}/category-quantity-sum', [SaEnvirementManagementRecodeController::class, 'yearlyCategoryQuantitySum']);
     Route::get('environment-record/{year}/{month}/{division}/category-source-quantity-sum', [SaEnvirementManagementRecodeController::class, 'categorySourceQuantitySum']);
-    Route::get('environment-record/{year}/{month}/{division}/scope-quantity-sum', [SaEnvirementManagementRecodeController::class, 'scopeQuantitySumByFilter']);//
+    Route::get('environment-record/{year}/{month}/{division}/scope-quantity-sum', [SaEnvirementManagementRecodeController::class, 'scopeQuantitySumByFilter']); //
     Route::get('environment-record/{year}/{division}/scope-quantity-sum', [SaEnvirementManagementRecodeController::class, 'yearlyScopeQuantitySum']);
     Route::get('environment-record/{year}/{month}/{division}/water-to-waste-water-percentage', [SaEnvirementManagementRecodeController::class, 'categoryWaterToWastePercentage']);
     Route::get('environment-record/{year}/{month}/{division}/waste-water-details', [SaEnvirementManagementRecodeController::class, 'categoryWasteWaterDetails']);
@@ -218,7 +230,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('environment-record/{year}/{month}/{division}/status-summary', [SaEnvirementManagementRecodeController::class, 'statusSummaryByYearMonthDivision']);
     Route::get('environment-record/{year}/{month}/{division}/water-ghg-by-source', [SaEnvirementManagementRecodeController::class, 'waterGhgBySource']);
     Route::get('environment-record/{year}/category-record-count-all', [SaEnvirementManagementRecodeController::class, 'allSummaryData']);
-
 
     Route::get('target-setting', [SaEnvirementTargetSettingRecodeController::class, 'index']);
     Route::post('target-setting', [SaEnvirementTargetSettingRecodeController::class, 'store']);
@@ -236,8 +247,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('chemical-records/{id}/approve', [SaCmChemicalManagementRecodeController::class, 'approvedStatus']);
 
     Route::get('purchase-inventory-records', [SaCmPurchaseInventoryRecodeController::class, 'index']);
-    Route::post('purchase-inventory-records/{id}/update', [SaCmPurchaseInventoryRecodeController::class, 'publishStatus']);
-
+    Route::post('purchase-inventory-records/{id}/update', [SaCmPurchaseInventoryRecodeController::class, 'update']);
+    Route::post('purchase-inventory-records/{id}/publish-update', [SaCmPurchaseInventoryRecodeController::class, 'publishStatus']);
+    Route::delete('purchase-inventory-recode/{id}/delete', [SaCmPurchaseInventoryRecodeController::class, 'destroy']);
 });
 
 Route::get('user-permissions', [ComPermissionController::class, 'index']);
@@ -424,6 +436,9 @@ Route::get('consumption-get/{categoryName}/sources', [SaEmrConsumptionCategoryCo
 Route::get('commercial-names', [SaCmCmrCommercialNameController::class, 'index']);
 Route::post('commercial-names', [SaCmCmrCommercialNameController::class, 'store']);
 
+Route::get('chemical-supplier-names', [SaCmPirSuplierNameController::class, 'index']);
+Route::post('chemical-supplier-names', [SaCmPirSuplierNameController::class, 'store']);
+
 Route::get('chemical-form-types', [SaCmChemicalFormTypeController::class, 'index']);
 Route::post('chemical-form-types', [SaCmChemicalFormTypeController::class, 'store']);
 
@@ -449,5 +464,3 @@ Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
 Route::post('upload', [ImageUploadController::class, 'uploadImage']);
 Route::delete('image/{imageId}', [ImageUploadController::class, 'deleteImage']);
 Route::post('image/update/{imageId}', [ImageUploadController::class, 'updateImage']);
-
-Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);

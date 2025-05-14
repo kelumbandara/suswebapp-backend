@@ -8,7 +8,6 @@ class ComPermission extends Model
 {
     use HasFactory;
 
-
     protected $fillable = [
         'userType',
         'description',
@@ -18,5 +17,10 @@ class ComPermission extends Model
     protected $casts = [
         'permissionObject' => 'array',
     ];
+
+    public function users()
+    {
+        return $this->hasMany(User::class, 'userType', 'userType');
+    }
 
 }
