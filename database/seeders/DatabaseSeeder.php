@@ -16,7 +16,6 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-
         ComPermission::factory()->create([
             'id'               => 1,
             'userType'         => 'Super Admin',
@@ -507,29 +506,29 @@ class DatabaseSeeder extends Seeder
         ]);
 
         ComAssigneeLevel::factory()->create([
-            'id'            => 1,
+            'id'        => 1,
             'levelId'   => '1',
-            'levelName'   => 'Admin',
+            'levelName' => 'Admin',
         ]);
-          ComAssigneeLevel::factory()->create([
-            'id'            => 2,
+        ComAssigneeLevel::factory()->create([
+            'id'        => 2,
             'levelId'   => '2',
-            'levelName'   => 'Team Member',
+            'levelName' => 'Team Member',
         ]);
-          ComAssigneeLevel::factory()->create([
-            'id'            => 3,
+        ComAssigneeLevel::factory()->create([
+            'id'        => 3,
             'levelId'   => '3',
-            'levelName'   => 'Excecutive',
+            'levelName' => 'Excecutive',
         ]);
-          ComAssigneeLevel::factory()->create([
-            'id'            => 4,
+        ComAssigneeLevel::factory()->create([
+            'id'        => 4,
             'levelId'   => '4',
-            'levelName'   => 'Manager ',
+            'levelName' => 'Manager ',
         ]);
-          ComAssigneeLevel::factory()->create([
-            'id'            => 5,
+        ComAssigneeLevel::factory()->create([
+            'id'        => 5,
             'levelId'   => '5',
-            'levelName'   => 'CEO',
+            'levelName' => 'CEO',
         ]);
     }
 
