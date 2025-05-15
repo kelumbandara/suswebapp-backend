@@ -10,6 +10,7 @@ use App\Http\Controllers\CommonControllers\ComPermissionController;
 use App\Http\Controllers\CommonControllers\DepartmentController;
 use App\Http\Controllers\CommonControllers\FactoryController;
 use App\Http\Controllers\CommonControllers\JobPositionController;
+use App\Http\Controllers\CommonControllers\OrganizationController;
 use App\Http\Controllers\CommonControllers\PersonTypeController;
 use App\Http\Controllers\CommonControllers\ResponsibleSectionController;
 use App\Http\Controllers\CommonControllers\UserTypeController;
@@ -257,6 +258,11 @@ Route::post('user-permissions', [ComPermissionController::class, 'store']);
 Route::get('user-permissions/{id}/show', [ComPermissionController::class, 'show']);
 Route::post('user-permissions/{id}/update', [ComPermissionController::class, 'update']);
 Route::delete('user-permissions/{id}/delete', [ComPermissionController::class, 'destroy']);
+
+Route::get('organizations', [OrganizationController::class, 'index']);
+Route::post('organizations', [OrganizationController::class, 'store']);
+Route::post('organizations/{id}/update', [OrganizationController::class, 'update']);
+Route::delete('organizations/{id}/delete', [OrganizationController::class, 'destroy']);
 
 Route::get('responsible-section', [ResponsibleSectionController::class, 'index']);
 Route::post('responsible-section', [ResponsibleSectionController::class, 'store']);
