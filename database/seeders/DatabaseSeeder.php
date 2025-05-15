@@ -1,6 +1,7 @@
 <?php
 namespace Database\Seeders;
 
+use App\Models\ComAssigneeLevel;
 use App\Models\ComPermission;
 use App\Models\ComResponsibleSection;
 use App\Models\User;
@@ -14,7 +15,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-
 
         ComPermission::factory()->create([
             'id'               => 1,
@@ -437,7 +437,7 @@ class DatabaseSeeder extends Seeder
             'assigneeLevel' => '1',
 
         ]);
-        
+
         ComResponsibleSection::factory()->create([
             'id'            => 1,
             'sectionName'   => 'Hazard And Risk Section',
@@ -503,6 +503,32 @@ class DatabaseSeeder extends Seeder
             'sectionName'   => 'Chemical Management Section',
             'sectionCode'   => 'CMS',
             'responsibleId' => '11',
+        ]);
+
+        ComAssigneeLevel::factory()->create([
+            'id'        => 1,
+            'levelId'   => '1',
+            'levelName' => 'Admin',
+        ]);
+        ComAssigneeLevel::factory()->create([
+            'id'        => 2,
+            'levelId'   => '2',
+            'levelName' => 'Team Member',
+        ]);
+        ComAssigneeLevel::factory()->create([
+            'id'        => 3,
+            'levelId'   => '3',
+            'levelName' => 'Excecutive',
+        ]);
+        ComAssigneeLevel::factory()->create([
+            'id'        => 4,
+            'levelId'   => '4',
+            'levelName' => 'Manager ',
+        ]);
+        ComAssigneeLevel::factory()->create([
+            'id'        => 5,
+            'levelId'   => '5',
+            'levelName' => 'CEO',
         ]);
     }
 
