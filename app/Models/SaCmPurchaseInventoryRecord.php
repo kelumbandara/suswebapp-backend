@@ -42,6 +42,7 @@ class SaCmPurchaseInventoryRecord extends Model
         'createdByUser',
         'updatedBy',
         'approvedBy',
+        'publishedBy',
         'rejectedBy',
         'responsibleSection',
         'assigneeLevel',
