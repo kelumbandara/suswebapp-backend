@@ -8,6 +8,7 @@ use App\Repositories\All\SaCmPurchaseInventory\PurchaseInventoryInterface;
 use App\Repositories\All\User\UserInterface;
 use App\Services\ChemicalManagementService;
 use App\Services\PirCertificationRecodeService;
+use Illuminate\Support\Facades\Auth;
 
 class SaCmPurchaseInventoryRecodeController extends Controller
 {
@@ -71,8 +72,36 @@ class SaCmPurchaseInventoryRecodeController extends Controller
             }
 
             $record->certificate = $certificate ? [$certificate] : [];
-        }
 
+            try {
+                $creator               = $this->userInterface->getById($record->createdByUser);
+                $record->createdByUser = $creator ? ['name' => $creator->name, 'id' => $creator->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $record->createdByUser = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $updater               = $this->userInterface->getById($record->updatedBy);
+                $record->updatedByUser = $updater ? ['name' => $updater->name, 'id' => $updater->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $record->updatedByUser = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $approver               = $this->userInterface->getById($record->approverId);
+                $record->approvedByUser = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $record->approvedByUser = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $publisher               = $this->userInterface->getById($record->publishedBy);
+                $record->publishedByUser = $publisher ? ['name' => $publisher->name, 'id' => $publisher->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $record->publishedByUser = ['name' => 'Unknown', 'id' => null];
+            }
+
+        }
         return response()->json($records, 200);
     }
 
@@ -297,11 +326,11 @@ class SaCmPurchaseInventoryRecodeController extends Controller
     }
     public function publish()
     {
-       $records = $this->purchaseInventoryInterface
-                    ->filterByStatus('published') 
-                    ->sortByDesc('created_at')
-                    ->sortByDesc('updated_at')
-                    ->values();
+        $records = $this->purchaseInventoryInterface
+            ->filterByStatus('published')
+            ->sortByDesc('created_at')
+            ->sortByDesc('updated_at')
+            ->values();
 
         foreach ($records as &$record) {
             $documents = [];
@@ -343,9 +372,128 @@ class SaCmPurchaseInventoryRecodeController extends Controller
             }
 
             $record->certificate = $certificate ? [$certificate] : [];
+            try {
+                $creator               = $this->userInterface->getById($record->createdByUser);
+                $record->createdByUser = $creator ? ['name' => $creator->name, 'id' => $creator->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $record->createdByUser = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $updater               = $this->userInterface->getById($record->updatedBy);
+                $record->updatedByUser = $updater ? ['name' => $updater->name, 'id' => $updater->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $record->updatedByUser = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $approver               = $this->userInterface->getById($record->approverId);
+                $record->approvedByUser = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $record->approvedByUser = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $publisher               = $this->userInterface->getById($record->publishedBy);
+                $record->publishedByUser = $publisher ? ['name' => $publisher->name, 'id' => $publisher->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $record->publishedByUser = ['name' => 'Unknown', 'id' => null];
+            }
         }
 
         return response()->json($records, 200);
     }
+
+    public function assignTask()
+{
+    $user = Auth::user();
+
+    if (! $user) {
+        return response()->json(['message' => 'Unauthorized'], 401);
+    }
+
+    $records = $this->purchaseInventoryInterface
+        ->getByReviewerId($user->id)
+        ->sortByDesc('created_at')
+        ->sortByDesc('updated_at')
+        ->values();
+
+    foreach ($records as &$record) {
+        $documents = [];
+        if (! empty($record->documents) && is_string($record->documents)) {
+            $documents = json_decode($record->documents, true);
+        } elseif (is_array($record->documents)) {
+            $documents = $record->documents;
+        }
+
+        foreach ($documents as &$doc) {
+            if (isset($doc['gsutil_uri'])) {
+                $urlData         = $this->chemicalManagementService->getImageUrl($doc['gsutil_uri']);
+                $doc['imageUrl'] = $urlData['signedUrl'];
+                $doc['fileName'] = $urlData['fileName'];
+            }
+        }
+
+        $record->documents = $documents;
+
+
+        $certificate = $this->certificateRecordInterface->findByInventoryId($record->id);
+
+        foreach ($certificate as &$certificate) {
+            $certificateDocs = [];
+
+            if (! empty($certificate->documents) && is_string($certificate->documents)) {
+                $certificateDocs = json_decode($certificate->documents, true);
+            } elseif (is_array($certificate->documents)) {
+                $certificateDocs = $certificate->documents;
+            }
+
+            foreach ($certificateDocs as &$doc) {
+                if (isset($doc['gsutil_uri'])) {
+                    $urlData         = $this->certificationRecodeService->getImageUrl($doc['gsutil_uri']);
+                    $doc['imageUrl'] = $urlData['signedUrl'];
+                    $doc['fileName'] = $urlData['fileName'];
+                }
+            }
+
+            $certificate->documents = $certificateDocs;
+        }
+
+        $record->certificate = $certificate ? [$certificate] : [];
+
+
+        try {
+            $creator               = $this->userInterface->getById($record->createdByUser);
+            $record->createdByUser = $creator ? ['name' => $creator->name, 'id' => $creator->id] : ['name' => 'Unknown', 'id' => null];
+        } catch (\Exception $e) {
+            $record->createdByUser = ['name' => 'Unknown', 'id' => null];
+        }
+
+        try {
+            $updater               = $this->userInterface->getById($record->updatedBy);
+            $record->updatedByUser = $updater ? ['name' => $updater->name, 'id' => $updater->id] : ['name' => 'Unknown', 'id' => null];
+        } catch (\Exception $e) {
+            $record->updatedByUser = ['name' => 'Unknown', 'id' => null];
+        }
+
+        try {
+            $approver               = $this->userInterface->getById($record->approverId);
+            $record->approvedByUser = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
+        } catch (\Exception $e) {
+            $record->approvedByUser = ['name' => 'Unknown', 'id' => null];
+        }
+
+        try {
+            $publisher               = $this->userInterface->getById($record->publishedBy);
+            $record->publishedByUser = $publisher ? ['name' => $publisher->name, 'id' => $publisher->id] : ['name' => 'Unknown', 'id' => null];
+        } catch (\Exception $e) {
+            $record->publishedByUser = ['name' => 'Unknown', 'id' => null];
+        }
+    }
+
+    return response()->json($records, 200);
+}
+
+
 
 }
