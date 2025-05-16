@@ -20,6 +20,12 @@ class PurchaseInventoryRepository extends BaseRepository implements PurchaseInve
     {
         $this->model = $model;
     }
+   public function filterByStatus(string $status)
+{
+    return $this->model->where('status', $status)->get();
+}
+
+
 
 
 }
