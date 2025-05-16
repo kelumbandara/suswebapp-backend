@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to ABA Group</title>
+    <title> Welcome to {{ $organizationName }} Group!</title>
 </head>
 <body style="font-family: Arial, sans-serif; background-color: #f7f7f7; margin: 0; padding: 0;">
     <div style="max-width: 600px; margin: 30px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); overflow: hidden;">
         <div style="text-align: center; background-color: #1e3a8a; padding: 20px;">
-            <img src="{{ asset('/assets/images/logo-blue.png') }}" alt="ABA Group Logo" style="width: 100px; height: auto;">
+            <img src="{{ $logoUrl ?? asset('/assets/images/logo-blue.png') }}" alt="{{ $organizationName }} Logo" style="width: 100px; height: auto;">
+
         </div>
         <div style="padding: 30px;">
             <h1 style="font-size: 22px; color: #333; margin-bottom: 20px; border-bottom: 1px solid #e0e0e0; padding-bottom: 10px; text-align: center;">
@@ -20,7 +21,7 @@
             <p style="font-size: 16px; color: #333; margin-top: 20px;">If you have any questions or need assistance, our support team is always ready to help. Let's make sustainability a shared journey!</p>
             <p style="font-size: 16px; color: #333; margin-top: 30px;">Thank you for being a part of the change!</p>
             <p style="font-size: 16px; color: #333; margin-top: 30px;">Best regards,</p>
-            <p style="font-size: 16px; color: #333; font-weight: bold; margin: 5px 0;">The ABA Group Team</p>
+            <p style="font-size: 16px; color: #333; font-weight: bold; margin: 5px 0;">The {{ $organizationName }} Group Team</p>
         </div>
         <div style="text-align: center; padding: 15px; background-color: #3b82f6;">
             <p style="font-size: 12px; color: #ffffff;">&copy; 2024 ABA Group. All rights reserved.</p>

@@ -70,7 +70,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
                 $certificate->documents = $certificateDocs;
             }
 
-            $record->certificate = $certificate;
+            $record->certificate = $certificate ? [$certificate] : [];
         }
 
         return response()->json($records, 200);
@@ -82,10 +82,12 @@ class SaCmPurchaseInventoryRecodeController extends Controller
         $validatedData['status'] = 'published';
 
         $targetSetting = $this->purchaseInventoryInterface->findById($id);
-        $documents     = json_decode($targetSetting->documents, true) ?? [];
+
+        $documents = json_decode($targetSetting->documents, true) ?? [];
 
         if ($request->has('removeDoc')) {
             $removeDocs = $request->input('removeDoc');
+
             if (is_array($removeDocs)) {
                 foreach ($removeDocs as $removeDoc) {
                     $this->chemicalManagementService->removeOldDocumentFromStorage($removeDoc);
@@ -99,13 +101,24 @@ class SaCmPurchaseInventoryRecodeController extends Controller
 
         if ($request->hasFile('documents')) {
             $newDocuments = [];
+            $existingUris = array_column($documents, 'gsutil_uri');
+
             foreach ($request->file('documents') as $newFile) {
                 $uploadResult = $this->chemicalManagementService->updateDocuments($newFile);
-                if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
+
+                if (
+                    $uploadResult &&
+                    isset($uploadResult['gsutil_uri']) &&
+                    ! in_array($uploadResult['gsutil_uri'], $existingUris)
+                ) {
+                    $gsutilUri = $uploadResult['gsutil_uri'];
+
                     $newDocuments[] = [
-                        'gsutil_uri' => $uploadResult['gsutil_uri'],
-                        'file_name'  => $uploadResult['file_name'],
+                        'gsutil_uri' => $gsutilUri,
+                        'file_name'  => $uploadResult['file_name'] ?? basename($gsutilUri ?? $newFile->getClientOriginalName()),
                     ];
+
+                    $existingUris[] = $gsutilUri;
                 }
             }
 
@@ -134,7 +147,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
                         if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
                             $certDocs[] = [
                                 'gsutil_uri' => $uploadResult['gsutil_uri'],
-                                'file_name'  => $uploadResult['file_name'],
+                                'file_name'  => $uploadResult['file_name'] ?? basename($uploadResult['gsutil_uri'] ?? $certFile->getClientOriginalName()),
                             ];
                         }
                     }

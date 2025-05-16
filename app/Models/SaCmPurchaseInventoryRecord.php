@@ -66,13 +66,21 @@ class SaCmPurchaseInventoryRecord extends Model
         'storageConditionRequirements',
         'storagePlace',
         'lotNumber',
+        'transactionsRefferenceNumber',
     ];
     protected $casts = [
         'documents'          => 'array',
         'hazardType'         => 'array',
         'useOfPPE'           => 'array',
-
-
     ];
+
+     protected static function booted()
+    {
+        static::created(function ($model) {
+            $model->transactionsRefferenceNumber = 'CTR-' . $model->id;
+
+            $model->save();
+        });
+    }
 
 }
