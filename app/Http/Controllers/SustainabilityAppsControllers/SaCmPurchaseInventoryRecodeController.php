@@ -295,5 +295,57 @@ class SaCmPurchaseInventoryRecodeController extends Controller
             'message' => 'Purchase inventory record deleted successfully.',
         ], 200);
     }
+    public function publish()
+    {
+       $records = $this->purchaseInventoryInterface
+                    ->filterByStatus('published') 
+                    ->sortByDesc('created_at')
+                    ->sortByDesc('updated_at')
+                    ->values();
+
+        foreach ($records as &$record) {
+            $documents = [];
+            if (! empty($record->documents) && is_string($record->documents)) {
+                $documents = json_decode($record->documents, true);
+            } elseif (is_array($record->documents)) {
+                $documents = $record->documents;
+            }
+
+            foreach ($documents as &$doc) {
+                if (isset($doc['gsutil_uri'])) {
+                    $urlData         = $this->chemicalManagementService->getImageUrl($doc['gsutil_uri']);
+                    $doc['imageUrl'] = $urlData['signedUrl'];
+                    $doc['fileName'] = $urlData['fileName'];
+                }
+            }
+            $record->documents = $documents;
+
+            $certificate = $this->certificateRecordInterface->findByInventoryId($record->id);
+
+            foreach ($certificate as &$certificate) {
+                $certificateDocs = [];
+
+                if (! empty($certificate->documents) && is_string($certificate->documents)) {
+                    $certificateDocs = json_decode($certificate->documents, true);
+                } elseif (is_array($certificate->documents)) {
+                    $certificateDocs = $certificate->documents;
+                }
+
+                foreach ($certificateDocs as &$doc) {
+                    if (isset($doc['gsutil_uri'])) {
+                        $urlData         = $this->certificationRecodeService->getImageUrl($doc['gsutil_uri']);
+                        $doc['imageUrl'] = $urlData['signedUrl'];
+                        $doc['fileName'] = $urlData['fileName'];
+                    }
+                }
+
+                $certificate->documents = $certificateDocs;
+            }
+
+            $record->certificate = $certificate ? [$certificate] : [];
+        }
+
+        return response()->json($records, 200);
+    }
 
 }
