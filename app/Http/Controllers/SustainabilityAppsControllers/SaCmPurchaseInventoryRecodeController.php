@@ -70,7 +70,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
                 $certificate->documents = $certificateDocs;
             }
 
-            $record->certificate = $certificate;
+            $record->certificate = $certificate ? [$certificate] : [];
         }
 
         return response()->json($records, 200);
@@ -118,7 +118,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
                         'file_name'  => $uploadResult['file_name'] ?? basename($gsutilUri ?? $newFile->getClientOriginalName()),
                     ];
 
-                    $existingUris[] = $gsutilUri; 
+                    $existingUris[] = $gsutilUri;
                 }
             }
 
