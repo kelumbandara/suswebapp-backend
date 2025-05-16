@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Notifications\WelcomeNotification;
 
 use Illuminate\Bus\Queueable;
@@ -11,10 +10,14 @@ class WelcomeNotification extends Notification
     use Queueable;
 
     protected $name;
+    protected $organizationName;
+    protected $logoUrl;
 
-    public function __construct($name)
+    public function __construct($name , $organizationName, $logoUrl)
     {
-        $this->name = $name;
+        $this->name             = $name;
+        $this->organizationName = $organizationName;
+        $this->logoUrl          = $logoUrl;
     }
 
     public function via($notifiable)
@@ -22,12 +25,14 @@ class WelcomeNotification extends Notification
         return ['mail'];
     }
 
-    public function toMail($notifiable) :MailMessage
+    public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
-        ->subject('Welcome to ABA Group!')
-        ->markdown('mail.welcome.welcome-notification', [
-            'name' => $this->name,
-        ]);
+            ->subject('Welcome to ABA Group!')
+            ->markdown('mail.welcome.welcome-notification', [
+                'name'             => $this->name,
+                'organizationName' => $this->organizationName,
+                'logoUrl'          => $this->logoUrl,
+            ]);
     }
 }
