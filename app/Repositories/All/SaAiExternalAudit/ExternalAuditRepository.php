@@ -28,8 +28,8 @@ class ExternalAuditRepository extends BaseRepository implements ExternalAuditInt
     public function filterByYearMonthDivision($year, $month, $division)
     {
         return $this->model
-            ->whereYear('updated_at', $year)
-            ->whereMonth('updated_at', $month)
+            ->whereYear('auditDate', $year)
+            ->whereMonth('auditDate', $month)
             ->where('division', $division)
             ->get();
     }
@@ -37,17 +37,35 @@ class ExternalAuditRepository extends BaseRepository implements ExternalAuditInt
     public function filterByYear($year)
     {
         return $this->model
-            ->whereYear('updated_at', $year)
+            ->whereYear('auditDate', $year)
             ->get();
     }
 
     public function filterByYearAndMonth($year, $month)
     {
         return $this->model
-            ->whereYear('updated_at', $year)
-            ->whereMonth('updated_at', $month)
+            ->whereYear('auditDate', $year)
+            ->whereMonth('auditDate', $month)
             ->get();
     }
+    public function filterByParams($startDate = null, $endDate = null, $year = null, $month = null, $division = null)
+    {
+        $query = $this->model->newQuery();
 
+        if ($startDate && $endDate) {
+            $query->whereBetween('auditDate', [$startDate, $endDate]);
+        } elseif ($year) {
+            $query->whereYear('auditDate', $year);
+            if ($month) {
+                $query->whereMonth('auditDate', $month);
+            }
+        }
+
+        if ($division) {
+            $query->where('division', $division);
+        }
+
+        return $query->get();
+    }
 
 }
