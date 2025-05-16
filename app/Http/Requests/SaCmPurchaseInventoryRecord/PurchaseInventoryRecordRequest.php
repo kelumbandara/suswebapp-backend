@@ -81,7 +81,7 @@ class PurchaseInventoryRecordRequest extends FormRequest
             'certificate.*.positiveList'                 => 'required|string',
             'certificate.*.description'                  => 'required|string',
             'certificate.*.documents'                    => 'nullable|array',
-            'certificate.*.documents.*'                  => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
+            'certificate.*.documents.*'                  => 'nullable|file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
             'certificate.*.removeDoc'                    => 'nullable|string',
 
         ];
