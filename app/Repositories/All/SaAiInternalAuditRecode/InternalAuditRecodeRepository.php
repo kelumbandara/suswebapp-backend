@@ -47,5 +47,24 @@ class InternalAuditRecodeRepository extends BaseRepository implements InternalAu
             ->whereMonth('auditDate', $month)
             ->get();
     }
+    public function filterByParams($startDate = null, $endDate = null, $year = null, $month = null, $division = null)
+    {
+        $query = $this->model->newQuery();
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('auditDate', [$startDate, $endDate]);
+        } elseif ($year) {
+            $query->whereYear('auditDate', $year);
+            if ($month) {
+                $query->whereMonth('auditDate', $month);
+            }
+        }
+
+        if ($division) {
+            $query->where('division', $division);
+        }
+
+        return $query->get();
+    }
 
 }

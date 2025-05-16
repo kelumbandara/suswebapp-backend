@@ -173,6 +173,8 @@ class SaCmChemicalManagementRecodeController extends Controller
         $this->chemicalManagementRecodeInterface->update($id, ['status' => 'approved']);
 
         $inventoryData = [
+            'referenceNumber'         => $chemicalRecord->referenceNumber,
+            'inventoryNumber'         => $chemicalRecord->id,
             'commercialName'          => $chemicalRecord->commercialName,
             'substanceName'           => $chemicalRecord->substanceName,
             'reachRegistrationNumber' => $chemicalRecord->reachRegistrationNumber,
@@ -180,7 +182,7 @@ class SaCmChemicalManagementRecodeController extends Controller
             'requestQuantity'         => $chemicalRecord->requestQuantity,
             'requestUnit'             => $chemicalRecord->requestUnit,
             'zdhcCategory'            => $chemicalRecord->zdhcCategory,
-            'status'                  => 'approved', 
+            'status'                  => 'approved',
             'chemicalFormType'        => $chemicalRecord->chemicalFormType,
             'whereAndWhyUse'          => $chemicalRecord->whereAndWhyUse,
             'productStandard'         => $chemicalRecord->productStandard,

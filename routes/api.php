@@ -97,6 +97,11 @@ Route::post('change-password', [ForgotPasswordController::class, 'changePassword
 Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('organizations', [OrganizationController::class, 'index']);
+    Route::post('organizations', [OrganizationController::class, 'store']);
+    Route::post('organizations/{id}/update', [OrganizationController::class, 'update']);
+    Route::delete('organizations/{id}/delete', [OrganizationController::class, 'destroy']);
+
     Route::get('users-assignee', [UserController::class, 'assignee']);
     Route::post('user-change-password', [UserController::class, 'changePassword']);
     Route::post('user/{id}/profile-update', [UserController::class, 'profileUpdate']);
@@ -174,8 +179,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('external-audit/{id}/delete', [SaAiExternalAuditRecodeController::class, 'destroy']);
     Route::get('external-audit-assign-task', [SaAiExternalAuditRecodeController::class, 'assignTask']);
     Route::get('external-audit-assignee', [SaAiExternalAuditRecodeController::class, 'assignee']);
-    Route::get('external-audit/{year}/{division}/status', [SaAiExternalAuditRecodeController::class, 'getStatusCountByMonth']);
     Route::get('audit-status-count/{year}/{month}/{division}/status-count', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCountByMonth']);
+    Route::get('external-audit/{year}/{division}/status', [SaAiExternalAuditRecodeController::class, 'getStatusCountByMonth']);
     Route::get('external-audit/{year}/{division}/audit-scores', [SaAiExternalAuditRecodeController::class, 'getAuditScoresByYearDivision']);
 
     Route::get('internal-audit', [SaAiInternalAuditRecodeController::class, 'index']);
@@ -197,7 +202,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('internal-audit-completed', [SaAiInternalAuditRecodeController::class, 'getFinalAuditers']);
     Route::get('internal-audit/{year}/{division}/status', [SaAiInternalAuditRecodeController::class, 'getStatusCountByMonth']);
     Route::get('internal-audit/{year}/{month}/{division}/audit-scores', [SaAiInternalAuditRecodeController::class, 'getAuditScoresByYearMonthDivision']);
-    Route::get('internal-audit/{year}/{division}/audit-scores', [SaAiInternalAuditRecodeController::class, 'getAuditScoresByYearDivision']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{year}/{month}/{division}/{type}/status-count', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCountByMonth']);
+    Route::get('internal-audit/{startDate}/{endDate}/{year}/{division}/{type}/audit-scores', [SaAiInternalAuditRecodeController::class, 'getAuditScoresByYearDivision']);
 
     Route::get('question-reports', [SaAiIaQuestionRecodeController::class, 'index']);
     Route::post('question-reports', [SaAiIaQuestionRecodeController::class, 'store']);
@@ -258,11 +264,6 @@ Route::post('user-permissions', [ComPermissionController::class, 'store']);
 Route::get('user-permissions/{id}/show', [ComPermissionController::class, 'show']);
 Route::post('user-permissions/{id}/update', [ComPermissionController::class, 'update']);
 Route::delete('user-permissions/{id}/delete', [ComPermissionController::class, 'destroy']);
-
-Route::get('organizations', [OrganizationController::class, 'index']);
-Route::post('organizations', [OrganizationController::class, 'store']);
-Route::post('organizations/{id}/update', [OrganizationController::class, 'update']);
-Route::delete('organizations/{id}/delete', [OrganizationController::class, 'destroy']);
 
 Route::get('responsible-section', [ResponsibleSectionController::class, 'index']);
 Route::post('responsible-section', [ResponsibleSectionController::class, 'store']);
