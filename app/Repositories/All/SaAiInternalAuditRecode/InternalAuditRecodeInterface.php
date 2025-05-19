@@ -10,6 +10,6 @@ interface InternalAuditRecodeInterface extends EloquentRepositoryInterface
     public function filterByYearMonthDivision(int $year, int $month, int $division);
     public function filterByYear($year);
     public function filterByYearAndMonth($year, $month);
-    public function filterByParams($startDate = null, $endDate = null, $year = null, $month = null, $division = null);
+    public function filterByParams($startDate, $endDate,  $division);
 
 }
