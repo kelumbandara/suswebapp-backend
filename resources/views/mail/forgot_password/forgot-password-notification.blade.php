@@ -14,13 +14,15 @@
             <h1 style="margin-bottom: 10px;">Password Reset Verification</h1>
             <p style="font-size: 16px; color: #333;">Hello <strong>{{ $name }}</strong>,</p>
             <p style="margin-bottom: 10px;">Your OTP for password change is:</p>
-            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px; margin-left: 20px;">
+
+            <div style="text-align: center; margin-top: 20px;">
                 @foreach(str_split($otp) as $digit)
-                    <div style="width: 50px; height: 50px; font-size: 24px; font-weight: bold; color: #1e3a8a; border: 2px solid #1e3a8a; border-radius: 8px; text-align: center; line-height: 50px;">
+                    <span style="display: inline-block; width: 50px; height: 50px; margin: 0 5px; font-size: 24px; font-weight: bold; color: #1e3a8a; border: 2px solid #1e3a8a; border-radius: 8px; text-align: center; line-height: 50px;">
                         {{ $digit }}
-                    </div>
+                    </span>
                 @endforeach
             </div>
+
             <p style="margin-top: 20px;">Please use this OTP to proceed with your password reset. This OTP expires in 5 minutes.</p>
             <p>If you did not request this change, please ignore this email.</p>
             <p style="font-size: 16px; color: #333; font-weight: bold; margin: 5px 0;">The {{ $organizationName }} Group Team</p>
