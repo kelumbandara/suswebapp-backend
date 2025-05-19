@@ -48,18 +48,13 @@ class ExternalAuditRepository extends BaseRepository implements ExternalAuditInt
             ->whereMonth('auditDate', $month)
             ->get();
     }
-    public function filterByParams($startDate = null, $endDate = null, $year = null, $month = null, $division = null)
+    public function filterByParams($startDate = null, $endDate = null, $division = null)
     {
         $query = $this->model->newQuery();
 
         if ($startDate && $endDate) {
             $query->whereBetween('auditDate', [$startDate, $endDate]);
-        } elseif ($year) {
-            $query->whereYear('auditDate', $year);
-            if ($month) {
-                $query->whereMonth('auditDate', $month);
-            }
-        }
+        } 
 
         if ($division) {
             $query->where('division', $division);

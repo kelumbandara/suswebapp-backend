@@ -249,30 +249,18 @@ class SaAiExternalAuditRecodeController extends Controller
     }
 
 
-    public function getCombinedStatusCountByMonth($startDate = null, $endDate = null, $year = null, $month = null, $division = null, $type = null)
+    public function getCombinedStatusCountByMonth($startDate = null, $endDate = null,  $division = null, $type = null)
     {
-        $monthNames = [
-            1  => 'January', 2  => 'February', 3  => 'March',
-            4  => 'April', 5    => 'May', 6       => 'June',
-            7  => 'July', 8     => 'August', 9    => 'September',
-            10 => 'October', 11 => 'November', 12 => 'December',
-        ];
+
 
         $monthNumber = null;
-        if ($month) {
-            $monthNumber = array_search(ucfirst(strtolower($month)), $monthNames);
-            if (! $monthNumber) {
-                return response()->json(['error' => 'Invalid month name'], 400);
-            }
-        }
-
 
         $statusSummary = [];
         $auditFeeTotal = 0;
 
         if ($type === 'external' || $type === 'both') {
             $externalRecords = $this->externalAuditInterface->filterByParams(
-                $startDate, $endDate, $year, $monthNumber, $division
+                $startDate, $endDate, $division
             );
 
             foreach ($externalRecords as $record) {
@@ -287,7 +275,7 @@ class SaAiExternalAuditRecodeController extends Controller
 
         if ($type === 'internal' || $type === 'both') {
             $internalRecords = $this->internalAuditRecodeInterface->filterByParams(
-                $startDate, $endDate, $year, $monthNumber, $division
+                $startDate, $endDate, $division
             );
 
             foreach ($internalRecords as $record) {
@@ -303,8 +291,6 @@ class SaAiExternalAuditRecodeController extends Controller
         return response()->json([
             'startDate' => $startDate,
             'endDate'   => $endDate,
-            'year'      => $year,
-            'month'     => $monthNumber ? $monthNames[$monthNumber] : null,
             'division'  => $division,
             'type'      => $type,
             'data'      => [
