@@ -32,20 +32,20 @@ class RegisteredUserController extends Controller
         $user = $this->userInterface->create($validatedData);
 
         try {
+            $organization = $this->comOrganizationInterface->first();
 
-            $organization = $this->comOrganizationInterface->findById($user->organizationId);
+            if ($organization) {
+                $organizationName = $organization->organizationName;
+                $logoData         = null;
 
-            $organizationName = $organization->organizationName ?? 'ABA';
-            $logoData         = null;
+                if (! empty($organization->logoUrl)) {
+                    $logoInfo = $this->organizationService->getImageUrl($organization->logoUrl);
+                    $logoData = $logoInfo['signedUrl'] ?? null;
+                }
 
-            if (! empty($organization->logoUrl)) {
-                $logoInfo = $this->organizationService->getImageUrl($organization->logoUrl);
-                $logoData = $logoInfo['signedUrl'] ?? null;
+                Notification::send($user, new WelcomeNotification($user->name, $organizationName, $logoData));
             }
-
-            Notification::send($user, new WelcomeNotification($user->name, $organizationName, $logoData));
         } catch (\Exception $e) {
-
         }
 
         return response()->json([

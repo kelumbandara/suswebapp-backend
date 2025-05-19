@@ -40,6 +40,7 @@ class PurchaseInventoryRecordRequest extends FormRequest
             'requestDate'                                => 'required|string',
             'reviewerId'                                 => 'required|string',
             'approverId'                                 => 'nullable|string',
+            'publishedBy'                                => 'nullable|string',
             'hazardType'                                 => 'nullable|array',
             'useOfPPE'                                   => 'nullable|array',
             'ghsClassification'                          => 'nullable|string',

@@ -50,6 +50,8 @@ class ChemicalManagementRecodeRequest extends FormRequest
             'removeDoc'               => 'nullable|array',
             'documents'               => 'nullable|array',
             'documents.*'             => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
+            'createdByUser'           => 'nullable|string',
+            'updatedBy'               => 'nullable|string',
         ];
     }
 }

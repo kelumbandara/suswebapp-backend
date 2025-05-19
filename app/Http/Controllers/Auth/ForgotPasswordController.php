@@ -3,7 +3,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Notifications\FrogotpasswordOTPsend\SendPasswordChangeConfirmation;
+use App\Repositories\All\ComOrganization\ComOrganizationInterface;
 use App\Repositories\All\User\UserInterface;
+use App\Services\OrganizationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
@@ -12,10 +14,14 @@ use Illuminate\Support\Facades\Validator;
 class ForgotPasswordController extends Controller
 {
     protected $userInterface;
+    protected $comOrganizationInterface;
+    protected $organizationService;
 
-    public function __construct(UserInterface $userInterface)
+    public function __construct(UserInterface $userInterface,ComOrganizationInterface $comOrganizationInterface,  OrganizationService $organizationService)
     {
         $this->userInterface = $userInterface;
+        $this->comOrganizationInterface = $comOrganizationInterface;
+        $this->organizationService = $organizationService;
     }
 
     public function sendResetLinkEmail(Request $request)
@@ -40,11 +46,29 @@ class ForgotPasswordController extends Controller
         $user->otp_expires_at = now()->addMinutes(5);
         $user->save();
 
-        try {
-            Notification::route('mail', $user->email)->notify(new SendPasswordChangeConfirmation($otp, $user->email));
+        // try {
+        //     Notification::route('mail', $user->email)->notify(new SendPasswordChangeConfirmation($otp, $user->email));
 
+        //     return response()->json(['message' => 'OTP has been sent to your email.'], 201);
+        // } catch (\Exception $e) {
+        //     return response()->json(['error' => 'Failed to send OTP. Please try again later.'], 500);
+        // }
+
+
+        try {
+         $organization = $this->comOrganizationInterface->first();
+
+            if ($organization) {
+                $organizationName = $organization->organizationName;
+                $logoData         = null;
+
+                if (! empty($organization->logoUrl)) {
+                    $logoInfo = $this->organizationService->getImageUrl($organization->logoUrl);
+                    $logoData = $logoInfo['signedUrl'] ?? null;
+                }
+            Notification::route('mail', $user->email)->notify(new SendPasswordChangeConfirmation($otp, $user->email, $user->name, $organizationName, $logoData));
             return response()->json(['message' => 'OTP has been sent to your email.'], 201);
-        } catch (\Exception $e) {
+        }} catch (\Exception $e) {
             return response()->json(['error' => 'Failed to send OTP. Please try again later.'], 500);
         }
     }
