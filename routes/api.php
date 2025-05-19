@@ -182,6 +182,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('audit-status-count/{year}/{month}/{division}/status-count', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCountByMonth']);
     Route::get('external-audit/{year}/{division}/status', [SaAiExternalAuditRecodeController::class, 'getStatusCountByMonth']);
     Route::get('external-audit/{year}/{division}/audit-scores', [SaAiExternalAuditRecodeController::class, 'getAuditScoresByYearDivision']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/status-count', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCount']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/score-count', [SaAiExternalAuditRecodeController::class, 'getCombinedScoreCountByMonth']);
 
     Route::get('internal-audit', [SaAiInternalAuditRecodeController::class, 'index']);
     Route::get('internal-audit/{id}', [SaAiInternalAuditRecodeController::class, 'show']);
@@ -201,8 +203,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('internal-audit-completed/{id}/update', [SaAiInternalAuditRecodeController::class, 'complete']);
     Route::get('internal-audit-completed', [SaAiInternalAuditRecodeController::class, 'getFinalAuditers']);
     Route::get('internal-audit/{year}/{division}/status', [SaAiInternalAuditRecodeController::class, 'getStatusCountByMonth']);
-    Route::get('internal-audit/{year}/{month}/{division}/audit-scores', [SaAiInternalAuditRecodeController::class, 'getAuditScoresByYearMonthDivision']);
-    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/status-count', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCountByMonth']);
+
     Route::get('internal-audit/{startDate}/{endDate}/{year}/{division}/{type}/audit-scores', [SaAiInternalAuditRecodeController::class, 'getAuditScoresByYearDivision']);
 
     Route::get('question-reports', [SaAiIaQuestionRecodeController::class, 'index']);
