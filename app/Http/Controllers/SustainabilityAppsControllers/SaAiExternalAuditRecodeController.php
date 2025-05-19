@@ -262,7 +262,7 @@ class SaAiExternalAuditRecodeController extends Controller
         $statusSummary = [];
         $auditFeeTotal = 0;
 
-        if ($type === 'external' || $type === 'both') {
+        if ($type === 'External Audit' || $type === 'both') {
             $externalRecords = $this->externalAuditInterface->filterByParams(
                 $startDate, $endDate, $division
             );
@@ -277,7 +277,7 @@ class SaAiExternalAuditRecodeController extends Controller
             }
         }
 
-        if ($type === 'internal' || $type === 'both') {
+        if ($type === 'Internal Audit' || $type === 'both') {
             $internalRecords = $this->internalAuditRecodeInterface->filterByParams(
                 $startDate, $endDate, $division
             );
@@ -338,7 +338,7 @@ public function getCombinedScoreCountByMonth($startDate, $endDate, $division, $t
             $monthlyTotals[$monthName] = 0;
             $monthlyCountScores[$monthName] = 0;
 
-            if ($type === 'internal') {
+            if ($type === 'Internal Audit') {
                 $audits = $this->internalAuditRecodeInterface->filterByParams($startOfMonth, $endOfMonth, $division);
                 $results = [];
 
@@ -369,7 +369,7 @@ public function getCombinedScoreCountByMonth($startDate, $endDate, $division, $t
 
                 $monthlyAuditScores[$monthName] = $results;
 
-            } elseif ($type === 'external') {
+            } elseif ($type === 'External Audit') {
                 $audits = $this->externalAuditInterface->filterByParams($startOfMonth, $endOfMonth, $division);
                 $results = [];
 
