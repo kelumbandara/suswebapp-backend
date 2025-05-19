@@ -13,10 +13,10 @@
         </div>
         <div style="padding: 30px;">
             <h1 style="font-size: 22px; color: #333; margin-bottom: 20px; border-bottom: 1px solid #e0e0e0; padding-bottom: 10px; text-align: center;">
-                Welcome to ABA Group!
+                Welcome to {{ $organizationName }} Group!
             </h1>
             <p style="font-size: 16px; color: #333;">Hello <strong>{{ $name }}</strong>,</p>
-            <p style="font-size: 16px; color: #333; margin-top: 30px;">We are delighted to welcome you to ABA Group, our sustainability initiative for garment factory employees. By joining, you are taking a step towards a greener future and a healthier workplace.</p>
+            <p style="font-size: 16px; color: #333; margin-top: 30px;">We are delighted to welcome you to {{ $organizationName }} Group, our sustainability initiative for garment factory employees. By joining, you are taking a step towards a greener future and a healthier workplace.</p>
             <p style="font-size: 16px; color: #333; margin-top: 20px;">Our platform helps you track your sustainable practices, access educational resources, and contribute to an eco-friendly work environment.</p>
             <p style="font-size: 16px; color: #333; margin-top: 20px;">If you have any questions or need assistance, our support team is always ready to help. Let's make sustainability a shared journey!</p>
             <p style="font-size: 16px; color: #333; margin-top: 30px;">Thank you for being a part of the change!</p>
@@ -24,7 +24,7 @@
             <p style="font-size: 16px; color: #333; font-weight: bold; margin: 5px 0;">The {{ $organizationName }} Group Team</p>
         </div>
         <div style="text-align: center; padding: 15px; background-color: #3b82f6;">
-            <p style="font-size: 12px; color: #ffffff;">&copy; 2024 ABA Group. All rights reserved.</p>
+            <p style="font-size: 12px; color: #ffffff;">&copy; 2025 {{ $organizationName }} Group. All rights reserved.</p>
         </div>
     </div>
 </body>

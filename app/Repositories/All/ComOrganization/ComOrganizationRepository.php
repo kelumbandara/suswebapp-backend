@@ -20,5 +20,9 @@ class ComOrganizationRepository extends BaseRepository implements ComOrganizatio
     {
         $this->model = $model;
     }
+    public function first()
+{
+    return $this->model->orderBy('id')->first();
+}
 
 }
