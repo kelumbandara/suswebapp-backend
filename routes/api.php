@@ -202,7 +202,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('internal-audit-completed', [SaAiInternalAuditRecodeController::class, 'getFinalAuditers']);
     Route::get('internal-audit/{year}/{division}/status', [SaAiInternalAuditRecodeController::class, 'getStatusCountByMonth']);
     Route::get('internal-audit/{year}/{month}/{division}/audit-scores', [SaAiInternalAuditRecodeController::class, 'getAuditScoresByYearMonthDivision']);
-    Route::get('audit-status-count/{startDate}/{endDate}/{year}/{month}/{division}/{type}/status-count', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCountByMonth']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/status-count', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCountByMonth']);
     Route::get('internal-audit/{startDate}/{endDate}/{year}/{division}/{type}/audit-scores', [SaAiInternalAuditRecodeController::class, 'getAuditScoresByYearDivision']);
 
     Route::get('question-reports', [SaAiIaQuestionRecodeController::class, 'index']);
