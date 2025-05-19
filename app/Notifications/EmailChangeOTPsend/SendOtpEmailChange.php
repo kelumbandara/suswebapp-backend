@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Notifications\EmailChangeOTPsend;
 
 use Illuminate\Bus\Queueable;
@@ -12,11 +11,17 @@ class SendOtpEmailChange extends Notification
 
     protected $otp;
     protected $email;
+    protected $name;
+    protected $organizationName;
+    protected $logoUrl;
 
-    public function __construct($otp, $email)
+    public function __construct($otp, $email, $name, $organizationName, $logoUrl)
     {
-        $this->otp = $otp;
-        $this->email = $email;
+        $this->otp              = $otp;
+        $this->email            = $email;
+        $this->name             = $name;
+        $this->organizationName = $organizationName;
+        $this->logoUrl          = $logoUrl;
     }
 
     public function via($notifiable)
@@ -24,12 +29,16 @@ class SendOtpEmailChange extends Notification
         return ['mail'];
     }
 
-    public function toMail($notifiable) :MailMessage
+    public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
             ->subject('Your OTP for Email Change')
             ->markdown('mail.email_change.change-email-notification', [
-                'otp' => $this->otp,
+                'otp'              => $this->otp,
+                'email'            => $this->email,
+                'name'             => $this->name,
+                'organizationName' => $this->organizationName,
+                'logoUrl'          => $this->logoUrl,
             ]);
     }
 }

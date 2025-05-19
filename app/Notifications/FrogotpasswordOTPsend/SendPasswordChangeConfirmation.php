@@ -13,11 +13,18 @@ class SendPasswordChangeConfirmation extends Notification
 
     protected $otp;
     protected $email;
+    protected $name;
+     protected $organizationName;
+    protected $logoUrl;
 
-    public function __construct($otp, $email)
+
+    public function __construct($otp, $email, $name, $organizationName, $logoUrl)
     {
         $this->otp = $otp;
         $this->email = $email;
+        $this->name = $name;
+        $this->organizationName = $organizationName;
+        $this->logoUrl = $logoUrl;
     }
 
     public function via($notifiable)
@@ -31,6 +38,10 @@ class SendPasswordChangeConfirmation extends Notification
             ->subject('Your OTP for Password Change')
             ->markdown('mail.forgot_password.forgot-password-notification', [
                 'otp' => $this->otp,
+                'email'            => $this->email,
+                'name'             => $this->name,
+                'organizationName' => $this->organizationName,
+                'logoUrl'          => $this->logoUrl,
             ]);
     }
 }

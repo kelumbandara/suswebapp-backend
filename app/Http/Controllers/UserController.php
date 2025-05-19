@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Notifications\EmailChangeOTPsend\SendOtpEmailChange;
 use App\Repositories\All\AssigneeLevel\AssigneeLevelInterface;
+use App\Repositories\All\ComOrganization\ComOrganizationInterface;
 use App\Repositories\All\ComPermission\ComPermissionInterface;
 use App\Repositories\All\User\UserInterface;
+use App\Services\OrganizationService;
 use App\Services\ProfileImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -18,13 +20,17 @@ class UserController extends Controller
     protected $comPermissionInterface;
     protected $assigneeLevelInterface;
     protected $profileImageService;
+    protected $organizationService;
+    protected $comOrganizationInterface;
 
-    public function __construct(UserInterface $userInterface, ComPermissionInterface $comPermissionInterface, AssigneeLevelInterface $assigneeLevelInterface, ProfileImageService $profileImageService)
+    public function __construct(UserInterface $userInterface, ComPermissionInterface $comPermissionInterface, AssigneeLevelInterface $assigneeLevelInterface, ProfileImageService $profileImageService, ComOrganizationInterface $comOrganizationInterface, OrganizationService $organizationService)
     {
         $this->userInterface          = $userInterface;
         $this->comPermissionInterface = $comPermissionInterface;
         $this->assigneeLevelInterface = $assigneeLevelInterface;
         $this->profileImageService    = $profileImageService;
+        $this->organizationService    = $organizationService;
+        $this->comOrganizationInterface = $comOrganizationInterface;
     }
 
     public function show(Request $request)
@@ -199,12 +205,23 @@ class UserController extends Controller
         $user->save();
 
         try {
-            Notification::route('mail', $user->email)->notify(new SendOtpEmailChange($otp, $user->email));
+         $organization = $this->comOrganizationInterface->first();
+
+            if ($organization) {
+                $organizationName = $organization->organizationName;
+                $logoData         = null;
+
+                if (! empty($organization->logoUrl)) {
+                    $logoInfo = $this->organizationService->getImageUrl($organization->logoUrl);
+                    $logoData = $logoInfo['signedUrl'] ?? null;
+                }
+            Notification::route('mail', $user->email)->notify(new SendOtpEmailChange($otp, $user->email, $user->name, $organizationName, $logoData));
             return response()->json(['message' => 'OTP has been sent to your email.'], 201);
-        } catch (\Exception $e) {
+        }} catch (\Exception $e) {
             return response()->json(['error' => 'Failed to send OTP. Please try again later.'], 500);
         }
     }
+
 
     public function emailChangeVerify(Request $request, $id)
     {
