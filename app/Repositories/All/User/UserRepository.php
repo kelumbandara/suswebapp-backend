@@ -30,5 +30,9 @@ class UserRepository extends BaseRepository implements UserInterface
     {
         return User::where('userType', $userType)->get();
     }
+    public function getByIds(array $ids)
+    {
+        return User::whereIn('id', $ids)->get()->keyBy('id');
+    }
 
 }

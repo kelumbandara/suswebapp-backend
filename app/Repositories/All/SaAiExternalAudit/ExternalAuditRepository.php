@@ -63,6 +63,6 @@ class ExternalAuditRepository extends BaseRepository implements ExternalAuditInt
         return $query->get();
     }
 
-    
+
 
 }

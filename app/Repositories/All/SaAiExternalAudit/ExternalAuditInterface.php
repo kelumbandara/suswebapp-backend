@@ -12,4 +12,5 @@ interface ExternalAuditInterface extends EloquentRepositoryInterface {
     public function filterByYearAndMonth($year, $month);
     public function filterByParams($startDate, $endDate,  $division);
 
+
 }
