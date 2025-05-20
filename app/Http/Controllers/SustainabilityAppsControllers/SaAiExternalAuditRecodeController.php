@@ -3,6 +3,7 @@ namespace App\Http\Controllers\SustainabilityAppsControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaAiExternalAudit\ExternalAuditRequest;
+use App\Models\User;
 use App\Repositories\All\SaAiExternalAudit\ExternalAuditInterface;
 use App\Repositories\All\SaAiIaAnswerRecode\AnswerRecodeInterface;
 use App\Repositories\All\SaAiIaQuestionRecode\QuestionRecodeInterface;
@@ -257,8 +258,6 @@ class SaAiExternalAuditRecodeController extends Controller
     public function getCombinedStatusCount($startDate = null, $endDate = null, $division = null, $type = null)
     {
 
-        $monthNumber = null;
-
         $statusSummary = [];
         $auditFeeTotal = 0;
 
@@ -304,108 +303,173 @@ class SaAiExternalAuditRecodeController extends Controller
         ]);
     }
 
-public function getCombinedScoreCountByMonth($startDate, $endDate, $division, $type)
-{
-    $monthNames = [
-        1 => 'January', 2 => 'February', 3 => 'March',
-        4 => 'April', 5 => 'May', 6 => 'June',
-        7 => 'July', 8 => 'August', 9 => 'September',
-        10 => 'October', 11 => 'November', 12 => 'December',
-    ];
+    public function getCombinedScoreCountByMonth($startDate, $endDate, $division, $type)
+    {
+        $monthNames = [
+            1  => 'January', 2  => 'February', 3  => 'March',
+            4  => 'April', 5    => 'May', 6       => 'June',
+            7  => 'July', 8     => 'August', 9    => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December',
+        ];
 
-    $monthlyAuditScores = [];
-    $monthlyTotals = [];
-    $monthlyCountScores = [];
-    $totalScore = 0;
+        $monthlyAuditScores = [];
+        $monthlyTotals      = [];
+        $monthlyCountScores = [];
+        $totalScore         = 0;
 
-    $startYear = (int) date('Y', strtotime($startDate));
-    $startMonth = (int) date('m', strtotime($startDate));
-    $endYear = (int) date('Y', strtotime($endDate));
-    $endMonth = (int) date('m', strtotime($endDate));
+        $startYear  = (int) date('Y', strtotime($startDate));
+        $startMonth = (int) date('m', strtotime($startDate));
+        $endYear    = (int) date('Y', strtotime($endDate));
+        $endMonth   = (int) date('m', strtotime($endDate));
 
-    // Loop through years and months within the date range
-    for ($year = $startYear; $year <= $endYear; $year++) {
-        $monthStart = ($year === $startYear) ? $startMonth : 1;
-        $monthEnd = ($year === $endYear) ? $endMonth : 12;
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $monthStart = ($year === $startYear) ? $startMonth : 1;
+            $monthEnd   = ($year === $endYear) ? $endMonth : 12;
 
-        for ($month = $monthStart; $month <= $monthEnd; $month++) {
-            $monthStr = str_pad($month, 2, '0', STR_PAD_LEFT);
-            $startOfMonth = date("$year-$monthStr-01");
-            $endOfMonth = date("Y-m-t", strtotime($startOfMonth));
+            for ($month = $monthStart; $month <= $monthEnd; $month++) {
+                $monthStr     = str_pad($month, 2, '0', STR_PAD_LEFT);
+                $startOfMonth = date("$year-$monthStr-01");
+                $endOfMonth   = date("Y-m-t", strtotime($startOfMonth));
 
-            $monthName = $monthNames[$month];
-            $monthlyAuditScores[$monthName] = [];
-            $monthlyTotals[$monthName] = 0;
-            $monthlyCountScores[$monthName] = 0;
+                $monthName                      = $monthNames[$month];
+                $monthlyAuditScores[$monthName] = [];
+                $monthlyTotals[$monthName]      = 0;
+                $monthlyCountScores[$monthName] = 0;
 
-            if ($type === 'Internal Audit') {
-                $audits = $this->internalAuditRecodeInterface->filterByParams($startOfMonth, $endOfMonth, $division);
-                $results = [];
+                if ($type === 'Internal Audit') {
+                    $audits  = $this->internalAuditRecodeInterface->filterByParams($startOfMonth, $endOfMonth, $division);
+                    $results = [];
 
-                foreach ($audits as $audit) {
-                    try {
-                        $questionRecode = $this->questionRecodeInterface->getById($audit->auditId);
-                        if (!$questionRecode) {
+                    foreach ($audits as $audit) {
+                        try {
+                            $questionRecode = $this->questionRecodeInterface->getById($audit->auditId);
+                            if (! $questionRecode) {
+                                continue;
+                            }
+
+                            $answers = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
+                            $score   = collect($answers)->sum('score');
+
+                            $results[] = [
+                                'internalAuditId' => $audit->id,
+                                'auditId'         => $audit->auditId,
+                                'totalScore'      => $score,
+                                'questionRecode'  => $questionRecode,
+                            ];
+
+                            $monthlyTotals[$monthName] += $score;
+                            $monthlyCountScores[$monthName]++;
+                            $totalScore += $score;
+                        } catch (\Exception $e) {
                             continue;
                         }
+                    }
 
-                        $answers = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
-                        $score = collect($answers)->sum('score');
+                    $monthlyAuditScores[$monthName] = $results;
+
+                } elseif ($type === 'External Audit') {
+                    $audits  = $this->externalAuditInterface->filterByParams($startOfMonth, $endOfMonth, $division);
+                    $results = [];
+
+                    foreach ($audits as $audit) {
+                        $score = is_numeric($audit->auditScore) ? (float) $audit->auditScore : 0;
 
                         $results[] = [
-                            'internalAuditId' => $audit->id,
-                            'auditId' => $audit->auditId,
-                            'totalScore' => $score,
-                            'questionRecode' => $questionRecode,
+                            'externalAuditId' => $audit->id,
+                            'auditScore'      => $score,
+                            'auditType'       => $audit->auditType,
+                            'auditFirm'       => $audit->auditFirm,
                         ];
 
                         $monthlyTotals[$monthName] += $score;
                         $monthlyCountScores[$monthName]++;
                         $totalScore += $score;
-                    } catch (\Exception $e) {
-                        continue;
                     }
+
+                    $monthlyAuditScores[$monthName] = $results;
                 }
-
-                $monthlyAuditScores[$monthName] = $results;
-
-            } elseif ($type === 'External Audit') {
-                $audits = $this->externalAuditInterface->filterByParams($startOfMonth, $endOfMonth, $division);
-                $results = [];
-
-                foreach ($audits as $audit) {
-                    $score = is_numeric($audit->auditScore) ? (float) $audit->auditScore : 0;
-
-                    $results[] = [
-                        'externalAuditId' => $audit->id,
-                        'auditScore' => $score,
-                        'auditType' => $audit->auditType,
-                        'auditFirm' => $audit->auditFirm,
-                    ];
-
-                    $monthlyTotals[$monthName] += $score;
-                    $monthlyCountScores[$monthName]++;
-                    $totalScore += $score;
-                }
-
-                $monthlyAuditScores[$monthName] = $results;
             }
         }
+
+        return response()->json([
+            'yearStart'         => $startYear,
+            'yearEnd'           => $endYear,
+            'type'              => $type,
+            'division'          => $division,
+            'data'              => $monthlyAuditScores,
+            'monthlyTotal'      => $monthlyTotals,
+            'monthlyCountScore' => $monthlyCountScores,
+            'totalScore'        => $totalScore,
+        ]);
     }
 
-    return response()->json([
-        'yearStart' => $startYear,
-        'yearEnd' => $endYear,
-        'type' => $type,
-        'division' => $division,
-        'data' => $monthlyAuditScores,
-        'monthlyTotal' => $monthlyTotals,
-        'monthlyCountScore' => $monthlyCountScores,
-        'totalScore' => $totalScore,
-    ]);
-}
+    public function getCombinedStatusCountMonthly($startDate = null, $endDate = null, $division = null, $type = null)
+    {
+        $monthNames = [
+            1  => 'January', 2  => 'February', 3  => 'March',
+            4  => 'April', 5    => 'May', 6       => 'June',
+            7  => 'July', 8     => 'August', 9    => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December',
+        ];
 
+        $monthlyStatusSummary = [];
+        $monthlyAuditFeeTotal = [];
 
+        $start = new \DateTime($startDate);
+        $end   = new \DateTime($endDate);
+        $end->modify('last day of this month');
+
+        while ($start <= $end) {
+            $year      = $start->format('Y');
+            $month     = (int) $start->format('m');
+            $monthName = $monthNames[$month] . " $year";
+
+            $startOfMonth = $start->format('Y-m-01');
+            $endOfMonth   = $start->format('Y-m-t');
+
+            $statusSummary = [];
+            $auditFeeTotal = 0;
+
+            if ($type === 'External Audit' || $type === 'both') {
+                $externalRecords = $this->externalAuditInterface->filterByParams($startOfMonth, $endOfMonth, $division);
+
+                foreach ($externalRecords as $record) {
+                    $status                 = strtolower(trim($record->status ?? 'unknown'));
+                    $statusSummary[$status] = ($statusSummary[$status] ?? 0) + 1;
+
+                    if (is_numeric($record->auditFee)) {
+                        $auditFeeTotal += floatval($record->auditFee);
+                    }
+                }
+            }
+
+            if ($type === 'Internal Audit' || $type === 'both') {
+                $internalRecords = $this->internalAuditRecodeInterface->filterByParams($startOfMonth, $endOfMonth, $division);
+
+                foreach ($internalRecords as $record) {
+                    $status                 = strtolower(trim($record->status ?? 'unknown'));
+                    $statusSummary[$status] = ($statusSummary[$status] ?? 0) + 1;
+
+                    if (is_numeric($record->auditFee)) {
+                        $auditFeeTotal += floatval($record->auditFee);
+                    }
+                }
+            }
+
+            $monthlyStatusSummary[$monthName] = $statusSummary;
+            $monthlyAuditFeeTotal[$monthName] = round($auditFeeTotal, 2);
+
+            $start->modify('+1 month');
+        }
+
+        return response()->json([
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
+            'division'  => $division,
+            'type'      => $type,
+            'data'      => $monthlyStatusSummary,
+        ]);
+    }
 
     public function getStatusCountByMonth($startDate, $endDate, $year, $division, $type)
     {
@@ -421,7 +485,7 @@ public function getCombinedScoreCountByMonth($startDate, $endDate, $division, $t
         for ($month = 1; $month <= 12; $month++) {
             $statusSummary = [];
 
-            if ($type === 'external' || $type === 'both') {
+            if ($type === 'External Audit' || $type === 'both') {
                 $externalRecords = $this->externalAuditInterface
                     ->filterByYearMonthDivision($year, $month, $division);
 
@@ -431,7 +495,7 @@ public function getCombinedScoreCountByMonth($startDate, $endDate, $division, $t
                 }
             }
 
-            if ($type === 'internal' || $type === 'both') {
+            if ($type === 'Internal Audit' || $type === 'both') {
                 $internalRecords = $this->internalAuditRecodeInterface
                     ->filterByYearMonthDivision($year, $month, $division);
 
@@ -454,42 +518,79 @@ public function getCombinedScoreCountByMonth($startDate, $endDate, $division, $t
         ]);
     }
 
-    public function getAuditScoresByYearDivision($year, $division)
+    public function getAssignedCompletionStats($startDate = null, $endDate = null, $division = null, $type = null)
     {
-        $monthNames = [
-            1  => 'January', 2  => 'February', 3  => 'March',
-            4  => 'April', 5    => 'May', 6       => 'June',
-            7  => 'July', 8     => 'August', 9    => 'September',
-            10 => 'October', 11 => 'November', 12 => 'December',
-        ];
+        $userStats = [];
 
-        $monthlyAuditScores = array_combine(array_values($monthNames), array_fill(0, 12, []));
+        if ($type === 'External Audit' || $type === 'both') {
+            $externalRecords = $this->externalAuditInterface->filterByParams($startDate, $endDate, $division);
 
-        for ($month = 1; $month <= 12; $month++) {
-            $records = $this->externalAuditInterface->filterByYearMonthDivision($year, $month, $division);
-
-            $statusSummary = [];
-
-            foreach ($records as $record) {
-                $category = $record->auditCategory;
-                $score    = is_numeric($record->auditScore) ? floatval($record->auditScore) : 0;
-
-                if (! isset($statusSummary[$category])) {
-                    $statusSummary[$category] = 0;
+            foreach ($externalRecords as $record) {
+                $userId = $record->representorId ?? null;
+                if (! $userId) {
+                    continue;
                 }
 
-                $statusSummary[$category] += $score;
+                $status = $record->status ?? 'unknown';
+                if (! isset($userStats[$userId])) {
+                    $userStats[$userId] = ['total' => 0, 'completed' => 0];
+                }
+
+                $userStats[$userId]['total']++;
+                if ($status === 'complete') {
+                    $userStats[$userId]['completed']++;
+                }
             }
 
-            $monthName                      = $monthNames[$month];
-            $monthlyAuditScores[$monthName] = $statusSummary;
+        }
+
+        if ($type === 'Internal Audit' || $type === 'both') {
+            $internalRecords = $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate, $division);
+
+            foreach ($internalRecords as $record) {
+                $userId = $record->factoryContactPersonId ?? null;
+                if (! $userId) {
+                    continue;
+                }
+
+                $status = $record->status ?? 'unknown';
+
+                if (! isset($userStats[$userId])) {
+                    $userStats[$userId] = ['total' => 0, 'completed' => 0];
+                }
+
+                $userStats[$userId]['total']++;
+                if ($status === 'complete') {
+                    $userStats[$userId]['completed']++;
+                }
+            }
+
+        }
+
+        $userIds = array_keys($userStats);
+        $users   = $this->userInterface->getByIds($userIds);
+
+        foreach ($userStats as $userId => $stat) {
+            $user = $users->get($userId);
+
+            $results[] = [
+                'userId'     => $userId,
+                'userName'   => $user->name ?? "User #$userId",
+                'userEmail'  => $user->email ?? null,
+                'total'      => $stat['total'],
+                'completed'  => $stat['completed'],
+                'percentage' => $stat['total'] > 0 ? round(($stat['completed'] / $stat['total']) * 100, 2) : 0,
+            ];
         }
 
         return response()->json([
-            'year'     => (int) $year,
-            'division' => $division,
-            'data'     => $monthlyAuditScores,
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
+            'division'  => $division,
+            'type'      => $type,
+            'data'      => $results,
         ]);
     }
 
+    
 }
