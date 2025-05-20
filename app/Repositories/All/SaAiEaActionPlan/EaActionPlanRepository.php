@@ -29,5 +29,10 @@ class EaActionPlanRepository extends BaseRepository implements EaActionPlanInter
     {
         return $this->model->where('externalAuditId', $externalAuditId)->delete();
     }
+    public function getByExternalAuditId($externalAuditId)
+    {
+        return $this->model->where('externalAuditId', $externalAuditId)->first();
+    }
+
 
 }

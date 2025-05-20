@@ -7,6 +7,7 @@ use App\Http\Requests\SaAiExternalAudit\ExternalAuditRequest;
 use App\Models\User;
 use App\Repositories\All\SaAiEaActionPlan\EaActionPlanInterface;
 use App\Repositories\All\SaAiExternalAudit\ExternalAuditInterface;
+use App\Repositories\All\SaAiIaActionPlan\ActionPlanInterface;
 use App\Repositories\All\SaAiIaAnswerRecode\AnswerRecodeInterface;
 use App\Repositories\All\SaAiIaQuestionRecode\QuestionRecodeInterface;
 use App\Repositories\All\SaAiInternalAuditRecode\InternalAuditRecodeInterface;
@@ -24,8 +25,9 @@ class SaAiExternalAuditRecodeController extends Controller
     protected $answerRecodeInterface;
     protected $questionRecodeInterface;
     protected $eaActionPlanInterface;
+    protected $actionPlanInterface;
 
-    public function __construct(ExternalAuditInterface $externalAuditInterface, QuestionRecodeInterface $questionRecodeInterface, AnswerRecodeInterface $answerRecodeInterface, UserInterface $userInterface, ExternalAuditService $externalAuditService, InternalAuditRecodeInterface $internalAuditRecodeInterface, EaActionPlanInterface $eaActionPlanInterface)
+    public function __construct(ExternalAuditInterface $externalAuditInterface, QuestionRecodeInterface $questionRecodeInterface, AnswerRecodeInterface $answerRecodeInterface, UserInterface $userInterface, ExternalAuditService $externalAuditService, InternalAuditRecodeInterface $internalAuditRecodeInterface, EaActionPlanInterface $eaActionPlanInterface, ActionPlanInterface $actionPlanInterface)
     {
         $this->externalAuditInterface       = $externalAuditInterface;
         $this->userInterface                = $userInterface;
@@ -34,6 +36,7 @@ class SaAiExternalAuditRecodeController extends Controller
         $this->answerRecodeInterface        = $answerRecodeInterface;
         $this->questionRecodeInterface      = $questionRecodeInterface;
         $this->eaActionPlanInterface        = $eaActionPlanInterface;
+        $this->actionPlanInterface          = $actionPlanInterface;
     }
 
     public function index()
@@ -258,7 +261,18 @@ class SaAiExternalAuditRecodeController extends Controller
 
         return response()->json($assignees);
     }
-public function actionPlanStore(EaActionPlanRequest $request)
+    public function actionPlanUpdate($id, EaActionPlanRequest $request)
+    {
+        $data = $request->validated();
+
+        $updatedActionPlan = $this->eaActionPlanInterface->update($id, $data);
+
+        return response()->json([
+            'message' => 'Action plan updated successfully',
+            'data'    => $updatedActionPlan,
+        ], 200);
+    }
+    public function actionPlanStore(EaActionPlanRequest $request)
     {
         $data       = $request->validated();
         $actionplan = $this->eaActionPlanInterface->create($data);
@@ -705,6 +719,70 @@ public function actionPlanStore(EaActionPlanRequest $request)
             'division'  => $division,
             'type'      => $type,
             'data'      => null,
+        ]);
+    }
+
+    public function getCategoryPriorityScore($startDate, $endDate, $division, $type)
+    {
+        $results = [];
+
+        if ($type === 'External Audit' || $type === 'both') {
+            $externalAudits = $this->externalAuditInterface->filterByParams($startDate, $endDate, $division);
+
+            foreach ($externalAudits as $audit) {
+                $category = $audit->auditCategory ?? 'Unknown';
+                $score    = is_numeric($audit->auditScore) ? (float) $audit->auditScore : 0;
+
+                $priority = optional($this->eaActionPlanInterface->getByExternalAuditId($audit->id))->priority ?? 'Unknown';
+
+                if (! isset($results[$category])) {
+                    $results[$category] = [];
+                }
+
+                if (! isset($results[$category][$priority])) {
+                    $results[$category][$priority] = ['score' => 0, 'count' => 0];
+                }
+
+                $results[$category][$priority]['score'] += $score;
+                $results[$category][$priority]['count'] += 1;
+            }
+        }
+        if ($type === 'Internal Audit' || $type === 'both') {
+            $internalAudits = $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate, $division);
+
+            foreach ($internalAudits as $audit) {
+                $questionRecode = $this->questionRecodeInterface->getById($audit->auditId);
+
+                if (! $questionRecode) {
+                    continue;
+                }
+
+                $questionRecodeName = $questionRecode->name ?? 'Unknown';
+                $actionPlan         = $this->actionPlanInterface->getByInternalAuditId($audit->id);
+                $priority           = optional($actionPlan)->priority ?? 'Unknown';
+
+                $answers = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
+                $score   = collect($answers)->sum('score');
+
+                if (! isset($results[$questionRecodeName])) {
+                    $results[$questionRecodeName] = [];
+                }
+
+                if (! isset($results[$questionRecodeName][$priority])) {
+                    $results[$questionRecodeName][$priority] = ['score' => 0, 'count' => 0];
+                }
+
+                $results[$questionRecodeName][$priority]['score'] += $score;
+                $results[$questionRecodeName][$priority]['count'] += 1;
+                
+            }
+        }
+        return response()->json([
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
+            'division'  => $division,
+            'type'      => $type,
+            'data'      => $results,
         ]);
     }
 
