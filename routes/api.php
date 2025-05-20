@@ -183,6 +183,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('external-audit-action-plan/{id}/update', [SaAiExternalAuditRecodeController::class, 'actionPlanUpdate']);
     Route::delete('external-audit-action-plan/{id}/delete', [SaAiExternalAuditRecodeController::class, 'actionPlanDelete']);
 
+        //calender api
+    Route::get('audit-calender/{startDate}/{endDate}/calender', [SaAiExternalAuditRecodeController::class, 'getCalendarRecord']);
+
        //audit dashboard routes
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/status-count', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCount']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/score-count', [SaAiExternalAuditRecodeController::class, 'getCombinedScoreCountByMonth']);
@@ -210,7 +213,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('internal-audit-completed/{id}/update', [SaAiInternalAuditRecodeController::class, 'complete']);
     Route::get('internal-audit-completed', [SaAiInternalAuditRecodeController::class, 'getFinalAuditers']);
 
-    
+
+
 
 
 

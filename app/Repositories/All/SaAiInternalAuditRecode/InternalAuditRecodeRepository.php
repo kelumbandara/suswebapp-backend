@@ -62,6 +62,12 @@ class InternalAuditRecodeRepository extends BaseRepository implements InternalAu
         return $query->get();
     }
 
+    public function getBetweenDates($startDate, $endDate)
+{
+    return $this->model->whereBetween('auditDate', [$startDate, $endDate])->get();
+}
+
+
 
 
 }
