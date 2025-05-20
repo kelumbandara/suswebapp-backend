@@ -179,11 +179,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('external-audit/{id}/delete', [SaAiExternalAuditRecodeController::class, 'destroy']);
     Route::get('external-audit-assign-task', [SaAiExternalAuditRecodeController::class, 'assignTask']);
     Route::get('external-audit-assignee', [SaAiExternalAuditRecodeController::class, 'assignee']);
+    Route::post('external-audit-action-plan', [SaAiExternalAuditRecodeController::class, 'actionPlanStore']);
+    Route::delete('external-audit-action-plan/{id}/delete', [SaAiExternalAuditRecodeController::class, 'actionPlanDelete']);
+
        //audit dashboard routes
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/status-count', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCount']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/score-count', [SaAiExternalAuditRecodeController::class, 'getCombinedScoreCountByMonth']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/status-count-by-month', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCountMonthly']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/assigned-completion', [SaAiExternalAuditRecodeController::class, 'getAssignedCompletionStats']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/grade-stats', [SaAiExternalAuditRecodeController::class, 'getAuditGradeStats']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/announcement-stats', [SaAiExternalAuditRecodeController::class, 'getAuditAnnouncementStats']);
 
     Route::get('internal-audit', [SaAiInternalAuditRecodeController::class, 'index']);
     Route::get('internal-audit/{id}', [SaAiInternalAuditRecodeController::class, 'show']);
