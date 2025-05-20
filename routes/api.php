@@ -209,9 +209,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('internal-audit-action-plan', [SaAiInternalAuditRecodeController::class, 'actionPlanStore']);
     Route::post('internal-audit-completed/{id}/update', [SaAiInternalAuditRecodeController::class, 'complete']);
     Route::get('internal-audit-completed', [SaAiInternalAuditRecodeController::class, 'getFinalAuditers']);
-    Route::get('internal-audit/{year}/{division}/status', [SaAiInternalAuditRecodeController::class, 'getStatusCountByMonth']);
 
-    Route::get('internal-audit/{startDate}/{endDate}/{year}/{division}/{type}/audit-scores', [SaAiInternalAuditRecodeController::class, 'getAuditScoresByYearDivision']);
+    
+
+
 
     Route::get('question-reports', [SaAiIaQuestionRecodeController::class, 'index']);
     Route::post('question-reports', [SaAiIaQuestionRecodeController::class, 'store']);
