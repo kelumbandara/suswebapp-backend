@@ -89,6 +89,8 @@ use App\Repositories\All\OhMrBeBenefitType\BenefitTypeInterface;
 use App\Repositories\All\OhMrBeBenefitType\BenefitTypeRepository;
 use App\Repositories\All\OhMrBenefitRequest\BenefitRequestInterface;
 use App\Repositories\All\OhMrBenefitRequest\BenefitRequestRepository;
+use App\Repositories\All\SaAiEaActionPlan\EaActionPlanInterface;
+use App\Repositories\All\SaAiEaActionPlan\EaActionPlanRepository;
 use App\Repositories\All\SaAiEaAuditCategory\ExternalAuditCategoryInterface;
 use App\Repositories\All\SaAiEaAuditCategory\ExternalAuditCategoryRepository;
 use App\Repositories\All\SaAiEaAuditFirm\ExternalAuditFirmInterface;
@@ -291,6 +293,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(PositiveListInterface::class, PositiveListRepository::class);
         $this->app->bind(SuplierNameInterface::class, SuplierNameRepository::class);
         $this->app->bind(ComOrganizationInterface::class, ComOrganizationRepository::class);
+        $this->app->bind(EaActionPlanInterface::class, EaActionPlanRepository::class);
 
     }
 }

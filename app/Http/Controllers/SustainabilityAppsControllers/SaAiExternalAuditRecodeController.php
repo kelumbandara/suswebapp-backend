@@ -2,8 +2,10 @@
 namespace App\Http\Controllers\SustainabilityAppsControllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SaAiEaActionPlan\EaActionPlanRequest;
 use App\Http\Requests\SaAiExternalAudit\ExternalAuditRequest;
 use App\Models\User;
+use App\Repositories\All\SaAiEaActionPlan\EaActionPlanInterface;
 use App\Repositories\All\SaAiExternalAudit\ExternalAuditInterface;
 use App\Repositories\All\SaAiIaAnswerRecode\AnswerRecodeInterface;
 use App\Repositories\All\SaAiIaQuestionRecode\QuestionRecodeInterface;
@@ -21,8 +23,9 @@ class SaAiExternalAuditRecodeController extends Controller
     protected $internalAuditRecodeInterface;
     protected $answerRecodeInterface;
     protected $questionRecodeInterface;
+    protected $eaActionPlanInterface;
 
-    public function __construct(ExternalAuditInterface $externalAuditInterface, QuestionRecodeInterface $questionRecodeInterface, AnswerRecodeInterface $answerRecodeInterface, UserInterface $userInterface, ExternalAuditService $externalAuditService, InternalAuditRecodeInterface $internalAuditRecodeInterface)
+    public function __construct(ExternalAuditInterface $externalAuditInterface, QuestionRecodeInterface $questionRecodeInterface, AnswerRecodeInterface $answerRecodeInterface, UserInterface $userInterface, ExternalAuditService $externalAuditService, InternalAuditRecodeInterface $internalAuditRecodeInterface, EaActionPlanInterface $eaActionPlanInterface)
     {
         $this->externalAuditInterface       = $externalAuditInterface;
         $this->userInterface                = $userInterface;
@@ -30,6 +33,7 @@ class SaAiExternalAuditRecodeController extends Controller
         $this->internalAuditRecodeInterface = $internalAuditRecodeInterface;
         $this->answerRecodeInterface        = $answerRecodeInterface;
         $this->questionRecodeInterface      = $questionRecodeInterface;
+        $this->eaActionPlanInterface        = $eaActionPlanInterface;
     }
 
     public function index()
@@ -254,7 +258,25 @@ class SaAiExternalAuditRecodeController extends Controller
 
         return response()->json($assignees);
     }
+public function actionPlanStore(EaActionPlanRequest $request)
+    {
+        $data       = $request->validated();
+        $actionplan = $this->eaActionPlanInterface->create($data);
+        return response()->json([
+            'message' => 'Action plan created successfully',
+            'data'    => $actionplan,
+        ], 201);
 
+    }
+
+    public function actionPlanDelete($id)
+    {
+        $actionplan = $this->eaActionPlanInterface->deleteById($id);
+        return response()->json([
+            'message' => $actionplan ? 'Record deleted successfully!' : 'Failed to delete record.',
+        ], $actionplan ? 200 : 500);
+
+    }
     public function getCombinedStatusCount($startDate = null, $endDate = null, $division = null, $type = null)
     {
 
@@ -548,7 +570,7 @@ class SaAiExternalAuditRecodeController extends Controller
             $internalRecords = $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate, $division);
 
             foreach ($internalRecords as $record) {
-                $userId = $record->factoryContactPersonId ?? null;
+                $userId = $record->auditeeId ?? null;
                 if (! $userId) {
                     continue;
                 }
@@ -592,5 +614,98 @@ class SaAiExternalAuditRecodeController extends Controller
         ]);
     }
 
-    
+    public function getAuditGradeStats($startDate = null, $endDate = null, $division = null, $type = null)
+    {
+        if ($type === 'External Audit' || $type === 'both') {
+            $gradeStats = [];
+
+            $externalRecords = $this->externalAuditInterface->filterByParams($startDate, $endDate, $division);
+            $totalCount      = 0;
+
+            foreach ($externalRecords as $record) {
+                $grade = $record->auditGrade ?? 'Unknown';
+
+                if (! isset($gradeStats[$grade])) {
+                    $gradeStats[$grade] = 0;
+                }
+
+                $gradeStats[$grade]++;
+                $totalCount++;
+            }
+
+            $results = [];
+
+            foreach ($gradeStats as $grade => $count) {
+                $results[] = [
+                    'grade'      => $grade,
+                    'count'      => $count,
+                    'percentage' => $totalCount > 0 ? round(($count / $totalCount) * 100, 2) : 0,
+                ];
+            }
+
+            return response()->json([
+                'startDate' => $startDate,
+                'endDate'   => $endDate,
+                'division'  => $division,
+                'type'      => $type,
+                'data'      => $results,
+            ]);
+        }
+
+        return response()->json([
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
+            'division'  => $division,
+            'type'      => $type,
+            'data'      => null,
+        ]);
+    }
+
+    public function getAuditAnnouncementStats($startDate = null, $endDate = null, $division = null, $type = null)
+    {
+        if ($type === 'External Audit' || $type === 'both') {
+            $announcementStats = [];
+
+            $externalRecords = $this->externalAuditInterface->filterByParams($startDate, $endDate, $division);
+            $totalCount      = 0;
+
+            foreach ($externalRecords as $record) {
+                $announcement = $record->announcement ?? 'Unknown';
+
+                if (! isset($announcementStats[$announcement])) {
+                    $announcementStats[$announcement] = 0;
+                }
+
+                $announcementStats[$announcement]++;
+                $totalCount++;
+            }
+
+            $results = [];
+
+            foreach ($announcementStats as $announcement => $count) {
+                $results[] = [
+                    'announcement' => $announcement,
+                    'count'        => $count,
+                    'percentage'   => $totalCount > 0 ? round(($count / $totalCount) * 100, 2) : 0,
+                ];
+            }
+
+            return response()->json([
+                'startDate' => $startDate,
+                'endDate'   => $endDate,
+                'division'  => $division,
+                'type'      => $type,
+                'data'      => $results,
+            ]);
+        }
+
+        return response()->json([
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
+            'division'  => $division,
+            'type'      => $type,
+            'data'      => null,
+        ]);
+    }
+
 }
