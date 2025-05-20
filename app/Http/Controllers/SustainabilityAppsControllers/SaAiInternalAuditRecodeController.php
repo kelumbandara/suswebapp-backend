@@ -643,49 +643,117 @@ class SaAiInternalAuditRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $internalAudit = $this->internalAuditRecodeInterface->getByApproverId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+        try {
+            $internalAudits = $this->internalAuditRecodeInterface->getByApproverId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
-        $internalAudit = $internalAudit->map(function ($audit) {
-            try {
-                $approver        = $this->userInterface->getById($audit->approverId);
-                $audit->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
-            } catch (\Exception $e) {
-                $audit->approver = ['name' => 'Unknown', 'id' => null];
-            }
-            try {
-                $auditee        = $this->userInterface->getById($audit->auditeeId);
-                $audit->auditee = $auditee ? ['name' => $auditee->name, 'id' => $auditee->id] : ['name' => 'Unknown', 'id' => null];
-            } catch (\Exception $e) {
-                $audit->auditee = ['name' => 'Unknown', 'id' => null];
-            }
-
-            try {
-                $creator                  = $this->userInterface->getById($audit->createdByUser);
-                $audit->createdByUserName = $creator ? $creator->name : 'Unknown';
-            } catch (\Exception $e) {
-                $audit->createdByUserName = 'Unknown';
-            }
-            try {
-                $departments = [];
-                if (is_array($audit->department)) {
-                    foreach ($audit->department as $dept) {
-                        $deptId = is_array($dept) && isset($dept['id']) ? $dept['id'] : $dept;
-
-                        $department = $this->departmentInterface->getById($deptId);
-
-                        $departments[] = $department
-                        ? ['department' => $department->department, 'id' => $department->id]
-                        : ['department' => 'Unknown', 'id' => $deptId];
-                    }
+            $internalAudits = $internalAudits->map(function ($audit) {
+                try {
+                    $approver        = $this->userInterface->getById($audit->approverId);
+                    $audit->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
+                } catch (\Exception $e) {
+                    $audit->approver = ['name' => 'Unknown', 'id' => null];
                 }
-                $audit->department = $departments;
-            } catch (\Exception $e) {
-                $audit->department = [['department' => 'Unknown', 'id' => null]];
-            }
-            return $audit;
-        });
 
-        return response()->json($internalAudit, 200);
+                try {
+                    $auditee        = $this->userInterface->getById($audit->auditeeId);
+                    $audit->auditee = $auditee ? ['name' => $auditee->name, 'id' => $auditee->id] : ['name' => 'Unknown', 'id' => null];
+                } catch (\Exception $e) {
+                    $audit->auditee = ['name' => 'Unknown', 'id' => null];
+                }
+
+                try {
+                    $creator                  = $this->userInterface->getById($audit->createdByUser);
+                    $audit->createdByUserName = $creator ? $creator->name : 'Unknown';
+                } catch (\Exception $e) {
+                    $audit->createdByUserName = 'Unknown';
+                }
+
+                try {
+                    $contactPerson               = $this->contactPersonInterface->getById($audit->factoryContactPersonId);
+                    $audit->factoryContactPerson = $contactPerson
+                    ? ['name' => $contactPerson->name, 'id' => $contactPerson->id]
+                    : ['name' => 'Unknown', 'id' => null];
+                } catch (\Exception $e) {
+                    $audit->factoryContactPerson = ['name' => 'Unknown', 'id' => null];
+                }
+
+                try {
+                    $questionRecode = $this->questionRecodeInterface->getById($audit->auditId);
+
+                    $totalQuestions = 0;
+                    $totalScore     = 0;
+
+                    $groups = $this->groupRecodeInterface->findByQuestionRecoId($questionRecode->id);
+
+                    $groups = collect($groups)->map(function ($group) use (&$totalQuestions, &$totalScore) {
+                        $questions = $this->questionsInterface->findByQueGroupId($group->queGroupId);
+
+                        $group->questions = $questions;
+                        $totalQuestions += count($questions);
+                        $totalScore += collect($questions)->sum('allocatedScore');
+
+                        return $group;
+                    });
+
+                    $questionRecode->questionGroups         = $groups;
+                    $questionRecode->totalNumberOfQuestions = $totalQuestions;
+                    $questionRecode->achievableScore        = $totalScore;
+
+                    $audit->audit = $questionRecode;
+
+                } catch (\Exception $e) {
+                    $audit->audit = null;
+                }
+
+                try {
+                    $departments = [];
+                    if (is_array($audit->department)) {
+                        foreach ($audit->department as $dept) {
+                            $deptId = is_array($dept) && isset($dept['id']) ? $dept['id'] : $dept;
+
+                            $department = $this->departmentInterface->getById($deptId);
+
+                            $departments[] = $department
+                            ? ['department' => $department->department, 'id' => $department->id]
+                            : ['department' => 'Unknown', 'id' => $deptId];
+                        }
+                    }
+                    $audit->department = $departments;
+                } catch (\Exception $e) {
+                    $audit->department = [['department' => 'Unknown', 'id' => null]];
+                }
+
+                try {
+                    $actionPlans       = $this->actionPlanInterface->findByInternalAuditId($audit->id);
+                    $audit->actionPlan = collect($actionPlans)->map(function ($actionPlan) {
+                        try {
+                            $approver             = $this->userInterface->getById($actionPlan->approverId);
+                            $actionPlan->approver = $approver
+                            ? ['name' => $approver->name, 'id' => $approver->id]
+                            : ['name' => 'Unknown', 'id' => null];
+                        } catch (\Exception $e) {
+                            $actionPlan->approver = ['name' => 'Unknown', 'id' => null];
+                        }
+                        return $actionPlan;
+                    });
+                } catch (\Exception $e) {
+                    $audit->actionPlan = [];
+                }
+
+                try {
+                    $audit->answers = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
+                } catch (\Exception $e) {
+                    $audit->answers = [];
+                }
+
+                return $audit;
+            });
+
+            return response()->json($internalAudits, 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Something went wrong', 'error' => $e->getMessage()], 500);
+        }
     }
 
     public function assignee()
@@ -735,7 +803,6 @@ class SaAiInternalAuditRecodeController extends Controller
             'data'     => $monthlyStatusCounts,
         ]);
     }
-
 
     public function getAuditScoresByYearDivision($year, $division)
     {

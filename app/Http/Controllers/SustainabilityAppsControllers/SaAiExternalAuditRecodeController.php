@@ -39,77 +39,71 @@ class SaAiExternalAuditRecodeController extends Controller
         $this->actionPlanInterface          = $actionPlanInterface;
     }
 
-public function index()
-{
-    $externalAudit = $this->externalAuditInterface->All()
-        ->sortByDesc('created_at')
-        ->sortByDesc('updated_at')
-        ->values();
+    public function index()
+    {
+        $externalAudit = $this->externalAuditInterface->All()
+            ->sortByDesc('created_at')
+            ->sortByDesc('updated_at')
+            ->values();
 
-    $externalAudit = $externalAudit->map(function ($audit) {
-        // Attach approver info
-        try {
-            $approver = $this->userInterface->getById($audit->approverId);
-            $audit->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
-        } catch (\Exception $e) {
-            $audit->approver = ['name' => 'Unknown', 'id' => null];
-        }
-
-        // Attach representor info
-        try {
-            $representor = $this->userInterface->getById($audit->representorId);
-            $audit->representor = $representor ? ['name' => $representor->name, 'id' => $representor->id] : ['name' => 'Unknown', 'id' => null];
-        } catch (\Exception $e) {
-            $audit->representor = ['name' => 'Unknown', 'id' => null];
-        }
-
-        // Attach creator info
-        try {
-            $creator = $this->userInterface->getById($audit->createdByUser);
-            $audit->createdByUserName = $creator ? $creator->name : 'Unknown';
-        } catch (\Exception $e) {
-            $audit->createdByUserName = 'Unknown';
-        }
-
-        // Handle documents and signed URLs
-        if (!empty($audit->documents) && is_string($audit->documents)) {
-            $documents = json_decode($audit->documents, true);
-        } else {
-            $documents = is_array($audit->documents) ? $audit->documents : [];
-        }
-
-        foreach ($documents as &$document) {
-            if (isset($document['gsutil_uri'])) {
-                $imageData = $this->externalAuditService->getImageUrl($document['gsutil_uri']);
-                $document['imageUrl'] = $imageData['signedUrl'];
-                $document['fileName'] = $imageData['fileName'];
-            }
-        }
-
-        $audit->documents = $documents;
-
-        // Attach action plans with approver info
-        $actionPlans = $this->eaActionPlanInterface->findByExternalAuditId($audit->id);
-        $actionPlans = collect($actionPlans)->map(function ($actionPlan) {
+        $externalAudit = $externalAudit->map(function ($audit) {
             try {
-                $approver = $this->userInterface->getById($actionPlan->approverId);
-                $actionPlan->approver = $approver
+                $approver        = $this->userInterface->getById($audit->approverId);
+                $audit->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $audit->approver = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $representor        = $this->userInterface->getById($audit->representorId);
+                $audit->representor = $representor ? ['name' => $representor->name, 'id' => $representor->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $audit->representor = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $creator                  = $this->userInterface->getById($audit->createdByUser);
+                $audit->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $audit->createdByUserName = 'Unknown';
+            }
+
+            if (! empty($audit->documents) && is_string($audit->documents)) {
+                $documents = json_decode($audit->documents, true);
+            } else {
+                $documents = is_array($audit->documents) ? $audit->documents : [];
+            }
+
+            foreach ($documents as &$document) {
+                if (isset($document['gsutil_uri'])) {
+                    $imageData            = $this->externalAuditService->getImageUrl($document['gsutil_uri']);
+                    $document['imageUrl'] = $imageData['signedUrl'];
+                    $document['fileName'] = $imageData['fileName'];
+                }
+            }
+
+            $audit->documents = $documents;
+
+            $actionPlans = $this->eaActionPlanInterface->findByExternalAuditId($audit->id);
+            $actionPlans = collect($actionPlans)->map(function ($actionPlan) {
+                try {
+                    $approver             = $this->userInterface->getById($actionPlan->approverId);
+                    $actionPlan->approver = $approver
                     ? ['name' => $approver->name, 'id' => $approver->id]
                     : ['name' => 'Unknown', 'id' => null];
-            } catch (\Exception $e) {
-                $actionPlan->approver = ['name' => 'Unknown', 'id' => null];
-            }
-            return $actionPlan;
+                } catch (\Exception $e) {
+                    $actionPlan->approver = ['name' => 'Unknown', 'id' => null];
+                }
+                return $actionPlan;
+            });
+
+            $audit->actionPlan = $actionPlans;
+
+            return $audit;
         });
 
-        $audit->actionPlan = $actionPlans;
-
-        return $audit;
-    });
-
-    return response()->json($externalAudit, 200);
-}
-
+        return response()->json($externalAudit, 200);
+    }
 
     public function store(ExternalAuditRequest $request)
     {
