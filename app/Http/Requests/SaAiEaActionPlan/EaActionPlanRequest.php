@@ -23,7 +23,7 @@ class EaActionPlanRequest extends FormRequest
     {
 
         return [
-            'internalAuditId'              => 'required|numeric',
+            'externalAuditId'              => 'required|numeric',
             'correctiveOrPreventiveAction' => 'required|string',
             'priority'                     => 'required|string',
             'approverId'                   => 'required|numeric',
