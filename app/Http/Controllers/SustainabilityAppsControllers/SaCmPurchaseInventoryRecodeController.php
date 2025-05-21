@@ -71,7 +71,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
                 $certificate->documents = $certificateDocs;
             }
 
-            $record->certificate = $certificate ? [$certificate] : [];
+            $record->certificate = $certificate ? $certificate : null;
 
             try {
                 $creator               = $this->userInterface->getById($record->createdByUser);
