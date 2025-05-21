@@ -197,7 +197,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('audit-status-count/{startDate}/{endDate}/{type}/all-division-record', [SaAiExternalAuditRecodeController::class, 'getAllDivisionRecode']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/audit-standards', [SaAiExternalAuditRecodeController::class, 'getAuditStandardsRecode']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/audit-completion-draft', [SaAiExternalAuditRecodeController::class, 'getAuditCompletionDraftStats']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/expiry-acction', [SaAiExternalAuditRecodeController::class, 'getAuditActionPlanByDateRange']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/audit-type', [SaAiExternalAuditRecodeController::class, 'getAuditTypeStats']);
 
+
+    
     Route::get('internal-audit', [SaAiInternalAuditRecodeController::class, 'index']);
     Route::get('internal-audit/{id}', [SaAiInternalAuditRecodeController::class, 'show']);
     Route::post('internal-audit', [SaAiInternalAuditRecodeController::class, 'store']);

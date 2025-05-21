@@ -832,7 +832,7 @@ class SaAiExternalAuditRecodeController extends Controller
 
         $userIds = array_keys($userStats);
         $users   = $this->userInterface->getByIds($userIds);
-
+        $results = [];
         foreach ($userStats as $userId => $stat) {
             $user = $users->get($userId);
 
@@ -1145,72 +1145,184 @@ class SaAiExternalAuditRecodeController extends Controller
         ]);
     }
 
-  public function getAuditCompletionDraftStats($startDate = null, $endDate = null, $division = null, $type = null)
-{
-    $allRecords          = collect();
-    $timeFilteredRecords = collect();
-    $internalRecords     = collect();
-    $externalRecords     = collect();
-    $internalTime        = collect();
-    $externalTime        = collect();
+    public function getAuditCompletionDraftStats($startDate = null, $endDate = null, $division = null, $type = null)
+    {
+        $allRecords          = collect();
+        $timeFilteredRecords = collect();
+        $internalRecords     = collect();
+        $externalRecords     = collect();
+        $internalTime        = collect();
+        $externalTime        = collect();
 
-    if ($type === 'External Audit' || $type === 'both') {
-        $externalRecords  = $this->externalAuditInterface->filterByParams(null, null, $division);
-        $externalTime     = $this->externalAuditInterface->filterByParams($startDate, $endDate, $division);
-        $allRecords       = $allRecords->merge($externalRecords);
-        $timeFilteredRecords = $timeFilteredRecords->merge($externalTime);
+        if ($type === 'External Audit' || $type === 'both') {
+            $externalRecords     = $this->externalAuditInterface->filterByParams(null, null, $division);
+            $externalTime        = $this->externalAuditInterface->filterByParams($startDate, $endDate, $division);
+            $allRecords          = $allRecords->merge($externalRecords);
+            $timeFilteredRecords = $timeFilteredRecords->merge($externalTime);
+        }
+
+        if ($type === 'Internal Audit' || $type === 'both') {
+            $internalRecords     = $this->internalAuditRecodeInterface->filterByParams(null, null, $division);
+            $internalTime        = $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate, $division);
+            $allRecords          = $allRecords->merge($internalRecords);
+            $timeFilteredRecords = $timeFilteredRecords->merge($internalTime);
+        }
+
+        $totalRecordsCount = $allRecords->count();
+
+        $totalComplete = $externalRecords->filter(function ($r) {
+            return strtolower(trim($r->status)) === 'complete';
+        })->count() + $internalRecords->filter(function ($r) {
+            return strtolower(trim($r->status)) === 'completed';
+        })->count();
+
+        $totalDraft = $externalRecords->filter(function ($r) {
+            return strtolower(trim($r->status)) === 'draft';
+        })->count() + $internalRecords->filter(function ($r) {
+            return strtolower(trim($r->status)) === 'draft';
+        })->count();
+
+        $timeRangeRecordsCount = $timeFilteredRecords->count();
+
+        $timeComplete = $externalTime->filter(function ($r) {
+            return strtolower(trim($r->status)) === 'complete';
+        })->count() + $internalTime->filter(function ($r) {
+            return strtolower(trim($r->status)) === 'completed';
+        })->count();
+
+        $timeDraft = $externalTime->filter(function ($r) {
+            return strtolower(trim($r->status)) === 'draft';
+        })->count() + $internalTime->filter(function ($r) {
+            return strtolower(trim($r->status)) === 'draft';
+        })->count();
+
+        return response()->json([
+            'totalRecords'            => $totalRecordsCount,
+            'totalComplete'           => $totalComplete,
+            'totalDraft'              => $totalDraft,
+            'totalCompletePercentage' => $totalRecordsCount ? round(($totalComplete / $totalRecordsCount) * 100, 2) : 0,
+            'totalDraftPercentage'    => $totalRecordsCount ? round(($totalDraft / $totalRecordsCount) * 100, 2) : 0,
+
+            'timeRangeRecords'        => $timeRangeRecordsCount,
+            'timeRangeCompleteCount'  => $timeComplete,
+            'timeRangeDraftCount'     => $timeDraft,
+            'timeCompletePercentage'  => $timeRangeRecordsCount ? round(($timeComplete / $timeRangeRecordsCount) * 100, 2) : 0,
+            'timeDraftPercentage'     => $timeRangeRecordsCount ? round(($timeDraft / $timeRangeRecordsCount) * 100, 2) : 0,
+        ]);
     }
 
-    if ($type === 'Internal Audit' || $type === 'both') {
-        $internalRecords  = $this->internalAuditRecodeInterface->filterByParams(null, null, $division);
-        $internalTime     = $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate, $division);
-        $allRecords       = $allRecords->merge($internalRecords);
-        $timeFilteredRecords = $timeFilteredRecords->merge($internalTime);
+    public function getAuditActionPlanByDateRange($startDate, $endDate, $division)
+    {
+        try {
+            $externalAudits = $this->externalAuditInterface->filterByParams($startDate, $endDate, $division);
+
+            $externalNotCompleted = collect($externalAudits)->filter(function ($audit) use ($startDate, $endDate) {
+                return $audit->status !== 'complete' &&
+                $audit->auditExpiryDate >= $startDate &&
+                $audit->auditExpiryDate <= $endDate;
+            })->values();
+
+            $externalCompletedWithActionPlans = collect($externalAudits)->filter(function ($audit) {
+                return $audit->status === 'complete';
+            })->filter(function ($audit) use ($startDate, $endDate) {
+                $actionPlans = $this->eaActionPlanInterface->findByExternalAuditId($audit->id);
+                return collect($actionPlans)->contains(function ($plan) use ($startDate, $endDate) {
+                    return $plan->targetCompletionDate >= $startDate &&
+                    $plan->targetCompletionDate <= $endDate;
+                });
+            })->map(function ($audit) use ($startDate, $endDate) {
+                $actionPlans   = $this->eaActionPlanInterface->findByExternalAuditId($audit->id);
+                $filteredPlans = collect($actionPlans)->filter(function ($plan) use ($startDate, $endDate) {
+                    return $plan->targetCompletionDate >= $startDate &&
+                    $plan->targetCompletionDate <= $endDate;
+                })->values();
+
+                $audit->action_plans = $filteredPlans;
+                return $audit;
+            })->values();
+
+            $internalCompletedWithActionPlans = collect(
+                $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate, $division)
+            )->filter(function ($audit) {
+                return $audit->status === 'completed';
+            })->filter(function ($audit) use ($startDate, $endDate) {
+                $actionPlans = $this->actionPlanInterface->findByInternalAuditId($audit->id);
+                return collect($actionPlans)->contains(function ($plan) use ($startDate, $endDate) {
+                    return $plan->targetCompletionDate >= $startDate &&
+                    $plan->targetCompletionDate <= $endDate;
+                });
+            })->map(function ($audit) use ($startDate, $endDate) {
+                $actionPlans   = $this->actionPlanInterface->findByInternalAuditId($audit->id);
+                $filteredPlans = collect($actionPlans)->filter(function ($plan) use ($startDate, $endDate) {
+                    return $plan->targetCompletionDate >= $startDate &&
+                    $plan->targetCompletionDate <= $endDate;
+                })->values();
+
+                $audit->action_plans = $filteredPlans;
+                return $audit;
+            })->values();
+
+            return response()->json([
+                'external_not_completed'               => $externalNotCompleted,
+                'external_completed_with_action_plans' => $externalCompletedWithActionPlans,
+                'internal_completed_with_action_plans' => $internalCompletedWithActionPlans,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
 
-    // Normalize status comparison
-    $totalRecordsCount = $allRecords->count();
+    public function getAuditTypeStats($startDate, $endDate, $division, $type)
+    {
+        $auditTypes = [];
 
-    $totalComplete = $externalRecords->filter(function ($r) {
-        return strtolower(trim($r->status)) === 'complete';
-    })->count() + $internalRecords->filter(function ($r) {
-        return strtolower(trim($r->status)) === 'completed';
-    })->count();
+        if ($type === 'External Audit' || $type === 'both') {
+            $externalRecords = $this->externalAuditInterface->filterByParams($startDate, $endDate, $division);
 
-    $totalDraft = $externalRecords->filter(function ($r) {
-        return strtolower(trim($r->status)) === 'draft';
-    })->count() + $internalRecords->filter(function ($r) {
-        return strtolower(trim($r->status)) === 'draft';
-    })->count();
+            foreach ($externalRecords as $record) {
+                $auditType = $record->auditType ?? 'Unknown';
 
-    $timeRangeRecordsCount = $timeFilteredRecords->count();
+                if (! isset($auditTypes[$auditType])) {
+                    $auditTypes[$auditType] = 0;
+                }
 
-    $timeComplete = $externalTime->filter(function ($r) {
-        return strtolower(trim($r->status)) === 'complete';
-    })->count() + $internalTime->filter(function ($r) {
-        return strtolower(trim($r->status)) === 'completed';
-    })->count();
+                $auditTypes[$auditType]++;
+            }
+        }
 
-    $timeDraft = $externalTime->filter(function ($r) {
-        return strtolower(trim($r->status)) === 'draft';
-    })->count() + $internalTime->filter(function ($r) {
-        return strtolower(trim($r->status)) === 'draft';
-    })->count();
+        if ($type === 'Internal Audit' || $type === 'both') {
+            $internalRecords = $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate, $division);
 
-    return response()->json([
-        'totalRecords'            => $totalRecordsCount,
-        'totalComplete'           => $totalComplete,
-        'totalDraft'              => $totalDraft,
-        'totalCompletePercentage' => $totalRecordsCount ? round(($totalComplete / $totalRecordsCount) * 100, 2) : 0,
-        'totalDraftPercentage'    => $totalRecordsCount ? round(($totalDraft / $totalRecordsCount) * 100, 2) : 0,
+            foreach ($internalRecords as $record) {
+                $auditType = $record->auditType ?? 'Unknown';
 
-        'timeRangeRecords'        => $timeRangeRecordsCount,
-        'timeRangeCompleteCount'  => $timeComplete,
-        'timeRangeDraftCount'     => $timeDraft,
-        'timeCompletePercentage'  => $timeRangeRecordsCount ? round(($timeComplete / $timeRangeRecordsCount) * 100, 2) : 0,
-        'timeDraftPercentage'     => $timeRangeRecordsCount ? round(($timeDraft / $timeRangeRecordsCount) * 100, 2) : 0,
-    ]);
-}
+                if (! isset($auditTypes[$auditType])) {
+                    $auditTypes[$auditType] = 0;
+                }
 
+                $auditTypes[$auditType]++;
+            }
+        }
+
+        $results = [];
+        foreach ($auditTypes as $auditType => $count) {
+            $results[] = [
+                'auditType' => $auditType,
+                'count'     => $count,
+            ];
+        }
+
+        return response()->json([
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
+            'type'      => $type,
+            'division'  => $division,
+            'data'      => $results,
+        ]);
+    }
 
 }
