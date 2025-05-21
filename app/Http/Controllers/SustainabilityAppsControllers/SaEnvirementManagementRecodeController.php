@@ -690,20 +690,17 @@ class SaEnvirementManagementRecodeController extends Controller
         $totalReused     = 0;
         $totalRecycled   = 0;
 
-        $statusCountYear = []; // Count status per year
+        $statusCountYear = [];
 
-        // Loop through all records for the given year
         foreach ($allRecords as $record) {
             $impacts = $this->addConcumptionInterface->findByEnvirementId($record->id);
 
-            // Count status of the record itself, not each individual impact
             $status = strtolower(trim($record->status ?? 'unknown'));
             if (! isset($statusCountYear[$status])) {
                 $statusCountYear[$status] = 0;
             }
             $statusCountYear[$status]++;
 
-            // Process each impact record related to the environment record
             foreach ($impacts as $impact) {
                 $category = strtolower($impact->category);
                 $source   = strtolower($impact->source);
@@ -765,7 +762,6 @@ class SaEnvirementManagementRecodeController extends Controller
             }
         }
 
-        // Calculate percentage values
         $renewablePercentage = $totalEnergy > 0 ? ($totalRenewable / $totalEnergy) * 100 : 0;
         $reusePercentage     = $totalWasteWater > 0 ? ($totalReused / $totalWasteWater) * 100 : 0;
         $recyclePercentage   = $totalWasteWater > 0 ? ($totalRecycled / $totalWasteWater) * 100 : 0;
@@ -860,7 +856,6 @@ class SaEnvirementManagementRecodeController extends Controller
             $yearlyCategoryMonthly[] = $categorySumsPerMonth;
         }
 
-        // Status count for the whole year
         $statusSummary = [];
         foreach ($statusCountYear as $status => $count) {
             $statusSummary[$status] = $count;

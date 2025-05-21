@@ -290,4 +290,8 @@ class SaCmChemicalManagementRecodeController extends Controller
 
         return response()->json($assignees);
     }
+
+
+
+    
 }
