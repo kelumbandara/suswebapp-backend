@@ -98,7 +98,6 @@ Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('organizations', [OrganizationController::class, 'index']);
-    Route::post('organizations', [OrganizationController::class, 'store']);
     Route::post('organizations/{id}/update', [OrganizationController::class, 'update']);
     Route::delete('organizations/{id}/delete', [OrganizationController::class, 'destroy']);
 
@@ -183,10 +182,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('external-audit-action-plan/{id}/update', [SaAiExternalAuditRecodeController::class, 'actionPlanUpdate']);
     Route::delete('external-audit-action-plan/{id}/delete', [SaAiExternalAuditRecodeController::class, 'actionPlanDelete']);
 
-        //calender api
+    //calender api
     Route::get('audit-calender/{startDate}/{endDate}/calender', [SaAiExternalAuditRecodeController::class, 'getCalendarRecord']);
 
-       //audit dashboard routes
+    //audit dashboard routes
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/status-count', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCount']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/score-count', [SaAiExternalAuditRecodeController::class, 'getCombinedScoreCountByMonth']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/status-count-by-month', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCountMonthly']);
@@ -194,6 +193,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/grade-stats', [SaAiExternalAuditRecodeController::class, 'getAuditGradeStats']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/announcement-stats', [SaAiExternalAuditRecodeController::class, 'getAuditAnnouncementStats']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/category-priority-score', [SaAiExternalAuditRecodeController::class, 'getCategoryPriorityScore']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/select-division-recode', [SaAiExternalAuditRecodeController::class, 'getSelectDivisionRecode']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{type}/all-division-recode', [SaAiExternalAuditRecodeController::class, 'getAllDivisionRecode']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/audit-standards', [SaAiExternalAuditRecodeController::class, 'getAuditStandardsRecode']);
 
     Route::get('internal-audit', [SaAiInternalAuditRecodeController::class, 'index']);
     Route::get('internal-audit/{id}', [SaAiInternalAuditRecodeController::class, 'show']);
