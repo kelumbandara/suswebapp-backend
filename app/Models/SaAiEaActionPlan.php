@@ -11,6 +11,7 @@ class SaAiEaActionPlan extends Model
 
     protected $primaryKey = "actionPlanId";
 
+
     protected $fillable = [
         'externalAuditId',
         'correctiveOrPreventiveAction',
@@ -25,4 +26,5 @@ class SaAiEaActionPlan extends Model
     {
         return $this->belongsTo(SaAiExternalAuditRecode::class, 'externalAuditId');
     }
+    
 }
