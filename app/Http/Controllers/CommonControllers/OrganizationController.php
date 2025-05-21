@@ -17,53 +17,33 @@ class OrganizationController extends Controller
         $this->organizationService      = $organizationService;
     }
 
-    public function index()
-    {
-        $organizations = $this->comOrganizationInterface->all();
+public function index()
+{
+    $organization = $this->comOrganizationInterface->all()->first();
 
-        foreach ($organizations as &$organization) {
-            if (! empty($organization->logoUrl)) {
-                $imageData             = $this->organizationService->getImageUrl($organization->logoUrl);
-                $organization->logoUrl = [
-                    'signedUrl'  => $imageData['signedUrl'],
-                    'fileName'   => $imageData['fileName'],
-                    'gsutil_uri' => $organization->logoUrl,
-                ];
-            }
-
-            if (! empty($organization->insightImage)) {
-                $imageData                  = $this->organizationService->getImageUrl($organization->insightImage);
-                $organization->insightImage = [
-                    'signedUrl' => $imageData['signedUrl'],
-                    'fileName'  => $imageData['fileName'],
-                    'gsutil_uri' => $organization->insightImage,
-                ];
-            }
+    if ($organization) {
+        if (!empty($organization->logoUrl)) {
+            $imageData = $this->organizationService->getImageUrl($organization->logoUrl);
+            $organization->logoUrl = [
+                'signedUrl'  => $imageData['signedUrl'],
+                'fileName'   => $imageData['fileName'],
+                'gsutil_uri' => $organization->logoUrl,
+            ];
         }
 
-        return response()->json($organizations);
+        if (!empty($organization->insightImage)) {
+            $imageData = $this->organizationService->getImageUrl($organization->insightImage);
+            $organization->insightImage = [
+                'signedUrl'  => $imageData['signedUrl'],
+                'fileName'   => $imageData['fileName'],
+                'gsutil_uri' => $organization->insightImage,
+            ];
+        }
     }
 
-    public function store(OrganizationRequest $request, OrganizationService $orgService)
-    {
-        $data = $request->validated();
+    return response()->json($organization);
+}
 
-        if ($request->hasFile('logoUrl')) {
-            $logo            = $orgService->uploadImageToGCS($request->file('logoUrl'));
-            $data['logoUrl'] = $logo['gsutil_uri'];
-        }
-
-        if ($request->hasFile('insightImage')) {
-            $insightImage         = $orgService->uploadImageToGCS($request->file('insightImage'));
-            $data['insightImage'] = $insightImage['gsutil_uri'];
-        }
-
-        if (isset($data['colorPallet'])) {
-            $data['colorPallet'] = json_encode($data['colorPallet']);
-        }
-
-        return $this->comOrganizationInterface->create($data);
-    }
 
     public function update($id, OrganizationRequest $request, OrganizationService $orgService)
     {

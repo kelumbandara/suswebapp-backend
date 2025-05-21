@@ -35,7 +35,7 @@ class SaAiExternalAuditRecodeController extends Controller
     protected $departmentInterface;
     protected $groupRecodeInterface;
 
-    public function __construct(ExternalAuditInterface $externalAuditInterface, QuestionRecodeInterface $questionRecodeInterface, AnswerRecodeInterface $answerRecodeInterface, UserInterface $userInterface, ExternalAuditService $externalAuditService,GroupRecodeInterface $groupRecodeInterface, DepartmentInterface $departmentInterface,  QuestionsInterface $questionsInterface, ContactPersonInterface $contactPersonInterface, InternalAuditRecodeInterface $internalAuditRecodeInterface, EaActionPlanInterface $eaActionPlanInterface, ActionPlanInterface $actionPlanInterface)
+    public function __construct(ExternalAuditInterface $externalAuditInterface, QuestionRecodeInterface $questionRecodeInterface, AnswerRecodeInterface $answerRecodeInterface, UserInterface $userInterface, ExternalAuditService $externalAuditService, GroupRecodeInterface $groupRecodeInterface, DepartmentInterface $departmentInterface, QuestionsInterface $questionsInterface, ContactPersonInterface $contactPersonInterface, InternalAuditRecodeInterface $internalAuditRecodeInterface, EaActionPlanInterface $eaActionPlanInterface, ActionPlanInterface $actionPlanInterface)
     {
         $this->externalAuditInterface       = $externalAuditInterface;
         $this->userInterface                = $userInterface;
@@ -371,7 +371,6 @@ class SaAiExternalAuditRecodeController extends Controller
 
 //             $audit->documents = $documents;
 
-
 //             $actionPlans = $this->eaActionPlanInterface->findByExternalAuditId($audit->id);
 //             $actionPlans = collect($actionPlans)->map(function ($actionPlan) {
 //                 try {
@@ -395,7 +394,6 @@ class SaAiExternalAuditRecodeController extends Controller
 
 //             return $audit;
 //         });
-
 
 //         $internalAudits = $this->internalAuditRecodeInterface->getBetweenDates($startDate, $endDate)
 //             ->sortByDesc('created_at')
@@ -466,11 +464,6 @@ class SaAiExternalAuditRecodeController extends Controller
 //     }
 // }
 
-
-
-
-
-
     public function getCalendarRecord($startDate, $endDate)
     {
         try {
@@ -533,17 +526,17 @@ class SaAiExternalAuditRecodeController extends Controller
                 $audit->actionPlan = $actionPlans;
                 $audit->type       = 'external';
                 try {
-                $auditDate = new \DateTime($audit->auditDate, new \DateTimeZone('UTC'));
-                $audit->Date  = $auditDate->format('Y-m-d');
-                $audit->Year  = $auditDate->format('Y');
-                $audit->Month = $auditDate->format('m');
-                $audit->Time  = $auditDate->format('H:i:s');
-            } catch (\Exception $e) {
-                $audit->Date  = null;
-                $audit->Year  = null;
-                $audit->Month = null;
-                $audit->Time  = null;
-            }
+                    $auditDate    = new \DateTime($audit->auditDate, new \DateTimeZone('UTC'));
+                    $audit->Date  = $auditDate->format('Y-m-d');
+                    $audit->Year  = $auditDate->format('Y');
+                    $audit->Month = $auditDate->format('m');
+                    $audit->Time  = $auditDate->format('H:i:s');
+                } catch (\Exception $e) {
+                    $audit->Date  = null;
+                    $audit->Year  = null;
+                    $audit->Month = null;
+                    $audit->Time  = null;
+                }
 
                 return $audit;
             });
@@ -639,19 +632,18 @@ class SaAiExternalAuditRecodeController extends Controller
                 $audit->actionPlan = $actionPlans;
                 $audit->answers    = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
                 $audit->type       = 'internal';
-                 try {
-                $auditDate = new \DateTime($audit->auditDate, new \DateTimeZone('UTC'));
-                $audit->Date  = $auditDate->format('Y-m-d');
-                $audit->Year  = $auditDate->format('Y');
-                $audit->Month = $auditDate->format('m');
-                $audit->Time  = $auditDate->format('H:i:s');
-            } catch (\Exception $e) {
-                $audit->Date  = null;
-                $audit->Year  = null;
-                $audit->Month = null;
-                $audit->Time  = null;
-            }
-
+                try {
+                    $auditDate    = new \DateTime($audit->auditDate, new \DateTimeZone('UTC'));
+                    $audit->Date  = $auditDate->format('Y-m-d');
+                    $audit->Year  = $auditDate->format('Y');
+                    $audit->Month = $auditDate->format('m');
+                    $audit->Time  = $auditDate->format('H:i:s');
+                } catch (\Exception $e) {
+                    $audit->Date  = null;
+                    $audit->Year  = null;
+                    $audit->Month = null;
+                    $audit->Time  = null;
+                }
 
                 return $audit;
             });
@@ -1155,6 +1147,131 @@ class SaAiExternalAuditRecodeController extends Controller
             'startDate' => $startDate,
             'endDate'   => $endDate,
             'division'  => $division,
+            'type'      => $type,
+            'data'      => $results,
+        ]);
+    }
+
+    public function getSelectDivisionRecode($startDate, $endDate, $division, $type)
+    {
+        $records = [];
+
+        if ($type === 'External Audit' || $type === 'both') {
+            $records = $this->externalAuditInterface->filterByParams($startDate, $endDate, $division);
+        }
+
+        if ($type === 'Internal Audit' || $type === 'both') {
+            $records = $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate, $division);
+        }
+
+        return response()->json([
+            'startDate'  => $startDate,
+            'endDate'    => $endDate,
+            'division'   => $division,
+            'type'       => $type,
+            'totalCount' => count($records),
+        ]);
+    }
+
+    public function getAllDivisionRecode($startDate, $endDate, $type)
+    {
+        $divisionStats = [];
+
+        if ($type === 'External Audit' || $type === 'both') {
+            $externalRecords = $this->externalAuditInterface->filterByParams($startDate, $endDate,null);
+
+            foreach ($externalRecords as $record) {
+                $division = $record->division ?? 'Unknown';
+
+                if (! isset($divisionStats[$division])) {
+                    $divisionStats[$division] = 0;
+                }
+
+                $divisionStats[$division]++;
+            }
+        }
+
+        if ($type === 'Internal Audit' || $type === 'both') {
+            $internalRecords = $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate,null);
+
+            foreach ($internalRecords as $record) {
+                $division = $record->division ?? 'Unknown';
+
+                if (! isset($divisionStats[$division])) {
+                    $divisionStats[$division] = 0;
+                }
+
+                $divisionStats[$division]++;
+            }
+        }
+
+        $results = [];
+
+        foreach ($divisionStats as $division => $count) {
+            $results[] = [
+                'division' => $division,
+                'count'    => $count,
+            ];
+        }
+
+        return response()->json([
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
+            'type'      => $type,
+            'data'      => $results,
+        ]);
+    }
+
+     public function getAuditStandardsRecode($startDate, $endDate, $division, $type)
+    {
+       $auditStandards = [];
+
+        if ($type === 'External Audit' || $type === 'both') {
+            $externalRecords = $this->externalAuditInterface->filterByParams($startDate, $endDate,null);
+
+            foreach ($externalRecords as $record) {
+                $auditStandard = $record->auditStandard ?? 'Unknown';
+
+                if (! isset($auditStandards[$auditStandard])) {
+                    $auditStandards[$auditStandard] = 0;
+                }
+
+                $auditStandards[$auditStandard]++;
+            }
+        }
+
+        if ($type === 'Internal Audit' || $type === 'both') {
+            $internalRecords = $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate,null);
+
+            foreach ($internalRecords as $record) {
+                $auditStandard = $record->auditStandard ?? 'Unknown';
+
+                if (! isset($auditStandards[$auditStandard])) {
+                    $auditStandards[$auditStandard] = 0;
+                }
+
+                $auditStandards[$auditStandard]++;
+                return response()->json([
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
+            'type'      => $type,
+            'data'      => null,
+        ]);
+            }
+        }
+
+        $results = [];
+
+        foreach ($auditStandards as $auditStandard => $count) {
+            $results[] = [
+                'auditStandard' => $auditStandard,
+                'count'    => $count,
+            ];
+        }
+
+        return response()->json([
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
             'type'      => $type,
             'data'      => $results,
         ]);
