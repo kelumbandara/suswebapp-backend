@@ -193,10 +193,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/grade-stats', [SaAiExternalAuditRecodeController::class, 'getAuditGradeStats']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/announcement-stats', [SaAiExternalAuditRecodeController::class, 'getAuditAnnouncementStats']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/category-priority-score', [SaAiExternalAuditRecodeController::class, 'getCategoryPriorityScore']);
-    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/select-division-recode', [SaAiExternalAuditRecodeController::class, 'getSelectDivisionRecode']);
-    Route::get('audit-status-count/{startDate}/{endDate}/{type}/all-division-recode', [SaAiExternalAuditRecodeController::class, 'getAllDivisionRecode']);
+    Route::get('audit-status-count/{division}/{type}/select-division-record', [SaAiExternalAuditRecodeController::class, 'getSelectDivisionRecode']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{type}/all-division-record', [SaAiExternalAuditRecodeController::class, 'getAllDivisionRecode']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/audit-standards', [SaAiExternalAuditRecodeController::class, 'getAuditStandardsRecode']);
-    
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/audit-completion-draft', [SaAiExternalAuditRecodeController::class, 'getAuditCompletionDraftStats']);
 
     Route::get('internal-audit', [SaAiInternalAuditRecodeController::class, 'index']);
     Route::get('internal-audit/{id}', [SaAiInternalAuditRecodeController::class, 'show']);
@@ -215,11 +215,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('internal-audit-action-plan', [SaAiInternalAuditRecodeController::class, 'actionPlanStore']);
     Route::post('internal-audit-completed/{id}/update', [SaAiInternalAuditRecodeController::class, 'complete']);
     Route::get('internal-audit-completed', [SaAiInternalAuditRecodeController::class, 'getFinalAuditers']);
-
-
-
-
-
 
     Route::get('question-reports', [SaAiIaQuestionRecodeController::class, 'index']);
     Route::post('question-reports', [SaAiIaQuestionRecodeController::class, 'store']);
