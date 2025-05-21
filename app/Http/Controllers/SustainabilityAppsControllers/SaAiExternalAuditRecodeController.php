@@ -325,145 +325,6 @@ class SaAiExternalAuditRecodeController extends Controller
 
     }
 
-// public function getCalendarRecord($startDate, $endDate)
-// {
-//     try {
-//         $externalAudits = $this->externalAuditInterface->getBetweenDates($startDate, $endDate)
-//             ->sortByDesc('created_at')
-//             ->sortByDesc('updated_at')
-//             ->values();
-
-//         $externalAudits = $externalAudits->map(function ($audit) {
-//             try {
-//                 $approver = $this->userInterface->getById($audit->approverId);
-//                 $audit->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
-//             } catch (\Exception $e) {
-//                 $audit->approver = ['name' => 'Unknown', 'id' => null];
-//             }
-
-//             try {
-//                 $representor = $this->userInterface->getById($audit->representorId);
-//                 $audit->representor = $representor ? ['name' => $representor->name, 'id' => $representor->id] : ['name' => 'Unknown', 'id' => null];
-//             } catch (\Exception $e) {
-//                 $audit->representor = ['name' => 'Unknown', 'id' => null];
-//             }
-
-//             try {
-//                 $creator = $this->userInterface->getById($audit->createdByUser);
-//                 $audit->createdByUserName = $creator ? $creator->name : 'Unknown';
-//             } catch (\Exception $e) {
-//                 $audit->createdByUserName = 'Unknown';
-//             }
-
-//             if (!empty($audit->documents) && is_string($audit->documents)) {
-//                 $documents = json_decode($audit->documents, true);
-//             } else {
-//                 $documents = is_array($audit->documents) ? $audit->documents : [];
-//             }
-
-//             foreach ($documents as &$document) {
-//                 if (isset($document['gsutil_uri'])) {
-//                     $imageData = $this->externalAuditService->getImageUrl($document['gsutil_uri']);
-//                     $document['imageUrl'] = $imageData['signedUrl'];
-//                     $document['fileName'] = $imageData['fileName'];
-//                 }
-//             }
-
-//             $audit->documents = $documents;
-
-//             $actionPlans = $this->eaActionPlanInterface->findByExternalAuditId($audit->id);
-//             $actionPlans = collect($actionPlans)->map(function ($actionPlan) {
-//                 try {
-//                     $approver = $this->userInterface->getById($actionPlan->approverId);
-//                     $actionPlan->approver = $approver
-//                         ? ['name' => $approver->name, 'id' => $approver->id]
-//                         : ['name' => 'Unknown', 'id' => null];
-//                 } catch (\Exception $e) {
-//                     $actionPlan->approver = ['name' => 'Unknown', 'id' => null];
-//                 }
-//                 return $actionPlan;
-//             });
-
-//             $audit->actionPlan = $actionPlans;
-//             $audit->type = 'external';
-//             $date = \Carbon\Carbon::parse($audit->auditDate);
-//             $audit->year = $date->year;
-//             $audit->month = $date->month;
-//             $audit->day = $date->day;
-//             $audit->time = $date->toTimeString();
-
-//             return $audit;
-//         });
-
-//         $internalAudits = $this->internalAuditRecodeInterface->getBetweenDates($startDate, $endDate)
-//             ->sortByDesc('created_at')
-//             ->sortByDesc('updated_at')
-//             ->values();
-
-//         $internalAudits = $internalAudits->map(function ($audit) {
-//             try {
-//                 $audit->approver = $this->userInterface->getById($audit->approverId)
-//                     ? ['name' => $this->userInterface->getById($audit->approverId)->name, 'id' => $audit->approverId]
-//                     : ['name' => 'Unknown', 'id' => null];
-//             } catch (\Exception $e) {
-//                 $audit->approver = ['name' => 'Unknown', 'id' => null];
-//             }
-
-//             try {
-//                 $audit->auditee = $this->userInterface->getById($audit->auditeeId)
-//                     ? ['name' => $this->userInterface->getById($audit->auditeeId)->name, 'id' => $audit->auditeeId]
-//                     : ['name' => 'Unknown', 'id' => null];
-//             } catch (\Exception $e) {
-//                 $audit->auditee = ['name' => 'Unknown', 'id' => null];
-//             }
-
-//             try {
-//                 $audit->factoryContactPerson = $this->userInterface->getById($audit->factoryContactPersonId)
-//                     ? ['name' => $this->userInterface->getById($audit->factoryContactPersonId)->name, 'id' => $audit->factoryContactPersonId]
-//                     : ['name' => 'Unknown', 'id' => null];
-//             } catch (\Exception $e) {
-//                 $audit->factoryContactPerson = ['name' => 'Unknown', 'id' => null];
-//             }
-
-//             try {
-//                 $audit->createdByUserName = $this->userInterface->getById($audit->createdByUser)->name ?? 'Unknown';
-//             } catch (\Exception $e) {
-//                 $audit->createdByUserName = 'Unknown';
-//             }
-
-//             $actionPlans = $this->actionPlanInterface->findByInternalAuditId($audit->id);
-//             $actionPlans = collect($actionPlans)->map(function ($actionPlan) {
-//                 try {
-//                     $approver = $this->userInterface->getById($actionPlan->approverId);
-//                     $actionPlan->approver = $approver
-//                         ? ['name' => $approver->name, 'id' => $approver->id]
-//                         : ['name' => 'Unknown', 'id' => null];
-//                 } catch (\Exception $e) {
-//                     $actionPlan->approver = ['name' => 'Unknown', 'id' => null];
-//                 }
-//                 return $actionPlan;
-//             });
-
-//             $audit->actionPlan = $actionPlans;
-//             $audit->type = 'internal';
-
-//             $date = \Carbon\Carbon::parse($audit->auditDate);
-//             $audit->year = $date->year;
-//             $audit->month = $date->month;
-//             $audit->day = $date->day;
-//             $audit->time = $date->toTimeString();
-
-//             return $audit;
-//         });
-
-//         $allAudits = $externalAudits->merge($internalAudits)->values();
-
-//         return response()->json($allAudits);
-//     } catch (\Exception $e) {
-
-//     }
-// }
-
     public function getCalendarRecord($startDate, $endDate)
     {
         try {
@@ -1152,33 +1013,41 @@ class SaAiExternalAuditRecodeController extends Controller
         ]);
     }
 
-    public function getSelectDivisionRecode($startDate, $endDate, $division, $type)
-    {
-        $records = [];
+    public function getSelectDivisionRecode($division, $type)
+{
+    $records = collect();
 
-        if ($type === 'External Audit' || $type === 'both') {
-            $records = $this->externalAuditInterface->filterByParams($startDate, $endDate, $division);
-        }
-
-        if ($type === 'Internal Audit' || $type === 'both') {
-            $records = $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate, $division);
-        }
-
-        return response()->json([
-            'startDate'  => $startDate,
-            'endDate'    => $endDate,
-            'division'   => $division,
-            'type'       => $type,
-            'totalCount' => count($records),
-        ]);
+    if ($type === 'External Audit' || $type === 'both') {
+        $records = $records->merge($this->externalAuditInterface->filterByParams(null, null, $division));
     }
+
+    if ($type === 'Internal Audit' || $type === 'both') {
+        $records = $records->merge($this->internalAuditRecodeInterface->filterByParams(null, null, $division));
+    }
+
+    $groupedByYear = $records->groupBy(function ($record) {
+        return \Carbon\Carbon::parse($record->updated_at)->format('Y');
+    });
+
+    $result = $groupedByYear->map(function ($items, $year) use ($division, $type) {
+        return [
+            'division' => $division,
+            'type'     => $type,
+            'year'     => (int)$year,
+            'count'    => count($items),
+        ];
+    })->values(); 
+
+    return response()->json($result);
+}
+
 
     public function getAllDivisionRecode($startDate, $endDate, $type)
     {
         $divisionStats = [];
 
         if ($type === 'External Audit' || $type === 'both') {
-            $externalRecords = $this->externalAuditInterface->filterByParams($startDate, $endDate,null);
+            $externalRecords = $this->externalAuditInterface->filterByParams($startDate, $endDate, null);
 
             foreach ($externalRecords as $record) {
                 $division = $record->division ?? 'Unknown';
@@ -1192,7 +1061,7 @@ class SaAiExternalAuditRecodeController extends Controller
         }
 
         if ($type === 'Internal Audit' || $type === 'both') {
-            $internalRecords = $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate,null);
+            $internalRecords = $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate, null);
 
             foreach ($internalRecords as $record) {
                 $division = $record->division ?? 'Unknown';
@@ -1222,12 +1091,12 @@ class SaAiExternalAuditRecodeController extends Controller
         ]);
     }
 
-     public function getAuditStandardsRecode($startDate, $endDate, $division, $type)
+    public function getAuditStandardsRecode($startDate, $endDate, $division, $type)
     {
-       $auditStandards = [];
+        $auditStandards = [];
 
         if ($type === 'External Audit' || $type === 'both') {
-            $externalRecords = $this->externalAuditInterface->filterByParams($startDate, $endDate,null);
+            $externalRecords = $this->externalAuditInterface->filterByParams($startDate, $endDate, null);
 
             foreach ($externalRecords as $record) {
                 $auditStandard = $record->auditStandard ?? 'Unknown';
@@ -1241,7 +1110,7 @@ class SaAiExternalAuditRecodeController extends Controller
         }
 
         if ($type === 'Internal Audit' || $type === 'both') {
-            $internalRecords = $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate,null);
+            $internalRecords = $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate, null);
 
             foreach ($internalRecords as $record) {
                 $auditStandard = $record->auditStandard ?? 'Unknown';
@@ -1252,11 +1121,11 @@ class SaAiExternalAuditRecodeController extends Controller
 
                 $auditStandards[$auditStandard]++;
                 return response()->json([
-            'startDate' => $startDate,
-            'endDate'   => $endDate,
-            'type'      => $type,
-            'data'      => null,
-        ]);
+                    'startDate' => $startDate,
+                    'endDate'   => $endDate,
+                    'type'      => $type,
+                    'data'      => null,
+                ]);
             }
         }
 
@@ -1265,7 +1134,7 @@ class SaAiExternalAuditRecodeController extends Controller
         foreach ($auditStandards as $auditStandard => $count) {
             $results[] = [
                 'auditStandard' => $auditStandard,
-                'count'    => $count,
+                'count'         => $count,
             ];
         }
 
@@ -1276,5 +1145,44 @@ class SaAiExternalAuditRecodeController extends Controller
             'data'      => $results,
         ]);
     }
+
+public function getAuditCompletionDraftStats($startDate = null, $endDate = null, $division = null, $type = null)
+{
+    $allRecords = collect();
+    $timeFilteredRecords = collect();
+
+    if ($type === 'External Audit' || $type === 'both') {
+        $allRecords = $allRecords->merge($this->externalAuditInterface->filterByParams(null, null, $division));
+        $timeFilteredRecords = $timeFilteredRecords->merge($this->externalAuditInterface->filterByParams($startDate, $endDate, $division));
+    }
+
+    if ($type === 'Internal Audit' || $type === 'both') {
+        $allRecords = $allRecords->merge($this->internalAuditRecodeInterface->filterByParams(null, null, $division));
+        $timeFilteredRecords = $timeFilteredRecords->merge($this->internalAuditRecodeInterface->filterByParams($startDate, $endDate, $division));
+    }
+
+    $totalRecordsCount = $allRecords->count();
+    $totalComplete = $allRecords->where('status', 'complete')->count();
+    $totalDraft = $allRecords->where('status', 'draft')->count();
+
+    $timeRangeRecordsCount = $timeFilteredRecords->count();
+    $timeComplete = $timeFilteredRecords->where('status', 'complete')->count();
+    $timeDraft = $timeFilteredRecords->where('status', 'draft')->count();
+
+    return response()->json([
+        'totalRecords'             => $totalRecordsCount,
+        'totalComplete'            => $totalComplete,
+        'totalDraft'               => $totalDraft,
+        'totalCompletePercentage'  => $totalRecordsCount ? round(($totalComplete / $totalRecordsCount) * 100, 2) : 0,
+        'totalDraftPercentage'     => $totalRecordsCount ? round(($totalDraft / $totalRecordsCount) * 100, 2) : 0,
+
+        'timeRangeRecords'         => $timeRangeRecordsCount,
+        'timeRangeCompleteCount'   => $timeComplete,
+        'timeRangeDraftCount'      => $timeDraft,
+        'timeCompletePercentage'   => $timeRangeRecordsCount ? round(($timeComplete / $timeRangeRecordsCount) * 100, 2) : 0,
+        'timeDraftPercentage'      => $timeRangeRecordsCount ? round(($timeDraft / $timeRangeRecordsCount) * 100, 2) : 0,
+    ]);
+}
+
 
 }
