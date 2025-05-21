@@ -51,30 +51,29 @@ class SaCmPurchaseInventoryRecodeController extends Controller
 
             $certificates = $this->certificateRecordInterface->findByInventoryId($record->id);
 
-// Ensure it's an array (or convert if it's a collection)
-$certificates = is_array($certificates) ? $certificates : collect($certificates)->all();
+            $certificates = is_array($certificates) ? $certificates : collect($certificates)->all();
 
-foreach ($certificates as &$certificate) {
-    $certificateDocs = [];
+            foreach ($certificates as &$certificate) {
+                $certificateDocs = [];
 
-    if (!empty($certificate->documents) && is_string($certificate->documents)) {
-        $certificateDocs = json_decode($certificate->documents, true);
-    } elseif (is_array($certificate->documents)) {
-        $certificateDocs = $certificate->documents;
-    }
+                if (! empty($certificate->documents) && is_string($certificate->documents)) {
+                    $certificateDocs = json_decode($certificate->documents, true);
+                } elseif (is_array($certificate->documents)) {
+                    $certificateDocs = $certificate->documents;
+                }
 
-    foreach ($certificateDocs as &$doc) {
-        if (isset($doc['gsutil_uri'])) {
-            $urlData         = $this->certificationRecodeService->getImageUrl($doc['gsutil_uri']);
-            $doc['imageUrl'] = $urlData['signedUrl'];
-            $doc['fileName'] = $urlData['fileName'];
-        }
-    }
+                foreach ($certificateDocs as &$doc) {
+                    if (isset($doc['gsutil_uri'])) {
+                        $urlData         = $this->certificationRecodeService->getImageUrl($doc['gsutil_uri']);
+                        $doc['imageUrl'] = $urlData['signedUrl'];
+                        $doc['fileName'] = $urlData['fileName'];
+                    }
+                }
 
-    $certificate->documents = $certificateDocs;
-}
+                $certificate->documents = $certificateDocs;
+            }
 
-$record->certificate = $certificates;
+            $record->certificate = $certificates;
 
             try {
                 $creator               = $this->userInterface->getById($record->createdByUser);
@@ -488,5 +487,160 @@ $record->certificate = $certificates;
 
         return response()->json($records, 200);
     }
+
+    public function getStockAmount($startDate, $endDate, $division)
+    {
+        $records = $this->purchaseInventoryInterface->filterByParams($startDate, $endDate, $division);
+
+        $inStockFormulas = [];
+        $deliveredTotal  = 0;
+        $amountTotal     = 0;
+
+        foreach ($records as $record) {
+            if (! empty($record->molecularFormula)) {
+                $inStockFormulas[$record->molecularFormula] = true;
+            }
+
+            if (is_numeric($record->deliveryQuantity)) {
+                $deliveredTotal += floatval($record->deliveryQuantity);
+            }
+
+            if (is_numeric($record->purchaseAmount)) {
+                $amountTotal += floatval($record->purchaseAmount);
+            }
+        }
+
+        return response()->json([
+            'startDate'      => $startDate,
+            'endDate'        => $endDate,
+            'division'       => $division,
+            'inStockCount'   => count($inStockFormulas),
+            'deliveredTotal' => $deliveredTotal,
+            'purchaseAmount' => round($amountTotal, 2),
+        ]);
+    }
+
+    public function getMonthlyDelevery($startDate, $endDate, $division)
+    {
+        $records = $this->purchaseInventoryInterface->filterByParams($startDate, $endDate, $division);
+
+        $monthlyBreakdown = [];
+
+        foreach ($records as $record) {
+            if (empty($record->deliveryDate) || empty($record->molecularFormula)) {
+                continue;
+            }
+
+            $deliveryDate = \Carbon\Carbon::parse($record->deliveryDate);
+
+            if ($deliveryDate->lt($startDate) || $deliveryDate->gt($endDate)) {
+                continue;
+            }
+
+            $monthName = $deliveryDate->format('F');
+            $formula   = $record->molecularFormula;
+            $quantity  = is_numeric($record->deliveryQuantity) ? floatval($record->deliveryQuantity) : 0;
+
+            if (! isset($monthlyBreakdown[$monthName])) {
+                $monthlyBreakdown[$monthName] = [];
+            }
+
+            if (! isset($monthlyBreakdown[$monthName][$formula])) {
+                $monthlyBreakdown[$monthName][$formula] = 0;
+            }
+
+            $monthlyBreakdown[$monthName][$formula] += $quantity;
+        }
+
+        return response()->json([
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
+            'division'  => $division,
+            'data'      => $monthlyBreakdown,
+        ]);
+    }
+   public function getLatestRecord($startDate, $endDate, $division)
+{
+    $record = $this->purchaseInventoryInterface
+        ->filterByParams($startDate, $endDate, $division)
+        ->sortByDesc('updated_at')
+        ->first();
+
+    if (! $record) {
+        return response()->json(['message' => 'No record found'], 404);
+    }
+
+    $documents = [];
+    if (!empty($record->documents) && is_string($record->documents)) {
+        $documents = json_decode($record->documents, true);
+    } elseif (is_array($record->documents)) {
+        $documents = $record->documents;
+    }
+
+    foreach ($documents as &$doc) {
+        if (isset($doc['gsutil_uri'])) {
+            $urlData         = $this->chemicalManagementService->getImageUrl($doc['gsutil_uri']);
+            $doc['imageUrl'] = $urlData['signedUrl'];
+            $doc['fileName'] = $urlData['fileName'];
+        }
+    }
+    $record->documents = $documents;
+
+    $certificates = $this->certificateRecordInterface->findByInventoryId($record->id);
+    $certificates = is_array($certificates) ? $certificates : collect($certificates)->all();
+
+    foreach ($certificates as &$certificate) {
+        $certificateDocs = [];
+
+        if (!empty($certificate->documents) && is_string($certificate->documents)) {
+            $certificateDocs = json_decode($certificate->documents, true);
+        } elseif (is_array($certificate->documents)) {
+            $certificateDocs = $certificate->documents;
+        }
+
+        foreach ($certificateDocs as &$doc) {
+            if (isset($doc['gsutil_uri'])) {
+                $urlData         = $this->certificationRecodeService->getImageUrl($doc['gsutil_uri']);
+                $doc['imageUrl'] = $urlData['signedUrl'];
+                $doc['fileName'] = $urlData['fileName'];
+            }
+        }
+
+        $certificate->documents = $certificateDocs;
+    }
+
+    $record->certificate = $certificates;
+
+    try {
+        $creator               = $this->userInterface->getById($record->createdByUser);
+        $record->createdByUser = $creator ? ['name' => $creator->name, 'id' => $creator->id] : ['name' => 'Unknown', 'id' => null];
+    } catch (\Exception $e) {
+        $record->createdByUser = ['name' => 'Unknown', 'id' => null];
+    }
+
+    try {
+        $updater               = $this->userInterface->getById($record->updatedBy);
+        $record->updatedByUser = $updater ? ['name' => $updater->name, 'id' => $updater->id] : ['name' => 'Unknown', 'id' => null];
+    } catch (\Exception $e) {
+        $record->updatedByUser = ['name' => 'Unknown', 'id' => null];
+    }
+
+    try {
+        $approver               = $this->userInterface->getById($record->approverId);
+        $record->approvedByUser = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
+    } catch (\Exception $e) {
+        $record->approvedByUser = ['name' => 'Unknown', 'id' => null];
+    }
+
+    try {
+        $publisher               = $this->userInterface->getById($record->publishedBy);
+        $record->publishedByUser = $publisher ? ['name' => $publisher->name, 'id' => $publisher->id] : ['name' => 'Unknown', 'id' => null];
+    } catch (\Exception $e) {
+        $record->publishedByUser = ['name' => 'Unknown', 'id' => null];
+    }
+
+    return response()->json($record, 200);
+}
+
 
 }

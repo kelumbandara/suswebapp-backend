@@ -8,6 +8,7 @@ use App\Repositories\Base\EloquentRepositoryInterface;
 interface PurchaseInventoryInterface extends EloquentRepositoryInterface {
     public function filterByStatus(string $status);
     public function getByReviewerId($reviewerId);
+     public function filterByParams($startDate, $endDate, $division);
 
 
 

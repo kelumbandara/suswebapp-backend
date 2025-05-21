@@ -28,5 +28,19 @@ class PurchaseInventoryRepository extends BaseRepository implements PurchaseInve
     {
         return $this->model->where('reviewerId', $reviewerId)->get();
     }
+     public function filterByParams($startDate = null, $endDate = null, $division = null)
+    {
+        $query = $this->model->newQuery();
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('updated_at', [$startDate, $endDate]);
+        }
+
+        if ($division) {
+            $query->where('division', $division);
+        }
+
+        return $query->get();
+    }
 
 }
