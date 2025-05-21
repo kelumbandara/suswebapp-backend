@@ -1014,33 +1014,32 @@ class SaAiExternalAuditRecodeController extends Controller
     }
 
     public function getSelectDivisionRecode($division, $type)
-{
-    $records = collect();
+    {
+        $records = collect();
 
-    if ($type === 'External Audit' || $type === 'both') {
-        $records = $records->merge($this->externalAuditInterface->filterByParams(null, null, $division));
+        if ($type === 'External Audit' || $type === 'both') {
+            $records = $records->merge($this->externalAuditInterface->filterByParams(null, null, $division));
+        }
+
+        if ($type === 'Internal Audit' || $type === 'both') {
+            $records = $records->merge($this->internalAuditRecodeInterface->filterByParams(null, null, $division));
+        }
+
+        $groupedByYear = $records->groupBy(function ($record) {
+            return \Carbon\Carbon::parse($record->updated_at)->format('Y');
+        });
+
+        $result = $groupedByYear->map(function ($items, $year) use ($division, $type) {
+            return [
+                'division' => $division,
+                'type'     => $type,
+                'year'     => (int) $year,
+                'count'    => count($items),
+            ];
+        })->values();
+
+        return response()->json($result);
     }
-
-    if ($type === 'Internal Audit' || $type === 'both') {
-        $records = $records->merge($this->internalAuditRecodeInterface->filterByParams(null, null, $division));
-    }
-
-    $groupedByYear = $records->groupBy(function ($record) {
-        return \Carbon\Carbon::parse($record->updated_at)->format('Y');
-    });
-
-    $result = $groupedByYear->map(function ($items, $year) use ($division, $type) {
-        return [
-            'division' => $division,
-            'type'     => $type,
-            'year'     => (int)$year,
-            'count'    => count($items),
-        ];
-    })->values(); 
-
-    return response()->json($result);
-}
-
 
     public function getAllDivisionRecode($startDate, $endDate, $type)
     {
@@ -1146,41 +1145,70 @@ class SaAiExternalAuditRecodeController extends Controller
         ]);
     }
 
-public function getAuditCompletionDraftStats($startDate = null, $endDate = null, $division = null, $type = null)
+  public function getAuditCompletionDraftStats($startDate = null, $endDate = null, $division = null, $type = null)
 {
-    $allRecords = collect();
+    $allRecords          = collect();
     $timeFilteredRecords = collect();
+    $internalRecords     = collect();
+    $externalRecords     = collect();
+    $internalTime        = collect();
+    $externalTime        = collect();
 
     if ($type === 'External Audit' || $type === 'both') {
-        $allRecords = $allRecords->merge($this->externalAuditInterface->filterByParams(null, null, $division));
-        $timeFilteredRecords = $timeFilteredRecords->merge($this->externalAuditInterface->filterByParams($startDate, $endDate, $division));
+        $externalRecords  = $this->externalAuditInterface->filterByParams(null, null, $division);
+        $externalTime     = $this->externalAuditInterface->filterByParams($startDate, $endDate, $division);
+        $allRecords       = $allRecords->merge($externalRecords);
+        $timeFilteredRecords = $timeFilteredRecords->merge($externalTime);
     }
 
     if ($type === 'Internal Audit' || $type === 'both') {
-        $allRecords = $allRecords->merge($this->internalAuditRecodeInterface->filterByParams(null, null, $division));
-        $timeFilteredRecords = $timeFilteredRecords->merge($this->internalAuditRecodeInterface->filterByParams($startDate, $endDate, $division));
+        $internalRecords  = $this->internalAuditRecodeInterface->filterByParams(null, null, $division);
+        $internalTime     = $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate, $division);
+        $allRecords       = $allRecords->merge($internalRecords);
+        $timeFilteredRecords = $timeFilteredRecords->merge($internalTime);
     }
 
+    // Normalize status comparison
     $totalRecordsCount = $allRecords->count();
-    $totalComplete = $allRecords->where('status', 'complete')->count();
-    $totalDraft = $allRecords->where('status', 'draft')->count();
+
+    $totalComplete = $externalRecords->filter(function ($r) {
+        return strtolower(trim($r->status)) === 'complete';
+    })->count() + $internalRecords->filter(function ($r) {
+        return strtolower(trim($r->status)) === 'completed';
+    })->count();
+
+    $totalDraft = $externalRecords->filter(function ($r) {
+        return strtolower(trim($r->status)) === 'draft';
+    })->count() + $internalRecords->filter(function ($r) {
+        return strtolower(trim($r->status)) === 'draft';
+    })->count();
 
     $timeRangeRecordsCount = $timeFilteredRecords->count();
-    $timeComplete = $timeFilteredRecords->where('status', 'complete')->count();
-    $timeDraft = $timeFilteredRecords->where('status', 'draft')->count();
+
+    $timeComplete = $externalTime->filter(function ($r) {
+        return strtolower(trim($r->status)) === 'complete';
+    })->count() + $internalTime->filter(function ($r) {
+        return strtolower(trim($r->status)) === 'completed';
+    })->count();
+
+    $timeDraft = $externalTime->filter(function ($r) {
+        return strtolower(trim($r->status)) === 'draft';
+    })->count() + $internalTime->filter(function ($r) {
+        return strtolower(trim($r->status)) === 'draft';
+    })->count();
 
     return response()->json([
-        'totalRecords'             => $totalRecordsCount,
-        'totalComplete'            => $totalComplete,
-        'totalDraft'               => $totalDraft,
-        'totalCompletePercentage'  => $totalRecordsCount ? round(($totalComplete / $totalRecordsCount) * 100, 2) : 0,
-        'totalDraftPercentage'     => $totalRecordsCount ? round(($totalDraft / $totalRecordsCount) * 100, 2) : 0,
+        'totalRecords'            => $totalRecordsCount,
+        'totalComplete'           => $totalComplete,
+        'totalDraft'              => $totalDraft,
+        'totalCompletePercentage' => $totalRecordsCount ? round(($totalComplete / $totalRecordsCount) * 100, 2) : 0,
+        'totalDraftPercentage'    => $totalRecordsCount ? round(($totalDraft / $totalRecordsCount) * 100, 2) : 0,
 
-        'timeRangeRecords'         => $timeRangeRecordsCount,
-        'timeRangeCompleteCount'   => $timeComplete,
-        'timeRangeDraftCount'      => $timeDraft,
-        'timeCompletePercentage'   => $timeRangeRecordsCount ? round(($timeComplete / $timeRangeRecordsCount) * 100, 2) : 0,
-        'timeDraftPercentage'      => $timeRangeRecordsCount ? round(($timeDraft / $timeRangeRecordsCount) * 100, 2) : 0,
+        'timeRangeRecords'        => $timeRangeRecordsCount,
+        'timeRangeCompleteCount'  => $timeComplete,
+        'timeRangeDraftCount'     => $timeDraft,
+        'timeCompletePercentage'  => $timeRangeRecordsCount ? round(($timeComplete / $timeRangeRecordsCount) * 100, 2) : 0,
+        'timeDraftPercentage'     => $timeRangeRecordsCount ? round(($timeDraft / $timeRangeRecordsCount) * 100, 2) : 0,
     ]);
 }
 
