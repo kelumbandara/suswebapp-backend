@@ -1386,4 +1386,51 @@ class SaAiExternalAuditRecodeController extends Controller
         return response()->json($audits, 200);
     }
 
+    public function getCategoryScoreSummary($startDate, $endDate, $division)
+    {
+        $externalAudits = $this->externalAuditInterface->filterByParams($startDate, $endDate, $division)
+            ->filter(function ($audit) {
+                return is_numeric($audit->auditScore);
+            });
+
+        $grouped = collect($externalAudits)->groupBy(function ($audit) {
+            return $audit->auditCategory ?? 'Unknown';
+        });
+
+        $results         = [];
+        $grandTotalScore = 0;
+
+        foreach ($grouped as $category => $audits) {
+            $scoreSum = $audits->sum(function ($audit) {
+                return (float) $audit->auditScore;
+            });
+
+            $count = $audits->count();
+
+            $results[] = [
+                'category'   => $category,
+                'count'      => $count,
+                'totalScore' => $scoreSum,
+                'percentage' => 0,
+            ];
+
+            $grandTotalScore += $scoreSum;
+        }
+
+        $results = collect($results)->map(function ($item) use ($grandTotalScore) {
+            $item['percentage'] = $grandTotalScore > 0
+            ? round(($item['totalScore'] / $grandTotalScore) * 100, 2)
+            : 0;
+            return $item;
+        })->all();
+
+        return response()->json([
+            'startDate'  => $startDate,
+            'endDate'    => $endDate,
+            'division'   => $division,
+            'TotalScore' => $grandTotalScore,
+            'data'       => $results,
+        ]);
+    }
+
 }

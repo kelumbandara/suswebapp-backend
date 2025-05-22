@@ -200,6 +200,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/expiry-action', [SaAiExternalAuditRecodeController::class, 'getAuditActionPlanByDateRange']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/audit-type', [SaAiExternalAuditRecodeController::class, 'getAuditTypeStats']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/upcoming-expiry-audit', [SaAiExternalAuditRecodeController::class, 'getUpcomingExpiryAudit']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/category-score', [SaAiExternalAuditRecodeController::class, 'getCategoryScoreSummary']);
 
     Route::get('internal-audit', [SaAiInternalAuditRecodeController::class, 'index']);
     Route::get('internal-audit/{id}', [SaAiInternalAuditRecodeController::class, 'show']);
