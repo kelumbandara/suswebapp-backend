@@ -642,4 +642,76 @@ class SaCmPurchaseInventoryRecodeController extends Controller
         return response()->json($record, 200);
     }
 
+    public function getTransactionLatestRecord($startDate, $endDate, $division)
+{
+    $record = $this->purchaseInventoryInterface
+        ->filterByParams($startDate, $endDate, $division)
+        ->where('status', 'published')
+        ->sortByDesc('updated_at')
+        ->first();
+
+    if (! $record) {
+        return response()->json(['message' => 'No published record found'], 404);
+    }
+
+    $documents = [];
+    if (! empty($record->documents) && is_string($record->documents)) {
+        $documents = json_decode($record->documents, true);
+    } elseif (is_array($record->documents)) {
+        $documents = $record->documents;
+    }
+
+    foreach ($documents as &$doc) {
+        if (isset($doc['gsutil_uri'])) {
+            $urlData         = $this->chemicalManagementService->getImageUrl($doc['gsutil_uri']);
+            $doc['imageUrl'] = $urlData['signedUrl'];
+            $doc['fileName'] = $urlData['fileName'];
+        }
+    }
+    $record->documents = $documents;
+
+    $certificates = $this->certificateRecordInterface->findByInventoryId($record->id);
+    $certificates = is_array($certificates) ? $certificates : collect($certificates)->all();
+
+    foreach ($certificates as &$certificate) {
+        $certificateDocs = [];
+
+        if (! empty($certificate->documents) && is_string($certificate->documents)) {
+            $certificateDocs = json_decode($certificate->documents, true);
+        } elseif (is_array($certificate->documents)) {
+            $certificateDocs = $certificate->documents;
+        }
+
+        foreach ($certificateDocs as &$doc) {
+            if (isset($doc['gsutil_uri'])) {
+                $urlData         = $this->certificationRecodeService->getImageUrl($doc['gsutil_uri']);
+                $doc['imageUrl'] = $urlData['signedUrl'];
+                $doc['fileName'] = $urlData['fileName'];
+            }
+        }
+
+        $certificate->documents = $certificateDocs;
+    }
+
+    $record->certificate = $certificates;
+
+    $record->createdByUser    = $this->getUserInfo($record->createdByUser);
+    $record->updatedByUser    = $this->getUserInfo($record->updatedBy);
+    $record->approvedByUser   = $this->getUserInfo($record->approverId);
+    $record->publishedByUser  = $this->getUserInfo($record->publishedBy);
+
+    return response()->json($record, 200);
+}
+
+private function getUserInfo($userId)
+{
+    try {
+        $user = $this->userInterface->getById($userId);
+        return $user ? ['name' => $user->name, 'id' => $user->id] : ['name' => 'Unknown', 'id' => null];
+    } catch (\Exception $e) {
+        return ['name' => 'Unknown', 'id' => null];
+    }
+}
+
+
 }
