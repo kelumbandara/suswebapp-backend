@@ -281,6 +281,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/stock-amount', [SaCmPurchaseInventoryRecodeController::class, 'getStockAmount']);
     Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/monthly-delivery', [SaCmPurchaseInventoryRecodeController::class, 'getMonthlyDelivery']);
     Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/latest-record', [SaCmPurchaseInventoryRecodeController::class, 'getLatestRecord']);
+    Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/transaction-latest-record', [SaCmPurchaseInventoryRecodeController::class, 'getTransactionLatestRecord']);
 
 });
 
