@@ -949,66 +949,63 @@ class SaAiExternalAuditRecodeController extends Controller
         ]);
     }
 
-    public function getCategoryPriorityScore($startDate, $endDate, $division, $type)
+    public function getCategoryPriorityDistribution($startDate, $endDate, $division)
     {
         $results = [];
 
-        if ($type === 'External Audit' || $type === 'both') {
-            $externalAudits = $this->externalAuditInterface->filterByParams($startDate, $endDate, $division);
+        $externalAudits = $this->externalAuditInterface->filterByParams($startDate, $endDate, $division)
+            ->filter(function ($audit) {
+                return strtolower($audit->status) === 'complete';
+            });
 
-            foreach ($externalAudits as $audit) {
-                $category = $audit->auditCategory ?? 'Unknown';
-                $score    = is_numeric($audit->auditScore) ? (float) $audit->auditScore : 0;
+        $groupedByCategory = collect($externalAudits)->groupBy(function ($audit) {
+            return $audit->auditCategory ?? 'Unknown';
+        });
 
-                $priority = optional($this->eaActionPlanInterface->getByExternalAuditId($audit->id))->priority ?? 'Unknown';
+        foreach ($groupedByCategory as $category => $audits) {
+            $priorityCounts = [];
+            $validCount     = 0;
 
-                if (! isset($results[$category])) {
-                    $results[$category] = [];
+            foreach ($audits as $audit) {
+                $actionPlans = $this->eaActionPlanInterface->findByExternalAuditId($audit->id);
+
+                foreach ($actionPlans as $plan) {
+                    $priority = $plan->priority;
+
+                    if (empty($priority) || strtolower($priority) === 'unknown') {
+                        continue;
+                    }
+
+                    if (! isset($priorityCounts[$priority])) {
+                        $priorityCounts[$priority] = 0;
+                    }
+
+                    $priorityCounts[$priority]++;
+                    $validCount++;
                 }
-
-                if (! isset($results[$category][$priority])) {
-                    $results[$category][$priority] = ['score' => 0, 'count' => 0];
-                }
-
-                $results[$category][$priority]['score'] += $score;
-                $results[$category][$priority]['count'] += 1;
             }
-        }
-        if ($type === 'Internal Audit' || $type === 'both') {
-            $internalAudits = $this->internalAuditRecodeInterface->filterByParams($startDate, $endDate, $division);
 
-            foreach ($internalAudits as $audit) {
-                $questionRecode = $this->questionRecodeInterface->getById($audit->auditId);
-
-                if (! $questionRecode) {
-                    continue;
-                }
-
-                $questionRecodeName = $questionRecode->name ?? 'Unknown';
-                $actionPlan         = $this->actionPlanInterface->getByInternalAuditId($audit->id);
-                $priority           = optional($actionPlan)->priority ?? 'Unknown';
-
-                $answers = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
-                $score   = collect($answers)->sum('score');
-
-                if (! isset($results[$questionRecodeName])) {
-                    $results[$questionRecodeName] = [];
-                }
-
-                if (! isset($results[$questionRecodeName][$priority])) {
-                    $results[$questionRecodeName][$priority] = ['score' => 0, 'count' => 0];
-                }
-
-                $results[$questionRecodeName][$priority]['score'] += $score;
-                $results[$questionRecodeName][$priority]['count'] += 1;
-
+            if ($validCount === 0) {
+                continue;
             }
+
+            $results[] = [
+                'category'   => $category,
+                'total'      => $validCount,
+                'priorities' => collect($priorityCounts)->map(function ($count, $priority) use ($validCount) {
+                    return [
+                        'priority'   => $priority,
+                        'count'      => $count,
+                        'percentage' => round(($count / $validCount) * 100, 2),
+                    ];
+                })->values()->all(),
+            ];
         }
+
         return response()->json([
             'startDate' => $startDate,
             'endDate'   => $endDate,
             'division'  => $division,
-            'type'      => $type,
             'data'      => $results,
         ]);
     }
@@ -1323,6 +1320,70 @@ class SaAiExternalAuditRecodeController extends Controller
             'division'  => $division,
             'data'      => $results,
         ]);
+    }
+
+    public function getUpcomingExpiryAudit($startDate, $endDate, $division)
+    {
+        $audits = $this->externalAuditInterface->All()
+            ->filter(function ($audit) use ($startDate, $endDate, $division) {
+                $expiryDateValid = $audit->auditExpiryDate
+                && $audit->auditExpiryDate >= $startDate
+                && $audit->auditExpiryDate <= $endDate;
+
+                $notCompleted = ! isset($audit->auditStatus) || strtolower($audit->auditStatus) !== 'completed';
+
+                $divisionMatch = $audit->division === $division;
+
+                return $expiryDateValid && $notCompleted && $divisionMatch;
+            })
+            ->values()
+            ->map(function ($audit) {
+                try {
+                    $approver        = $this->userInterface->getById($audit->approverId);
+                    $audit->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
+                } catch (\Exception $e) {
+                    $audit->approver = ['name' => 'Unknown', 'id' => null];
+                }
+
+                try {
+                    $representor        = $this->userInterface->getById($audit->representorId);
+                    $audit->representor = $representor ? ['name' => $representor->name, 'id' => $representor->id] : ['name' => 'Unknown', 'id' => null];
+                } catch (\Exception $e) {
+                    $audit->representor = ['name' => 'Unknown', 'id' => null];
+                }
+
+                try {
+                    $creator                  = $this->userInterface->getById($audit->createdByUser);
+                    $audit->createdByUserName = $creator ? $creator->name : 'Unknown';
+                } catch (\Exception $e) {
+                    $audit->createdByUserName = 'Unknown';
+                }
+
+                $documents = is_string($audit->documents) ? json_decode($audit->documents, true) : (is_array($audit->documents) ? $audit->documents : []);
+                foreach ($documents as &$document) {
+                    if (isset($document['gsutil_uri'])) {
+                        $imageData            = $this->externalAuditService->getImageUrl($document['gsutil_uri']);
+                        $document['imageUrl'] = $imageData['signedUrl'];
+                        $document['fileName'] = $imageData['fileName'];
+                    }
+                }
+                $audit->documents = $documents;
+
+                $actionPlans       = $this->eaActionPlanInterface->findByExternalAuditId($audit->id);
+                $audit->actionPlan = collect($actionPlans)->map(function ($plan) {
+                    try {
+                        $approver       = $this->userInterface->getById($plan->approverId);
+                        $plan->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
+                    } catch (\Exception $e) {
+                        $plan->approver = ['name' => 'Unknown', 'id' => null];
+                    }
+                    return $plan;
+                });
+
+                return $audit;
+            });
+
+        return response()->json($audits, 200);
     }
 
 }

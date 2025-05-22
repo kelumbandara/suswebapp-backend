@@ -192,13 +192,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/assigned-completion', [SaAiExternalAuditRecodeController::class, 'getAssignedCompletionStats']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/grade-stats', [SaAiExternalAuditRecodeController::class, 'getAuditGradeStats']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/announcement-stats', [SaAiExternalAuditRecodeController::class, 'getAuditAnnouncementStats']);
-    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/category-priority-score', [SaAiExternalAuditRecodeController::class, 'getCategoryPriorityScore']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/category-priority-findings', [SaAiExternalAuditRecodeController::class, 'getCategoryPriorityDistribution']);
     Route::get('audit-status-count/{division}/{type}/select-division-record', [SaAiExternalAuditRecodeController::class, 'getSelectDivisionRecode']);
     Route::get('audit-status-count/{startDate}/{endDate}/{type}/all-division-record', [SaAiExternalAuditRecodeController::class, 'getAllDivisionRecode']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/audit-standards', [SaAiExternalAuditRecodeController::class, 'getAuditStandardsRecode']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/audit-completion-draft', [SaAiExternalAuditRecodeController::class, 'getAuditCompletionDraftStats']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/expiry-action', [SaAiExternalAuditRecodeController::class, 'getAuditActionPlanByDateRange']);
     Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/audit-type', [SaAiExternalAuditRecodeController::class, 'getAuditTypeStats']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/upcoming-expiry-audit', [SaAiExternalAuditRecodeController::class, 'getUpcomingExpiryAudit']);
 
     Route::get('internal-audit', [SaAiInternalAuditRecodeController::class, 'index']);
     Route::get('internal-audit/{id}', [SaAiInternalAuditRecodeController::class, 'show']);
@@ -277,8 +278,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Chemical dashboard api
     Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/stock-amount', [SaCmPurchaseInventoryRecodeController::class, 'getStockAmount']);
-    Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/monthly-delevery', [SaCmPurchaseInventoryRecodeController::class, 'getMonthlyDelevery']);
-    Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/letest-record', [SaCmPurchaseInventoryRecodeController::class, 'getLatestRecord']);
+    Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/monthly-delivery', [SaCmPurchaseInventoryRecodeController::class, 'getMonthlyDelivery']);
+    Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/latest-record', [SaCmPurchaseInventoryRecodeController::class, 'getLatestRecord']);
 
 });
 
