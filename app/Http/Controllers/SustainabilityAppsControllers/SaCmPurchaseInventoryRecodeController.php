@@ -497,6 +497,10 @@ class SaCmPurchaseInventoryRecodeController extends Controller
         $amountTotal     = 0;
 
         foreach ($records as $record) {
+            if ($record->status !== 'published') {
+                continue;
+            }
+
             if (! empty($record->molecularFormula)) {
                 $inStockFormulas[$record->molecularFormula] = true;
             }
@@ -527,6 +531,10 @@ class SaCmPurchaseInventoryRecodeController extends Controller
         $monthlyBreakdown = [];
 
         foreach ($records as $record) {
+            if ($record->status !== 'published') {
+                continue;
+            }
+
             if (empty($record->deliveryDate) || empty($record->molecularFormula)) {
                 continue;
             }
@@ -559,159 +567,138 @@ class SaCmPurchaseInventoryRecodeController extends Controller
             'data'      => $monthlyBreakdown,
         ]);
     }
+
     public function getLatestRecord($startDate, $endDate, $division)
     {
-        $record = $this->purchaseInventoryInterface
+        $records = $this->purchaseInventoryInterface
             ->filterByParams($startDate, $endDate, $division)
-            ->sortByDesc('updated_at')
-            ->first();
+            ->sortByDesc('updated_at');
 
-        if (! $record) {
-            return response()->json(['message' => 'No record found'], 404);
+        if ($records->isEmpty()) {
+            return response()->json(['message' => 'No records found'], 404);
         }
 
-        $documents = [];
-        if (! empty($record->documents) && is_string($record->documents)) {
-            $documents = json_decode($record->documents, true);
-        } elseif (is_array($record->documents)) {
-            $documents = $record->documents;
-        }
-
-        foreach ($documents as &$doc) {
-            if (isset($doc['gsutil_uri'])) {
-                $urlData         = $this->chemicalManagementService->getImageUrl($doc['gsutil_uri']);
-                $doc['imageUrl'] = $urlData['signedUrl'];
-                $doc['fileName'] = $urlData['fileName'];
-            }
-        }
-        $record->documents = $documents;
-
-        $certificates = $this->certificateRecordInterface->findByInventoryId($record->id);
-        $certificates = is_array($certificates) ? $certificates : collect($certificates)->all();
-
-        foreach ($certificates as &$certificate) {
-            $certificateDocs = [];
-
-            if (! empty($certificate->documents) && is_string($certificate->documents)) {
-                $certificateDocs = json_decode($certificate->documents, true);
-            } elseif (is_array($certificate->documents)) {
-                $certificateDocs = $certificate->documents;
+        foreach ($records as $record) {
+            $documents = [];
+            if (! empty($record->documents) && is_string($record->documents)) {
+                $documents = json_decode($record->documents, true);
+            } elseif (is_array($record->documents)) {
+                $documents = $record->documents;
             }
 
-            foreach ($certificateDocs as &$doc) {
+            foreach ($documents as &$doc) {
                 if (isset($doc['gsutil_uri'])) {
-                    $urlData         = $this->certificationRecodeService->getImageUrl($doc['gsutil_uri']);
+                    $urlData         = $this->chemicalManagementService->getImageUrl($doc['gsutil_uri']);
                     $doc['imageUrl'] = $urlData['signedUrl'];
                     $doc['fileName'] = $urlData['fileName'];
                 }
             }
+            $record->documents = $documents;
 
-            $certificate->documents = $certificateDocs;
+            $certificates = $this->certificateRecordInterface->findByInventoryId($record->id);
+            $certificates = is_array($certificates) ? $certificates : collect($certificates)->all();
+
+            foreach ($certificates as &$certificate) {
+                $certificateDocs = [];
+
+                if (! empty($certificate->documents) && is_string($certificate->documents)) {
+                    $certificateDocs = json_decode($certificate->documents, true);
+                } elseif (is_array($certificate->documents)) {
+                    $certificateDocs = $certificate->documents;
+                }
+
+                foreach ($certificateDocs as &$doc) {
+                    if (isset($doc['gsutil_uri'])) {
+                        $urlData         = $this->certificationRecodeService->getImageUrl($doc['gsutil_uri']);
+                        $doc['imageUrl'] = $urlData['signedUrl'];
+                        $doc['fileName'] = $urlData['fileName'];
+                    }
+                }
+
+                $certificate->documents = $certificateDocs;
+            }
+
+            $record->certificate = $certificates;
+
+            $record->createdByUser   = $this->getUserInfo($record->createdByUser);
+            $record->updatedByUser   = $this->getUserInfo($record->updatedBy);
+            $record->approvedByUser  = $this->getUserInfo($record->approverId);
+            $record->publishedByUser = $this->getUserInfo($record->publishedBy);
         }
 
-        $record->certificate = $certificates;
+        return response()->json(array_values($records->toArray()));
 
-        try {
-            $creator               = $this->userInterface->getById($record->createdByUser);
-            $record->createdByUser = $creator ? ['name' => $creator->name, 'id' => $creator->id] : ['name' => 'Unknown', 'id' => null];
-        } catch (\Exception $e) {
-            $record->createdByUser = ['name' => 'Unknown', 'id' => null];
-        }
-
-        try {
-            $updater               = $this->userInterface->getById($record->updatedBy);
-            $record->updatedByUser = $updater ? ['name' => $updater->name, 'id' => $updater->id] : ['name' => 'Unknown', 'id' => null];
-        } catch (\Exception $e) {
-            $record->updatedByUser = ['name' => 'Unknown', 'id' => null];
-        }
-
-        try {
-            $approver               = $this->userInterface->getById($record->approverId);
-            $record->approvedByUser = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
-        } catch (\Exception $e) {
-            $record->approvedByUser = ['name' => 'Unknown', 'id' => null];
-        }
-
-        try {
-            $publisher               = $this->userInterface->getById($record->publishedBy);
-            $record->publishedByUser = $publisher ? ['name' => $publisher->name, 'id' => $publisher->id] : ['name' => 'Unknown', 'id' => null];
-        } catch (\Exception $e) {
-            $record->publishedByUser = ['name' => 'Unknown', 'id' => null];
-        }
-
-        return response()->json($record, 200);
     }
 
     public function getTransactionLatestRecord($startDate, $endDate, $division)
-{
-    $record = $this->purchaseInventoryInterface
-        ->filterByParams($startDate, $endDate, $division)
-        ->where('status', 'published')
-        ->sortByDesc('updated_at')
-        ->first();
+    {
+        $records = $this->purchaseInventoryInterface
+            ->filterByParams($startDate, $endDate, $division)
+            ->where('status', 'published')
+            ->sortByDesc('updated_at');
 
-    if (! $record) {
-        return response()->json(['message' => 'No published record found'], 404);
-    }
-
-    $documents = [];
-    if (! empty($record->documents) && is_string($record->documents)) {
-        $documents = json_decode($record->documents, true);
-    } elseif (is_array($record->documents)) {
-        $documents = $record->documents;
-    }
-
-    foreach ($documents as &$doc) {
-        if (isset($doc['gsutil_uri'])) {
-            $urlData         = $this->chemicalManagementService->getImageUrl($doc['gsutil_uri']);
-            $doc['imageUrl'] = $urlData['signedUrl'];
-            $doc['fileName'] = $urlData['fileName'];
-        }
-    }
-    $record->documents = $documents;
-
-    $certificates = $this->certificateRecordInterface->findByInventoryId($record->id);
-    $certificates = is_array($certificates) ? $certificates : collect($certificates)->all();
-
-    foreach ($certificates as &$certificate) {
-        $certificateDocs = [];
-
-        if (! empty($certificate->documents) && is_string($certificate->documents)) {
-            $certificateDocs = json_decode($certificate->documents, true);
-        } elseif (is_array($certificate->documents)) {
-            $certificateDocs = $certificate->documents;
+        if ($records->isEmpty()) {
+            return response()->json(['message' => 'No published records found'], 404);
         }
 
-        foreach ($certificateDocs as &$doc) {
-            if (isset($doc['gsutil_uri'])) {
-                $urlData         = $this->certificationRecodeService->getImageUrl($doc['gsutil_uri']);
-                $doc['imageUrl'] = $urlData['signedUrl'];
-                $doc['fileName'] = $urlData['fileName'];
+        foreach ($records as $record) {
+            $documents = [];
+            if (! empty($record->documents) && is_string($record->documents)) {
+                $documents = json_decode($record->documents, true);
+            } elseif (is_array($record->documents)) {
+                $documents = $record->documents;
             }
+
+            foreach ($documents as &$doc) {
+                if (isset($doc['gsutil_uri'])) {
+                    $urlData         = $this->chemicalManagementService->getImageUrl($doc['gsutil_uri']);
+                    $doc['imageUrl'] = $urlData['signedUrl'];
+                    $doc['fileName'] = $urlData['fileName'];
+                }
+            }
+            $record->documents = $documents;
+            $certificates      = $this->certificateRecordInterface->findByInventoryId($record->id);
+            $certificates      = is_array($certificates) ? $certificates : collect($certificates)->all();
+
+            foreach ($certificates as &$certificate) {
+                $certificateDocs = [];
+
+                if (! empty($certificate->documents) && is_string($certificate->documents)) {
+                    $certificateDocs = json_decode($certificate->documents, true);
+                } elseif (is_array($certificate->documents)) {
+                    $certificateDocs = $certificate->documents;
+                }
+
+                foreach ($certificateDocs as &$doc) {
+                    if (isset($doc['gsutil_uri'])) {
+                        $urlData         = $this->certificationRecodeService->getImageUrl($doc['gsutil_uri']);
+                        $doc['imageUrl'] = $urlData['signedUrl'];
+                        $doc['fileName'] = $urlData['fileName'];
+                    }
+                }
+
+                $certificate->documents = $certificateDocs;
+            }
+
+            $record->certificate = $certificates;
+
+            $record->createdByUser   = $this->getUserInfo($record->createdByUser);
+            $record->updatedByUser   = $this->getUserInfo($record->updatedBy);
+            $record->approvedByUser  = $this->getUserInfo($record->approverId);
+            $record->publishedByUser = $this->getUserInfo($record->publishedBy);
         }
 
-        $certificate->documents = $certificateDocs;
+        return response()->json($records, 200);
     }
 
-    $record->certificate = $certificates;
-
-    $record->createdByUser    = $this->getUserInfo($record->createdByUser);
-    $record->updatedByUser    = $this->getUserInfo($record->updatedBy);
-    $record->approvedByUser   = $this->getUserInfo($record->approverId);
-    $record->publishedByUser  = $this->getUserInfo($record->publishedBy);
-
-    return response()->json($record, 200);
-}
-
-private function getUserInfo($userId)
-{
-    try {
-        $user = $this->userInterface->getById($userId);
-        return $user ? ['name' => $user->name, 'id' => $user->id] : ['name' => 'Unknown', 'id' => null];
-    } catch (\Exception $e) {
-        return ['name' => 'Unknown', 'id' => null];
+    private function getUserInfo($userId)
+    {
+        try {
+            $user = $this->userInterface->getById($userId);
+            return $user ? ['name' => $user->name, 'id' => $user->id] : ['name' => 'Unknown', 'id' => null];
+        } catch (\Exception $e) {
+            return ['name' => 'Unknown', 'id' => null];
+        }
     }
-}
-
 
 }
