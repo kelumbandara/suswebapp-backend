@@ -23,11 +23,11 @@ class SaCmPurchaseInventoryRecodeController extends Controller
 
     public function __construct(PurchaseInventoryInterface $purchaseInventoryInterface, ChemicalManagementRecodeInterface $chemicalManagementRecodeInterface, ChemicalManagementService $chemicalManagementService, PirCertificationRecodeService $certificationRecodeService, UserInterface $userInterface, CertificateRecordInterface $certificateRecordInterface)
     {
-        $this->purchaseInventoryInterface = $purchaseInventoryInterface;
-        $this->userInterface              = $userInterface;
-        $this->chemicalManagementService  = $chemicalManagementService;
-        $this->certificationRecodeService = $certificationRecodeService;
-        $this->certificateRecordInterface = $certificateRecordInterface;
+        $this->purchaseInventoryInterface        = $purchaseInventoryInterface;
+        $this->userInterface                     = $userInterface;
+        $this->chemicalManagementService         = $chemicalManagementService;
+        $this->certificationRecodeService        = $certificationRecodeService;
+        $this->certificateRecordInterface        = $certificateRecordInterface;
         $this->chemicalManagementRecodeInterface = $chemicalManagementRecodeInterface;
 
     }
@@ -734,11 +734,12 @@ class SaCmPurchaseInventoryRecodeController extends Controller
             if (! isset($chemicals[$formula])) {
                 $chemicals[$formula] = [
                     'chemicalName'  => $formula,
-                    'totalLimit'    => $thresholdLimit,
+                    'totalLimit'    => 0,
                     'totalQuantity' => 0,
                 ];
             }
 
+            $chemicals[$formula]['totalLimit'] += $thresholdLimit;
             $chemicals[$formula]['totalQuantity'] += $deliveryQty;
         }
 
@@ -773,8 +774,8 @@ class SaCmPurchaseInventoryRecodeController extends Controller
                 continue;
             }
 
-            $formula        = $record->molecularFormula;
-            $deliveryQty    = floatval($record->deliveryQuantity);
+            $formula     = $record->molecularFormula;
+            $deliveryQty = floatval($record->deliveryQuantity);
 
             if (! isset($chemicals[$formula])) {
                 $chemicals[$formula] = [
@@ -794,43 +795,42 @@ class SaCmPurchaseInventoryRecodeController extends Controller
         ]);
     }
 
-public function getStatusSummary($startDate, $endDate, $division)
-{
-    $statusCounts = [];
+    public function getStatusSummary($startDate, $endDate, $division)
+    {
+        $statusCounts = [];
 
-    $purchaseRecords = $this->purchaseInventoryInterface->filterByParams($startDate, $endDate, $division);
-    foreach ($purchaseRecords as $record) {
-        $status = $record->status ?? 'unknown';
-        if (!isset($statusCounts[$status])) {
-            $statusCounts[$status] = 0;
+        $purchaseRecords = $this->purchaseInventoryInterface->filterByParams($startDate, $endDate, $division);
+        foreach ($purchaseRecords as $record) {
+            $status = $record->status ?? 'unknown';
+            if (! isset($statusCounts[$status])) {
+                $statusCounts[$status] = 0;
+            }
+            $statusCounts[$status]++;
         }
-        $statusCounts[$status]++;
-    }
 
-    $chemicalRecords = $this->chemicalManagementRecodeInterface->filterByParams($startDate, $endDate, $division);
-    foreach ($chemicalRecords as $record) {
-        $status = $record->status ?? 'unknown';
-        if (!isset($statusCounts[$status])) {
-            $statusCounts[$status] = 0;
+        $chemicalRecords = $this->chemicalManagementRecodeInterface->filterByParams($startDate, $endDate, $division);
+        foreach ($chemicalRecords as $record) {
+            $status = $record->status ?? 'unknown';
+            if (! isset($statusCounts[$status])) {
+                $statusCounts[$status] = 0;
+            }
+            $statusCounts[$status]++;
         }
-        $statusCounts[$status]++;
+
+        $summary = [];
+        foreach ($statusCounts as $status => $count) {
+            $summary[] = [
+                'status' => $status,
+                'count'  => $count,
+            ];
+        }
+
+        return response()->json([
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
+            'division'  => $division,
+            'data'      => $summary,
+        ]);
     }
-
-    $summary = [];
-    foreach ($statusCounts as $status => $count) {
-        $summary[] = [
-            'status' => $status,
-            'count'  => $count,
-        ];
-    }
-
-    return response()->json([
-        'startDate' => $startDate,
-        'endDate'   => $endDate,
-        'division'  => $division,
-        'data'      => $summary,
-    ]);
-}
-
 
 }
