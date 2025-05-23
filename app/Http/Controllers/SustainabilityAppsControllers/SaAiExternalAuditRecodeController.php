@@ -391,7 +391,8 @@ class SaAiExternalAuditRecodeController extends Controller
                     $audit->Date  = $auditDate->format('Y-m-d');
                     $audit->Year  = $auditDate->format('Y');
                     $audit->Month = $auditDate->format('m');
-                    $audit->Time  = $auditDate->format('H:i:s');
+                    $audit->Day  = $auditDate->format('d');
+                    $audit->Time = $auditDate->format('H:i:s');
                 } catch (\Exception $e) {
                     $audit->Date  = null;
                     $audit->Year  = null;

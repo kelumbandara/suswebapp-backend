@@ -524,58 +524,57 @@ class SaCmPurchaseInventoryRecodeController extends Controller
         ]);
     }
 
-public function getMonthlyDelivery($startDate, $endDate, $division)
-{
-    $records = $this->purchaseInventoryInterface->filterByParams($startDate, $endDate, $division);
+    public function getMonthlyDelivery($startDate, $endDate, $division)
+    {
+        $records = $this->purchaseInventoryInterface->filterByParams($startDate, $endDate, $division);
 
-    $aggregated = [];
+        $aggregated = [];
 
-    foreach ($records as $record) {
-        if ($record->status !== 'published') {
-            continue;
+        foreach ($records as $record) {
+            if ($record->status !== 'published') {
+                continue;
+            }
+
+            if (empty($record->deliveryDate) || empty($record->molecularFormula)) {
+                continue;
+            }
+
+            $deliveryDate = \Carbon\Carbon::parse($record->deliveryDate);
+
+            if ($deliveryDate->lt($startDate) || $deliveryDate->gt($endDate)) {
+                continue;
+            }
+
+            $monthName = $deliveryDate->format('F');
+            $formula   = $record->molecularFormula;
+            $quantity  = is_numeric($record->deliveryQuantity) ? floatval($record->deliveryQuantity) : 0;
+
+            if (! isset($aggregated[$monthName][$formula])) {
+                $aggregated[$monthName][$formula] = 0;
+            }
+
+            $aggregated[$monthName][$formula] += $quantity;
         }
 
-        if (empty($record->deliveryDate) || empty($record->molecularFormula)) {
-            continue;
+        $monthlyBreakdown = [];
+
+        foreach ($aggregated as $month => $formulas) {
+            foreach ($formulas as $formula => $quantity) {
+                $monthlyBreakdown[] = [
+                    'month'    => $month,
+                    'chemical' => $formula,
+                    'quantity' => $quantity,
+                ];
+            }
         }
 
-        $deliveryDate = \Carbon\Carbon::parse($record->deliveryDate);
-
-        if ($deliveryDate->lt($startDate) || $deliveryDate->gt($endDate)) {
-            continue;
-        }
-
-        $monthName = $deliveryDate->format('F');
-        $formula   = $record->molecularFormula;
-        $quantity  = is_numeric($record->deliveryQuantity) ? floatval($record->deliveryQuantity) : 0;
-
-        if (! isset($aggregated[$monthName][$formula])) {
-            $aggregated[$monthName][$formula] = 0;
-        }
-
-        $aggregated[$monthName][$formula] += $quantity;
+        return response()->json([
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
+            'division'  => $division,
+            'data'      => $monthlyBreakdown,
+        ]);
     }
-
-    $monthlyBreakdown = [];
-
-    foreach ($aggregated as $month => $formulas) {
-        foreach ($formulas as $formula => $quantity) {
-            $monthlyBreakdown[] = [
-                'month'    => $month,
-                'chemical' => $formula,
-                'quantity' => $quantity,
-            ];
-        }
-    }
-
-    return response()->json([
-        'startDate' => $startDate,
-        'endDate'   => $endDate,
-        'division'  => $division,
-        'data'      => $monthlyBreakdown,
-    ]);
-}
-
 
     public function getLatestRecord($startDate, $endDate, $division)
     {
@@ -710,4 +709,85 @@ public function getMonthlyDelivery($startDate, $endDate, $division)
         }
     }
 
+    public function getStockThreshold($startDate, $endDate, $division)
+    {
+        $records = $this->purchaseInventoryInterface->filterByParams($startDate, $endDate, $division);
+
+        $chemicals = [];
+
+        foreach ($records as $record) {
+            if ($record->status !== 'published') {
+                continue;
+            }
+
+            if (empty($record->molecularFormula) || ! is_numeric($record->deliveryQuantity) || ! is_numeric($record->thresholdLimit)) {
+                continue;
+            }
+
+            $formula        = $record->molecularFormula;
+            $deliveryQty    = floatval($record->deliveryQuantity);
+            $thresholdLimit = floatval($record->thresholdLimit);
+
+            if (! isset($chemicals[$formula])) {
+                $chemicals[$formula] = [
+                    'chemicalName'  => $formula,
+                    'totalLimit'    => $thresholdLimit,
+                    'totalQuantity' => 0,
+                ];
+            }
+
+            $chemicals[$formula]['totalQuantity'] += $deliveryQty;
+        }
+
+        foreach ($chemicals as &$data) {
+            if ($data['totalLimit'] > 0) {
+                $data['percentage'] = round(($data['totalQuantity'] / $data['totalLimit']) * 100, 2);
+            } else {
+                $data['percentage'] = 0;
+            }
+        }
+
+        return response()->json([
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
+            'division'  => $division,
+            'data'      => array_values($chemicals),
+        ]);
+    }
+
+    public function getHighestStock($startDate, $endDate, $division)
+    {
+        $records = $this->purchaseInventoryInterface->filterByParams($startDate, $endDate, $division);
+
+        $chemicals = [];
+
+        foreach ($records as $record) {
+            if ($record->status !== 'published') {
+                continue;
+            }
+
+            if (empty($record->molecularFormula) || ! is_numeric($record->deliveryQuantity)) {
+                continue;
+            }
+
+            $formula        = $record->molecularFormula;
+            $deliveryQty    = floatval($record->deliveryQuantity);
+
+            if (! isset($chemicals[$formula])) {
+                $chemicals[$formula] = [
+                    'chemicalName'  => $formula,
+                    'totalQuantity' => 0,
+                ];
+            }
+
+            $chemicals[$formula]['totalQuantity'] += $deliveryQty;
+        }
+
+        return response()->json([
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
+            'division'  => $division,
+            'data'      => array_values($chemicals),
+        ]);
+    }
 }
