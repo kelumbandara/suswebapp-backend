@@ -653,13 +653,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
         }
 
         foreach ($records as $record) {
-            $documents = [];
-            if (! empty($record->documents) && is_string($record->documents)) {
-                $documents = json_decode($record->documents, true);
-            } elseif (is_array($record->documents)) {
-                $documents = $record->documents;
-            }
-
+            $documents = is_string($record->documents) ? json_decode($record->documents, true) : ($record->documents ?? []);
             foreach ($documents as &$doc) {
                 if (isset($doc['gsutil_uri'])) {
                     $urlData         = $this->chemicalManagementService->getImageUrl($doc['gsutil_uri']);
@@ -668,18 +662,10 @@ class SaCmPurchaseInventoryRecodeController extends Controller
                 }
             }
             $record->documents = $documents;
-            $certificates      = $this->certificateRecordInterface->findByInventoryId($record->id);
-            $certificates      = is_array($certificates) ? $certificates : collect($certificates)->all();
 
+            $certificates = collect($this->certificateRecordInterface->findByInventoryId($record->id));
             foreach ($certificates as &$certificate) {
-                $certificateDocs = [];
-
-                if (! empty($certificate->documents) && is_string($certificate->documents)) {
-                    $certificateDocs = json_decode($certificate->documents, true);
-                } elseif (is_array($certificate->documents)) {
-                    $certificateDocs = $certificate->documents;
-                }
-
+                $certificateDocs = is_string($certificate->documents) ? json_decode($certificate->documents, true) : ($certificate->documents ?? []);
                 foreach ($certificateDocs as &$doc) {
                     if (isset($doc['gsutil_uri'])) {
                         $urlData         = $this->certificationRecodeService->getImageUrl($doc['gsutil_uri']);
@@ -687,19 +673,19 @@ class SaCmPurchaseInventoryRecodeController extends Controller
                         $doc['fileName'] = $urlData['fileName'];
                     }
                 }
-
                 $certificate->documents = $certificateDocs;
             }
 
-            $record->certificate = $certificates;
-
+            $record->certificate     = $certificates;
             $record->createdByUser   = $this->getUserInfo($record->createdByUser);
             $record->updatedByUser   = $this->getUserInfo($record->updatedBy);
             $record->approvedByUser  = $this->getUserInfo($record->approverId);
             $record->publishedByUser = $this->getUserInfo($record->publishedBy);
+
+             $response[] = $record;
         }
 
-        return response()->json($records, 200);
+         return response()->json($response);
     }
 
     private function getUserInfo($userId)
