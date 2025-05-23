@@ -524,49 +524,58 @@ class SaCmPurchaseInventoryRecodeController extends Controller
         ]);
     }
 
-    public function getMonthlyDelivery($startDate, $endDate, $division)
-    {
-        $records = $this->purchaseInventoryInterface->filterByParams($startDate, $endDate, $division);
+public function getMonthlyDelivery($startDate, $endDate, $division)
+{
+    $records = $this->purchaseInventoryInterface->filterByParams($startDate, $endDate, $division);
 
-        $monthlyBreakdown = [];
+    $aggregated = [];
 
-        foreach ($records as $record) {
-            if ($record->status !== 'published') {
-                continue;
-            }
-
-            if (empty($record->deliveryDate) || empty($record->molecularFormula)) {
-                continue;
-            }
-
-            $deliveryDate = \Carbon\Carbon::parse($record->deliveryDate);
-
-            if ($deliveryDate->lt($startDate) || $deliveryDate->gt($endDate)) {
-                continue;
-            }
-
-            $monthName = $deliveryDate->format('F');
-            $formula   = $record->molecularFormula;
-            $quantity  = is_numeric($record->deliveryQuantity) ? floatval($record->deliveryQuantity) : 0;
-
-            if (! isset($monthlyBreakdown[$monthName])) {
-                $monthlyBreakdown[$monthName] = [];
-            }
-
-            if (! isset($monthlyBreakdown[$monthName][$formula])) {
-                $monthlyBreakdown[$monthName][$formula] = 0;
-            }
-
-            $monthlyBreakdown[$monthName][$formula] += $quantity;
+    foreach ($records as $record) {
+        if ($record->status !== 'published') {
+            continue;
         }
 
-        return response()->json([
-            'startDate' => $startDate,
-            'endDate'   => $endDate,
-            'division'  => $division,
-            'data'      => $monthlyBreakdown,
-        ]);
+        if (empty($record->deliveryDate) || empty($record->molecularFormula)) {
+            continue;
+        }
+
+        $deliveryDate = \Carbon\Carbon::parse($record->deliveryDate);
+
+        if ($deliveryDate->lt($startDate) || $deliveryDate->gt($endDate)) {
+            continue;
+        }
+
+        $monthName = $deliveryDate->format('F');
+        $formula   = $record->molecularFormula;
+        $quantity  = is_numeric($record->deliveryQuantity) ? floatval($record->deliveryQuantity) : 0;
+
+        if (! isset($aggregated[$monthName][$formula])) {
+            $aggregated[$monthName][$formula] = 0;
+        }
+
+        $aggregated[$monthName][$formula] += $quantity;
     }
+
+    $monthlyBreakdown = [];
+
+    foreach ($aggregated as $month => $formulas) {
+        foreach ($formulas as $formula => $quantity) {
+            $monthlyBreakdown[] = [
+                'month'    => $month,
+                'chemical' => $formula,
+                'quantity' => $quantity,
+            ];
+        }
+    }
+
+    return response()->json([
+        'startDate' => $startDate,
+        'endDate'   => $endDate,
+        'division'  => $division,
+        'data'      => $monthlyBreakdown,
+    ]);
+}
+
 
     public function getLatestRecord($startDate, $endDate, $division)
     {
