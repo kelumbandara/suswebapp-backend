@@ -682,10 +682,10 @@ class SaCmPurchaseInventoryRecodeController extends Controller
             $record->approvedByUser  = $this->getUserInfo($record->approverId);
             $record->publishedByUser = $this->getUserInfo($record->publishedBy);
 
-             $response[] = $record;
+            $response[] = $record;
         }
 
-         return response()->json($response);
+        return response()->json($response);
     }
 
     private function getUserInfo($userId)
@@ -818,5 +818,162 @@ class SaCmPurchaseInventoryRecodeController extends Controller
             'data'      => $summary,
         ]);
     }
+
+public function getAllSummary($year)
+{
+    $startDate = \Carbon\Carbon::parse("$year-01-01");
+    $endDate   = \Carbon\Carbon::parse("$year-12-31");
+
+    $purchaseRecords = $this->purchaseInventoryInterface->filterByYear($year);
+    $chemicalRecords = $this->chemicalManagementRecodeInterface->filterByYear($year);
+
+    $inStockFormulas       = [];
+    $deliveredTotal        = 0;
+    $amountTotal           = 0;
+    $monthlyAggregated     = [];
+    $thresholdChemicals    = [];
+    $highestStockChemicals = [];
+    $statusCounts          = [];
+
+    $latestPublishedRecord = null;
+    $latestPublishedTime   = null;
+    $latestRecord          = null;
+    $latestRecordTime      = null;
+
+    foreach ($purchaseRecords as $record) {
+        if (!empty($record->molecularFormula)) {
+            $inStockFormulas[$record->molecularFormula] = true;
+        }
+
+        if (!$latestRecordTime || $record->updated_at > $latestRecordTime) {
+            $latestRecord     = clone $record;
+            $latestRecordTime = $record->updated_at;
+        }
+
+        if ($record->status === 'published') {
+            if (is_numeric($record->deliveryQuantity)) {
+                $qty = floatval($record->deliveryQuantity);
+                $deliveredTotal += $qty;
+
+                if (is_numeric($record->thresholdLimit)) {
+                    $formula   = $record->molecularFormula;
+                    $threshold = floatval($record->thresholdLimit);
+                    if (!isset($thresholdChemicals[$formula])) {
+                        $thresholdChemicals[$formula] = ['chemicalName' => $formula, 'totalLimit' => 0, 'totalQuantity' => 0];
+                    }
+                    $thresholdChemicals[$formula]['totalLimit'] += $threshold;
+                    $thresholdChemicals[$formula]['totalQuantity'] += $qty;
+                }
+
+                if (!isset($highestStockChemicals[$formula])) {
+                    $highestStockChemicals[$formula] = ['chemicalName' => $formula, 'totalQuantity' => 0];
+                }
+                $highestStockChemicals[$formula]['totalQuantity'] += $qty;
+            }
+
+            if (is_numeric($record->purchaseAmount)) {
+                $amountTotal += floatval($record->purchaseAmount);
+            }
+
+            if (!empty($record->deliveryDate) && !empty($record->molecularFormula)) {
+                $deliveryDate = \Carbon\Carbon::parse($record->deliveryDate);
+                if ($deliveryDate->between($startDate, $endDate)) {
+                    $monthName = $deliveryDate->format('F');
+                    $formula   = $record->molecularFormula;
+                    $qty       = is_numeric($record->deliveryQuantity) ? floatval($record->deliveryQuantity) : 0;
+
+                    if (!isset($monthlyAggregated[$monthName][$formula])) {
+                        $monthlyAggregated[$monthName][$formula] = 0;
+                    }
+                    $monthlyAggregated[$monthName][$formula] += $qty;
+                }
+            }
+
+            if (!$latestPublishedTime || $record->updated_at > $latestPublishedTime) {
+                $latestPublishedRecord = $record;
+                $latestPublishedTime   = $record->updated_at;
+            }
+        }
+
+        $status = $record->status ?? 'unknown';
+        if (!isset($statusCounts[$status])) {
+            $statusCounts[$status] = 0;
+        }
+        $statusCounts[$status]++;
+    }
+
+    foreach ($chemicalRecords as $record) {
+        $status = $record->status ?? 'unknown';
+        if (!isset($statusCounts[$status])) {
+            $statusCounts[$status] = 0;
+        }
+        $statusCounts[$status]++;
+    }
+
+    foreach ($thresholdChemicals as &$data) {
+        $data['percentage'] = $data['totalLimit'] > 0
+            ? round(($data['totalQuantity'] / $data['totalLimit']) * 100, 2)
+            : 0;
+    }
+
+    $monthlyBreakdown = [];
+    foreach ($monthlyAggregated as $month => $formulas) {
+        foreach ($formulas as $formula => $qty) {
+            $monthlyBreakdown[] = [
+                'month'    => $month,
+                'chemical' => $formula,
+                'quantity' => $qty,
+            ];
+        }
+    }
+
+    $statusSummary = [];
+    foreach ($statusCounts as $status => $count) {
+        $statusSummary[] = ['status' => $status, 'count' => $count];
+    }
+
+    $formattedLatest = null;
+    if ($latestPublishedRecord) {
+        $formattedLatest = $latestPublishedRecord;
+        $documents = is_string($formattedLatest->documents) ? json_decode($formattedLatest->documents, true) : ($formattedLatest->documents ?? []);
+        foreach ($documents as &$doc) {
+            if (isset($doc['gsutil_uri'])) {
+                $urlData         = $this->chemicalManagementService->getImageUrl($doc['gsutil_uri']);
+                $doc['imageUrl'] = $urlData['signedUrl'];
+                $doc['fileName'] = $urlData['fileName'];
+            }
+        }
+        $formattedLatest->documents   = $documents;
+        $formattedLatest->certificate = collect($this->certificateRecordInterface->findByInventoryId($formattedLatest->id))->map(function ($cert) {
+            $docs = is_string($cert->documents) ? json_decode($cert->documents, true) : ($cert->documents ?? []);
+            foreach ($docs as &$doc) {
+                if (isset($doc['gsutil_uri'])) {
+                    $urlData         = $this->certificationRecodeService->getImageUrl($doc['gsutil_uri']);
+                    $doc['imageUrl'] = $urlData['signedUrl'];
+                    $doc['fileName'] = $urlData['fileName'];
+                }
+            }
+            $cert->documents = $docs;
+            return $cert;
+        });
+        $formattedLatest->createdByUser   = $this->getUserInfo($formattedLatest->createdByUser);
+        $formattedLatest->updatedByUser   = $this->getUserInfo($formattedLatest->updatedBy);
+        $formattedLatest->approvedByUser  = $this->getUserInfo($formattedLatest->approverId);
+        $formattedLatest->publishedByUser = $this->getUserInfo($formattedLatest->publishedBy);
+    }
+
+    return response()->json([
+        'year'              => $year,
+        'inStockCount'      => count($inStockFormulas),
+        'deliveredTotal'    => $deliveredTotal,
+        'purchaseAmount'    => round($amountTotal, 2),
+        'monthlyDelivery'   => $monthlyBreakdown,
+        'stockThreshold'    => array_values($thresholdChemicals),
+        'highestStock'      => array_values($highestStockChemicals),
+        'statusSummary'     => $statusSummary,
+        'latestRecord'      => $latestRecord,
+        'latestTransaction' => $formattedLatest,
+    ]);
+}
 
 }
