@@ -28,7 +28,7 @@ class PurchaseInventoryRepository extends BaseRepository implements PurchaseInve
     {
         return $this->model->where('reviewerId', $reviewerId)->get();
     }
-     public function filterByParams($startDate = null, $endDate = null, $division = null)
+    public function filterByParams($startDate = null, $endDate = null, $division = null)
     {
         $query = $this->model->newQuery();
 
@@ -41,6 +41,11 @@ class PurchaseInventoryRepository extends BaseRepository implements PurchaseInve
         }
 
         return $query->get();
+    }
+
+    public function filterByYear($year)
+    {
+        return $this->model->whereYear('updated_at', $year)->get();
     }
 
 }

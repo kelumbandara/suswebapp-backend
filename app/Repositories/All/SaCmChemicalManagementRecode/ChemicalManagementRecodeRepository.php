@@ -40,5 +40,9 @@ class ChemicalManagementRecodeRepository extends BaseRepository implements Chemi
 
         return $query->get();
     }
+    public function filterByYear($year)
+    {
+        return $this->model->whereYear('updated_at', $year)->get();
+    }
 
 }

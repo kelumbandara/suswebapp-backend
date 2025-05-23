@@ -285,6 +285,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/stock-threshold', [SaCmPurchaseInventoryRecodeController::class, 'getStockThreshold']);
     Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/highest-stock', [SaCmPurchaseInventoryRecodeController::class, 'getHighestStock']);
     Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/status-summary', [SaCmPurchaseInventoryRecodeController::class, 'getStatusSummary']);
+    Route::get('chemical-dashboard/{Year}/All-summary', [SaCmPurchaseInventoryRecodeController::class, 'getAllSummary']);
 
 
 });
