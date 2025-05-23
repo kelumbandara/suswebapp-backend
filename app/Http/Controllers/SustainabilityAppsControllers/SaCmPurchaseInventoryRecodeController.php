@@ -3,6 +3,7 @@ namespace App\Http\Controllers\SustainabilityAppsControllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaCmPurchaseInventoryRecord\PurchaseInventoryRecordRequest;
+use App\Repositories\All\SaCmChemicalManagementRecode\ChemicalManagementRecodeInterface;
 use App\Repositories\All\SaCmPirCertificateRecord\CertificateRecordInterface;
 use App\Repositories\All\SaCmPurchaseInventory\PurchaseInventoryInterface;
 use App\Repositories\All\User\UserInterface;
@@ -18,14 +19,16 @@ class SaCmPurchaseInventoryRecodeController extends Controller
     protected $chemicalManagementService;
     protected $certificationRecodeService;
     protected $certificateRecordInterface;
+    protected $chemicalManagementRecodeInterface;
 
-    public function __construct(PurchaseInventoryInterface $purchaseInventoryInterface, ChemicalManagementService $chemicalManagementService, PirCertificationRecodeService $certificationRecodeService, UserInterface $userInterface, CertificateRecordInterface $certificateRecordInterface)
+    public function __construct(PurchaseInventoryInterface $purchaseInventoryInterface, ChemicalManagementRecodeInterface $chemicalManagementRecodeInterface, ChemicalManagementService $chemicalManagementService, PirCertificationRecodeService $certificationRecodeService, UserInterface $userInterface, CertificateRecordInterface $certificateRecordInterface)
     {
         $this->purchaseInventoryInterface = $purchaseInventoryInterface;
         $this->userInterface              = $userInterface;
         $this->chemicalManagementService  = $chemicalManagementService;
         $this->certificationRecodeService = $certificationRecodeService;
         $this->certificateRecordInterface = $certificateRecordInterface;
+        $this->chemicalManagementRecodeInterface = $chemicalManagementRecodeInterface;
 
     }
     public function index()
@@ -790,4 +793,44 @@ class SaCmPurchaseInventoryRecodeController extends Controller
             'data'      => array_values($chemicals),
         ]);
     }
+
+public function getStatusSummary($startDate, $endDate, $division)
+{
+    $statusCounts = [];
+
+    $purchaseRecords = $this->purchaseInventoryInterface->filterByParams($startDate, $endDate, $division);
+    foreach ($purchaseRecords as $record) {
+        $status = $record->status ?? 'unknown';
+        if (!isset($statusCounts[$status])) {
+            $statusCounts[$status] = 0;
+        }
+        $statusCounts[$status]++;
+    }
+
+    $chemicalRecords = $this->chemicalManagementRecodeInterface->filterByParams($startDate, $endDate, $division);
+    foreach ($chemicalRecords as $record) {
+        $status = $record->status ?? 'unknown';
+        if (!isset($statusCounts[$status])) {
+            $statusCounts[$status] = 0;
+        }
+        $statusCounts[$status]++;
+    }
+
+    $summary = [];
+    foreach ($statusCounts as $status => $count) {
+        $summary[] = [
+            'status' => $status,
+            'count'  => $count,
+        ];
+    }
+
+    return response()->json([
+        'startDate' => $startDate,
+        'endDate'   => $endDate,
+        'division'  => $division,
+        'data'      => $summary,
+    ]);
+}
+
+
 }
