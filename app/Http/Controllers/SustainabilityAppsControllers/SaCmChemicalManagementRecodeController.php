@@ -192,11 +192,11 @@ class SaCmChemicalManagementRecodeController extends Controller
             return response()->json(['message' => 'Chemical record not found.'], 404);
         }
          $user = Auth::user();
-        $approvedBy = $user->id;
+        $approverId = $user->id;
 
         $this->chemicalManagementRecodeInterface->update($id, [
             'status'     => 'approved',
-            'approvedBy' => $approvedBy,
+            'approverId' => $approverId,
         ]);
 
         $this->chemicalManagementRecodeInterface->update($id, ['status' => 'approved']);
@@ -232,7 +232,6 @@ class SaCmChemicalManagementRecodeController extends Controller
             'colourIndex'             => $chemicalRecord->colourIndex,
             'documents'               => $chemicalRecord->documents,
             'createdByUser'           => $chemicalRecord->createdByUser,
-            'approvedBy'              => $approvedBy,
         ];
 
         $this->purchaseInventoryInterface->create($inventoryData);
