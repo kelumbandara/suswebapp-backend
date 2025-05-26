@@ -266,7 +266,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('chemical-records', [SaCmChemicalManagementRecodeController::class, 'store']);
     Route::post('chemical-records/{id}/update', [SaCmChemicalManagementRecodeController::class, 'update']);
     Route::delete('chemical-records/{id}/delete', [SaCmChemicalManagementRecodeController::class, 'destroy']);
-    Route::get('chemical-records-assign-task', [SaCmChemicalManagementRecodeController::class, 'assignTask']);
     Route::get('chemical-records-assignee', [SaCmChemicalManagementRecodeController::class, 'assignee']);
     Route::post('chemical-records/{id}/approve', [SaCmChemicalManagementRecodeController::class, 'approvedStatus']);
 
