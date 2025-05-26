@@ -94,13 +94,13 @@ class SaCmPurchaseInventoryRecodeController extends Controller
 
             try {
                 $creator              = $this->userInterface->getById($record->approverId);
-                $record->approverName = $creator ? $creator->name : 'Unknown';
+                $record->approverName = $creator ? ['name' => $creator->name, 'id' => $creator->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $record->approverName = ['name' => 'Unknown', 'id' => null];
             }
             try {
                 $creator            = $this->userInterface->getById($record->approvedBy);
-                $record->approvedBy = $creator ? $creator->name : 'Unknown';
+                $record->approvedBy = $creator ? ['name' => $creator->name, 'id' => $creator->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $record->approvedByUser = ['name' => 'Unknown', 'id' => null];
             }
