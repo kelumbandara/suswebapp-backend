@@ -232,6 +232,7 @@ class SaCmChemicalManagementRecodeController extends Controller
             'colourIndex'             => $chemicalRecord->colourIndex,
             'documents'               => $chemicalRecord->documents,
             'createdByUser'           => $chemicalRecord->createdByUser,
+            'approverId'              => $approverId,
         ];
 
         $this->purchaseInventoryInterface->create($inventoryData);
