@@ -14,8 +14,9 @@ class SendOtpEmailChange extends Notification
     protected $name;
     protected $organizationName;
     protected $logoUrl;
+    protected $organizationFactoryName;
 
-    public function __construct($otp, $email, $name, $organizationName, $logoUrl)
+    public function __construct($otp, $email, $name, $organizationName, $logoUrl, $organizationFactoryName)
     {
         $this->otp              = $otp;
         $this->email            = $email;
@@ -39,6 +40,7 @@ class SendOtpEmailChange extends Notification
                 'name'             => $this->name,
                 'organizationName' => $this->organizationName,
                 'logoUrl'          => $this->logoUrl,
+                'organizationFactoryName' => $this->organizationFactoryName
             ]);
     }
 }
