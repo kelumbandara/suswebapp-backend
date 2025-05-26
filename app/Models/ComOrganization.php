@@ -10,6 +10,7 @@ class ComOrganization extends Model
 
     protected $fillable = [
         'organizationName',
+        'organizationFactoryName',
         'logoUrl',
         'colorPallet',
         'insightImage',
@@ -17,6 +18,7 @@ class ComOrganization extends Model
         'status',
         'createdByUser',
         'updatedBy',
+
     ];
 
     protected $casts = [

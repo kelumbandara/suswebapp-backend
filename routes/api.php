@@ -273,7 +273,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('purchase-inventory-records', [SaCmPurchaseInventoryRecodeController::class, 'index']);
     Route::post('purchase-inventory-records/{id}/update', [SaCmPurchaseInventoryRecodeController::class, 'update']);
     Route::post('purchase-inventory-records/{id}/publish-update', [SaCmPurchaseInventoryRecodeController::class, 'publishStatus']);
-    Route::delete('purchase-inventory-recode/{id}/delete', [SaCmPurchaseInventoryRecodeController::class, 'destroy']);
+    Route::delete('purchase-inventory-record/{id}/delete', [SaCmPurchaseInventoryRecodeController::class, 'destroy']);
     Route::get('chemical-transaction-published', [SaCmPurchaseInventoryRecodeController::class, 'getPublishedStatus']);
     Route::get('purchase-inventory-records-assign-task', [SaCmPurchaseInventoryRecodeController::class, 'assignTask']);
 

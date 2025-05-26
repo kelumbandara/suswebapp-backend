@@ -12,12 +12,14 @@ class WelcomeNotification extends Notification
     protected $name;
     protected $organizationName;
     protected $logoUrl;
+    protected $organizationFactoryName;
 
-    public function __construct($name , $organizationName, $logoUrl)
+    public function __construct($name , $organizationName, $logoUrl, $organizationFactoryName)
     {
         $this->name             = $name;
         $this->organizationName = $organizationName;
         $this->logoUrl          = $logoUrl;
+        $this->organizationFactoryName = $organizationFactoryName;
     }
 
     public function via($notifiable)
@@ -28,11 +30,12 @@ class WelcomeNotification extends Notification
     public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Welcome to ABA Group!')
+            ->subject('Welcome to the ' . $this->organizationName . ' Group!')
             ->markdown('mail.welcome.welcome-notification', [
                 'name'             => $this->name,
                 'organizationName' => $this->organizationName,
                 'logoUrl'          => $this->logoUrl,
+                'organizationFactoryName' => $this->organizationFactoryName
             ]);
     }
 }

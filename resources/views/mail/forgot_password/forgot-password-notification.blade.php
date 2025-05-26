@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTP Verification - {{ $organizationName }} Group</title>
+    <title>OTP Verification -{{ $organizationFactoryName }} Factory!</title>
 </head>
 <body style="font-family: Arial, sans-serif; background-color: #f7f7f7; margin: 0; padding: 0;">
     <div style="max-width: 600px; margin: 30px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); overflow: hidden;">
@@ -25,10 +25,10 @@
 
             <p style="margin-top: 20px;">Please use this OTP to proceed with your password reset. This OTP expires in 5 minutes.</p>
             <p>If you did not request this change, please ignore this email.</p>
-            <p style="font-size: 16px; color: #333; font-weight: bold; margin: 5px 0;">The {{ $organizationName }} Group Team</p>
+            <p style="font-size: 16px; color: #333; font-weight: bold; margin: 5px 0;">The {{ $organizationFactoryName }} Factory Team</p>
         </div>
         <div style="text-align: center; padding: 15px; background-color: #3b82f6;">
-            <p style="font-size: 12px; color: #ffffff;">&copy; 2025 {{ $organizationName }} Group. All rights reserved.</p>
+            <p style="font-size: 12px; color: #ffffff;">&copy; {{ date('Y') }} chasseur-dynamics Group. All rights reserved.</p>
         </div>
     </div>
 </body>

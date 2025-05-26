@@ -18,20 +18,21 @@ class OrganizationRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-  public function rules(): array
-{
-    return [
-        'organizationName'   => 'nullable|string',
-        'logoUrl'            => 'nullable|file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
-        'removeLogo'         => 'nullable|string',
-        'colorPallet'        => 'nullable|array',
-        'insightImage'       => 'nullable|file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
-        'removeInsightImage' => 'nullable|string',
-        'insightDescription' => 'nullable|string',
-        'status'             => 'nullable|string',
-        'createdByUser'      => 'nullable|string',
-        'updatedBy'          => 'nullable|string',
-    ];
-}
+    public function rules(): array
+    {
+        return [
+            'organizationName'        => 'nullable|string',
+            'organizationFactoryName' => 'nullable|string',
+            'logoUrl'                 => 'nullable|file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp,svg',
+            'removeLogo'              => 'nullable|string',
+            'colorPallet'             => 'nullable|array',
+            'insightImage'            => 'nullable|file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp,svg',
+            'removeInsightImage'      => 'nullable|string',
+            'insightDescription'      => 'nullable|string',
+            'status'                  => 'nullable|string',
+            'createdByUser'           => 'nullable|string',
+            'updatedBy'               => 'nullable|string',
+        ];
+    }
 
 }
