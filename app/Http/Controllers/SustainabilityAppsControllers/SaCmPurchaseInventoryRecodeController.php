@@ -93,8 +93,14 @@ class SaCmPurchaseInventoryRecodeController extends Controller
             }
 
             try {
-                $approver               = $this->userInterface->getById($record->approverId);
-                $record->approvedByUser = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
+                $creator              = $this->userInterface->getById($record->approverId);
+                $record->approverName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $record->approverName = ['name' => 'Unknown', 'id' => null];
+            }
+            try {
+                $creator            = $this->userInterface->getById($record->approvedBy);
+                $record->approvedBy = $creator ? $creator->name : 'Unknown';
             } catch (\Exception $e) {
                 $record->approvedByUser = ['name' => 'Unknown', 'id' => null];
             }
@@ -117,10 +123,10 @@ class SaCmPurchaseInventoryRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $userId                  = $user->id;
-        $validatedData           = $request->validated();
+        $userId                       = $user->id;
+        $validatedData                = $request->validated();
         $validatedData['publishedBy'] = $userId;
-        $validatedData['status'] = 'published';
+        $validatedData['status']      = 'published';
 
         $targetSetting = $this->purchaseInventoryInterface->findById($id);
 
@@ -227,7 +233,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
             $newDocuments = [];
             foreach ($request->file('documents') as $newFile) {
                 $uploadResult = $this->chemicalManagementService->updateDocuments($newFile);
-                if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
+                if ($uploadResult && isset($uploadResult['gsutil_uri'], $uploadResult['file_name'])) {
                     $newDocuments[] = [
                         'gsutil_uri' => $uploadResult['gsutil_uri'],
                         'file_name'  => $uploadResult['file_name'],
@@ -262,7 +268,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
                 if ($request->hasFile("certificate.{$index}.documents")) {
                     foreach ($request->file("certificate.{$index}.documents") as $certFile) {
                         $uploadResult = $this->certificationRecodeService->uploadImageToGCS($certFile);
-                        if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
+                        if ($uploadResult && isset($uploadResult['gsutil_uri'], $uploadResult['file_name'])) {
                             $certDocs[] = [
                                 'gsutil_uri' => $uploadResult['gsutil_uri'],
                                 'file_name'  => $uploadResult['file_name'],
@@ -273,12 +279,12 @@ class SaCmPurchaseInventoryRecodeController extends Controller
 
                 $certificateData['inventoryId'] = $updatedRecord->id;
                 $certificateData['documents']   = $certDocs;
-
-                if (! empty($certificateData['inventoryId'])) {
+                if (! empty($certificateData['testName'])) {
                     $this->certificateRecordInterface->updateOrCreate(
                         ['inventoryId' => $updatedRecord->id, 'testName' => $certificateData['testName']],
                         $certificateData
                     );
+
                 } else {
                     $this->certificateRecordInterface->create($certificateData);
                 }

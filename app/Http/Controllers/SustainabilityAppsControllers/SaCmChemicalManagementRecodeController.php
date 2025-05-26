@@ -41,8 +41,21 @@ class SaCmChemicalManagementRecodeController extends Controller
                 $creator                     = $this->userInterface->getById($chemical->createdByUser);
                 $chemical->createdByUserName = $creator ? $creator->name : 'Unknown';
             } catch (\Exception $e) {
-                $chemical->createdByUserName = 'Unknown';
+                $chemical->createdByUserName = ['name' => 'Unknown', 'id' => null];
             }
+            try {
+                $creator                     = $this->userInterface->getById($chemical->approverId);
+                $chemical->approverName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $chemical->approverName = ['name' => 'Unknown', 'id' => null];
+            }
+             try {
+                $creator                     = $this->userInterface->getById($chemical->approvedBy);
+                $chemical->approvedBy = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $chemical->approvedByUser = ['name' => 'Unknown', 'id' => null];
+            }
+
             if (! empty($chemical->documents) && is_string($chemical->documents)) {
                 $decodedDocuments = json_decode($chemical->documents, true);
                 $documents        = is_array($decodedDocuments) ? $decodedDocuments : [];
@@ -183,7 +196,7 @@ class SaCmChemicalManagementRecodeController extends Controller
 
         $this->chemicalManagementRecodeInterface->update($id, [
             'status'     => 'approved',
-            'approverId' => $approvedBy,
+            'approvedBy' => $approvedBy,
         ]);
 
         $this->chemicalManagementRecodeInterface->update($id, ['status' => 'approved']);
@@ -250,51 +263,6 @@ class SaCmChemicalManagementRecodeController extends Controller
         ], $deleted ? 200 : 500);
     }
 
-    public function assignTask()
-    {
-        $user = Auth::user();
-
-        if (! $user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
-
-        $chemical = $this->chemicalManagementRecodeInterface->getByReviewerId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
-
-        $chemical = $chemical->map(function ($chemical) {
-            try {
-                $reviewer           = $this->userInterface->getById($chemical->reviewerId);
-                $chemical->reviewer = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
-            } catch (\Exception $e) {
-                $chemical->reviewer = ['name' => 'Unknown', 'id' => null];
-            }
-
-            try {
-                $creator                     = $this->userInterface->getById($chemical->createdByUser);
-                $chemical->createdByUserName = $creator ? $creator->name : 'Unknown';
-            } catch (\Exception $e) {
-                $chemical->createdByUserName = 'Unknown';
-            }
-            if (! empty($chemical->documents) && is_string($chemical->documents)) {
-                $decodedEvidence = json_decode($chemical->documents, true);
-                $documents       = is_array($decodedEvidence) ? $decodedEvidence : [];
-            } else {
-                $documents = is_array($chemical->documents) ? $chemical->documents : [];
-            }
-
-            foreach ($documents as &$item) {
-                if (isset($item['gsutil_uri'])) {
-                    $imageData        = $this->chemicalManagementService->getImageUrl($item['gsutil_uri']);
-                    $item['fileName'] = $imageData['fileName'];
-                    $item['imageUrl'] = $imageData['signedUrl'];
-                }
-            }
-
-            return $chemical;
-
-        });
-
-        return response()->json($chemical, 200);
-    }
 
     public function assignee()
     {
