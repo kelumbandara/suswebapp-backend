@@ -179,6 +179,27 @@ class SaCmPurchaseInventoryRecodeController extends Controller
         }
 
         $updatedRecord = $this->purchaseInventoryInterface->findById($id);
+        if ($request->has('removeCertificate')) {
+            $removeIds = $request->input('removeCertificate');
+            if (is_array($removeIds)) {
+                foreach ($removeIds as $certId) {
+                    $certificate = $this->certificateRecordInterface->findById($certId);
+                    if ($certificate) {
+                        // Remove GCS docs
+                        if (! empty($certificate->documents)) {
+                            $docs = json_decode($certificate->documents, true);
+                            foreach ($docs as $doc) {
+                                if (isset($doc['gsutil_uri'])) {
+                                    $this->certificationRecodeService->removeOldDocumentFromStorage($doc['gsutil_uri']);
+                                }
+                            }
+                        }
+
+                        $this->certificateRecordInterface->deleteById($certId);
+                    }
+                }
+            }
+        }
 
         if (! empty($validatedData['certificate'])) {
             foreach ($validatedData['certificate'] as $index => $certificateData) {
@@ -253,6 +274,27 @@ class SaCmPurchaseInventoryRecodeController extends Controller
         }
 
         $updatedRecord = $this->purchaseInventoryInterface->findById($id);
+
+        if ($request->has('removeCertificate')) {
+            $removeIds = $request->input('removeCertificate');
+            if (is_array($removeIds)) {
+                foreach ($removeIds as $certId) {
+                    $certificate = $this->certificateRecordInterface->findById($certId);
+                    if ($certificate) {
+                        if (! empty($certificate->documents)) {
+                            $docs = json_decode($certificate->documents, true);
+                            foreach ($docs as $doc) {
+                                if (isset($doc['gsutil_uri'])) {
+                                    $this->certificationRecodeService->removeOldDocumentFromStorage($doc['gsutil_uri']);
+                                }
+                            }
+                        }
+
+                        $this->certificateRecordInterface->deleteById($certId);
+                    }
+                }
+            }
+        }
 
         if (! empty($validatedData['certificate'])) {
             foreach ($validatedData['certificate'] as $index => $certificateData) {

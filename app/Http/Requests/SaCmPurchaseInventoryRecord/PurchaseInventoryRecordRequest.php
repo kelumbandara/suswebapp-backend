@@ -72,6 +72,8 @@ class PurchaseInventoryRecordRequest extends FormRequest
             'storageConditionRequirements'               => 'nullable|string',
             'storagePlace'                               => 'nullable|string',
             'lotNumber'                                  => 'nullable|string',
+            'removeCertificate'                          => 'nullable|array',
+            'removeCertificate.*'                        => 'integer',
             'certificate'                                => 'nullable|array',
             'certificate.*.inventoryId'                  => 'nullable|numeric',
             'certificate.*.testName'                     => 'required|string',
