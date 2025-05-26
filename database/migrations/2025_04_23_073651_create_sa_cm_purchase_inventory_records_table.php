@@ -59,7 +59,7 @@ return new class extends Migration
             $table->string('manufacturingDate')->nullable();
             $table->string('expiryDate')->nullable();
             $table->string('deliveryDate')->nullable();
-            $table->integer('deliveryQuantity')->nullable();
+            $table->integer('deliveryQuantity')->nullable(); 
             $table->string('deliveryUnit')->nullable();
             $table->integer('purchaseAmount')->nullable();
             $table->string('thresholdLimit')->nullable();

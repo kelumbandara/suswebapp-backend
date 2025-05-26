@@ -111,6 +111,15 @@ class SaCmChemicalManagementRecodeController extends Controller
 
     public function update($id, ChemicalManagementRecodeRequest $request)
     {
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $userId                     = $user->id;
+        $validatedData              = $request->validated();
+        $validatedData['updatedBy'] = $userId;
+
         $chemical      = $this->chemicalManagementRecodeInterface->findById($id);
         $validatedData = $request->validated();
 
@@ -169,6 +178,13 @@ class SaCmChemicalManagementRecodeController extends Controller
         if (! $chemicalRecord) {
             return response()->json(['message' => 'Chemical record not found.'], 404);
         }
+         $user = Auth::user();
+        $approvedBy = $user->id;
+
+        $this->chemicalManagementRecodeInterface->update($id, [
+            'status'     => 'approved',
+            'approverId' => $approvedBy,
+        ]);
 
         $this->chemicalManagementRecodeInterface->update($id, ['status' => 'approved']);
 
@@ -202,6 +218,7 @@ class SaCmChemicalManagementRecodeController extends Controller
             'casNumber'               => $chemicalRecord->casNumber,
             'colourIndex'             => $chemicalRecord->colourIndex,
             'documents'               => $chemicalRecord->documents,
+            'approvedBy'              => $approvedBy,
         ];
 
         $this->purchaseInventoryInterface->create($inventoryData);
@@ -291,7 +308,4 @@ class SaCmChemicalManagementRecodeController extends Controller
         return response()->json($assignees);
     }
 
-
-
-    
 }

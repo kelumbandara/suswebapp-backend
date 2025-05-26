@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -42,7 +41,6 @@ class SaCmPurchaseInventoryRecord extends Model
         'createdByUser',
         'updatedBy',
         'approvedBy',
-        'publishedBy',
         'rejectedBy',
         'responsibleSection',
         'assigneeLevel',
@@ -68,14 +66,16 @@ class SaCmPurchaseInventoryRecord extends Model
         'storagePlace',
         'lotNumber',
         'transactionsRefferenceNumber',
+        'publishedBy',
+
     ];
     protected $casts = [
-        'documents'          => 'array',
-        'hazardType'         => 'array',
-        'useOfPPE'           => 'array',
+        'documents'  => 'array',
+        'hazardType' => 'array',
+        'useOfPPE'   => 'array',
     ];
 
-     protected static function booted()
+    protected static function booted()
     {
         static::created(function ($model) {
             $model->transactionsRefferenceNumber = 'CTR-' . $model->id;
