@@ -2,6 +2,7 @@
 namespace Database\Seeders;
 
 use App\Models\ComAssigneeLevel;
+use App\Models\ComOrganization;
 use App\Models\ComPermission;
 use App\Models\ComResponsibleSection;
 use App\Models\User;
@@ -529,6 +530,12 @@ class DatabaseSeeder extends Seeder
             'id'        => 5,
             'levelId'   => '5',
             'levelName' => 'CEO',
+        ]);
+
+        ComOrganization::factory()->create([
+            'id'   => 1,
+            'organizationName' => 'ABA',
+            'organizationFactoryName' => 'Corporate',
         ]);
     }
 
