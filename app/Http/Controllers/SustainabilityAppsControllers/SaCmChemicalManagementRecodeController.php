@@ -53,7 +53,7 @@ class SaCmChemicalManagementRecodeController extends Controller
                 $creator                     = $this->userInterface->getById($chemical->approvedBy);
                 $chemical->approvedBy = $creator ? $creator->name : 'Unknown';
             } catch (\Exception $e) {
-                $chemical->approvedByUser = ['name' => 'Unknown', 'id' => null];
+                $chemical->approvedBy = ['name' => 'Unknown', 'id' => null];
             }
 
             if (! empty($chemical->documents) && is_string($chemical->documents)) {
@@ -231,6 +231,7 @@ class SaCmChemicalManagementRecodeController extends Controller
             'casNumber'               => $chemicalRecord->casNumber,
             'colourIndex'             => $chemicalRecord->colourIndex,
             'documents'               => $chemicalRecord->documents,
+            'createdByUser'           => $chemicalRecord->createdByUser,
             'approvedBy'              => $approvedBy,
         ];
 
