@@ -112,7 +112,14 @@ class SaCmPurchaseInventoryRecodeController extends Controller
 
     public function publishStatus($id, PurchaseInventoryRecordRequest $request)
     {
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $userId                  = $user->id;
         $validatedData           = $request->validated();
+        $validatedData['publishedBy'] = $userId;
         $validatedData['status'] = 'published';
 
         $targetSetting = $this->purchaseInventoryInterface->findById($id);

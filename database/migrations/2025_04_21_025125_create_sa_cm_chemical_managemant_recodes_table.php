@@ -59,3 +59,4 @@ return new class extends Migration
         Schema::dropIfExists('sa_cm_chemical_managemant_recodes');
     }
 };
+ 
