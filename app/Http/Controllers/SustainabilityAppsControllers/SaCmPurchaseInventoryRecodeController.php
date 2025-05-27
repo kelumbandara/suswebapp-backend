@@ -94,7 +94,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
 
              try {
                 $reviewer               = $this->userInterface->getById($record->reviewerId);
-                $record->reviewerByUser = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
+                $record->reviewer = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $record->reviewer = ['name' => 'Unknown', 'id' => null];
             }
@@ -462,7 +462,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
 
              try {
                 $reviewer               = $this->userInterface->getById($record->reviewerId);
-                $record->reviewerByUser = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
+                $record->reviewer = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $record->reviewer = ['name' => 'Unknown', 'id' => null];
             }
@@ -546,7 +546,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
 
              try {
                 $reviewer               = $this->userInterface->getById($record->reviewerId);
-                $record->reviewerByUser = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
+                $record->reviewer = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $record->reviewer = ['name' => 'Unknown', 'id' => null];
             }
