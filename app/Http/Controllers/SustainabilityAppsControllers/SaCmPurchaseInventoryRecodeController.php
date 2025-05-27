@@ -339,7 +339,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
         ]);
     }
 
-    public function destroy($id)
+    public function delete($id)
     {
         $record = $this->purchaseInventoryInterface->findById($id);
 
@@ -364,7 +364,6 @@ class SaCmPurchaseInventoryRecodeController extends Controller
                     $this->certificationRecodeService->removeOldDocumentFromStorage($doc['gsutil_uri']);
                 }
             }
-
             $this->certificateRecordInterface->deleteById($certificate->id);
         }
 
@@ -378,7 +377,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
 
         return response()->json([
             'message' => 'Purchase inventory record deleted successfully.',
-        ], 200);
+        ]);
     }
 
     public function assignTask()
