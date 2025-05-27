@@ -81,7 +81,7 @@ class SaEnvirementManagementRecodeController extends Controller
         $record = $this->envirementManagementRecodeInterface->create($data);
 
         if (! $record) {
-            return response()->json(['message' => 'Failed to create enviroment management report'], 500);
+            return response()->json(['message' => 'Failed to create environment management report'], 500);
         }
 
         if (! empty($data['impactConsumption'])) {
@@ -92,7 +92,7 @@ class SaEnvirementManagementRecodeController extends Controller
         }
 
         return response()->json([
-            'message' => 'Enviroment management report created successfully',
+            'message' => 'Environment management report created successfully',
             'record'  => $record,
         ], 201);
     }
@@ -120,7 +120,7 @@ class SaEnvirementManagementRecodeController extends Controller
         $updatedRecord->impactDetails = $this->addConcumptionInterface->findByEnvirementId($id);
 
         return response()->json([
-            'message' => 'Enviroment management report updated successfully',
+            'message' => 'Environment management report updated successfully',
             'record'  => $updatedRecord,
         ], 200);
     }
@@ -130,14 +130,14 @@ class SaEnvirementManagementRecodeController extends Controller
         $record = $this->envirementManagementRecodeInterface->findById($id);
 
         if (! $record) {
-            return response()->json(['message' => 'Enviroment management record not found'], 404);
+            return response()->json(['message' => 'Environment management record not found'], 404);
         }
 
         $this->addConcumptionInterface->deleteByEnvirementId($id);
 
         $this->envirementManagementRecodeInterface->deleteById($id);
 
-        return response()->json(['message' => 'Enviroment management report deleted successfully'], 200);
+        return response()->json(['message' => 'Environment management report deleted successfully'], 200);
     }
 
     public function assignTask()
