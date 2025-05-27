@@ -36,6 +36,7 @@ class RegisteredUserController extends Controller
 
             if ($organization) {
                 $organizationName = $organization->organizationName;
+                $organizationFactoryName = $organization->organizationFactoryName;
                 $logoData         = null;
 
                 if (! empty($organization->logoUrl)) {
@@ -43,7 +44,7 @@ class RegisteredUserController extends Controller
                     $logoData = $logoInfo['signedUrl'] ?? null;
                 }
 
-                Notification::send($user, new WelcomeNotification($user->name, $organizationName, $logoData));
+                Notification::send($user, new WelcomeNotification($user->name, $organizationName, $logoData, $organizationFactoryName));
             }
         } catch (\Exception $e) {
         }

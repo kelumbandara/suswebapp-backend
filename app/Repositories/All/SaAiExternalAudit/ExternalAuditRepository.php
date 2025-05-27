@@ -54,13 +54,17 @@ class ExternalAuditRepository extends BaseRepository implements ExternalAuditInt
 
         if ($startDate && $endDate) {
             $query->whereBetween('auditDate', [$startDate, $endDate]);
-        } 
+        }
 
         if ($division) {
             $query->where('division', $division);
         }
 
         return $query->get();
+    }
+    public function getBetweenDates($startDate, $endDate)
+    {
+        return $this->model->whereBetween('auditDate', [$startDate, $endDate])->get();
     }
 
 }

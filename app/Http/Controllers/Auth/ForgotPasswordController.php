@@ -46,13 +46,7 @@ class ForgotPasswordController extends Controller
         $user->otp_expires_at = now()->addMinutes(5);
         $user->save();
 
-        // try {
-        //     Notification::route('mail', $user->email)->notify(new SendPasswordChangeConfirmation($otp, $user->email));
 
-        //     return response()->json(['message' => 'OTP has been sent to your email.'], 201);
-        // } catch (\Exception $e) {
-        //     return response()->json(['error' => 'Failed to send OTP. Please try again later.'], 500);
-        // }
 
 
         try {
@@ -60,13 +54,14 @@ class ForgotPasswordController extends Controller
 
             if ($organization) {
                 $organizationName = $organization->organizationName;
+                $organizationFactoryName = $organization->organizationFactoryName;
                 $logoData         = null;
 
                 if (! empty($organization->logoUrl)) {
                     $logoInfo = $this->organizationService->getImageUrl($organization->logoUrl);
                     $logoData = $logoInfo['signedUrl'] ?? null;
                 }
-            Notification::route('mail', $user->email)->notify(new SendPasswordChangeConfirmation($otp, $user->email, $user->name, $organizationName, $logoData));
+            Notification::route('mail', $user->email)->notify(new SendPasswordChangeConfirmation($otp, $user->email, $user->name, $organizationName, $logoData, $organizationFactoryName));
             return response()->json(['message' => 'OTP has been sent to your email.'], 201);
         }} catch (\Exception $e) {
             return response()->json(['error' => 'Failed to send OTP. Please try again later.'], 500);

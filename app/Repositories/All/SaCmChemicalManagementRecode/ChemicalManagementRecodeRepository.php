@@ -16,7 +16,7 @@ class ChemicalManagementRecodeRepository extends BaseRepository implements Chemi
      *
      * @param SaCmChemicalManagemantRecode $model
      */
-    public function __construct( SaCmChemicalManagemantRecode $model)
+    public function __construct(SaCmChemicalManagemantRecode $model)
     {
         $this->model = $model;
     }
@@ -26,5 +26,23 @@ class ChemicalManagementRecodeRepository extends BaseRepository implements Chemi
         return $this->model->where('reviewerId', $reviewerId)->get();
     }
 
+    public function filterByParams($startDate = null, $endDate = null, $division = null)
+    {
+        $query = $this->model->newQuery();
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('updated_at', [$startDate, $endDate]);
+        }
+
+        if ($division) {
+            $query->where('division', $division);
+        }
+
+        return $query->get();
+    }
+    public function filterByYear($year)
+    {
+        return $this->model->whereYear('updated_at', $year)->get();
+    }
 
 }

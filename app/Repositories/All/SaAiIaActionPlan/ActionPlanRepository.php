@@ -30,4 +30,9 @@ class ActionPlanRepository extends BaseRepository implements ActionPlanInterface
         return $this->model->where('internalAuditId', $internalAuditId)->delete();
     }
 
+    public function getByInternalAuditId($internalAuditId)
+    {
+        return $this->model->where('internalAuditId', $internalAuditId)->first();
+    }
+
 }

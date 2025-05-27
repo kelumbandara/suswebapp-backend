@@ -209,13 +209,14 @@ class UserController extends Controller
 
             if ($organization) {
                 $organizationName = $organization->organizationName;
+                $organizationFactoryName = $organization->organizationFactoryName;
                 $logoData         = null;
 
                 if (! empty($organization->logoUrl)) {
                     $logoInfo = $this->organizationService->getImageUrl($organization->logoUrl);
                     $logoData = $logoInfo['signedUrl'] ?? null;
                 }
-            Notification::route('mail', $user->email)->notify(new SendOtpEmailChange($otp, $user->email, $user->name, $organizationName, $logoData));
+            Notification::route('mail', $user->email)->notify(new SendOtpEmailChange($otp, $user->email, $user->name, $organizationName, $logoData, $organizationFactoryName));
             return response()->json(['message' => 'OTP has been sent to your email.'], 201);
         }} catch (\Exception $e) {
             return response()->json(['error' => 'Failed to send OTP. Please try again later.'], 500);

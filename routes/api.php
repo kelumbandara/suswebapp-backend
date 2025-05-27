@@ -98,7 +98,6 @@ Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('organizations', [OrganizationController::class, 'index']);
-    Route::post('organizations', [OrganizationController::class, 'store']);
     Route::post('organizations/{id}/update', [OrganizationController::class, 'update']);
     Route::delete('organizations/{id}/delete', [OrganizationController::class, 'destroy']);
 
@@ -179,9 +178,29 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('external-audit/{id}/delete', [SaAiExternalAuditRecodeController::class, 'destroy']);
     Route::get('external-audit-assign-task', [SaAiExternalAuditRecodeController::class, 'assignTask']);
     Route::get('external-audit-assignee', [SaAiExternalAuditRecodeController::class, 'assignee']);
-    Route::get('audit-status-count/{year}/{month}/{division}/status-count', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCountByMonth']);
-    Route::get('external-audit/{year}/{division}/status', [SaAiExternalAuditRecodeController::class, 'getStatusCountByMonth']);
-    Route::get('external-audit/{year}/{division}/audit-scores', [SaAiExternalAuditRecodeController::class, 'getAuditScoresByYearDivision']);
+    Route::post('external-audit-action-plan', [SaAiExternalAuditRecodeController::class, 'actionPlanStore']);
+    Route::post('external-audit-action-plan/{id}/update', [SaAiExternalAuditRecodeController::class, 'actionPlanUpdate']);
+    Route::delete('external-audit-action-plan/{id}/delete', [SaAiExternalAuditRecodeController::class, 'actionPlanDelete']);
+
+    //calender api
+    Route::get('audit-calender/{startDate}/{endDate}/calender', [SaAiExternalAuditRecodeController::class, 'getCalendarRecord']);
+
+    //audit dashboard routes
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/status-count', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCount']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/score-count', [SaAiExternalAuditRecodeController::class, 'getCombinedScoreCountByMonth']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/status-count-by-month', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCountMonthly']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/assigned-completion', [SaAiExternalAuditRecodeController::class, 'getAssignedCompletionStats']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/grade-stats', [SaAiExternalAuditRecodeController::class, 'getAuditGradeStats']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/announcement-stats', [SaAiExternalAuditRecodeController::class, 'getAuditAnnouncementStats']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/category-priority-findings', [SaAiExternalAuditRecodeController::class, 'getCategoryPriorityDistribution']);
+    Route::get('audit-status-count/{division}/{type}/select-division-record', [SaAiExternalAuditRecodeController::class, 'getSelectDivisionRecode']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{type}/all-division-record', [SaAiExternalAuditRecodeController::class, 'getAllDivisionRecode']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/audit-standards', [SaAiExternalAuditRecodeController::class, 'getAuditStandardsRecode']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/audit-completion-draft', [SaAiExternalAuditRecodeController::class, 'getAuditCompletionDraftStats']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/expiry-action', [SaAiExternalAuditRecodeController::class, 'getAuditActionPlanByDateRange']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/audit-type', [SaAiExternalAuditRecodeController::class, 'getAuditTypeStats']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/upcoming-expiry-audit', [SaAiExternalAuditRecodeController::class, 'getUpcomingExpiryAudit']);
+    Route::get('audit-status-count/{startDate}/{endDate}/{division}/category-score', [SaAiExternalAuditRecodeController::class, 'getCategoryScoreSummary']);
 
     Route::get('internal-audit', [SaAiInternalAuditRecodeController::class, 'index']);
     Route::get('internal-audit/{id}', [SaAiInternalAuditRecodeController::class, 'show']);
@@ -200,10 +219,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('internal-audit-action-plan', [SaAiInternalAuditRecodeController::class, 'actionPlanStore']);
     Route::post('internal-audit-completed/{id}/update', [SaAiInternalAuditRecodeController::class, 'complete']);
     Route::get('internal-audit-completed', [SaAiInternalAuditRecodeController::class, 'getFinalAuditers']);
-    Route::get('internal-audit/{year}/{division}/status', [SaAiInternalAuditRecodeController::class, 'getStatusCountByMonth']);
-    Route::get('internal-audit/{year}/{month}/{division}/audit-scores', [SaAiInternalAuditRecodeController::class, 'getAuditScoresByYearMonthDivision']);
-    Route::get('audit-status-count/{startDate}/{endDate}/{division}/{type}/status-count', [SaAiExternalAuditRecodeController::class, 'getCombinedStatusCountByMonth']);
-    Route::get('internal-audit/{startDate}/{endDate}/{year}/{division}/{type}/audit-scores', [SaAiInternalAuditRecodeController::class, 'getAuditScoresByYearDivision']);
 
     Route::get('question-reports', [SaAiIaQuestionRecodeController::class, 'index']);
     Route::post('question-reports', [SaAiIaQuestionRecodeController::class, 'store']);
@@ -224,6 +239,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('environment-record/{id}/delete', [SaEnvirementManagementRecodeController::class, 'destroy']);
     Route::get('environment-record-assign-task', [SaEnvirementManagementRecodeController::class, 'assignTask']);
     Route::get('environment-record-assignee', [SaEnvirementManagementRecodeController::class, 'assignee']);
+
+    //environment dashboard api
     Route::get('environment-record/{year}/{month}/{division}/category-quantity-sum', [SaEnvirementManagementRecodeController::class, 'monthlyCategoryQuantitySum']);
     Route::get('environment-record/{year}/{division}/category-quantity-sum', [SaEnvirementManagementRecodeController::class, 'yearlyCategoryQuantitySum']);
     Route::get('environment-record/{year}/{month}/{division}/category-source-quantity-sum', [SaEnvirementManagementRecodeController::class, 'categorySourceQuantitySum']);
@@ -249,17 +266,30 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('chemical-records', [SaCmChemicalManagementRecodeController::class, 'store']);
     Route::post('chemical-records/{id}/update', [SaCmChemicalManagementRecodeController::class, 'update']);
     Route::delete('chemical-records/{id}/delete', [SaCmChemicalManagementRecodeController::class, 'destroy']);
-    Route::get('chemical-records-assign-task', [SaCmChemicalManagementRecodeController::class, 'assignTask']);
     Route::get('chemical-records-assignee', [SaCmChemicalManagementRecodeController::class, 'assignee']);
     Route::post('chemical-records/{id}/approve', [SaCmChemicalManagementRecodeController::class, 'approvedStatus']);
 
     Route::get('purchase-inventory-records', [SaCmPurchaseInventoryRecodeController::class, 'index']);
     Route::post('purchase-inventory-records/{id}/update', [SaCmPurchaseInventoryRecodeController::class, 'update']);
     Route::post('purchase-inventory-records/{id}/publish-update', [SaCmPurchaseInventoryRecodeController::class, 'publishStatus']);
-    Route::delete('purchase-inventory-recode/{id}/delete', [SaCmPurchaseInventoryRecodeController::class, 'destroy']);
+    Route::delete('purchase-inventory-record/{id}/delete', [SaCmPurchaseInventoryRecodeController::class, 'destroy']);
     Route::get('chemical-transaction-published', [SaCmPurchaseInventoryRecodeController::class, 'getPublishedStatus']);
-
     Route::get('purchase-inventory-records-assign-task', [SaCmPurchaseInventoryRecodeController::class, 'assignTask']);
+
+ 
+    Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/stock-amount', [SaCmPurchaseInventoryRecodeController::class, 'getStockAmount']);
+    Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/monthly-delivery', [SaCmPurchaseInventoryRecodeController::class, 'getMonthlyDelivery']);
+    Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/latest-record', [SaCmPurchaseInventoryRecodeController::class, 'getLatestRecord']);
+    Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/transaction-latest-record', [SaCmPurchaseInventoryRecodeController::class, 'getTransactionLatestRecord']);
+    Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/stock-threshold', [SaCmPurchaseInventoryRecodeController::class, 'getStockThreshold']);
+    Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/highest-stock', [SaCmPurchaseInventoryRecodeController::class, 'getHighestStock']);
+    Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/status-summary', [SaCmPurchaseInventoryRecodeController::class, 'getStatusSummary']);
+    Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/chemical-inventory-insights', [SaCmPurchaseInventoryRecodeController::class, 'getChemicalInventoryInsights']);
+    Route::get('chemical-dashboard/{Year}/all-summary', [SaCmPurchaseInventoryRecodeController::class, 'getAllSummary']);
+    Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/category-and-classification', [SaCmPurchaseInventoryRecodeController::class, 'getCategoryAndClassification']);
+    Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/do-you-have-msds', [SaCmPurchaseInventoryRecodeController::class, 'getDoYouHaveMsdsPercentage']);
+
+
 });
 
 Route::get('user-permissions', [ComPermissionController::class, 'index']);
