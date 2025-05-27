@@ -328,63 +328,53 @@ class SaAiExternalAuditRecodeController extends Controller
 public function getCalendarRecord($startDate, $endDate)
 {
     try {
-        // Fetch and map external audits
         $externalAudits = $this->externalAuditInterface->getBetweenDates($startDate, $endDate)
+            ->sortByDesc('created_at')
             ->sortByDesc('updated_at')
             ->values();
 
         $externalAudits = $externalAudits->map(function ($audit) {
             try {
-                $approver = $this->userInterface->getById($audit->approverId);
-                $audit->approver = $approver
-                    ? ['name' => $approver->name, 'id' => $approver->id]
-                    : ['name' => 'Unknown', 'id' => null];
+                $approver        = $this->userInterface->getById($audit->approverId);
+                $audit->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $audit->approver = ['name' => 'Unknown', 'id' => null];
             }
 
             try {
-                $representor = $this->userInterface->getById($audit->representorId);
-                $audit->representor = $representor
-                    ? ['name' => $representor->name, 'id' => $representor->id]
-                    : ['name' => 'Unknown', 'id' => null];
+                $representor        = $this->userInterface->getById($audit->representorId);
+                $audit->representor = $representor ? ['name' => $representor->name, 'id' => $representor->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $audit->representor = ['name' => 'Unknown', 'id' => null];
             }
 
             try {
-                $creator = $this->userInterface->getById($audit->createdByUser);
+                $creator                  = $this->userInterface->getById($audit->createdByUser);
                 $audit->createdByUserName = $creator ? $creator->name : 'Unknown';
             } catch (\Exception $e) {
                 $audit->createdByUserName = 'Unknown';
             }
 
-            // Decode documents
-            $documents = [];
-            if (!empty($audit->documents)) {
-                $decoded = is_string($audit->documents)
-                    ? json_decode($audit->documents, true)
-                    : $audit->documents;
+            if (! empty($audit->documents) && is_string($audit->documents)) {
+                $documents = json_decode($audit->documents, true);
+            } else {
+                $documents = is_array($audit->documents) ? $audit->documents : [];
+            }
 
-                if (is_array($decoded)) {
-                    foreach ($decoded as $doc) {
-                        if (isset($doc['gsutil_uri'])) {
-                            $imageData = $this->externalAuditService->getImageUrl($doc['gsutil_uri']);
-                            $doc['imageUrl'] = $imageData['signedUrl'] ?? null;
-                            $doc['fileName'] = $imageData['fileName'] ?? null;
-                        }
-                        $documents[] = $doc;
-                    }
+            foreach ($documents as &$document) {
+                if (isset($document['gsutil_uri'])) {
+                    $imageData            = $this->externalAuditService->getImageUrl($document['gsutil_uri']);
+                    $document['imageUrl'] = $imageData['signedUrl'];
+                    $document['fileName'] = $imageData['fileName'];
                 }
             }
 
             $audit->documents = $documents;
 
-            // Action plans
             $actionPlans = $this->eaActionPlanInterface->findByExternalAuditId($audit->id);
-            $audit->actionPlan = collect($actionPlans)->map(function ($actionPlan) {
+            $actionPlans = collect($actionPlans)->map(function ($actionPlan) {
                 try {
-                    $approver = $this->userInterface->getById($actionPlan->approverId);
+                    $approver             = $this->userInterface->getById($actionPlan->approverId);
                     $actionPlan->approver = $approver
                         ? ['name' => $approver->name, 'id' => $approver->id]
                         : ['name' => 'Unknown', 'id' => null];
@@ -394,56 +384,55 @@ public function getCalendarRecord($startDate, $endDate)
                 return $actionPlan;
             });
 
-            $audit->type = 'external';
+            $audit->actionPlan = $actionPlans;
+            $audit->type       = 'external';
 
-            // Format date
             try {
-                $auditDate = new \DateTime($audit->auditDate, new \DateTimeZone('UTC'));
-                $audit->Date = $auditDate->format('Y-m-d');
-                $audit->Year = $auditDate->format('Y');
+                $auditDate    = new \DateTime($audit->auditDate, new \DateTimeZone('UTC'));
+                $audit->Date  = $auditDate->format('Y-m-d');
+                $audit->Year  = $auditDate->format('Y');
                 $audit->Month = $auditDate->format('m');
-                $audit->Day = $auditDate->format('d');
-                $audit->Time = $auditDate->format('H:i:s');
+                $audit->Day   = $auditDate->format('d');
+                $audit->Time  = $auditDate->format('H:i:s');
             } catch (\Exception $e) {
-                $audit->Date = $audit->Year = $audit->Month = $audit->Day = $audit->Time = null;
+                $audit->Date  = null;
+                $audit->Year  = null;
+                $audit->Month = null;
+                $audit->Time  = null;
             }
 
             return $audit;
         });
 
-        // Fetch and map internal audits
         $internalAudits = $this->internalAuditRecodeInterface->getBetweenDates($startDate, $endDate)
+            ->sortByDesc('created_at')
             ->sortByDesc('updated_at')
             ->values();
 
         $internalAudits = $internalAudits->map(function ($audit) {
             try {
-                $approver = $this->userInterface->getById($audit->approverId);
-                $audit->approver = $approver
-                    ? ['name' => $approver->name, 'id' => $approver->id]
-                    : ['name' => 'Unknown', 'id' => null];
+                $approver        = $this->userInterface->getById($audit->approverId);
+                $audit->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $audit->approver = ['name' => 'Unknown', 'id' => null];
             }
 
             try {
-                $auditee = $this->userInterface->getById($audit->auditeeId);
-                $audit->auditee = $auditee
-                    ? ['name' => $auditee->name, 'id' => $auditee->id]
-                    : ['name' => 'Unknown', 'id' => null];
+                $auditee        = $this->userInterface->getById($audit->auditeeId);
+                $audit->auditee = $auditee ? ['name' => $auditee->name, 'id' => $auditee->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $audit->auditee = ['name' => 'Unknown', 'id' => null];
             }
 
             try {
-                $creator = $this->userInterface->getById($audit->createdByUser);
+                $creator                  = $this->userInterface->getById($audit->createdByUser);
                 $audit->createdByUserName = $creator ? $creator->name : 'Unknown';
             } catch (\Exception $e) {
                 $audit->createdByUserName = 'Unknown';
             }
 
             try {
-                $contactPerson = $this->contactPersonInterface->getById($audit->factoryContactPersonId);
+                $contactPerson               = $this->contactPersonInterface->getById($audit->factoryContactPersonId);
                 $audit->factoryContactPerson = $contactPerson
                     ? ['name' => $contactPerson->name, 'id' => $contactPerson->id]
                     : ['name' => 'Unknown', 'id' => null];
@@ -453,46 +442,84 @@ public function getCalendarRecord($startDate, $endDate)
 
             try {
                 $questionRecode = $this->questionRecodeInterface->getById($audit->auditId);
-                $totalQuestions = $totalScore = 0;
+                $totalQuestions = 0;
+                $totalScore     = 0;
 
                 $groups = $this->groupRecodeInterface->findByQuestionRecoId($questionRecode->id);
                 $groups = collect($groups)->map(function ($group) use (&$totalQuestions, &$totalScore) {
-                    $questions = $this->questionsInterface->findByQueGroupId($group->queGroupId);
+                    $questions        = $this->questionsInterface->findByQueGroupId($group->queGroupId);
                     $group->questions = $questions;
                     $totalQuestions += count($questions);
                     $totalScore += collect($questions)->sum('allocatedScore');
                     return $group;
                 });
 
-                $questionRecode->questionGroups = $groups;
+                $questionRecode->questionGroups         = $groups;
                 $questionRecode->totalNumberOfQuestions = $totalQuestions;
-                $questionRecode->achievableScore = $totalScore;
+                $questionRecode->achievableScore        = $totalScore;
+
                 $audit->audit = $questionRecode;
             } catch (\Exception $e) {
                 $audit->audit = null;
             }
 
             try {
-                $auditDate = new \DateTime($audit->auditDate, new \DateTimeZone('UTC'));
-                $audit->Date = $auditDate->format('Y-m-d');
-                $audit->Year = $auditDate->format('Y');
-                $audit->Month = $auditDate->format('m');
-                $audit->Day = $auditDate->format('d');
-                $audit->Time = $auditDate->format('H:i:s');
+                $departments = [];
+                if (is_array($audit->department)) {
+                    foreach ($audit->department as $dept) {
+                        $deptId        = is_array($dept) && isset($dept['id']) ? $dept['id'] : $dept;
+                        $department    = $this->departmentInterface->getById($deptId);
+                        $departments[] = $department
+                            ? ['department' => $department->department, 'id' => $department->id]
+                            : ['department' => 'Unknown', 'id' => $deptId];
+                    }
+                }
+                $audit->department = $departments;
             } catch (\Exception $e) {
-                $audit->Date = $audit->Year = $audit->Month = $audit->Day = $audit->Time = null;
+                $audit->department = [['department' => 'Unknown', 'id' => null]];
             }
 
-            $audit->type = 'internal';
+            $actionPlans = $this->actionPlanInterface->findByInternalAuditId($audit->id);
+            $actionPlans = collect($actionPlans)->map(function ($actionPlan) {
+                try {
+                    $approver             = $this->userInterface->getById($actionPlan->approverId);
+                    $actionPlan->approver = $approver
+                        ? ['name' => $approver->name, 'id' => $approver->id]
+                        : ['name' => 'Unknown', 'id' => null];
+                } catch (\Exception $e) {
+                    $actionPlan->approver = ['name' => 'Unknown', 'id' => null];
+                }
+                return $actionPlan;
+            });
+
+            $audit->actionPlan = $actionPlans;
+            $audit->answers    = $this->answerRecodeInterface->findByInternalAuditId($audit->id);
+            $audit->type       = 'internal';
+
+            try {
+                $auditDate    = new \DateTime($audit->auditDate, new \DateTimeZone('UTC'));
+                $audit->Date  = $auditDate->format('Y-m-d');
+                $audit->Year  = $auditDate->format('Y');
+                $audit->Month = $auditDate->format('m');
+                $audit->Day   = $auditDate->format('d');
+                $audit->Time  = $auditDate->format('H:i:s');
+            } catch (\Exception $e) {
+                $audit->Date  = null;
+                $audit->Year  = null;
+                $audit->Month = null;
+                $audit->Time  = null;
+            }
 
             return $audit;
         });
 
-        $allRecords = $externalAudits->merge($internalAudits)->values();
-        return response()->json($allRecords);
+        // Replace merge() with concat() here
+        $combined = $externalAudits->concat($internalAudits)->sortByDesc('auditDate')->values();
+
+        return response()->json($combined);
 
     } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
+        return response()->json(['message' => 'Something went wrong', 'error' => $e->getMessage()], 500);
     }
 }
 
