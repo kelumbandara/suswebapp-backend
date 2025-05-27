@@ -339,10 +339,9 @@ class SaCmPurchaseInventoryRecodeController extends Controller
         ]);
     }
 
-    public function delete($id)
+    public function destroy($id)
     {
-        $record = $this->purchaseInventoryInterface->findById($id);
-
+        $record = $this->purchaseInventoryInterface->getById($id);
         if (! $record) {
             return response()->json([
                 'message' => 'Purchase inventory record not found.',
@@ -351,7 +350,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
 
         $documents = json_decode($record->documents, true) ?? [];
         foreach ($documents as $doc) {
-            if (isset($doc['gsutil_uri'])) {
+            if (! empty($doc['gsutil_uri'])) {
                 $this->chemicalManagementService->removeOldDocumentFromStorage($doc['gsutil_uri']);
             }
         }
@@ -360,16 +359,18 @@ class SaCmPurchaseInventoryRecodeController extends Controller
         foreach ($certificates as $certificate) {
             $certDocs = json_decode($certificate->documents, true) ?? [];
             foreach ($certDocs as $doc) {
-                if (isset($doc['gsutil_uri'])) {
+                if (! empty($doc['gsutil_uri'])) {
                     $this->certificationRecodeService->removeOldDocumentFromStorage($doc['gsutil_uri']);
                 }
             }
-            $this->certificateRecordInterface->deleteById($certificate->id);
+
+            $this->certificateRecordInterface->deleteByInventoryId($id);
         }
 
         $deleted = $this->purchaseInventoryInterface->deleteById($id);
 
         if (! $deleted) {
+
             return response()->json([
                 'message' => 'Failed to delete purchase inventory record.',
             ], 500);
@@ -377,7 +378,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
 
         return response()->json([
             'message' => 'Purchase inventory record deleted successfully.',
-        ]);
+        ], 200);
     }
 
     public function assignTask()
