@@ -92,6 +92,13 @@ class SaCmPurchaseInventoryRecodeController extends Controller
                 $record->updatedByUser = ['name' => 'Unknown', 'id' => null];
             }
 
+             try {
+                $reviewer               = $this->userInterface->getById($record->reviewerId);
+                $record->reviewerByUser = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $record->reviewerByUser = ['name' => 'Unknown', 'id' => null];
+            }
+
             try {
                 $creator              = $this->userInterface->getById($record->approverId);
                 $record->approverName = $creator ? ['name' => $creator->name, 'id' => $creator->id] : ['name' => 'Unknown', 'id' => null];
@@ -231,7 +238,14 @@ class SaCmPurchaseInventoryRecodeController extends Controller
 
     public function update($id, PurchaseInventoryRecordRequest $request)
     {
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $userId = $user->id;
         $validatedData = $request->validated();
+        $validatedData['updatedBy'] = $userId;
         $targetSetting = $this->purchaseInventoryInterface->findById($id);
 
         $documents = json_decode($targetSetting->documents, true) ?? [];
