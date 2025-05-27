@@ -185,7 +185,6 @@ class SaCmPurchaseInventoryRecodeController extends Controller
                 foreach ($removeIds as $certId) {
                     $certificate = $this->certificateRecordInterface->findById($certId);
                     if ($certificate) {
-                        // Remove GCS docs
                         if (! empty($certificate->documents)) {
                             $docs = json_decode($certificate->documents, true);
                             foreach ($docs as $doc) {
@@ -233,9 +232,9 @@ class SaCmPurchaseInventoryRecodeController extends Controller
     public function update($id, PurchaseInventoryRecordRequest $request)
     {
         $validatedData = $request->validated();
-
         $targetSetting = $this->purchaseInventoryInterface->findById($id);
-        $documents     = json_decode($targetSetting->documents, true) ?? [];
+
+        $documents = json_decode($targetSetting->documents, true) ?? [];
 
         if ($request->has('removeDoc')) {
             $removeDocs = $request->input('removeDoc');
@@ -252,29 +251,38 @@ class SaCmPurchaseInventoryRecodeController extends Controller
 
         if ($request->hasFile('documents')) {
             $newDocuments = [];
+            $existingUris = array_column($documents, 'gsutil_uri');
+
             foreach ($request->file('documents') as $newFile) {
                 $uploadResult = $this->chemicalManagementService->updateDocuments($newFile);
-                if ($uploadResult && isset($uploadResult['gsutil_uri'], $uploadResult['file_name'])) {
-                    $newDocuments[] = [
-                        'gsutil_uri' => $uploadResult['gsutil_uri'],
-                        'file_name'  => $uploadResult['file_name'],
-                    ];
+
+                if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
+                    $gsutilUri = $uploadResult['gsutil_uri'];
+
+                    if (! in_array($gsutilUri, $existingUris)) {
+                        $newDocuments[] = [
+                            'gsutil_uri' => $gsutilUri,
+                            'file_name'  => $uploadResult['file_name'] ?? basename($gsutilUri),
+                        ];
+                        $existingUris[] = $gsutilUri;
+                    }
                 }
             }
+
             $documents = array_merge($documents, $newDocuments);
         }
 
         $validatedData['documents'] = json_encode($documents);
 
         $updatedRecord = $this->purchaseInventoryInterface->update($id, $validatedData);
+
         if (! $updatedRecord) {
             return response()->json([
-                'message' => 'Failed to update purchase inventory record.',
+                'message' => 'Failed to draft purchase inventory record.',
             ], 500);
         }
 
         $updatedRecord = $this->purchaseInventoryInterface->findById($id);
-
         if ($request->has('removeCertificate')) {
             $removeIds = $request->input('removeCertificate');
             if (is_array($removeIds)) {
@@ -300,44 +308,31 @@ class SaCmPurchaseInventoryRecodeController extends Controller
             foreach ($validatedData['certificate'] as $index => $certificateData) {
                 $certDocs = [];
 
-                if (! empty($certificateData['removeDoc'])) {
-                    $removeCertDocs = is_array($certificateData['removeDoc']) ? $certificateData['removeDoc'] : [$certificateData['removeDoc']];
-                    foreach ($removeCertDocs as $removeDoc) {
-                        $this->certificationRecodeService->removeOldDocumentFromStorage($removeDoc);
-                    }
-                }
-
                 if ($request->hasFile("certificate.{$index}.documents")) {
                     foreach ($request->file("certificate.{$index}.documents") as $certFile) {
                         $uploadResult = $this->certificationRecodeService->uploadImageToGCS($certFile);
-                        if ($uploadResult && isset($uploadResult['gsutil_uri'], $uploadResult['file_name'])) {
+                        if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
                             $certDocs[] = [
                                 'gsutil_uri' => $uploadResult['gsutil_uri'],
-                                'file_name'  => $uploadResult['file_name'],
+                                'file_name'  => $uploadResult['file_name'] ?? basename($uploadResult['gsutil_uri']),
                             ];
                         }
                     }
                 }
 
                 $certificateData['inventoryId'] = $updatedRecord->id;
-                $certificateData['documents']   = $certDocs;
-                if (! empty($certificateData['testName'])) {
-                    $this->certificateRecordInterface->updateOrCreate(
-                        ['inventoryId' => $updatedRecord->id, 'testName' => $certificateData['testName']],
-                        $certificateData
-                    );
+                $certificateData['documents']   = json_encode($certDocs);
 
-                } else {
-                    $this->certificateRecordInterface->create($certificateData);
-                }
+                $this->certificateRecordInterface->create($certificateData);
             }
         }
 
         return response()->json([
-            'message' => 'Purchase inventory record updated successfully.',
+            'message' => 'Purchase inventory record draft successfully.',
             'data'    => $updatedRecord,
         ]);
     }
+
 
     public function destroy($id)
     {
