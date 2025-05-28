@@ -513,7 +513,7 @@ public function getCalendarRecord($startDate, $endDate)
             return $audit;
         });
 
-        // Replace merge() with concat() here
+
         $combined = $externalAudits->concat($internalAudits)->sortByDesc('auditDate')->values();
 
         return response()->json($combined);
