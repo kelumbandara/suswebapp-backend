@@ -36,7 +36,7 @@ return new class extends Migration
             $table->string('auditDate')->nullable();
             $table->string('dateForApproval')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected', 'published', 'ongoing', 'draft', 'scheduled', 'completed'])->default('draft')->nullable();
-            $table->string('responsibleSection')->nullable()->default('SDGReportingRecodes');
+            $table->string('responsibleSection')->nullable()->default('InternalAudits');
             $table->string('assigneeLevel')->nullable()->default('1');
             $table->integer('createdByUser')->nullable();
             $table->integer('updatedByUser')->nullable();
