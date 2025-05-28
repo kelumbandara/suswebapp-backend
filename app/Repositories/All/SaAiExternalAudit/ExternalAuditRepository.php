@@ -61,6 +61,7 @@ class ExternalAuditRepository extends BaseRepository implements ExternalAuditInt
         }
 
         return $query->get();
+
     }
     public function getBetweenDates($startDate, $endDate)
     {

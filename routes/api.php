@@ -93,11 +93,11 @@ Route::post('login', [LoginController::class, 'login']);
 Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
 Route::post('reset-password', [ForgotPasswordController::class, 'otpVerifyFunction']);
 Route::post('change-password', [ForgotPasswordController::class, 'changePassword']);
+Route::get('organizations', [OrganizationController::class, 'index']);
 
 Route::middleware('auth:sanctum')->get('user', [UserController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('organizations', [OrganizationController::class, 'index']);
     Route::post('organizations/{id}/update', [OrganizationController::class, 'update']);
     Route::delete('organizations/{id}/delete', [OrganizationController::class, 'destroy']);
 
@@ -276,7 +276,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('chemical-transaction-published', [SaCmPurchaseInventoryRecodeController::class, 'getPublishedStatus']);
     Route::get('purchase-inventory-records-assign-task', [SaCmPurchaseInventoryRecodeController::class, 'assignTask']);
 
- 
     Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/stock-amount', [SaCmPurchaseInventoryRecodeController::class, 'getStockAmount']);
     Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/monthly-delivery', [SaCmPurchaseInventoryRecodeController::class, 'getMonthlyDelivery']);
     Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/latest-record', [SaCmPurchaseInventoryRecodeController::class, 'getLatestRecord']);
@@ -288,7 +287,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('chemical-dashboard/{Year}/all-summary', [SaCmPurchaseInventoryRecodeController::class, 'getAllSummary']);
     Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/category-and-classification', [SaCmPurchaseInventoryRecodeController::class, 'getCategoryAndClassification']);
     Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/do-you-have-msds', [SaCmPurchaseInventoryRecodeController::class, 'getDoYouHaveMsdsPercentage']);
-
 
 });
 
