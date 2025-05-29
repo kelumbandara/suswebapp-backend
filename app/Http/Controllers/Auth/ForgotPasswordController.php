@@ -17,11 +17,11 @@ class ForgotPasswordController extends Controller
     protected $comOrganizationInterface;
     protected $organizationService;
 
-    public function __construct(UserInterface $userInterface,ComOrganizationInterface $comOrganizationInterface,  OrganizationService $organizationService)
+    public function __construct(UserInterface $userInterface, ComOrganizationInterface $comOrganizationInterface, OrganizationService $organizationService)
     {
-        $this->userInterface = $userInterface;
+        $this->userInterface            = $userInterface;
         $this->comOrganizationInterface = $comOrganizationInterface;
-        $this->organizationService = $organizationService;
+        $this->organizationService      = $organizationService;
     }
 
     public function sendResetLinkEmail(Request $request)
@@ -45,25 +45,22 @@ class ForgotPasswordController extends Controller
         $user->otp            = $otp;
         $user->otp_expires_at = now()->addMinutes(5);
         $user->save();
-
-
-
-
         try {
-         $organization = $this->comOrganizationInterface->first();
+            $organization = $this->comOrganizationInterface->first();
 
             if ($organization) {
-                $organizationName = $organization->organizationName;
+                $organizationName        = $organization->organizationName;
                 $organizationFactoryName = $organization->organizationFactoryName;
-                $logoData         = null;
+                $logoData                = null;
 
                 if (! empty($organization->logoUrl)) {
                     $logoInfo = $this->organizationService->getImageUrl($organization->logoUrl);
                     $logoData = $logoInfo['signedUrl'] ?? null;
                 }
-            Notification::route('mail', $user->email)->notify(new SendPasswordChangeConfirmation($otp, $user->email, $user->name, $organizationName, $logoData, $organizationFactoryName));
-            return response()->json(['message' => 'OTP has been sent to your email.'], 201);
-        }} catch (\Exception $e) {
+                Notification::route('mail', $user->email)->notify(new SendPasswordChangeConfirmation($otp, $user->email, $user->name, $organizationName, $logoData, $organizationFactoryName));
+                return response()->json(['message' => 'OTP has been sent to your email.'], 201);
+            }
+        } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to send OTP. Please try again later.'], 500);
         }
     }
@@ -110,7 +107,7 @@ class ForgotPasswordController extends Controller
         }
 
         $user->password = Hash::make($request->password);
-        $user->otp = null;
+        $user->otp      = null;
         $user->save();
 
         return response()->json(['message' => 'Password changed successfully.'], 200);
