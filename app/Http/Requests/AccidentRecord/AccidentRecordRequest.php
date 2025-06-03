@@ -21,13 +21,14 @@ class AccidentRecordRequest extends FormRequest
     public function rules(): array
     {
         return [
+            
             'division'                                 => 'required|string',
             'location'                                 => 'required|string',
             'department'                               => 'required|string',
             'supervisorName'                           => 'required|string',
-            'removeDoc'                                => 'nullable|array',
-            'evidence'                                 => 'nullable|array',
-            'evidence.*'                               => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
+            // 'removeDoc'                                => 'nullable|array',
+            // 'evidence'                                 => 'nullable|array',
+            // 'evidence.*'                               => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
             'category'                                 => 'nullable|string',
             'subCategory'                              => 'nullable|string',
             'accidentType'                             => 'required|string',

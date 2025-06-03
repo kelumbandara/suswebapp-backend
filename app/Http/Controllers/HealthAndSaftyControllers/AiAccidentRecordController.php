@@ -196,14 +196,14 @@ class AiAccidentRecordController extends Controller
 
         if (! empty($data['witnesses'])) {
             foreach ($data['witnesses'] as $witness) {
-                $witness['incidentId'] = $id;
+                $witness['accidentId'] = $id;
                 $this->accidentWitnessInterface->create($witness);
             }
         }
 
         if (! empty($data['effectedIndividuals'])) {
             foreach ($data['effectedIndividuals'] as $person) {
-                $person['incidentId'] = $id;
+                $person['accidentId'] = $id;
                 $this->accidentPeopleInterface->create($person);
             }
         }
