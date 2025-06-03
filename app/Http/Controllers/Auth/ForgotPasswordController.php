@@ -6,6 +6,7 @@ use App\Notifications\FrogotpasswordOTPsend\SendPasswordChangeConfirmation;
 use App\Repositories\All\ComOrganization\ComOrganizationInterface;
 use App\Repositories\All\User\UserInterface;
 use App\Services\OrganizationService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
@@ -43,7 +44,8 @@ class ForgotPasswordController extends Controller
         $otp = rand(100000, 999999);
 
         $user->otp            = $otp;
-        $user->otp_expires_at = now()->addMinutes(5);
+        $user->otp_expires_at = Carbon::now('UTC')->addMinutes(5);
+
         $user->save();
         try {
             $organization = $this->comOrganizationInterface->first();
@@ -85,6 +87,10 @@ class ForgotPasswordController extends Controller
         if ($user->otp !== $request->otp) {
             return response()->json(['message' => 'Invalid OTP.'], 400);
         }
+
+        if (now()->greaterThan($user->otp_expires_at)) {
+        return response()->json(['message' => 'OTP has expired.'], 400);
+    }
 
         return response()->json(['message' => 'OTP verified successfully.'], 202);
     }
