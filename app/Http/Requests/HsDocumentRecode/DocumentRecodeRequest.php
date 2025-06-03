@@ -43,8 +43,8 @@ class DocumentRecodeRequest extends FormRequest
             'document.*'       => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
             'issuedDate'       => 'nullable|string',
             'isNoExpiry'       => 'nullable|boolean',
-            'expiryDate'       => 'required_if:isNoExpiry,false|string',
-            'notifyDate'       => 'required_if:isNoExpiry,false|string',
+            'expiryDate'       => 'required_if:isNoExpiry,false|string|nullable',
+            'notifyDate'       => 'required_if:isNoExpiry,false|string|nullable',
 
         ];
     }
