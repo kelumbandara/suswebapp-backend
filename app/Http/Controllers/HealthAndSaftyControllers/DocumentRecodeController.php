@@ -59,10 +59,12 @@ class DocumentRecodeController extends Controller
             } else {
                 $risk->setAttribute('document', []);
             }
-            if (isset($doc['isNoExpiry']) && ($doc['isNoExpiry'] === true || $doc['isNoExpiry'] === 1 || $doc['isNoExpiry'] === '1')) {
-            $doc['expiryDate'] = null;
-            $doc['notifyDate'] = null;
-        
+            if (
+            isset($risk->isNoExpiry) &&
+            ($risk->isNoExpiry === true || $risk->isNoExpiry === 1 || $risk->isNoExpiry === '1')
+        ) {
+            $risk->expiryDate = null;
+            $risk->notifyDate = null;
         }
 
             return $risk;
