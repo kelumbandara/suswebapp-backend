@@ -201,7 +201,7 @@ class UserController extends Controller
 
         $otp                  = rand(100000, 999999);
         $user->otp            = $otp;
-        $user->otp_expires_at = now()->addMinutes(10);
+        $user->otp_expires_at = now()->addMinutes(5);
         $user->save();
 
         try {
