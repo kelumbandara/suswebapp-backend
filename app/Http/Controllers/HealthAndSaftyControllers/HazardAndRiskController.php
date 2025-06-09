@@ -27,11 +27,12 @@ class HazardAndRiskController extends Controller
 
         $hazardRisks = $hazardRisks->map(function ($risk) {
             try {
-                $assignee       = $this->userInterface->getById($risk->assigneeId);
-                $risk->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
-            } catch (\Exception $e) {
-                $risk->assignee = ['name' => 'Unknown', 'id' => null];
-            }
+        $assignee       = $this->userInterface->getById($risk->assigneeId);
+        $risk->assignee = $assignee ?? (object)['name' => 'Unknown', 'id' => null];
+    } catch (\Exception $e) {
+        $risk->assignee = (object)['name' => 'Unknown', 'id' => null];
+    }
+
             try {
                 $creator                 = $this->userInterface->getById($risk->createdByUser);
                 $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
@@ -185,49 +186,107 @@ class HazardAndRiskController extends Controller
     }
 
     public function assignTask()
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
-        if (! $user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+    if (! $user) {
+        return response()->json(['message' => 'Unauthorized'], 401);
+    }
+
+    $hazardRisks = $this->hazardAndRiskInterface
+        ->getByAssigneeId($user->id)
+        ->filter(function ($risk) {
+            return $risk->status !== 'Approved';
+        })
+        ->sortByDesc('created_at')
+        ->sortByDesc('updated_at')
+        ->values();
+
+    $hazardRisks = $hazardRisks->map(function ($risk) {
+        try {
+            $assignee       = $this->userInterface->getById($risk->assigneeId);
+            $risk->assignee = $assignee ?? (object)['name' => 'Unknown', 'id' => null];
+        } catch (\Exception $e) {
+            $risk->assignee = (object)['name' => 'Unknown', 'id' => null];
         }
 
-        $hazardRisks = $this->hazardAndRiskInterface->getByAssigneeId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+        try {
+            $creator                 = $this->userInterface->getById($risk->createdByUser);
+            $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+        } catch (\Exception $e) {
+            $risk->createdByUserName = 'Unknown';
+        }
 
-        $hazardRisks = $hazardRisks->map(function ($risk) {
-            try {
-                $assignee       = $this->userInterface->getById($risk->assigneeId);
-                $risk->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
-            } catch (\Exception $e) {
-                $risk->assignee = ['name' => 'Unknown', 'id' => null];
+        $documents = is_string($risk->documents)
+            ? json_decode($risk->documents, true)
+            : (is_array($risk->documents) ? $risk->documents : []);
+
+        foreach ($documents as &$document) {
+            if (isset($document['gsutil_uri'])) {
+                $imageData            = $this->hazardAndRiskService->getImageUrl($document['gsutil_uri']);
+                $document['imageUrl'] = $imageData['signedUrl'];
+                $document['fileName'] = $imageData['fileName'];
             }
+        }
 
-            try {
-                $creator                 = $this->userInterface->getById($risk->createdByUser);
-                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
-            } catch (\Exception $e) {
-                $risk->createdByUserName = 'Unknown';
-            }
-            if (! empty($risk->documents) && is_string($risk->documents)) {
-                $documents = json_decode($risk->documents, true);
-            } else {
-                $documents = is_array($risk->documents) ? $risk->documents : [];
-            }
+        $risk->documents = $documents;
+        return $risk;
+    });
 
-            foreach ($documents as &$document) {
-                if (isset($document['gsutil_uri'])) {
-                    $imageData            = $this->hazardAndRiskService->getImageUrl($document['gsutil_uri']);
-                    $document['imageUrl'] = $imageData['signedUrl'];
-                    $document['fileName'] = $imageData['fileName'];
-                }
-            }
+    return response()->json($hazardRisks, 200);
+}
 
-            $risk->documents = $documents;
-            return $risk;
-        });
+public function assignTaskApproved()
+{
+    $user = Auth::user();
 
-        return response()->json($hazardRisks, 200);
+    if (! $user) {
+        return response()->json(['message' => 'Unauthorized'], 401);
     }
+
+    $hazardRisks = $this->hazardAndRiskInterface
+        ->getByAssigneeId($user->id)
+        ->filter(function ($risk) {
+            return $risk->status === 'Approved'; // ✅ Only approved ones
+        })
+        ->sortByDesc('created_at')
+        ->sortByDesc('updated_at')
+        ->values();
+
+    $hazardRisks = $hazardRisks->map(function ($risk) {
+        try {
+            $assignee       = $this->userInterface->getById($risk->assigneeId);
+            $risk->assignee = $assignee ?? (object)['name' => 'Unknown', 'id' => null];
+        } catch (\Exception $e) {
+            $risk->assignee = (object)['name' => 'Unknown', 'id' => null];
+        }
+
+        try {
+            $creator                 = $this->userInterface->getById($risk->createdByUser);
+            $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+        } catch (\Exception $e) {
+            $risk->createdByUserName = 'Unknown';
+        }
+
+        $documents = is_string($risk->documents)
+            ? json_decode($risk->documents, true)
+            : (is_array($risk->documents) ? $risk->documents : []);
+
+        foreach ($documents as &$document) {
+            if (isset($document['gsutil_uri'])) {
+                $imageData            = $this->hazardAndRiskService->getImageUrl($document['gsutil_uri']);
+                $document['imageUrl'] = $imageData['signedUrl'];
+                $document['fileName'] = $imageData['fileName'];
+            }
+        }
+
+        $risk->documents = $documents;
+        return $risk;
+    });
+
+    return response()->json($hazardRisks, 200);
+}
+
 
     public function assignee()
     {
@@ -240,6 +299,97 @@ class HazardAndRiskController extends Controller
 
         return response()->json($assignees);
     }
+
+    public function updateStatusToApproved($id)
+{
+    $user = Auth::user();
+
+    if ($user->assigneeLevel != 5) {
+        return response()->json(['message' => 'Unauthorized. Only CEO assignees can approve.'], 403);
+    }
+
+    $hazardRisk = $this->hazardAndRiskInterface->findById($id);
+
+    if (!$hazardRisk) {
+        return response()->json(['message' => 'Hazard and risk record not found.'], 404);
+    }
+
+    $updated = $this->hazardAndRiskInterface->update($id, ['status' => 'Approved']);
+
+    if ($updated) {
+        return response()->json([
+            'message' => 'Hazard and risk record approved successfully!',
+            'hazardRisk' => $this->hazardAndRiskInterface->findById($id),
+        ], 200);
+    } else {
+        return response()->json(['message' => 'Failed to approve the hazard and risk record.'], 500);
+    }
+}
+
+// public function updateStatusToApproved($id, HazardAndRiskRequest $request)
+// {
+//     $user = Auth::user();
+
+//     $hazardRisk = $this->hazardAndRiskInterface->findById($id);
+
+//     if (!$hazardRisk) {
+//         return response()->json(['message' => 'Hazard and risk record not found.'], 404);
+//     }
+
+//     $validatedData = $request->validated();
+
+//     if (isset($validatedData['status']) && $validatedData['status'] === 'Approved') {
+//         if ($user->assigneeLevel != 5) {
+//             return response()->json(['message' => 'Unauthorized. Only CEO assignees can approve.'], 403);
+//         }
+//     }
+
+//     $documents = json_decode($hazardRisk->documents, true) ?? [];
+
+//     if ($request->has('removeDoc')) {
+//         $removeDocs = $request->input('removeDoc');
+
+//         if (is_array($removeDocs)) {
+//             foreach ($removeDocs as $removeDoc) {
+//                 $this->hazardAndRiskService->removeOldDocumentFromStorage($removeDoc);
+//             }
+
+//             $documents = array_values(array_filter($documents, function ($doc) use ($removeDocs) {
+//                 return !in_array($doc['gsutil_uri'], $removeDocs);
+//             }));
+//         }
+//     }
+
+//     if ($request->hasFile('documents')) {
+//         $newDocuments = [];
+//         foreach ($request->file('documents') as $newFile) {
+//             $uploadResult = $this->hazardAndRiskService->updateDocuments($newFile);
+
+//             if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
+//                 $newDocuments[] = [
+//                     'gsutil_uri' => $uploadResult['gsutil_uri'],
+//                     'file_name'  => $uploadResult['file_name'],
+//                 ];
+//             }
+//         }
+
+//         $documents = array_merge($documents, $newDocuments);
+//     }
+
+//     $validatedData['documents'] = json_encode($documents);
+
+//     $updated = $this->hazardAndRiskInterface->update($id, $validatedData);
+
+//     if ($updated) {
+//         return response()->json([
+//             'message'    => 'Hazard and risk record updated successfully!',
+//             'hazardRisk' => $this->hazardAndRiskInterface->findById($id),
+//         ], 200);
+//     } else {
+//         return response()->json(['message' => 'Failed to update the hazard and risk record.'], 500);
+//     }
+// }
+
 
     public function dashboardStats()
     {

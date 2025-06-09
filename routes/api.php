@@ -118,7 +118,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('hazard-risk/{id}/update', [HazardAndRiskController::class, 'update']);
     Route::delete('hazard-risk/{id}/delete', [HazardAndRiskController::class, 'destroy']);
     Route::get('hazard-risks-assign-task', [HazardAndRiskController::class, 'assignTask']);
+    Route::post('hazard-risks-assign-task-approved', [HazardAndRiskController::class, 'assignTaskApproved']);
     Route::get('hazard-risks-assignee', [HazardAndRiskController::class, 'assignee']);
+    Route::post('hazard-risk/{id}/update-approved', [HazardAndRiskController::class, 'updateStatusToApproved']);
     Route::get('hazard-risk-dashboard', [HazardAndRiskController::class, 'dashboardStats']);
     Route::get('hazard-risk-dashboard-division', [HazardAndRiskController::class, 'dashboardStatsByDivision']);
 

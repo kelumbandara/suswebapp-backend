@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('condition')->nullable();
             $table->enum('riskLevel', ['Low', 'Medium', 'High'])->default('Low')->nullable();
             $table->enum('unsafeActOrCondition', ['Unsafe Act', 'Unsafe Condition'])->default('Unsafe Act')->nullable();
-            $table->enum('status', ['Open','Draft', 'Closed', 'Pending', 'Completed'])->default('Pending')->nullable();
+            $table->enum('status', ['Open','Draft', 'Closed', 'Pending', 'Completed', 'Approved'])->default('Pending')->nullable();
             $table->string('serverDateAndTime')->nullable();
             $table->integer('assigneeLevel')->nullable()->default(1);
             $table->string('createdUserLevel')->nullable();
