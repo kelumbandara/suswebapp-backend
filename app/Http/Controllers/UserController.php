@@ -25,11 +25,11 @@ class UserController extends Controller
 
     public function __construct(UserInterface $userInterface, ComPermissionInterface $comPermissionInterface, AssigneeLevelInterface $assigneeLevelInterface, ProfileImageService $profileImageService, ComOrganizationInterface $comOrganizationInterface, OrganizationService $organizationService)
     {
-        $this->userInterface          = $userInterface;
-        $this->comPermissionInterface = $comPermissionInterface;
-        $this->assigneeLevelInterface = $assigneeLevelInterface;
-        $this->profileImageService    = $profileImageService;
-        $this->organizationService    = $organizationService;
+        $this->userInterface            = $userInterface;
+        $this->comPermissionInterface   = $comPermissionInterface;
+        $this->assigneeLevelInterface   = $assigneeLevelInterface;
+        $this->profileImageService      = $profileImageService;
+        $this->organizationService      = $organizationService;
         $this->comOrganizationInterface = $comOrganizationInterface;
     }
 
@@ -205,24 +205,24 @@ class UserController extends Controller
         $user->save();
 
         try {
-         $organization = $this->comOrganizationInterface->first();
+            $organization = $this->comOrganizationInterface->first();
 
             if ($organization) {
-                $organizationName = $organization->organizationName;
+                $organizationName        = $organization->organizationName;
                 $organizationFactoryName = $organization->organizationFactoryName;
-                $logoData         = null;
+                $logoData                = null;
 
                 if (! empty($organization->logoUrl)) {
                     $logoInfo = $this->organizationService->getImageUrl($organization->logoUrl);
                     $logoData = $logoInfo['signedUrl'] ?? null;
                 }
-            Notification::route('mail', $user->email)->notify(new SendOtpEmailChange($otp, $user->email, $user->name, $organizationName, $logoData, $organizationFactoryName));
-            return response()->json(['message' => 'OTP has been sent to your email.'], 201);
-        }} catch (\Exception $e) {
+                Notification::route('mail', $user->email)->notify(new SendOtpEmailChange($otp, $user->email, $user->name, $organizationName, $logoData, $organizationFactoryName));
+                return response()->json(['message' => 'OTP has been sent to your email.'], 201);
+            }
+        } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to send OTP. Please try again later.'], 500);
         }
     }
-
 
     public function emailChangeVerify(Request $request, $id)
     {
@@ -265,6 +265,48 @@ class UserController extends Controller
         $user->save();
 
         return response()->json(['message' => 'Email changed successfully.'], 200);
+    }
+
+    public function search(Request $request)
+    {
+        $keyword = $request->input('keyword');
+
+        $users = $this->userInterface->search($keyword);
+
+        $userData = $users->map(function ($user) {
+            $userArray = $user->toArray();
+
+            $permission            = $this->comPermissionInterface->getById($user->userType);
+            $userArray['userType'] = [
+                'id'          => $permission->id ?? null,
+                'userType'    => $permission->userType ?? null,
+                'description' => $permission->description ?? null,
+            ];
+
+            $assigneeLevel          = $this->assigneeLevelInterface->getById($user->assigneeLevel);
+            $userArray['userLevel'] = $assigneeLevel ? [
+                'id'        => $assigneeLevel->id,
+                'levelId'   => $assigneeLevel->levelId,
+                'levelName' => $assigneeLevel->levelName,
+            ] : [];
+
+            $profileImages = is_array($user->profileImage) ? $user->profileImage : json_decode($user->profileImage, true) ?? [];
+            $signedImages  = [];
+
+            foreach ($profileImages as $uri) {
+                $signed         = $this->profileImageService->getImageUrl($uri);
+                $signedImages[] = [
+                    'fileName' => $signed['fileName'] ?? null,
+                    'imageUrl' => $signed['signedUrl'] ?? null,
+                ];
+            }
+
+            $userArray['profileImage'] = $signedImages;
+
+            return $userArray;
+        });
+
+        return response()->json($userData, 200);
     }
 
 }

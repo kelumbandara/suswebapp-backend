@@ -88,6 +88,8 @@ Route::post('calculate', [CalculationController::class, 'store']);
 Route::post('register', [RegisteredUserController::class, 'store']);
 
 Route::get('all-users', [UserController::class, 'index']);
+Route::get('users/search', [UserController::class, 'search']);
+
 
 Route::post('login', [LoginController::class, 'login']);
 Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);

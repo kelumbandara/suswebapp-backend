@@ -35,4 +35,11 @@ class UserRepository extends BaseRepository implements UserInterface
         return User::whereIn('id', $ids)->get()->keyBy('id');
     }
 
+    public function search($keyword)
+    {
+        return User::where('name', 'like', '%' . $keyword . '%')
+            ->orWhere('email', 'like', '%' . $keyword . '%')
+            ->get();
+    }
+
 }
