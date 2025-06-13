@@ -67,11 +67,19 @@ class UserController extends Controller
 
         if ($permission) {
             $userData['permissionObject'] = (array) $permission->permissionObject;
-            $userData['userTypeObject']   = [
-                'id'   => $permission->id,
-                'name' => $permission->userType ?? null,
+            $userData['userType']         = [
+                'id'          => $permission->id,
+                'name'        => $permission->userType,
+                'description' => $permission->description,
+            ];
+            $userData['userTypeObject'] = [
+                'id'          => $permission->id,
+                'name'        => $permission->userType ?? null,
+                'description' => $permission->description ?? null,
             ];
         }
+
+        $userData['assigneeLevel'] = $this->assigneeLevelInterface->getById($user->assigneeLevel);
 
         $userData['assigneeLevelObject'] = $this->assigneeLevelInterface->getById($user->assigneeLevel);
 
