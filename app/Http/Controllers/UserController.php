@@ -79,7 +79,7 @@ class UserController extends Controller
             ];
         }
 
-        $userData['assigneeLevel'] = $this->assigneeLevelInterface->getById($user->assigneeLevel);
+        $userData['userLevel'] = $this->assigneeLevelInterface->getById($user->assigneeLevel);
 
         $userData['assigneeLevelObject'] = $this->assigneeLevelInterface->getById($user->assigneeLevel);
 
