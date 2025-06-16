@@ -43,6 +43,10 @@ use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineNameFormControlle
 use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineRequestController;
 use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineTypeController;
 use App\Http\Controllers\ImageUploadController;
+use App\Http\Controllers\SocialApps\SaGrCategoryController;
+use App\Http\Controllers\SocialApps\SaGrChannelController;
+use App\Http\Controllers\SocialApps\SaGrSubmissionsController;
+use App\Http\Controllers\SocialApps\SaGrTopicController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditCategoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditFirmController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditRecodeController;
@@ -502,6 +506,20 @@ Route::post('testing-labs', [SaCmPirTestingLabController::class, 'store']);
 
 Route::get('positive-list', [SaCmPirPositiveListController::class, 'index']);
 Route::post('positive-list', [SaCmPirPositiveListController::class, 'store']);
+
+Route::get('grievance-categories', [SaGrCategoryController::class, 'index']);
+Route::post('grievance-categories', [SaGrCategoryController::class, 'store']);
+
+Route::get('grievance-channels', [SaGrChannelController::class, 'index']);
+Route::post('grievance-channels', [SaGrChannelController::class, 'store']);
+
+Route::get('grievance-topics', [SaGrTopicController::class, 'index']);
+Route::post('grievance-topics', [SaGrTopicController::class, 'store']);
+
+Route::get('grievance-submissions', [SaGrSubmissionsController::class, 'index']);
+Route::post('grievance-submissions', [SaGrSubmissionsController::class, 'store']);
+
+
 
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
 Route::post('upload', [ImageUploadController::class, 'uploadImage']);
