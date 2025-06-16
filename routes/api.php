@@ -121,10 +121,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('hazard-risk/{id}/delete', [HazardAndRiskController::class, 'destroy']);
     Route::get('hazard-risks-assign-task', [HazardAndRiskController::class, 'assignTask']);
     Route::post('hazard-risks-assign-task-approved', [HazardAndRiskController::class, 'assignTaskApproved']);
-    Route::get('hazard-risks-assignee', [HazardAndRiskController::class, 'assignee']);
-    Route::post('hazard-risk/{id}/update-approved', [HazardAndRiskController::class, 'updateStatusToApproved']);
-    Route::get('hazard-risk-dashboard', [HazardAndRiskController::class, 'dashboardStats']);
-    Route::get('hazard-risk-dashboard-division', [HazardAndRiskController::class, 'dashboardStatsByDivision']);
+
 
     Route::get('accidents', [AiAccidentRecordController::class, 'index']);
     Route::post('accidents', [AiAccidentRecordController::class, 'store']);
@@ -132,13 +129,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('accidents/{id}/update', [AiAccidentRecordController::class, 'update']);
     Route::delete('accidents/{id}/delete', [AiAccidentRecordController::class, 'destroy']);
     Route::get('accidents-assign-task', [AiAccidentRecordController::class, 'assignTask']);
+    Route::post('accidents-assign-task-approved', [AiAccidentRecordController::class, 'assignTaskApproved']);
     Route::get('accidents-assignee', [AiAccidentRecordController::class, 'assignee']);
+    Route::post('accidents/{id}/update-status-to-approved', [AiAccidentRecordController::class, 'updateStatusToApproved']);
 
     Route::get('incidents', [AiIncidentRecodeController::class, 'index']);
     Route::post('incidents', [AiIncidentRecodeController::class, 'store']);
     Route::post('incidents/{id}/update', [AiIncidentRecodeController::class, 'update']);
     Route::delete('incidents/{id}/delete', [AiIncidentRecodeController::class, 'destroy']);
     Route::get('incidents-assign-task', [AiIncidentRecodeController::class, 'assignTask']);
+    Route::post('incidents-assign-task-approved', [AiIncidentRecodeController::class, 'assignTaskApproved']);
+    Route::post('accidents/{id}/update-status-to-approved', [AiIncidentRecodeController::class, 'updateStatusToApproved']);
     Route::get('incidents-assignee', [AiIncidentRecodeController::class, 'assignee']);
 
     Route::get('documents', [DocumentRecodeController::class, 'index']);

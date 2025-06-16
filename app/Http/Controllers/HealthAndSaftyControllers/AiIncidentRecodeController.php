@@ -32,11 +32,11 @@ class AiIncidentRecodeController extends Controller
     {
         $records = $this->incidentRecordInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
         $records = $records->map(function ($risk) {
-            try {
-                $assignee       = $this->userInterface->getById($risk->assigneeId);
-                $risk->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
+           try {
+                $assignee           = $this->userInterface->getById($risk->assigneeId);
+                $risk->assignee = $assignee ?? (object) ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
-                $risk->assignee = ['name' => 'Unknown', 'id' => null];
+                $risk->assignee = (object) ['name' => 'Unknown', 'id' => null];
             }
 
             try {
@@ -247,14 +247,21 @@ class AiIncidentRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $record = $this->incidentRecordInterface->getByAssigneeId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+        $record = $this->incidentRecordInterface
+        ->getByAssigneeId($user->id)
+         ->filter(function ($risk) {
+                return $risk->status !== 'approved';
+            })
+        ->sortByDesc('created_at')
+        ->sortByDesc('updated_at')
+        ->values();
 
         $record = $record->map(function ($incident) {
             try {
                 $assignee           = $this->userInterface->getById($incident->assigneeId);
-                $incident->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
+                $incident->assignee = $assignee ?? (object) ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
-                $incident->assignee = ['name' => 'Unknown', 'id' => null];
+                $incident->assignee = (object) ['name' => 'Unknown', 'id' => null];
             }
 
             try {
@@ -284,6 +291,98 @@ class AiIncidentRecodeController extends Controller
         });
 
         return response()->json($record, 200);
+    }
+
+
+   public function assignTaskApproved()
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $record = $this->incidentRecordInterface
+        ->getByAssigneeId($user->id)
+         ->filter(function ($risk) {
+                return $risk->status === 'approved';
+            })
+        ->sortByDesc('created_at')
+        ->sortByDesc('updated_at')
+        ->values();
+
+        $record = $record->map(function ($incident) {
+            try {
+                $assignee           = $this->userInterface->getById($incident->assigneeId);
+                $incident->assignee = $assignee ?? (object) ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $incident->assignee = (object) ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $creator                     = $this->userInterface->getById($incident->createdByUser);
+                $incident->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $incident->createdByUserName = 'Unknown';
+            }
+            if (! empty($incident->evidence) && is_string($incident->evidence)) {
+                $decodedEvidence = json_decode($incident->evidence, true);
+                $evidence        = is_array($decodedEvidence) ? $decodedEvidence : [];
+            } else {
+                $evidence = is_array($incident->evidence) ? $incident->evidence : [];
+            }
+
+            foreach ($evidence as &$item) {
+                if (isset($item['gsutil_uri'])) {
+                    $imageData        = $this->incidentService->getImageUrl($item['gsutil_uri']);
+                    $item['fileName'] = $imageData['fileName'];
+                    $item['imageUrl'] = $imageData['signedUrl'];
+                }
+            }
+
+            $incident->evidence = $evidence;
+
+            return $incident;
+        });
+
+        return response()->json($record, 200);
+    }
+
+
+    public function updateStatusToApproved(string $id)
+    {
+        $user = Auth::user();
+
+        if (! $user || $user->assigneeLevel != 5) {
+            return response()->json([
+                'message' => 'Unauthorized. Only CEO assignees can approve.',
+            ], 403);
+        }
+
+        $record = $this->incidentRecordInterface->findById($id);
+
+        if (! $record) {
+            return response()->json([
+                'message' => 'Incident record not found.',
+            ], 404);
+        }
+
+        $updated = $this->incidentRecordInterface->update($id, [
+            'status' => 'Approved',
+        ]);
+
+        if (! $updated) {
+            return response()->json([
+                'message' => 'Failed to approve the incident record.',
+            ], 500);
+        }
+
+        $record = $this->incidentRecordInterface->findById($id);
+
+        return response()->json([
+            'message' => 'Incident record approved successfully!',
+            'record'  => $record,
+        ], 200);
     }
 
     public function assignee()

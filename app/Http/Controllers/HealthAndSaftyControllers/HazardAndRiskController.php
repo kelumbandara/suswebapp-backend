@@ -27,11 +27,11 @@ class HazardAndRiskController extends Controller
 
         $hazardRisks = $hazardRisks->map(function ($risk) {
             try {
-        $assignee       = $this->userInterface->getById($risk->assigneeId);
-        $risk->assignee = $assignee ?? (object)['name' => 'Unknown', 'id' => null];
-    } catch (\Exception $e) {
-        $risk->assignee = (object)['name' => 'Unknown', 'id' => null];
-    }
+                $assignee       = $this->userInterface->getById($risk->assigneeId);
+                $risk->assignee = $assignee ?? (object) ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $risk->assignee = (object) ['name' => 'Unknown', 'id' => null];
+            }
 
             try {
                 $creator                 = $this->userInterface->getById($risk->createdByUser);
@@ -107,7 +107,7 @@ class HazardAndRiskController extends Controller
     {
         $hazardRisk = $this->hazardAndRiskInterface->findById($id);
 
-        if (!$hazardRisk) {
+        if (! $hazardRisk) {
             return response()->json(['message' => 'Hazard and risk record not found.'], 404);
         }
 
@@ -124,7 +124,7 @@ class HazardAndRiskController extends Controller
                 }
 
                 $documents = array_values(array_filter($documents, function ($doc) use ($removeDocs) {
-                    return !in_array($doc['gsutil_uri'], $removeDocs);
+                    return ! in_array($doc['gsutil_uri'], $removeDocs);
                 }));
             }
         }
@@ -159,7 +159,6 @@ class HazardAndRiskController extends Controller
         }
     }
 
-
     public function destroy($id)
     {
         $hazardRisk = $this->hazardAndRiskInterface->findById((int) $id);
@@ -186,107 +185,106 @@ class HazardAndRiskController extends Controller
     }
 
     public function assignTask()
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    if (! $user) {
-        return response()->json(['message' => 'Unauthorized'], 401);
-    }
-
-    $hazardRisks = $this->hazardAndRiskInterface
-        ->getByAssigneeId($user->id)
-        ->filter(function ($risk) {
-            return $risk->status !== 'Approved';
-        })
-        ->sortByDesc('created_at')
-        ->sortByDesc('updated_at')
-        ->values();
-
-    $hazardRisks = $hazardRisks->map(function ($risk) {
-        try {
-            $assignee       = $this->userInterface->getById($risk->assigneeId);
-            $risk->assignee = $assignee ?? (object)['name' => 'Unknown', 'id' => null];
-        } catch (\Exception $e) {
-            $risk->assignee = (object)['name' => 'Unknown', 'id' => null];
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        try {
-            $creator                 = $this->userInterface->getById($risk->createdByUser);
-            $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
-        } catch (\Exception $e) {
-            $risk->createdByUserName = 'Unknown';
-        }
+        $hazardRisks = $this->hazardAndRiskInterface
+            ->getByAssigneeId($user->id)
+            ->filter(function ($risk) {
+                return $risk->status !== 'Approved';
+            })
+            ->sortByDesc('created_at')
+            ->sortByDesc('updated_at')
+            ->values();
 
-        $documents = is_string($risk->documents)
+        $hazardRisks = $hazardRisks->map(function ($risk) {
+            try {
+                $assignee       = $this->userInterface->getById($risk->assigneeId);
+                $risk->assignee = $assignee ?? (object) ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $risk->assignee = (object) ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $creator                 = $this->userInterface->getById($risk->createdByUser);
+                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->createdByUserName = 'Unknown';
+            }
+
+            $documents = is_string($risk->documents)
             ? json_decode($risk->documents, true)
             : (is_array($risk->documents) ? $risk->documents : []);
 
-        foreach ($documents as &$document) {
-            if (isset($document['gsutil_uri'])) {
-                $imageData            = $this->hazardAndRiskService->getImageUrl($document['gsutil_uri']);
-                $document['imageUrl'] = $imageData['signedUrl'];
-                $document['fileName'] = $imageData['fileName'];
+            foreach ($documents as &$document) {
+                if (isset($document['gsutil_uri'])) {
+                    $imageData            = $this->hazardAndRiskService->getImageUrl($document['gsutil_uri']);
+                    $document['imageUrl'] = $imageData['signedUrl'];
+                    $document['fileName'] = $imageData['fileName'];
+                }
             }
-        }
 
-        $risk->documents = $documents;
-        return $risk;
-    });
+            $risk->documents = $documents;
+            return $risk;
+        });
 
-    return response()->json($hazardRisks, 200);
-}
-
-public function assignTaskApproved()
-{
-    $user = Auth::user();
-
-    if (! $user) {
-        return response()->json(['message' => 'Unauthorized'], 401);
+        return response()->json($hazardRisks, 200);
     }
 
-    $hazardRisks = $this->hazardAndRiskInterface
-        ->getByAssigneeId($user->id)
-        ->filter(function ($risk) {
-            return $risk->status === 'Approved'; // ✅ Only approved ones
-        })
-        ->sortByDesc('created_at')
-        ->sortByDesc('updated_at')
-        ->values();
+    public function assignTaskApproved()
+    {
+        $user = Auth::user();
 
-    $hazardRisks = $hazardRisks->map(function ($risk) {
-        try {
-            $assignee       = $this->userInterface->getById($risk->assigneeId);
-            $risk->assignee = $assignee ?? (object)['name' => 'Unknown', 'id' => null];
-        } catch (\Exception $e) {
-            $risk->assignee = (object)['name' => 'Unknown', 'id' => null];
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        try {
-            $creator                 = $this->userInterface->getById($risk->createdByUser);
-            $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
-        } catch (\Exception $e) {
-            $risk->createdByUserName = 'Unknown';
-        }
+        $hazardRisks = $this->hazardAndRiskInterface
+            ->getByAssigneeId($user->id)
+            ->filter(function ($risk) {
+                return $risk->status === 'Approved';
+            })
+            ->sortByDesc('created_at')
+            ->sortByDesc('updated_at')
+            ->values();
 
-        $documents = is_string($risk->documents)
+        $hazardRisks = $hazardRisks->map(function ($risk) {
+            try {
+                $assignee       = $this->userInterface->getById($risk->assigneeId);
+                $risk->assignee = $assignee ?? (object) ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $risk->assignee = (object) ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $creator                 = $this->userInterface->getById($risk->createdByUser);
+                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->createdByUserName = 'Unknown';
+            }
+
+            $documents = is_string($risk->documents)
             ? json_decode($risk->documents, true)
             : (is_array($risk->documents) ? $risk->documents : []);
 
-        foreach ($documents as &$document) {
-            if (isset($document['gsutil_uri'])) {
-                $imageData            = $this->hazardAndRiskService->getImageUrl($document['gsutil_uri']);
-                $document['imageUrl'] = $imageData['signedUrl'];
-                $document['fileName'] = $imageData['fileName'];
+            foreach ($documents as &$document) {
+                if (isset($document['gsutil_uri'])) {
+                    $imageData            = $this->hazardAndRiskService->getImageUrl($document['gsutil_uri']);
+                    $document['imageUrl'] = $imageData['signedUrl'];
+                    $document['fileName'] = $imageData['fileName'];
+                }
             }
-        }
 
-        $risk->documents = $documents;
-        return $risk;
-    });
+            $risk->documents = $documents;
+            return $risk;
+        });
 
-    return response()->json($hazardRisks, 200);
-}
-
+        return response()->json($hazardRisks, 200);
+    }
 
     public function assignee()
     {
@@ -301,30 +299,30 @@ public function assignTaskApproved()
     }
 
     public function updateStatusToApproved($id)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    if ($user->assigneeLevel != 5) {
-        return response()->json(['message' => 'Unauthorized. Only CEO assignees can approve.'], 403);
+        if ($user->assigneeLevel != 5) {
+            return response()->json(['message' => 'Unauthorized. Only CEO assignees can approve.'], 403);
+        }
+
+        $hazardRisk = $this->hazardAndRiskInterface->findById($id);
+
+        if (! $hazardRisk) {
+            return response()->json(['message' => 'Hazard and risk record not found.'], 404);
+        }
+
+        $updated = $this->hazardAndRiskInterface->update($id, ['status' => 'Approved']);
+
+        if ($updated) {
+            return response()->json([
+                'message'    => 'Hazard and risk record approved successfully!',
+                'hazardRisk' => $this->hazardAndRiskInterface->findById($id),
+            ], 200);
+        } else {
+            return response()->json(['message' => 'Failed to approve the hazard and risk record.'], 500);
+        }
     }
-
-    $hazardRisk = $this->hazardAndRiskInterface->findById($id);
-
-    if (!$hazardRisk) {
-        return response()->json(['message' => 'Hazard and risk record not found.'], 404);
-    }
-
-    $updated = $this->hazardAndRiskInterface->update($id, ['status' => 'Approved']);
-
-    if ($updated) {
-        return response()->json([
-            'message' => 'Hazard and risk record approved successfully!',
-            'hazardRisk' => $this->hazardAndRiskInterface->findById($id),
-        ], 200);
-    } else {
-        return response()->json(['message' => 'Failed to approve the hazard and risk record.'], 500);
-    }
-}
 
 // public function updateStatusToApproved($id, HazardAndRiskRequest $request)
 // {
@@ -389,53 +387,5 @@ public function assignTaskApproved()
 //         return response()->json(['message' => 'Failed to update the hazard and risk record.'], 500);
 //     }
 // }
-
-
-    public function dashboardStats()
-    {
-        try {
-            $total     = $this->hazardAndRiskInterface->countAll();
-            $completed = $this->hazardAndRiskInterface->countByStatus('Completed');
-            $pending   = $this->hazardAndRiskInterface->countByStatus('Pending');
-            $amount    = $this->hazardAndRiskInterface->sumField('amount');
-
-            return response()->json([
-                'total'     => $total,
-                'completed' => $completed,
-                'pending'   => $pending,
-                'amount'    => $amount,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error fetching dashboard stats.',
-                'error'   => $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    public function dashboardStatsByDivision()
-    {
-        try {
-            $divisions = $this->hazardAndRiskInterface->getDistinctDivisions();
-
-            $divisionStats = [];
-
-            foreach ($divisions as $division) {
-                $totalCount = $this->hazardAndRiskInterface->countByDivision($division->division);
-
-                $divisionStats[] = [
-                    'division' => $division->division,
-                    'total'    => $totalCount,
-                ];
-            }
-
-            return response()->json($divisionStats, 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error fetching division-wise stats.',
-                'error'   => $e->getMessage(),
-            ], 500);
-        }
-    }
 
 }

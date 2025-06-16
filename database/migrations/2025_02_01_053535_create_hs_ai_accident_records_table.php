@@ -31,7 +31,7 @@ return new class extends Migration
             $table->string('consultedHospital')->nullable();
             $table->string('consultedDoctor')->nullable();
             $table->string('description')->nullable();
-            $table->enum('status', ['draft', 'open', 'closed'])->default('draft')->nullable();
+            $table->enum('status', ['draft', 'open', 'closed','pending', 'completed', 'approved'])->default('draft')->nullable();
             $table->string('workPerformed')->nullable();
             $table->string('actionTaken')->nullable();
             $table->string('accidentDate')->nullable();
