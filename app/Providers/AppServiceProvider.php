@@ -163,6 +163,24 @@ use App\Repositories\All\SaETsCategory\TsCategoryInterface;
 use App\Repositories\All\SaETsCategory\TsCategoryRepository;
 use App\Repositories\All\SaETsSource\TsSourceInterface;
 use App\Repositories\All\SaETsSource\TsSourceRepository;
+use App\Repositories\All\SaGrCategory\GrCategoryInterface;
+use App\Repositories\All\SaGrCategory\GrCategoryRepository;
+use App\Repositories\All\SaGrChannel\GrChannelInterface;
+use App\Repositories\All\SaGrChannel\GrChannelRepository;
+use App\Repositories\All\SaGrCommiteeMemberDetails\GrCommiteeMemberDetailsInterface;
+use App\Repositories\All\SaGrCommiteeMemberDetails\GrCommiteeMemberDetailsRepository;
+use App\Repositories\All\SaGrievanceRecord\GrievanceInterface;
+use App\Repositories\All\SaGrievanceRecord\GrievanceRepository;
+use App\Repositories\All\SaGrLegalAdvisorDetails\GrLegalAdvisorDetailsInterface;
+use App\Repositories\All\SaGrLegalAdvisorDetails\GrLegalAdvisorDetailsRepository;
+use App\Repositories\All\SaGrNomineeDetails\GrNomineeDetailsInterface;
+use App\Repositories\All\SaGrNomineeDetails\GrNomineeDetailsRepository;
+use App\Repositories\All\SaGrRespondentDetails\GrRespondentDetailsInterface;
+use App\Repositories\All\SaGrRespondentDetails\GrRespondentDetailsRepository;
+use App\Repositories\All\SaGrSubmissions\GrSubmissionsInterface;
+use App\Repositories\All\SaGrSubmissions\GrSubmissionsRepository;
+use App\Repositories\All\SaGrTopic\GrTopicInterface;
+use App\Repositories\All\SaGrTopic\GrTopicRepository;
 use App\Repositories\All\SaSDGRecode\SDGRecodeInterface;
 use App\Repositories\All\SaSDGRecode\SDGRecodeRepository;
 use App\Repositories\All\SaSrAdditionalSDG\AdditionalSDGInterface;
@@ -294,6 +312,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SuplierNameInterface::class, SuplierNameRepository::class);
         $this->app->bind(ComOrganizationInterface::class, ComOrganizationRepository::class);
         $this->app->bind(EaActionPlanInterface::class, EaActionPlanRepository::class);
+        $this->app->bind(GrievanceInterface::class, GrievanceRepository::class);
+        $this->app->bind(GrRespondentDetailsInterface::class, GrRespondentDetailsRepository::class);
+        $this->app->bind(GrNomineeDetailsInterface::class, GrNomineeDetailsRepository::class);
+        $this->app->bind(GrCommiteeMemberDetailsInterface::class, GrCommiteeMemberDetailsRepository::class);
+        $this->app->bind(GrLegalAdvisorDetailsInterface::class, GrLegalAdvisorDetailsRepository::class);
+        $this->app->bind(GrChannelInterface::class, GrChannelRepository::class);
+        $this->app->bind(GrCategoryInterface::class, GrCategoryRepository::class);
+        $this->app->bind(GrSubmissionsInterface::class, GrSubmissionsRepository::class);
+        $this->app->bind(GrTopicInterface::class, GrTopicRepository::class);
 
     }
 }
