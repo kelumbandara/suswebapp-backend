@@ -33,9 +33,9 @@ class AiAccidentRecordController extends Controller
         $records = $records->map(function ($risk) {
             try {
                 $assignee       = $this->userInterface->getById($risk->assigneeId);
-                $risk->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
+                $risk->assignee = $assignee ?? (object) ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
-                $risk->assignee = ['name' => 'Unknown', 'id' => null];
+                $risk->assignee = (object) ['name' => 'Unknown', 'id' => null];
             }
 
             try {
@@ -258,14 +258,73 @@ class AiAccidentRecordController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $record = $this->accidentRecordInterface->getByAssigneeId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+        $record = $this->accidentRecordInterface
+            ->getByAssigneeId($user->id)
+            ->filter(function ($risk) {
+                return $risk->status !== 'approved';
+            })
+            ->sortByDesc('created_at')
+            ->sortByDesc('updated_at')->values();
 
         $record = $record->map(function ($accident) {
             try {
                 $assignee           = $this->userInterface->getById($accident->assigneeId);
-                $accident->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
+                $accident->assignee = $assignee ?? (object) ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
-                $accident->assignee = ['name' => 'Unknown', 'id' => null];
+                $accident->assignee = (object) ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $creator                     = $this->userInterface->getById($accident->createdByUser);
+                $accident->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $accident->createdByUserName = 'Unknown';
+            }
+            if (! empty($accident->evidence) && is_string($accident->evidence)) {
+                $decodedEvidence = json_decode($accident->evidence, true);
+                $evidence        = is_array($decodedEvidence) ? $decodedEvidence : [];
+            } else {
+                $evidence = is_array($accident->evidence) ? $accident->evidence : [];
+            }
+
+            foreach ($evidence as &$item) {
+                if (isset($item['gsutil_uri'])) {
+                    $imageData        = $this->accidentService->getImageUrl($item['gsutil_uri']);
+                    $item['fileName'] = $imageData['fileName'];
+                    $item['imageUrl'] = $imageData['signedUrl'];
+                }
+            }
+
+            $accident->evidence = $evidence;
+
+            return $accident;
+        });
+
+        return response()->json($record, 200);
+    }
+
+    public function assignTaskApproved()
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $record = $this->accidentRecordInterface
+            ->getByAssigneeId($user->id)
+            ->filter(function ($risk) {
+                return $risk->status === 'approved';
+            })
+            ->sortByDesc('created_at')
+            ->sortByDesc('updated_at')->values();
+
+        $record = $record->map(function ($accident) {
+            try {
+                $assignee           = $this->userInterface->getById($accident->assigneeId);
+                $accident->assignee = $assignee ?? (object) ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $accident->assignee = (object) ['name' => 'Unknown', 'id' => null];
             }
 
             try {
@@ -307,6 +366,42 @@ class AiAccidentRecordController extends Controller
             ->where('availability', 1)
             ->values();
         return response()->json($assignees);
+    }
+
+    public function updateStatusToApproved(string $id)
+    {
+        $user = Auth::user();
+
+        if (! $user || $user->assigneeLevel != 5) {
+            return response()->json([
+                'message' => 'Unauthorized. Only CEO assignees can approve.',
+            ], 403);
+        }
+
+        $record = $this->accidentRecordInterface->findById($id);
+
+        if (! $record) {
+            return response()->json([
+                'message' => 'Accident record not found.',
+            ], 404);
+        }
+
+        $updated = $this->accidentRecordInterface->update($id, [
+            'status' => 'Approved',
+        ]);
+
+        if (! $updated) {
+            return response()->json([
+                'message' => 'Failed to approve the accident record.',
+            ], 500);
+        }
+
+        $record = $this->accidentRecordInterface->findById($id);
+
+        return response()->json([
+            'message' => 'Accident record approved successfully!',
+            'record'  => $record,
+        ], 200);
     }
 
 }
