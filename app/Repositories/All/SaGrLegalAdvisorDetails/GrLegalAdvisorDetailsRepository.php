@@ -20,12 +20,12 @@ class GrLegalAdvisorDetailsRepository extends BaseRepository implements GrLegalA
     {
         $this->model = $model;
     }
-    public function findByLegalAdvisorId($grievanceId)
+    public function findByGrievanceId($grievanceId)
     {
         return $this->model->where('grievanceId', $grievanceId)->get();
     }
 
-    public function deleteByLegalAdvisorId($grievanceId)
+    public function deleteByGrievanceId($grievanceId)
     {
         return $this->model->where('grievanceId', $grievanceId)->delete();
     }

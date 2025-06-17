@@ -20,12 +20,12 @@ class GrRespondentDetailsRepository extends BaseRepository implements GrResponde
     {
         $this->model = $model;
     }
-    public function findByRespondentId($grievanceId)
+    public function findByGrievanceId($grievanceId)
     {
         return $this->model->where('grievanceId', $grievanceId)->get();
     }
 
-    public function deleteByRespondentId($grievanceId)
+    public function deleteByGrievanceId($grievanceId)
     {
         return $this->model->where('grievanceId', $grievanceId)->delete();
     }

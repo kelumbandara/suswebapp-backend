@@ -20,12 +20,12 @@ class GrNomineeDetailsRepository extends BaseRepository implements GrNomineeDeta
     {
         $this->model = $model;
     }
-    public function findByNomineeId($grievanceId)
+    public function findByGrievanceId($grievanceId)
     {
         return $this->model->where('grievanceId', $grievanceId)->get();
     }
 
-    public function deleteByNomineeId($grievanceId)
+    public function deleteByGrievanceId($grievanceId)
     {
         return $this->model->where('grievanceId', $grievanceId)->delete();
     }

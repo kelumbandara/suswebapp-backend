@@ -6,6 +6,6 @@ use App\Repositories\Base\EloquentRepositoryInterface;
 
 // Interface
 interface GrRespondentDetailsInterface extends EloquentRepositoryInterface {
-    public function findByRespondentId(int $grievanceId);
-    public function deleteByRespondentId(int $grievanceId);
+    public function findByGrievanceId(int $grievanceId);
+    public function deleteByGrievanceId(int $grievanceId);
 }

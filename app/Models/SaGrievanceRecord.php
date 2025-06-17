@@ -17,7 +17,7 @@ class SaGrievanceRecord extends Model
         'personType',
         'name',
         'gender',
-        'supervisor',
+        'supervisorId',
         'employeeShift',
         'location',
         'submissionDate',
@@ -43,7 +43,7 @@ class SaGrievanceRecord extends Model
         'isFollowUp',
         'isAppeal',
         'solutionProvided',
-        'isIssuesPreviouslyRaised ',
+        'isIssuesPreviouslyRaised',
         'statementDocuments',
         'investigationCommitteeStatementDocuments',
         'evidence',
@@ -73,4 +73,13 @@ class SaGrievanceRecord extends Model
         'investigationCommitteeStatementDocuments' => 'array',
         'evidence' => 'array',
     ];
+
+        protected static function booted()
+    {
+        static::created(function ($model) {
+            $model->referenceNumber = 'GRI-' . $model->id;
+
+            $model->save();
+        });
+    }
 }

@@ -45,6 +45,7 @@ use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineTypeController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\SocialApps\SaGrCategoryController;
 use App\Http\Controllers\SocialApps\SaGrChannelController;
+use App\Http\Controllers\SocialApps\SaGrievanceRecodeController;
 use App\Http\Controllers\SocialApps\SaGrSubmissionsController;
 use App\Http\Controllers\SocialApps\SaGrTopicController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditCategoryController;
@@ -125,6 +126,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('hazard-risk/{id}/delete', [HazardAndRiskController::class, 'destroy']);
     Route::get('hazard-risks-assign-task', [HazardAndRiskController::class, 'assignTask']);
     Route::post('hazard-risks-assign-task-approved', [HazardAndRiskController::class, 'assignTaskApproved']);
+    Route::post('hazard-risks/{id}/update-status-to-approved', [HazardAndRiskController::class, 'updateStatusToApproved']);
+
+
 
 
     Route::get('accidents', [AiAccidentRecordController::class, 'index']);
@@ -296,6 +300,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('chemical-dashboard/{Year}/all-summary', [SaCmPurchaseInventoryRecodeController::class, 'getAllSummary']);
     Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/category-and-classification', [SaCmPurchaseInventoryRecodeController::class, 'getCategoryAndClassification']);
     Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/do-you-have-msds', [SaCmPurchaseInventoryRecodeController::class, 'getDoYouHaveMsdsPercentage']);
+
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('grievance-record', [SaGrievanceRecodeController::class, 'index']);
+    Route::post('grievance-record', [SaGrievanceRecodeController::class, 'store']);
+    Route::post('grievance-record/{id}/update', [SaGrievanceRecodeController::class, 'update']);
+    Route::delete('grievance-record/{id}/delete', [SaGrievanceRecodeController::class, 'destroy']);
+    Route::post('grievance-record/{id}/feedback', [SaGrievanceRecodeController::class, 'updateFeedback']);
+    Route::get('grievance-record-assign-task', [SaGrievanceRecodeController::class, 'assignTask']);
+    Route::post('hazard-risks-assign-task-approved', [SaGrievanceRecodeController::class, 'assignTaskApproved']);
+    Route::post('hazard-risks/{id}/update-status-to-approved', [SaGrievanceRecodeController::class, 'updateStatusToApproved']);
+
+
+
+
 
 });
 
