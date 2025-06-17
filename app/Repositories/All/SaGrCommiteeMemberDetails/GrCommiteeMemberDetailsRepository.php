@@ -20,12 +20,12 @@ class GrCommiteeMemberDetailsRepository extends BaseRepository implements GrComm
     {
         $this->model = $model;
     }
-    public function findByCommitteeMemberId($grievanceId)
+    public function findByGrievanceId($grievanceId)
     {
         return $this->model->where('grievanceId', $grievanceId)->get();
     }
 
-    public function deleteByCommitteeMemberId($grievanceId)
+    public function deleteByGrievanceId($grievanceId)
     {
         return $this->model->where('grievanceId', $grievanceId)->delete();
     }

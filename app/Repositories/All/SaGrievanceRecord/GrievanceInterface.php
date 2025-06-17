@@ -6,5 +6,6 @@ use App\Repositories\Base\EloquentRepositoryInterface;
 
 // Interface
 interface GrievanceInterface extends EloquentRepositoryInterface {
+    public function getByAssigneeId(int $supervisorId);
 
 }
