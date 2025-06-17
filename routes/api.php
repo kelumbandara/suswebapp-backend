@@ -311,8 +311,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('grievance-record/{id}/delete', [SaGrievanceRecodeController::class, 'destroy']);
     Route::post('grievance-record/{id}/feedback', [SaGrievanceRecodeController::class, 'updateFeedback']);
     Route::get('grievance-record-assign-task', [SaGrievanceRecodeController::class, 'assignTask']);
-    Route::post('hazard-risks-assign-task-approved', [SaGrievanceRecodeController::class, 'assignTaskApproved']);
-    Route::post('hazard-risks/{id}/update-status-to-approved', [SaGrievanceRecodeController::class, 'updateStatusToApproved']);
+    Route::post('grievance-record-assign-task-approved', [SaGrievanceRecodeController::class, 'assignTaskApproved']);
+    Route::post('grievance-record/{id}/update-status-to-approved', [SaGrievanceRecodeController::class, 'updateStatusToApproved']);
 
 
 
