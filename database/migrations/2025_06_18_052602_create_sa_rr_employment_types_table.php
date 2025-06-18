@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sa_gr_legal_advisor_details', function (Blueprint $table) {
-            $table->id('legalAdvisorId');
-            $table->bigInteger('grievanceId')->nullable();
-            $table->string('email')->nullable();
-            $table->string('name')->nullable();
-            $table->integer('phone')->nullable();
+        Schema::create('sa_rr_employment_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('employmentType');
             $table->timestamps();
         });
     }
@@ -26,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sa_gr_legal_advisor_details');
+        Schema::dropIfExists('sa_rr_employment_types');
     }
 };

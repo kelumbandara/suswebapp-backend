@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('personType')->nullable();
             $table->string('name')->nullable();
             $table->string('gender')->nullable();
-            $table->integer('supervisorId')->nullable();
+            $table->integer('supervisor')->nullable();
             $table->string('employeeShift')->nullable();
             $table->string('location')->nullable();
             $table->string('submissionDate')->nullable();
@@ -30,9 +30,9 @@ return new class extends Migration
             $table->string('submission')->nullable();
             $table->string('description')->nullable();
             $table->string('dueDate')->nullable();
-            $table->string('BusinessUnit')->nullable();
+            $table->string('businessUnit')->nullable();
             $table->string('resolutionDate')->nullable();
-            $table->string('remark')->nullable();
+            $table->string('remarks')->nullable();
             $table->string('helpDeskPerson')->nullable();
             $table->string('responsibleDepartment')->nullable();
             $table->string('humanRightsViolation')->nullable();
@@ -56,14 +56,13 @@ return new class extends Migration
             $table->string('department')->nullable();
             $table->string('feedback')->nullable();
             $table->integer('stars')->nullable();
-            $table->enum('status', ['inprogress', 'approved', 'rejected', 'published', 'ongoing', 'draft', 'scheduled', 'completed', 'open'])->default('draft')->nullable();
-            $table->integer('rejectedBy')->nullable();
-            $table->integer('approvedBy')->nullable();
-            $table->integer('createdByUser')->nullable();
-            $table->integer('updatedBy')->nullable();
-            $table->integer('inprogressBy')->nullable();
-            $table->integer('publishedBy')->nullable();
-            $table->integer('completedBy')->nullable();
+            $table->integer('assigneeId')->nullable();
+            $table->enum('status', ['inprogress', 'draft', 'completed', 'open'])->default('draft')->nullable();
+            $table->integer('createdByUserId')->nullable();
+            $table->integer('updatedByUserId')->nullable();
+            $table->integer('openedByUserId')->nullable();
+            $table->integer('inprogressByUserId')->nullable();
+            $table->integer('completedByUserId')->nullable();
             $table->timestamps();
         });
     }

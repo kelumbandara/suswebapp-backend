@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('sa_gr_respondent_details', function (Blueprint $table) {
             $table->id('respondentId');
-            $table->string('grievanceId')->nullable();
+            $table->bigInteger('grievanceId')->nullable();
             $table->string('employeeId')->nullable();
             $table->string('name')->nullable();
             $table->string('designation')->nullable();
