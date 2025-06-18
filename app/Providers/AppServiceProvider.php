@@ -181,6 +181,24 @@ use App\Repositories\All\SaGrSubmissions\GrSubmissionsInterface;
 use App\Repositories\All\SaGrSubmissions\GrSubmissionsRepository;
 use App\Repositories\All\SaGrTopic\GrTopicInterface;
 use App\Repositories\All\SaGrTopic\GrTopicRepository;
+use App\Repositories\All\SaRagRecode\RagRecodeInterface;
+use App\Repositories\All\SaRagRecode\RagRecodeRepository;
+use App\Repositories\All\SaRrCategory\RrCategoryInterface;
+use App\Repositories\All\SaRrCategory\RrCategoryRepository;
+use App\Repositories\All\SaRrCountryName\RrCountryNameInterface;
+use App\Repositories\All\SaRrCountryName\RrCountryNameRepository;
+use App\Repositories\All\SaRrDesignationName\RrDesignationNameInterface;
+use App\Repositories\All\SaRrDesignationName\RrDesignationNameRepository;
+use App\Repositories\All\SaRrEmployeeType\RrEmployeeTypeInterface;
+use App\Repositories\All\SaRrEmployeeType\RrEmployeeTypeRepository;
+use App\Repositories\All\SaRrEmploymentType\RrEmploymentTypeInterface;
+use App\Repositories\All\SaRrEmploymentType\RrEmploymentTypeRepository;
+use App\Repositories\All\SaRrFunction\RrFunctionInterface;
+use App\Repositories\All\SaRrFunction\RrFunctionRepository;
+use App\Repositories\All\SaRrSourceOfHiring\RrSourceOfHiringInterface;
+use App\Repositories\All\SaRrSourceOfHiring\RrSourceOfHiringRepository;
+use App\Repositories\All\SaRrState\RrStateInterface;
+use App\Repositories\All\SaRrState\RrStateRepository;
 use App\Repositories\All\SaSDGRecode\SDGRecodeInterface;
 use App\Repositories\All\SaSDGRecode\SDGRecodeRepository;
 use App\Repositories\All\SaSrAdditionalSDG\AdditionalSDGInterface;
@@ -321,6 +339,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(GrCategoryInterface::class, GrCategoryRepository::class);
         $this->app->bind(GrSubmissionsInterface::class, GrSubmissionsRepository::class);
         $this->app->bind(GrTopicInterface::class, GrTopicRepository::class);
+        $this->app->bind(RagRecodeInterface::class, RagRecodeRepository::class);
+        $this->app->bind(RrDesignationNameInterface::class, RrDesignationNameRepository::class);
+        $this->app->bind(RrFunctionInterface::class, RrFunctionRepository::class);
+        $this->app->bind(RrSourceOfHiringInterface::class, RrSourceOfHiringRepository::class);
+        $this->app->bind(RrEmployeeTypeInterface::class, RrEmployeeTypeRepository::class);
+        $this->app->bind(RrCountryNameInterface::class, RrCountryNameRepository::class);
+        $this->app->bind(RrStateInterface::class, RrStateRepository::class);
+        $this->app->bind(RrCategoryInterface::class,   RrCategoryRepository::class);
+        $this->app->bind(RrEmploymentTypeInterface::class, RrEmploymentTypeRepository::class);
 
     }
 }

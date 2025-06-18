@@ -48,6 +48,7 @@ use App\Http\Controllers\SocialApps\SaGrChannelController;
 use App\Http\Controllers\SocialApps\SaGrievanceRecodeController;
 use App\Http\Controllers\SocialApps\SaGrSubmissionsController;
 use App\Http\Controllers\SocialApps\SaGrTopicController;
+use App\Http\Controllers\SocialApps\SaRagRecodeController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditCategoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditFirmController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditRecodeController;
@@ -315,7 +316,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('grievance-record/{id}/update-status-to-approved', [SaGrievanceRecodeController::class, 'updateStatusToApproved']);
 
 
-
+    Route::get('rag-record', [SaRagRecodeController::class, 'index']);
+    Route::post('rag-record', [SaRagRecodeController::class, 'store']);
+    Route::post('rag-record/{id}/update', [SaRagRecodeController::class, 'update']);
+    Route::delete('rag-record/{id}/delete', [SaRagRecodeController::class, 'destroy']);
 
 
 });
