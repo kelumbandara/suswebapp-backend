@@ -21,9 +21,9 @@ class GrievanceRepository extends BaseRepository implements GrievanceInterface
         $this->model = $model;
     }
 
-    public function getByAssigneeId($supervisorId)
+    public function getByAssigneeId($assigneeId)
     {
-        return $this->model->where('supervisorId', $supervisorId)->get();
+        return $this->model->where('assigneeId', $assigneeId)->get();
     }
 
 }

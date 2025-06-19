@@ -58,6 +58,21 @@ class SaGrievanceRecodeController extends Controller
         return $files;
     }
 
+    private function safeUser($userId)
+    {
+        try {
+            return $this->userInterface->getById($userId) ?? (object) [
+                'id'   => null,
+                'name' => 'Unknown',
+            ];
+        } catch (\Exception $e) {
+            return (object) [
+                'id'   => null,
+                'name' => 'Unknown',
+            ];
+        }
+    }
+
     public function index()
     {
         $records = $this->grievanceInterface->All()
@@ -66,51 +81,28 @@ class SaGrievanceRecodeController extends Controller
             ->values();
 
         $records = $records->map(function ($record) {
+            $record->createdByUser    = $this->safeUser($record->createdByUserId);
+            $record->updatedByUser    = $this->safeUser($record->updatedByUserId);
+            $record->inprogressByUser = $this->safeUser($record->inprogressByUserId);
+            $record->completedByUser  = $this->safeUser($record->completedByUserId);
 
-            try {
-                $supervisor         = $this->userInterface->getById($record->supervisorId);
-                $record->supervisor = $supervisor ?? (object) ['name' => 'Unknown', 'id' => null];
-            } catch (\Exception $e) {
-                $record->supervisor = (object) ['name' => 'Unknown', 'id' => null];
-            }
-
-            try {
-                $creator                   = $this->userInterface->getById($record->createdByUser);
-                $record->createdByUserName = $creator ? $creator->name : 'Unknown';
-            } catch (\Exception $e) {
-                $record->createdByUserName = 'Unknown';
-            }
-
-            try {
-                $creator               = $this->userInterface->getById($record->createdByUser);
-                $record->createdByUser = $creator ?? (object) [
-                    'id'   => null,
-                    'name' => 'Unknown',
-                ];
-            } catch (\Exception $e) {
-                $record->createdByUser = (object) [
-                    'id'   => null,
-                    'name' => 'Unknown',
-                ];
-            }
-
-            $record->statementDocuments = $this->resolveGcsFiles($record->statementDocuments);
-
+            $record->statementDocuments                       = $this->resolveGcsFiles($record->statementDocuments);
             $record->investigationCommitteeStatementDocuments = $this->resolveGcsFiles($record->investigationCommitteeStatementDocuments);
+            $record->evidence                                 = $this->resolveGcsFiles($record->evidence);
 
-            $record->evidence = $this->resolveGcsFiles($record->evidence);
+            if ($record->isAnonymous) {
+                $record->personType    = null;
+                $record->name          = null;
+                $record->gender        = null;
+                $record->supervisor    = null;
+                $record->employeeShift = null;
+                $record->location      = null;
+            }
 
             return $record;
         });
 
-        foreach ($records as $record) {
-            $record->committeeMembers = $this->commiteeMemberDetailsInterface->findByGrievanceId($record->id);
-            $record->legalAdvisors    = $this->legalAdvisorDetailsInterface->findByGrievanceId($record->id);
-            $record->nominees         = $this->nomineeDetailsInterface->findByGrievanceId($record->id);
-            $record->respondents      = $this->respondentDetailsInterface->findByGrievanceId($record->id);
-        }
-
-        return response()->json($records, 200);
+        return response()->json($records);
     }
 
     public function store(GrievanceRecordRequest $request)
@@ -239,7 +231,11 @@ class SaGrievanceRecodeController extends Controller
 
         $data                    = $request->validated();
         $data['createdByUserId'] = $user->id;
-        $record                  = $this->grievanceInterface->create($data);
+        if (isset($data['status']) && $data['status'] === 'open') {
+            $data['openedByUserId'] = $user->id;
+        }
+
+        $record = $this->grievanceInterface->create($data);
 
         if (! $record) {
             return response()->json(['message' => 'Failed to create grievance record'], 500);
@@ -272,8 +268,6 @@ class SaGrievanceRecodeController extends Controller
             'record'  => $record,
         ], 201);
     }
-
-
 
     public function updateQuSuApp($id, GrStoreQuSuAppRequest $request)
     {
@@ -284,6 +278,9 @@ class SaGrievanceRecodeController extends Controller
 
         $data                    = $request->validated();
         $data['updatedByUserId'] = $user->id;
+        if (isset($data['status']) && $data['status'] === 'open') {
+            $data['openedByUserId'] = $user->id;
+        }
 
         $record = $this->grievanceInterface->findById($id);
         if (! $record) {
@@ -339,9 +336,7 @@ class SaGrievanceRecodeController extends Controller
         }
     }
 
-
-
-      public function storeComGri(GrStoreComGriRequest $request)
+    public function storeComGri(GrStoreComGriRequest $request)
     {
         $user = Auth::user();
         if (! $user) {
@@ -350,7 +345,11 @@ class SaGrievanceRecodeController extends Controller
 
         $data                    = $request->validated();
         $data['createdByUserId'] = $user->id;
-        $record                  = $this->grievanceInterface->create($data);
+        if (isset($data['status']) && $data['status'] === 'open') {
+            $data['openedByUserId'] = $user->id;
+        }
+
+        $record = $this->grievanceInterface->create($data);
 
         if (! $record) {
             return response()->json(['message' => 'Failed to create grievance record'], 500);
@@ -384,8 +383,7 @@ class SaGrievanceRecodeController extends Controller
         ], 201);
     }
 
-
-      public function updateComGri($id, GrStoreComGriRequest $request)
+    public function updateComGri($id, GrStoreComGriRequest $request)
     {
         $user = Auth::user();
         if (! $user) {
@@ -394,6 +392,9 @@ class SaGrievanceRecodeController extends Controller
 
         $data                    = $request->validated();
         $data['updatedByUserId'] = $user->id;
+        if (isset($data['status']) && $data['status'] === 'open') {
+            $data['openedByUserId'] = $user->id;
+        }
 
         $record = $this->grievanceInterface->findById($id);
         if (! $record) {
@@ -449,7 +450,7 @@ class SaGrievanceRecodeController extends Controller
         }
     }
 
-     public function updateStatusInprogress($id)
+    public function updateStatusInprogress($id)
     {
         $user = Auth::user();
         if (! $user) {
@@ -462,8 +463,9 @@ class SaGrievanceRecodeController extends Controller
         }
 
         $updated = $this->grievanceInterface->update($id, [
-            'status'     => 'inprogress',
-            'assigneeId' => $user->id,
+            'status'             => 'inprogress',
+            'assigneeId'         => $user->id,
+            'inprogressByUserId' => $user->id,
         ]);
 
         if ($updated) {
@@ -474,6 +476,93 @@ class SaGrievanceRecodeController extends Controller
         } else {
             return response()->json(['message' => 'Failed to update grievance record'], 500);
         }
+    }
+
+    public function updateCompleteStatus($id, GrievanceRecordRequest $request)
+    {
+        $user   = Auth::user();
+        $record = $this->grievanceInterface->findById($id);
+        if (! $record) {
+            return response()->json(['message' => 'Grievance record not found.'], 404);
+        }
+
+        $data             = $request->validated();
+        $handleJsonColumn = function (string $column, string $removeKey, string $fileKey) use ($request, $record) {
+            $existing = json_decode($record->{$column} ?? '[]', true);
+
+            if ($request->has($removeKey)) {
+                foreach ((array) $request->input($removeKey) as $uri) {
+                    $this->grievanceService->removeOldDocumentFromStorage($uri);
+                }
+                $existing = array_filter($existing, fn($doc) => ! in_array($doc['gsutil_uri'], $request->input($removeKey)));
+                $existing = array_values($existing);
+            }
+
+            if ($request->hasFile($fileKey)) {
+                foreach ($request->file($fileKey) as $file) {
+                    $res = $this->grievanceService->updateDocuments($file);
+                    if (! empty($res['gsutil_uri'])) {
+                        $existing[] = [
+                            'gsutil_uri' => $res['gsutil_uri'],
+                            'file_name'  => $res['file_name'],
+                        ];
+                    }
+                }
+            }
+
+            return json_encode($existing);
+        };
+
+        $data['statementDocuments'] = $handleJsonColumn(
+            'statementDocuments',
+            'removeStatementDocuments',
+            'statementDocuments'
+        );
+        $data['investigationCommitteeStatementDocuments'] = $handleJsonColumn(
+            'investigationCommitteeStatementDocuments',
+            'removeInvestigationCommitteeStatementDocuments',
+            'investigationCommitteeStatementDocuments'
+        );
+        $data['evidence'] = $handleJsonColumn(
+            'evidence',
+            'removeEvidence',
+            'evidence'
+        );
+
+        $data['status']            = 'completed';
+        $data['completedUserById'] = $user->id;
+        $updated                   = $this->grievanceInterface->update($id, $data);
+
+        $this->commiteeMemberDetailsInterface->deleteByGrievanceId($id);
+        foreach ($data['committeeMembers'] ?? [] as $m) {
+            $m['grievanceId'] = $id;
+            $this->commiteeMemberDetailsInterface->create($m);
+        }
+
+        $this->legalAdvisorDetailsInterface->deleteByGrievanceId($id);
+        foreach ($data['legalAdvisors'] ?? [] as $a) {
+            $a['grievanceId'] = $id;
+            $this->legalAdvisorDetailsInterface->create($a);
+        }
+
+        $this->nomineeDetailsInterface->deleteByGrievanceId($id);
+        foreach ($data['nominees'] ?? [] as $n) {
+            $n['grievanceId'] = $id;
+            $this->nomineeDetailsInterface->create($n);
+        }
+
+        $this->respondentDetailsInterface->deleteByGrievanceId($id);
+        foreach ($data['respondents'] ?? [] as $r) {
+            $r['grievanceId'] = $id;
+            $this->respondentDetailsInterface->create($r);
+        }
+
+        return response()->json([
+            'message' => $updated
+            ? 'Grievance record updated successfully.'
+            : 'Update failed.',
+            'record'  => $this->grievanceInterface->findById($id),
+        ], $updated ? 200 : 500);
     }
 
     public function update($id, GrievanceRecordRequest $request)
@@ -606,7 +695,7 @@ class SaGrievanceRecodeController extends Controller
             return response()->json(['message' => 'Grievance record not found.'], 404);
         }
 
-        $data = $request->only(['feedback', 'stars']);
+        $data           = $request->only(['feedback', 'stars']);
         $data['status'] = 'completed';
 
         $updated = $this->grievanceInterface->update($id, $data);
@@ -622,101 +711,66 @@ class SaGrievanceRecodeController extends Controller
     public function assignTask()
     {
 
-        $supervisorId = Auth::id();
+        $assigneeId = Auth::id();
 
         $tasks = $this->grievanceInterface
-            ->getByAssigneeId($supervisorId)
+            ->getByAssigneeId($assigneeId)
             ->filter(fn($g) => $g->status !== 'completed')
             ->sortByDesc('created_at')
             ->values();
 
         $tasks = $tasks->map(function ($tasks) {
-            try {
-                $supervisor        = $this->userInterface->getById($tasks->supervisorId);
-                $tasks->supervisor = $supervisor ?? (object) ['name' => 'Unknown', 'id' => null];
-            } catch (\Exception $e) {
-                $tasks->supervisor = (object) ['name' => 'Unknown', 'id' => null];
-            }
-            try {
-                $creator              = $this->userInterface->getById($tasks->createdByUser);
-                $tasks->createdByUser = $creator ?? (object) [
-                    'id'   => null,
-                    'name' => 'Unknown',
-                ];
-            } catch (\Exception $e) {
-                $tasks->createdByUser = (object) [
-                    'id'   => null,
-                    'name' => 'Unknown',
-                ];
-            }
-
-            try {
-                $creator                  = $this->userInterface->getById($tasks->createdByUser);
-                $tasks->createdByUserName = $creator->name;
-            } catch (\Exception $e) {
-                $tasks->createdByUserName = 'Unknown';
-            }
+            $tasks->createdByUser    = $this->safeUser($tasks->createdByUserId);
+            $tasks->updatedByUser    = $this->safeUser($tasks->updatedByUserId);
+            $tasks->inprogressByUser = $this->safeUser($tasks->inprogressByUserId);
+            $tasks->completedByUser  = $this->safeUser($tasks->completedByUserId);
 
             $tasks->statementDocuments                       = $this->resolveGcsFiles($tasks->statementDocuments);
             $tasks->investigationCommitteeStatementDocuments = $this->resolveGcsFiles($tasks->investigationCommitteeStatementDocuments);
             $tasks->evidence                                 = $this->resolveGcsFiles($tasks->evidence);
 
-            $tasks->committeeMembers = $this->commiteeMemberDetailsInterface->findByGrievanceId($tasks->id);
-            $tasks->legalAdvisors    = $this->legalAdvisorDetailsInterface->findByGrievanceId($tasks->id);
-            $tasks->nominees         = $this->nomineeDetailsInterface->findByGrievanceId($tasks->id);
-            $tasks->respondents      = $this->respondentDetailsInterface->findByGrievanceId($tasks->id);
-
+            if ($tasks->isAnonymous) {
+                $tasks->personType    = null;
+                $tasks->name          = null;
+                $tasks->gender        = null;
+                $tasks->supervisor    = null;
+                $tasks->employeeShift = null;
+                $tasks->location      = null;
+            }
             return $tasks;
         });
 
         return response()->json($tasks, 200);
     }
 
-    public function assignTaskApproved()
+    public function assignTaskComplete()
     {
-        $supervisorId = Auth::id();
+        $assigneeId = Auth::id();
 
         $tasks = $this->grievanceInterface
-            ->getByAssigneeId($supervisorId)
+            ->getByAssigneeId($assigneeId)
             ->filter(fn($g) => $g->status === 'completed')
             ->sortByDesc('created_at')
             ->values();
 
         $tasks = $tasks->map(function ($tasks) {
-            try {
-                $supervisor        = $this->userInterface->getById($tasks->supervisorId);
-                $tasks->supervisor = $supervisor ?? (object) ['name' => 'Unknown', 'id' => null];
-            } catch (\Exception $e) {
-                $tasks->supervisor = (object) ['name' => 'Unknown', 'id' => null];
-            }
-            try {
-                $creator              = $this->userInterface->getById($tasks->createdByUser);
-                $tasks->createdByUser = $creator ?? (object) [
-                    'id'   => null,
-                    'name' => 'Unknown',
-                ];
-            } catch (\Exception $e) {
-                $tasks->createdByUser = (object) [
-                    'id'   => null,
-                    'name' => 'Unknown',
-                ];
-            }
-
-            try {
-                $creator                  = $this->userInterface->getById($tasks->createdByUser);
-                $tasks->createdByUserName = $creator->name;
-            } catch (\Exception $e) {
-                $tasks->createdByUserName = 'Unknown';
-            }
+            $tasks->createdByUser    = $this->safeUser($tasks->createdByUserId);
+            $tasks->updatedByUser    = $this->safeUser($tasks->updatedByUserId);
+            $tasks->inprogressByUser = $this->safeUser($tasks->inprogressByUserId);
+            $tasks->completedByUser  = $this->safeUser($tasks->completedByUserId);
 
             $tasks->statementDocuments                       = $this->resolveGcsFiles($tasks->statementDocuments);
             $tasks->investigationCommitteeStatementDocuments = $this->resolveGcsFiles($tasks->investigationCommitteeStatementDocuments);
             $tasks->evidence                                 = $this->resolveGcsFiles($tasks->evidence);
 
-            $tasks->committeeMembers = $this->commiteeMemberDetailsInterface->findByGrievanceId($tasks->id);
-            $tasks->legalAdvisors    = $this->legalAdvisorDetailsInterface->findByGrievanceId($tasks->id);
-            $tasks->nominees         = $this->nomineeDetailsInterface->findByGrievanceId($tasks->id);
-            $tasks->respondents      = $this->respondentDetailsInterface->findByGrievanceId($tasks->id);
+            if ($tasks->isAnonymous) {
+                $tasks->personType    = null;
+                $tasks->name          = null;
+                $tasks->gender        = null;
+                $tasks->supervisor    = null;
+                $tasks->employeeShift = null;
+                $tasks->location      = null;
+            }
 
             return $tasks;
         });

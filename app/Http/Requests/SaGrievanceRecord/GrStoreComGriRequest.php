@@ -53,6 +53,7 @@ class GrStoreComGriRequest extends FormRequest
             'createdByUserId'                                => 'nullable|integer',
             'updatedByUserId'                                => 'nullable|integer',
             'inprogressBy'                                   => 'nullable|integer',
+            'openedByUserId'                                 => 'nullable|integer',
 
         ];
     }
