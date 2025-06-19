@@ -104,7 +104,6 @@ Route::post('register', [RegisteredUserController::class, 'store']);
 Route::get('all-users', [UserController::class, 'index']);
 Route::get('users/search', [UserController::class, 'search']);
 
-
 Route::post('login', [LoginController::class, 'login']);
 Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
 Route::post('reset-password', [ForgotPasswordController::class, 'otpVerifyFunction']);
@@ -136,9 +135,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('hazard-risks-assign-task', [HazardAndRiskController::class, 'assignTask']);
     Route::post('hazard-risks-assign-task-approved', [HazardAndRiskController::class, 'assignTaskApproved']);
     Route::post('hazard-risks/{id}/update-status-to-approved', [HazardAndRiskController::class, 'updateStatusToApproved']);
-
-
-
 
     Route::get('accidents', [AiAccidentRecordController::class, 'index']);
     Route::post('accidents', [AiAccidentRecordController::class, 'store']);
@@ -317,8 +313,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('grievance-record', [SaGrievanceRecodeController::class, 'index']);
     Route::post('grievance-record', [SaGrievanceRecodeController::class, 'store']);
     Route::post('grievance-record-que-sug-app', [SaGrievanceRecodeController::class, 'storeQuSuApp']);
-        Route::post('grievance-record-que-sug-app/{id}/update', [SaGrievanceRecodeController::class, 'updateQuSuApp']);
-        Route::post('grievance-record/{id}/update-status-inprogress', [SaGrievanceRecodeController::class, 'updateStatusInprogress']);
+    Route::post('grievance-record-que-sug-app/{id}/update', [SaGrievanceRecodeController::class, 'updateQuSuApp']);
+    Route::post('grievance-record-com-gri', [SaGrievanceRecodeController::class, 'storeComGri']);
+    Route::post('grievance-record-com-gri/{id}/update', [SaGrievanceRecodeController::class, 'updateComGri']);
+
+
+
+    Route::post('grievance-record/{id}/update-status-inprogress', [SaGrievanceRecodeController::class, 'updateStatusInprogress']);
 
     Route::post('grievance-record/{id}/update', [SaGrievanceRecodeController::class, 'update']);
     Route::delete('grievance-record/{id}/delete', [SaGrievanceRecodeController::class, 'destroy']);
@@ -327,12 +328,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('grievance-record-assign-task-approved', [SaGrievanceRecodeController::class, 'assignTaskApproved']);
     Route::post('grievance-record/{id}/update-status-to-approved', [SaGrievanceRecodeController::class, 'updateStatusToApproved']);
 
-
     Route::get('rag-record', [SaRagRecodeController::class, 'index']);
     Route::post('rag-record', [SaRagRecodeController::class, 'store']);
     Route::post('rag-record/{id}/update', [SaRagRecodeController::class, 'update']);
     Route::delete('rag-record/{id}/delete', [SaRagRecodeController::class, 'destroy']);
-
 
 });
 
@@ -579,7 +578,6 @@ Route::post('rag-category-names', [SaRrCategoryController::class, 'store']);
 
 Route::get('rag-employment-types', [SaRrEmploymentTypeController::class, 'index']);
 Route::post('rag-employment-types', [SaRrEmploymentTypeController::class, 'store']);
-
 
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
 Route::post('upload', [ImageUploadController::class, 'uploadImage']);

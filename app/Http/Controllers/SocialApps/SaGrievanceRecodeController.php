@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SocialApps;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaGrGrievanceFeedbackRequest\GrievanceFeedbackRequest;
 use App\Http\Requests\SaGrievanceRecord\GrievanceRecordRequest;
+use App\Http\Requests\SaGrievanceRecord\GrStoreComGriRequest;
 use App\Http\Requests\SaGrievanceRecord\GrStoreQuSuAppRequest;
 use App\Repositories\All\SaGrCommiteeMemberDetails\GrCommiteeMemberDetailsInterface;
 use App\Repositories\All\SaGrievanceRecord\GrievanceInterface;
@@ -275,6 +276,116 @@ class SaGrievanceRecodeController extends Controller
 
 
     public function updateQuSuApp($id, GrStoreQuSuAppRequest $request)
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $data                    = $request->validated();
+        $data['updatedByUserId'] = $user->id;
+
+        $record = $this->grievanceInterface->findById($id);
+        if (! $record) {
+            return response()->json(['message' => 'Grievance record not found'], 404);
+        }
+
+        $validatedData = $request->validated();
+
+        $evidence = json_decode($record->evidence, true) ?? [];
+
+        if ($request->has('removeEvidence')) {
+            $removeEvidence = $request->input('removeEvidence');
+
+            if (is_array($removeEvidence)) {
+                foreach ($removeEvidence as $removeItem) {
+                    $this->grievanceService->removeOldDocumentFromStorage($removeItem);
+                }
+
+                $evidence = array_values(array_filter($evidence, function ($doc) use ($removeEvidence) {
+                    return ! in_array($doc['gsutil_uri'], $removeEvidence);
+                }));
+            }
+        }
+
+        if ($request->hasFile('evidence')) {
+            $newEvidence = [];
+
+            foreach ($request->file('evidence') as $file) {
+                $uploadResult = $this->grievanceService->uploadImageToGCS($file, 'evidence');
+
+                if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
+                    $newEvidence[] = [
+                        'gsutil_uri' => $uploadResult['gsutil_uri'],
+                        'file_name'  => $uploadResult['file_name'],
+                    ];
+                }
+            }
+
+            $evidence = array_merge($evidence, $newEvidence);
+        }
+
+        $validatedData['evidence'] = json_encode($evidence);
+
+        $updated = $this->grievanceInterface->update($id, $validatedData);
+
+        if ($updated) {
+            return response()->json([
+                'message' => 'Grievance record updated successfully',
+                'record'  => $this->grievanceInterface->findById($id),
+            ], 200);
+        } else {
+            return response()->json(['message' => 'Failed to update grievance record'], 500);
+        }
+    }
+
+
+
+      public function storeComGri(GrStoreComGriRequest $request)
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $data                    = $request->validated();
+        $data['createdByUserId'] = $user->id;
+        $record                  = $this->grievanceInterface->create($data);
+
+        if (! $record) {
+            return response()->json(['message' => 'Failed to create grievance record'], 500);
+        }
+        $uploadedFiles = [];
+        if ($request->hasFile('evidence')) {
+            foreach ($request->file('evidence') as $file) {
+                $uploadedFiles[] = $this->grievanceService->uploadImageToGCS($file, 'evidence');
+            }
+        }
+
+        if (! empty($uploadedFiles)) {
+            $existingEvidence = (! empty($record->evidence) && is_string($record->evidence))
+            ? json_decode($record->evidence, true)
+            : [];
+
+            if (! is_array($existingEvidence)) {
+                $existingEvidence = [];
+            }
+
+            $mergedEvidence = array_merge($existingEvidence, $uploadedFiles);
+
+            $this->grievanceInterface->update($record->id, [
+                'evidence' => json_encode($mergedEvidence),
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Grievance record created successfully',
+            'record'  => $record,
+        ], 201);
+    }
+
+
+      public function updateComGri($id, GrStoreComGriRequest $request)
     {
         $user = Auth::user();
         if (! $user) {
