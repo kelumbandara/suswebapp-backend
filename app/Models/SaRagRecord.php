@@ -25,7 +25,7 @@ class SaRagRecord extends Model
         'sourceOfHiring',
         'function',
         'reportingManager',
-        'countryName',
+        'country',
         'state',
         'origin',
         'category',

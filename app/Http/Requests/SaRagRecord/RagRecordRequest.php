@@ -36,7 +36,7 @@ class RagRecordRequest extends FormRequest
             'sourceOfHiring'    => 'required|string',
             'function'          => 'nullable|string',
             'reportingManager'  => 'required|string',
-            'countryName'       => 'required|string',
+            'country'       => 'required|string',
             'state'             => 'required|string',
             'origin'            => 'required|string',
             'category'          => 'required|string',
