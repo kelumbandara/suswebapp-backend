@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SocialApps;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaRagRecord\RagRecordRequest;
 use App\Repositories\All\SaRagRecode\RagRecodeInterface;
+use App\Repositories\All\SaRrCountryName\RrCountryNameInterface;
 use App\Repositories\All\User\UserInterface;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,11 +12,13 @@ class SaRagRecodeController extends Controller
 {
     protected $ragRecodeInterface;
     protected $userInterface;
+    protected $rrCountryNameInterface;
 
-    public function __construct(RagRecodeInterface $ragRecodeInterface, UserInterface $userInterface)
+    public function __construct(RagRecodeInterface $ragRecodeInterface, UserInterface $userInterface, RrCountryNameInterface $rrCountryNameInterface)
     {
         $this->ragRecodeInterface = $ragRecodeInterface;
         $this->userInterface      = $userInterface;
+        $this->rrCountryNameInterface = $rrCountryNameInterface;
     }
 
 
@@ -30,6 +33,14 @@ class SaRagRecodeController extends Controller
                 $risk->createdByUser = $creator ?? (object) ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $risk->createdByUser = 'Unknown';
+            }
+
+
+            try {
+                $country                = $this->rrCountryNameInterface->getById($risk->country);
+                $risk->countryName = $country ?? (object) ['countryName' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $risk->countryName = 'Unknown';
             }
 
             return $risk;

@@ -29,7 +29,7 @@ return new class extends Migration
             $table->string('sourceOfHiring')->nullable();
             $table->string('function')->nullable();
             $table->string('reportingManager')->nullable();
-            $table->string('country')->nullable();
+            $table->integer('country')->nullable();
             $table->string('state')->nullable();
             $table->string('origin')->nullable();
             $table->string('category')->nullable();
