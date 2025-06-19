@@ -49,6 +49,14 @@ use App\Http\Controllers\SocialApps\SaGrievanceRecodeController;
 use App\Http\Controllers\SocialApps\SaGrSubmissionsController;
 use App\Http\Controllers\SocialApps\SaGrTopicController;
 use App\Http\Controllers\SocialApps\SaRagRecodeController;
+use App\Http\Controllers\SocialApps\SaRrCategoryController;
+use App\Http\Controllers\SocialApps\SaRrCountryNameController;
+use App\Http\Controllers\SocialApps\SaRrDesignationNameController;
+use App\Http\Controllers\SocialApps\SaRrEmployeeTypeController;
+use App\Http\Controllers\SocialApps\SaRrEmploymentTypeController;
+use App\Http\Controllers\SocialApps\SaRrFunctionController;
+use App\Http\Controllers\SocialApps\SaRrSourceOfHirngController;
+use App\Http\Controllers\SocialApps\SaRrStateController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditCategoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditFirmController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditRecodeController;
@@ -544,6 +552,29 @@ Route::post('grievance-topics', [SaGrTopicController::class, 'store']);
 Route::get('grievance-submissions', [SaGrSubmissionsController::class, 'index']);
 Route::post('grievance-submissions', [SaGrSubmissionsController::class, 'store']);
 
+Route::get('rag-designation-names', [SaRrDesignationNameController::class, 'index']);
+Route::post('rag-designation-names', [SaRrDesignationNameController::class, 'store']);
+
+Route::get('rag-functions', [SaRrFunctionController::class, 'index']);
+Route::post('rag-functions', [SaRrFunctionController::class, 'store']);
+
+Route::get('rag-source-of-hirng', [SaRrSourceOfHirngController::class, 'index']);
+Route::post('rag-source-of-hirng', [SaRrSourceOfHirngController::class, 'store']);
+
+Route::get('rag-employee-types', [SaRrEmployeeTypeController::class, 'index']);
+Route::post('rag-employee-types', [SaRrEmployeeTypeController::class, 'store']);
+
+Route::get('rag-country-names', [SaRrCountryNameController::class, 'index']);
+Route::post('rag-country-names', [SaRrCountryNameController::class, 'store']);
+
+Route::get('rag-state-names/{countryId}', [SaRrStateController::class, 'index']);
+Route::post('rag-state-names', [SaRrStateController::class, 'store']);
+
+Route::get('rag-category-names', [SaRrCategoryController::class, 'index']);
+Route::post('rag-category-names', [SaRrCategoryController::class, 'store']);
+
+Route::get('rag-employment-types', [SaRrEmploymentTypeController::class, 'index']);
+Route::post('rag-employment-types', [SaRrEmploymentTypeController::class, 'store']);
 
 
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
