@@ -311,21 +311,19 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('grievance-record', [SaGrievanceRecodeController::class, 'index']);
-    Route::post('grievance-record', [SaGrievanceRecodeController::class, 'store']);
     Route::post('grievance-record-que-sug-app', [SaGrievanceRecodeController::class, 'storeQuSuApp']);
     Route::post('grievance-record-que-sug-app/{id}/update', [SaGrievanceRecodeController::class, 'updateQuSuApp']);
     Route::post('grievance-record-com-gri', [SaGrievanceRecodeController::class, 'storeComGri']);
     Route::post('grievance-record-com-gri/{id}/update', [SaGrievanceRecodeController::class, 'updateComGri']);
-
-
-
     Route::post('grievance-record/{id}/update-status-inprogress', [SaGrievanceRecodeController::class, 'updateStatusInprogress']);
-
-    Route::post('grievance-record/{id}/update', [SaGrievanceRecodeController::class, 'update']);
+    Route::post('grievance-record/{id}/update-complete-status', [SaGrievanceRecodeController::class, 'updateCompleteStatus']);
     Route::delete('grievance-record/{id}/delete', [SaGrievanceRecodeController::class, 'destroy']);
     Route::post('grievance-record/{id}/feedback', [SaGrievanceRecodeController::class, 'updateFeedback']);
     Route::get('grievance-record-assign-task', [SaGrievanceRecodeController::class, 'assignTask']);
-    Route::post('grievance-record-assign-task-approved', [SaGrievanceRecodeController::class, 'assignTaskApproved']);
+    Route::post('grievance-record-assign-task-complete', [SaGrievanceRecodeController::class, 'assignTaskComplete']);
+
+    Route::post('grievance-record', [SaGrievanceRecodeController::class, 'store']);
+    Route::post('grievance-record/{id}/update', [SaGrievanceRecodeController::class, 'update']);
     Route::post('grievance-record/{id}/update-status-to-approved', [SaGrievanceRecodeController::class, 'updateStatusToApproved']);
 
     Route::get('rag-record', [SaRagRecodeController::class, 'index']);
