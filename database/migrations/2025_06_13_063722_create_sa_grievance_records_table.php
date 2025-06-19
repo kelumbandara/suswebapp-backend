@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('personType')->nullable();
             $table->string('name')->nullable();
             $table->string('gender')->nullable();
-            $table->integer('supervisor')->nullable();
+            $table->string('supervisor')->nullable();
             $table->string('employeeShift')->nullable();
             $table->string('location')->nullable();
             $table->string('submissionDate')->nullable();
