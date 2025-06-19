@@ -19,9 +19,7 @@ class SaRrStateController extends Controller
         $states = $this->rrStateInterface->findByCountryId($countryId);
 
         if ($states->isEmpty()) {
-            return response()->json([
-                'message' => 'No states found for the selected country.',
-            ], 404);
+            return response()->json();
         }
 
         return response()->json($states);

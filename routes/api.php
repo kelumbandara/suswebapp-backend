@@ -316,6 +316,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('grievance-record', [SaGrievanceRecodeController::class, 'index']);
     Route::post('grievance-record', [SaGrievanceRecodeController::class, 'store']);
+    Route::post('grievance-record-que-sug-app', [SaGrievanceRecodeController::class, 'storeQuSuApp']);
+        Route::post('grievance-record-que-sug-app/{id}/update', [SaGrievanceRecodeController::class, 'updateQuSuApp']);
+        Route::post('grievance-record/{id}/update-status-inprogress', [SaGrievanceRecodeController::class, 'updateStatusInprogress']);
+
     Route::post('grievance-record/{id}/update', [SaGrievanceRecodeController::class, 'update']);
     Route::delete('grievance-record/{id}/delete', [SaGrievanceRecodeController::class, 'destroy']);
     Route::post('grievance-record/{id}/feedback', [SaGrievanceRecodeController::class, 'updateFeedback']);
