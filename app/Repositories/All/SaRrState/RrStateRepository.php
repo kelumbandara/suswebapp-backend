@@ -21,5 +21,10 @@ class RrStateRepository extends BaseRepository implements RrStateInterface
         $this->model = $model;
     }
 
+     public function findByCountryId($countryId)
+    {
+        return $this->model->where('countryId', $countryId)->get();
+    }
+
 
 }

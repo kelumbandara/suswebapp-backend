@@ -8,7 +8,7 @@ class SaRrState extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'legalAdvisorId';
+    protected $primaryKey = 'stateId';
 
     protected $fillable = [
         'stateName',

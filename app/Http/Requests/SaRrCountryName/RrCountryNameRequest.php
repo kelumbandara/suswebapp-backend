@@ -11,7 +11,7 @@ class RrCountryNameRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,7 @@ class RrCountryNameRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'countryName' => 'required|string|unique:sa_rr_country_names,countryName',
         ];
     }
 }

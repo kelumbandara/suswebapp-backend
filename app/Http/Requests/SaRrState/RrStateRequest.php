@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Http\Requests\SaRrState;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class RrStateRequest extends FormRequest
 {
@@ -11,7 +11,7 @@ class RrStateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,15 @@ class RrStateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'countryId' => 'required|integer',
+            'stateName' => [
+                'required',
+                'string',
+                Rule::unique('sa_rr_states')->where(function ($query) {
+                    return $query->where('countryId', $this->countryId);
+                }),
+            ],
         ];
     }
+
 }
