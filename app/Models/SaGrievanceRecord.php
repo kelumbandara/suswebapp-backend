@@ -53,6 +53,7 @@ class SaGrievanceRecord extends Model
         'tenureSplit',
         'designation',
         'department',
+        'division',
         'feedback',
         'stars',
         'status',

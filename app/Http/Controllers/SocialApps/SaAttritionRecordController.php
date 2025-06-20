@@ -1,22 +1,25 @@
 <?php
+
 namespace App\Http\Controllers\SocialApps;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\SaRagRecord\RagRecordRequest;
-use App\Repositories\All\SaRagRecode\RagRecodeInterface;
+use App\Http\Requests\SaAttritionRecord\AttritionRecordRequest;
+use App\Repositories\All\SaAttritionRecord\AttritionRecordInterface;
 use App\Repositories\All\SaRrCountryName\RrCountryNameInterface;
 use App\Repositories\All\User\UserInterface;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class SaRagRecodeController extends Controller
+class SaAttritionRecordController extends Controller
 {
-    protected $ragRecodeInterface;
+
+     protected $attritionRecordInterface;
     protected $userInterface;
     protected $rrCountryNameInterface;
 
-    public function __construct(RagRecodeInterface $ragRecodeInterface, UserInterface $userInterface, RrCountryNameInterface $rrCountryNameInterface)
+    public function __construct(AttritionRecordInterface $attritionRecordInterface, UserInterface $userInterface, RrCountryNameInterface $rrCountryNameInterface)
     {
-        $this->ragRecodeInterface = $ragRecodeInterface;
+        $this->attritionRecordInterface = $attritionRecordInterface;
         $this->userInterface      = $userInterface;
         $this->rrCountryNameInterface = $rrCountryNameInterface;
     }
@@ -24,7 +27,7 @@ class SaRagRecodeController extends Controller
 
      public function index()
     {
-        $record = $this->ragRecodeInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+        $record = $this->attritionRecordInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         $record = $record->map(function ($risk) {
 
@@ -49,7 +52,7 @@ class SaRagRecodeController extends Controller
         return response()->json($record, 200);
     }
 
-    public function store(RagRecordRequest $request)
+    public function store(AttritionRecordRequest $request)
     {
 
         $user = Auth::user();
@@ -62,44 +65,42 @@ class SaRagRecodeController extends Controller
         $validatedData['createdByUser'] = $userId;
 
 
-        $record = $this->ragRecodeInterface->create($validatedData);
+        $record = $this->attritionRecordInterface->create($validatedData);
 
         return response()->json([
-            'message'    => 'RAG record created successfully!',
+            'message'    => 'Attrition record created successfully!',
             'record' => $record,
         ], 201);
     }
 
-        public function update($id, RagRecordRequest $request)
+        public function update($id, AttritionRecordRequest $request)
     {
-        $record = $this->ragRecodeInterface->findById($id);
+        $record = $this->attritionRecordInterface->findById($id);
 
         if (! $record) {
-            return response()->json(['message' => 'RAG record not found.'], 404);
+            return response()->json(['message' => 'Attrition record not found.'], 404);
         }
 
         $validatedData = $request->validated();
-        $updated = $this->ragRecodeInterface->update($id, $validatedData);
+        $updated = $this->attritionRecordInterface->update($id, $validatedData);
 
         if ($updated) {
             return response()->json([
-                'message'    => 'RAG record updated successfully!',
-                'record' => $this->ragRecodeInterface->findById($id),
+                'message'    => 'Attrition record updated successfully!',
+                'record' => $this->attritionRecordInterface->findById($id),
             ], 200);
         } else {
-            return response()->json(['message' => 'Failed to update the RAG record.'], 500);
+            return response()->json(['message' => 'Failed to update the attrition record.'], 500);
         }
     }
 
     public function destroy($id)
     {
-        $deleted = $this->ragRecodeInterface->deleteById($id);
+        $deleted = $this->attritionRecordInterface->deleteById($id);
 
         return response()->json([
             'message' => $deleted ? 'Record deleted successfully!' : 'Failed to delete record.',
         ], $deleted ? 200 : 500);
     }
-
-
 
 }

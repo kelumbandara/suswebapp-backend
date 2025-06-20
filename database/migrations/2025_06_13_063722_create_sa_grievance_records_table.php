@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('channel')->nullable();
             $table->string('category')->nullable();
             $table->string('topic')->nullable();
-            $table->string('submission')->nullable();
+            $table->string('submissions')->nullable();
             $table->string('description')->nullable();
             $table->string('dueDate')->nullable();
             $table->string('businessUnit')->nullable();
@@ -55,6 +55,7 @@ return new class extends Migration
             $table->string('tenureSplit')->nullable();
             $table->string('designation')->nullable();
             $table->string('department')->nullable();
+            $table->string('division')->nullable();
             $table->string('feedback')->nullable();
             $table->integer('stars')->nullable();
             $table->integer('assigneeId')->nullable();

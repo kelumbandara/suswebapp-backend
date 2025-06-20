@@ -43,6 +43,9 @@ use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineNameFormControlle
 use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineRequestController;
 use App\Http\Controllers\HealthAndSaftyControllers\OsMiMedicineTypeController;
 use App\Http\Controllers\ImageUploadController;
+use App\Http\Controllers\SocialApps\SaArEmploymentClassificationController;
+use App\Http\Controllers\SocialApps\SaArResignationTypeController;
+use App\Http\Controllers\SocialApps\SaAttritionRecordController;
 use App\Http\Controllers\SocialApps\SaGrCategoryController;
 use App\Http\Controllers\SocialApps\SaGrChannelController;
 use App\Http\Controllers\SocialApps\SaGrievanceRecodeController;
@@ -331,6 +334,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('rag-record/{id}/update', [SaRagRecodeController::class, 'update']);
     Route::delete('rag-record/{id}/delete', [SaRagRecodeController::class, 'destroy']);
 
+    Route::get('attrition-record', [SaAttritionRecordController::class, 'index']);
+    Route::post('attrition-record', [SaAttritionRecordController::class, 'store']);
+    Route::post('attrition-record/{id}/update', [SaAttritionRecordController::class, 'update']);
+    Route::delete('attrition-record/{id}/delete', [SaAttritionRecordController::class, 'destroy']);
+
 });
 
 Route::get('user-permissions', [ComPermissionController::class, 'index']);
@@ -576,6 +584,24 @@ Route::post('rag-category-names', [SaRrCategoryController::class, 'store']);
 
 Route::get('rag-employment-types', [SaRrEmploymentTypeController::class, 'index']);
 Route::post('rag-employment-types', [SaRrEmploymentTypeController::class, 'store']);
+
+Route::get('attrition-resignation-types', [SaArResignationTypeController::class, 'index']);
+Route::post('attrition-resignation-types', [SaArResignationTypeController::class, 'store']);
+
+Route::get('attrition-employment-classifications', [SaArEmploymentClassificationController::class, 'index']);
+Route::post('attrition-employment-classifications', [SaArEmploymentClassificationController::class, 'store']);
+
+Route::get('attrition-designation-names', [SaRrDesignationNameController::class, 'index']);
+Route::post('attrition-designation-names', [SaRrDesignationNameController::class, 'store']);
+
+Route::get('attrition-country-names', [SaRrCountryNameController::class, 'index']);
+Route::post('attrition-country-names', [SaRrCountryNameController::class, 'store']);
+
+Route::get('attrition-state-names/{countryId}', [SaRrStateController::class, 'index']);
+Route::post('attrition-state-names', [SaRrStateController::class, 'store']);
+
+Route::get('attrition-employee-types', [SaRrEmployeeTypeController::class, 'index']);
+Route::post('attrition-employee-types', [SaRrEmployeeTypeController::class, 'store']);
 
 Route::get('image/{imageId}', [ImageUploadController::class, 'getImage']);
 Route::post('upload', [ImageUploadController::class, 'uploadImage']);
