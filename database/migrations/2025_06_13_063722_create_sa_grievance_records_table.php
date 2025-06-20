@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('gender')->nullable();
             $table->string('supervisor')->nullable();
+            $table->string('employeeId')->nullable();
             $table->string('employeeShift')->nullable();
             $table->string('location')->nullable();
             $table->string('submissionDate')->nullable();

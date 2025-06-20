@@ -27,6 +27,7 @@ class GrStoreQuSuAppRequest extends FormRequest
             'name'                  => 'required|string',
             'gender'                => 'required|string',
             'employeeShift'         => 'required|string',
+            'employeeId'            => 'required|string',
             'submissionDate'        => 'nullable|string',
             'businessUnit'          => 'required|string',
             'isAnonymous'           => 'boolean|nullable',

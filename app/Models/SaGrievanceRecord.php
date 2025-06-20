@@ -19,6 +19,7 @@ class SaGrievanceRecord extends Model
         'gender',
         'supervisor',
         'employeeShift',
+        'employeeId',
         'location',
         'submissionDate',
         'isAnonymous',
