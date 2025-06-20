@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('sa_ar_resignation_types', function (Blueprint $table) {
             $table->id();
+            $table->string('resignationTypeName')->nullable();
             $table->timestamps();
         });
     }

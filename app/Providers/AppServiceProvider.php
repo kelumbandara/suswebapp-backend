@@ -127,6 +127,11 @@ use App\Repositories\All\SaAiInternalAuditFactory\InternalAuditFactoryInterface;
 use App\Repositories\All\SaAiInternalAuditFactory\InternalAuditFactoryRepository;
 use App\Repositories\All\SaAiInternalAuditRecode\InternalAuditRecodeInterface;
 use App\Repositories\All\SaAiInternalAuditRecode\InternalAuditRecodeRepository;
+use App\Repositories\All\SaArEmploymentClassification\ArEmploymentClassificationInterface;
+use App\Repositories\All\SaArEmploymentClassification\ArEmploymentClassificationRepository;
+use App\Repositories\All\SaArResignationType\ArResignationTypeInterface;
+use App\Repositories\All\SaAttritionRecord\AttritionRecordInterface;
+use App\Repositories\All\SaAttritionRecord\AttritionRecordRepository;
 use App\Repositories\All\SaCmChemicalManagementRecode\ChemicalManagementRecodeInterface;
 use App\Repositories\All\SaCmChemicalManagementRecode\ChemicalManagementRecodeRepository;
 use App\Repositories\All\SaCmCmrChemicalFormType\ChemicalFormTypeInterface;
@@ -348,6 +353,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(RrStateInterface::class, RrStateRepository::class);
         $this->app->bind(RrCategoryInterface::class,   RrCategoryRepository::class);
         $this->app->bind(RrEmploymentTypeInterface::class, RrEmploymentTypeRepository::class);
+        $this->app->bind(AttritionRecordInterface::class, AttritionRecordRepository::class);
+        $this->app->bind(ArResignationTypeInterface::class, ArResignationTypeInterface::class);
+        $this->app->bind(ArEmploymentClassificationInterface::class, ArEmploymentClassificationRepository::class);
 
     }
 }

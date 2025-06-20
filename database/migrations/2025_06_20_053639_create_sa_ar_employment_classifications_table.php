@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('sa_ar_employment_classifications', function (Blueprint $table) {
             $table->id();
+            $table->string('employmentClassificationName')->nullable();
             $table->timestamps();
         });
     }
