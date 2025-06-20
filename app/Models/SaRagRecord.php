@@ -32,6 +32,7 @@ class SaRagRecord extends Model
         'discussionSummary',
         'remark',
         'employmentType',
+        'rag',
         'status',
         'createdByUser',
         'updatedBy',

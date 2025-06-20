@@ -43,6 +43,8 @@ class RagRecordRequest extends FormRequest
             'discussionSummary' => 'required|string',
             'remark'            => 'required|string',
             'employmentType'    => 'required|string',
+            'status'            => 'nullable|string',
+            'rag'               => 'nullable|string',
         ];
     }
 }
