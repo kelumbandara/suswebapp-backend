@@ -36,6 +36,7 @@ return new class extends Migration
             $table->string('discussionSummary')->nullable();
             $table->string('remark')->nullable();
             $table->string('employmentType')->nullable();
+            $table->enum('rag', ['red', 'amber', 'green'])->nullable();
             $table->enum('status', ['inprogress', 'approved', 'rejected', 'published', 'ongoing', 'draft', 'scheduled', 'completed', 'open'])->default('draft')->nullable();
             $table->integer('createdByUser')->nullable();
             $table->integer('updatedBy')->nullable();
