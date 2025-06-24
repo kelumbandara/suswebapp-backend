@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('referenceNumber')->nullable();
             $table->string('employeeName')->nullable();
             $table->string('employeeId')->nullable();
-            $table->string('countryName')->nullable();
+            $table->string('country')->nullable();
             $table->string('state')->nullable();
             $table->string('resignedDate')->nullable();
             $table->string('relievedDate')->nullable();

@@ -13,7 +13,7 @@ class SaAttritionRecord extends Model
         'referenceNumber',
         'employeeName',
         'employeeId',
-        'countryName',
+        'country',
         'state',
         'resignedDate',
         'relievedDate',
