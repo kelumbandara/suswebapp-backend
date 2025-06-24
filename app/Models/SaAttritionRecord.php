@@ -18,6 +18,7 @@ class SaAttritionRecord extends Model
         'resignedDate',
         'relievedDate',
         'division',
+        'gender',
         'designation',
         'department',
         'perDaySalary',

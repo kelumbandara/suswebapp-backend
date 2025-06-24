@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\SaAttritionRecord;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -21,17 +20,18 @@ class AttritionRecordRequest extends FormRequest
      */
     public function rules(): array
     {
-         return [
+        return [
             'employeeName'             => 'required|string',
             'employeeId'               => 'required|string',
-            'country'              => 'required|integer',
+            'country'                  => 'required|integer',
             'state'                    => 'required|string',
             'resignedDate'             => 'required|string',
             'relievedDate'             => 'required|string',
             'division'                 => 'required|string',
+            'gender'                   => 'required|string',
             'designation'              => 'required|string',
             'department'               => 'required|string',
-            'perDaySalary'            => 'required|string',
+            'perDaySalary'             => 'required|string',
             'dateOfJoin'               => 'required|string',
             'employmentClassification' => 'required|string',
             'employmentType'           => 'required|string',
