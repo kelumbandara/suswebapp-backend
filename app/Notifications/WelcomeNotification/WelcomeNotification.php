@@ -11,7 +11,7 @@ class WelcomeNotification extends Notification
 
     protected $name;
     protected $organizationName;
-    protected $logoUrl;
+    protected $logoUrl; 
     protected $organizationFactoryName;
 
     public function __construct($name , $organizationName, $logoUrl, $organizationFactoryName)
