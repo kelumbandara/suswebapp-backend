@@ -7,13 +7,12 @@ use App\Http\Requests\SaAttritionRecord\AttritionRecordRequest;
 use App\Repositories\All\SaAttritionRecord\AttritionRecordInterface;
 use App\Repositories\All\SaRrCountryName\RrCountryNameInterface;
 use App\Repositories\All\User\UserInterface;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SaAttritionRecordController extends Controller
 {
 
-     protected $attritionRecordInterface;
+    protected $attritionRecordInterface;
     protected $userInterface;
     protected $rrCountryNameInterface;
 
@@ -25,7 +24,7 @@ class SaAttritionRecordController extends Controller
     }
 
 
-     public function index()
+    public function index()
     {
         $record = $this->attritionRecordInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
@@ -72,6 +71,7 @@ class SaAttritionRecordController extends Controller
             'record' => $record,
         ], 201);
     }
+
 
         public function update($id, AttritionRecordRequest $request)
     {
