@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('country')->nullable();
             $table->string('state')->nullable();
             $table->string('resignedDate')->nullable();
+            $table->string('gender')->nullable();
             $table->string('relievedDate')->nullable();
             $table->string('division')->nullable();
             $table->string('designation')->nullable();
