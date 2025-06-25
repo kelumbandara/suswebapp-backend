@@ -44,11 +44,7 @@ class AttritionRecordRequest extends FormRequest
             'isNormalResignation'      => 'required|boolean',
             'remark'                   => 'nullable|string',
             'status'                   => 'nullable|string',
-            'createdByUser'            => 'nullable|integer',
-            'updatedBy'                => 'nullable|integer',
-            'rejectedBy'               => 'nullable|integer',
-            'inprogressBy'             => 'nullable|integer',
-            'approvedBy'               => 'nullable|integer',
+            
         ];
     }
 }
