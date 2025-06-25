@@ -4,7 +4,6 @@ namespace App\Http\Controllers\SocialApps;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaRagRecord\RagRecordRequest;
 use App\Repositories\All\SaRagRecode\RagRecodeInterface;
-use App\Repositories\All\SaRrCountryName\RrCountryNameInterface;
 use App\Repositories\All\User\UserInterface;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,15 +18,14 @@ class SaRagRecodeController extends Controller
         $this->userInterface      = $userInterface;
     }
 
-
-     public function index()
+    public function index()
     {
         $record = $this->ragRecodeInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         $record = $record->map(function ($risk) {
 
             try {
-                $creator                 = $this->userInterface->getById($risk->createdByUser);
+                $creator             = $this->userInterface->getById($risk->createdByUser);
                 $risk->createdByUser = $creator ?? (object) ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $risk->createdByUser = 'Unknown';
@@ -51,16 +49,15 @@ class SaRagRecodeController extends Controller
         $validatedData                  = $request->validated();
         $validatedData['createdByUser'] = $userId;
 
-
         $record = $this->ragRecodeInterface->create($validatedData);
 
         return response()->json([
-            'message'    => 'RAG record created successfully!',
-            'record' => $record,
+            'message' => 'RAG record created successfully!',
+            'record'  => $record,
         ], 201);
     }
 
-        public function update($id, RagRecordRequest $request)
+    public function update($id, RagRecordRequest $request)
     {
         $record = $this->ragRecodeInterface->findById($id);
 
@@ -69,12 +66,12 @@ class SaRagRecodeController extends Controller
         }
 
         $validatedData = $request->validated();
-        $updated = $this->ragRecodeInterface->update($id, $validatedData);
+        $updated       = $this->ragRecodeInterface->update($id, $validatedData);
 
         if ($updated) {
             return response()->json([
-                'message'    => 'RAG record updated successfully!',
-                'record' => $this->ragRecodeInterface->findById($id),
+                'message' => 'RAG record updated successfully!',
+                'record'  => $this->ragRecodeInterface->findById($id),
             ], 200);
         } else {
             return response()->json(['message' => 'Failed to update the RAG record.'], 500);
@@ -90,6 +87,27 @@ class SaRagRecodeController extends Controller
         ], $deleted ? 200 : 500);
     }
 
+    public function getRagTotalRecord($startDate, $endDate)
+    {
+        $records = $this->ragRecodeInterface->filterByParams($startDate, $endDate);
 
+        $total = $records->count();
+
+        $ragCounts = $records->groupBy('rag')->map(function ($group) use ($total) {
+            return [
+                'count'      => $group->count(),
+                'percentage' => $total > 0 ? round(($group->count() / $total) * 100, 2) : 0,
+            ];
+        });
+
+        $result = [
+            'total' => $total,
+            'red'   => $ragCounts['red'] ?? ['count' => 0, 'percentage' => 0],
+            'amber' => $ragCounts['amber'] ?? ['count' => 0, 'percentage' => 0],
+            'green' => $ragCounts['green'] ?? ['count' => 0, 'percentage' => 0],
+        ];
+
+        return response()->json($result);
+    }
 
 }
