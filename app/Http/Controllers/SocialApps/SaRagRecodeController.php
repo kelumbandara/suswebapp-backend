@@ -87,29 +87,49 @@ class SaRagRecodeController extends Controller
         ], $deleted ? 200 : 500);
     }
 
-public function getRagTotalRecord($startDate, $endDate)
-{
-    $allRecords = $this->ragRecodeInterface->filterByParams($startDate, $endDate);
-    $filledRagRecords = $allRecords->whereNotNull('rag');
+    public function getRagTotalRecord($startDate, $endDate)
+    {
+        $allRecords       = $this->ragRecodeInterface->filterByParams($startDate, $endDate);
+        $filledRagRecords = $allRecords->whereNotNull('rag');
 
-    $totalAll = $allRecords->count();
-    $totalFilled = $filledRagRecords->count();
+        $totalAll    = $allRecords->count();
+        $totalFilled = $filledRagRecords->count();
 
-    $ragCounts = $filledRagRecords->groupBy('rag')->map(function ($group) use ($totalFilled) {
-        return [
-            'count' => $group->count(),
-            'percentage' => $totalFilled > 0 ? round(($group->count() / $totalFilled) * 100, 2) : 0,
-        ];
-    });
+        $ragCounts = $filledRagRecords->groupBy('rag')->map(function ($group) use ($totalFilled) {
+            return [
+                'count'      => $group->count(),
+                'percentage' => $totalFilled > 0 ? round(($group->count() / $totalFilled) * 100, 2) : 0,
+            ];
+        });
 
-    return response()->json([
-        'totalRecords' => $totalAll,
-        'totalRag' => $totalFilled,
-        'ragPercentage' => $totalAll > 0 ? round(($totalFilled / $totalAll) * 100, 2) : 0,
-        'red' => $ragCounts['red'] ?? ['count' => 0, 'percentage' => 0],
-        'amber' => $ragCounts['amber'] ?? ['count' => 0, 'percentage' => 0],
-        'green' => $ragCounts['green'] ?? ['count' => 0, 'percentage' => 0],
-    ]);
-}
+        return response()->json([
+            'totalRecords'  => $totalAll,
+            'totalRag'      => $totalFilled,
+            'ragPercentage' => $totalAll > 0 ? round(($totalFilled / $totalAll) * 100, 2) : 0,
+            'red'           => $ragCounts['red'] ?? ['count' => 0, 'percentage' => 0],
+            'amber'         => $ragCounts['amber'] ?? ['count' => 0, 'percentage' => 0],
+            'green'         => $ragCounts['green'] ?? ['count' => 0, 'percentage' => 0],
+        ]);
+    }
+
+    public function getCategoryTotalRecord($startDate, $endDate)
+    {
+        $allRecords = $this->ragRecodeInterface->filterByParams($startDate, $endDate);
+
+        $filledCategoryRecords = $allRecords->whereNotNull('category');
+
+        $totalFilled = $filledCategoryRecords->count();
+
+        $categoryCounts = $filledCategoryRecords->groupBy('category')->map(function ($group) use ($totalFilled) {
+            return [
+                'count'      => $group->count(),
+                'percentage' => $totalFilled > 0 ? round(($group->count() / $totalFilled) * 100, 2) : 0,
+            ];
+        });
+
+        return response()->json([
+             $categoryCounts,
+        ]);
+    }
 
 }

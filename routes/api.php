@@ -332,6 +332,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('rag-record/{id}/update', [SaRagRecodeController::class, 'update']);
     Route::delete('rag-record/{id}/delete', [SaRagRecodeController::class, 'destroy']);
     Route::get('rag-dashboard/{startDate}/{endDate}/rag-total-record', [SaRagRecodeController::class, 'getRagTotalRecord']);
+    Route::get('rag-dashboard/{startDate}/{endDate}/category-total-record', [SaRagRecodeController::class, 'getCategoryTotalRecord']);
 
 
     Route::get('attrition-record', [SaAttritionRecordController::class, 'index']);
