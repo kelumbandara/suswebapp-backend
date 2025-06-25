@@ -128,11 +128,11 @@ class SaRagRecodeController extends Controller
         });
 
         return response()->json([
-             $categoryCounts,
+            $categoryCounts,
         ]);
     }
 
-     public function getGenderTotalRecord($startDate, $endDate)
+    public function getGenderTotalRecord($startDate, $endDate)
     {
         $allRecords = $this->ragRecodeInterface->filterByParams($startDate, $endDate);
 
@@ -148,10 +148,10 @@ class SaRagRecodeController extends Controller
         });
 
         return response()->json([
-             $GenderCounts,
+            $GenderCounts,
         ]);
     }
-     public function getStatusTotalRecord($startDate, $endDate)
+    public function getStatusTotalRecord($startDate, $endDate)
     {
         $allRecords = $this->ragRecodeInterface->filterByParams($startDate, $endDate);
 
@@ -167,7 +167,226 @@ class SaRagRecodeController extends Controller
         });
 
         return response()->json([
-             $StatusCounts,
+            $StatusCounts,
         ]);
     }
+
+    public function getEmployeeTypeRecord($startDate, $endDate)
+    {
+        $allRecords = $this->ragRecodeInterface->filterByParams($startDate, $endDate);
+
+        $filledEmployeeTypeRecords = $allRecords->whereNotNull('employeeType');
+
+        $totalFilled = $filledEmployeeTypeRecords->count();
+
+        $employeeTypeCounts = $filledEmployeeTypeRecords->groupBy('employeeType')->map(function ($group) use ($totalFilled) {
+            return [
+                'count'      => $group->count(),
+                'percentage' => $totalFilled > 0 ? round(($group->count() / $totalFilled) * 100, 2) : 0,
+            ];
+        });
+
+        return response()->json([
+            $employeeTypeCounts,
+        ]);
+    }
+
+    public function getStateTotalRecord($startDate, $endDate)
+    {
+        $allRecords = $this->ragRecodeInterface->filterByParams($startDate, $endDate);
+
+        $filledEmployeeTypeRecords = $allRecords->whereNotNull('state');
+
+        $totalFilled = $filledEmployeeTypeRecords->count();
+
+        $employeeTypeCounts = $filledEmployeeTypeRecords->groupBy('state')->map(function ($group) use ($totalFilled) {
+            return [
+                'count'      => $group->count(),
+                'percentage' => $totalFilled > 0 ? round(($group->count() / $totalFilled) * 100, 2) : 0,
+            ];
+        });
+
+        return response()->json([
+            $employeeTypeCounts,
+        ]);
+    }
+
+    public function getAgeTotalRecord($startDate, $endDate)
+    {
+        $allRecords = $this->ragRecodeInterface->filterByParams($startDate, $endDate);
+
+        $filtered = $allRecords->whereNotNull('age')->filter(function ($item) {
+            return is_numeric($item->age);
+        });
+
+        $total = $filtered->count();
+
+        $ageGroups = [
+            '18-28' => 0,
+            '29-39' => 0,
+            '40-50' => 0,
+            '51-61' => 0,
+            '62-72' => 0,
+            '73-83' => 0,
+            '84-94' => 0,
+        ];
+
+        foreach ($filtered as $record) {
+            $age = (int) $record->age;
+
+            if ($age >= 18 && $age <= 28) {
+                $ageGroups['18-28']++;
+            } elseif ($age >= 29 && $age <= 39) {
+                $ageGroups['29-39']++;
+            } elseif ($age >= 40 && $age <= 50) {
+                $ageGroups['40-50']++;
+            } elseif ($age >= 51 && $age <= 61) {
+                $ageGroups['51-61']++;
+            } elseif ($age >= 62 && $age <= 72) {
+                $ageGroups['62-72']++;
+            } elseif ($age >= 73 && $age <= 83) {
+                $ageGroups['73-83']++;
+            } elseif ($age >= 84 && $age <= 94) {
+                $ageGroups['84-94']++;
+            }
+        }
+
+        $formatted = [];
+        foreach ($ageGroups as $range => $count) {
+            $formatted[$range] = [
+                'count'      => $count,
+                'percentage' => $total > 0 ? round(($count / $total) * 100, 2) : 0,
+            ];
+        }
+
+        return response()->json([
+            'totalAge'        => $total,
+            'ageGroupSummary' => $formatted,
+        ]);
+    }
+
+    public function getAllSummary($year)
+    {
+        $startDate = \Carbon\Carbon::parse("$year-01-01");
+        $endDate   = \Carbon\Carbon::parse("$year-12-31");
+
+        $allRecords = $this->ragRecodeInterface->filterByParams($startDate, $endDate);
+
+        $filledRagRecords = $allRecords->whereNotNull('rag');
+        $totalRagAll      = $allRecords->count();
+        $totalRagFilled   = $filledRagRecords->count();
+        $ragCounts        = $filledRagRecords->groupBy('rag')->map(function ($group) use ($totalRagFilled) {
+            return [
+                'count'      => $group->count(),
+                'percentage' => $totalRagFilled > 0 ? round(($group->count() / $totalRagFilled) * 100, 2) : 0,
+            ];
+        });
+
+        $filledCategoryRecords = $allRecords->whereNotNull('category');
+        $totalCategoryFilled   = $filledCategoryRecords->count();
+        $categoryCounts        = $filledCategoryRecords->groupBy('category')->map(function ($group) use ($totalCategoryFilled) {
+            return [
+                'count'      => $group->count(),
+                'percentage' => $totalCategoryFilled > 0 ? round(($group->count() / $totalCategoryFilled) * 100, 2) : 0,
+            ];
+        });
+
+        $filledGenderRecords = $allRecords->whereNotNull('gender');
+        $totalGenderFilled   = $filledGenderRecords->count();
+        $genderCounts        = $filledGenderRecords->groupBy('gender')->map(function ($group) use ($totalGenderFilled) {
+            return [
+                'count'      => $group->count(),
+                'percentage' => $totalGenderFilled > 0 ? round(($group->count() / $totalGenderFilled) * 100, 2) : 0,
+            ];
+        });
+
+        $filledStatusRecords = $allRecords->whereNotNull('status');
+        $totalStatusFilled   = $filledStatusRecords->count();
+        $statusCounts        = $filledStatusRecords->groupBy('status')->map(function ($group) use ($totalStatusFilled) {
+            return [
+                'count'      => $group->count(),
+                'percentage' => $totalStatusFilled > 0 ? round(($group->count() / $totalStatusFilled) * 100, 2) : 0,
+            ];
+        });
+
+        $filledEmpTypeRecords = $allRecords->whereNotNull('employeeType');
+        $totalEmpTypeFilled   = $filledEmpTypeRecords->count();
+        $empTypeCounts        = $filledEmpTypeRecords->groupBy('employeeType')->map(function ($group) use ($totalEmpTypeFilled) {
+            return [
+                'count'      => $group->count(),
+                'percentage' => $totalEmpTypeFilled > 0 ? round(($group->count() / $totalEmpTypeFilled) * 100, 2) : 0,
+            ];
+        });
+
+        $filledStateRecords = $allRecords->whereNotNull('state');
+        $totalStateFilled   = $filledStateRecords->count();
+        $stateCounts        = $filledStateRecords->groupBy('state')->map(function ($group) use ($totalStateFilled) {
+            return [
+                'count'      => $group->count(),
+                'percentage' => $totalStateFilled > 0 ? round(($group->count() / $totalStateFilled) * 100, 2) : 0,
+            ];
+        });
+
+        $filteredAgeRecords = $allRecords->whereNotNull('age')->filter(function ($item) {
+            return is_numeric($item->age);
+        });
+        $totalAgeFilled = $filteredAgeRecords->count();
+
+        $ageGroups = [
+            '18-28' => 0,
+            '29-39' => 0,
+            '40-50' => 0,
+            '51-61' => 0,
+            '62-72' => 0,
+            '73-83' => 0,
+            '84-94' => 0,
+        ];
+        foreach ($filteredAgeRecords as $record) {
+            $age = (int) $record->age;
+            if ($age >= 18 && $age <= 28) {
+                $ageGroups['18-28']++;
+            } elseif ($age >= 29 && $age <= 39) {
+                $ageGroups['29-39']++;
+            } elseif ($age >= 40 && $age <= 50) {
+                $ageGroups['40-50']++;
+            } elseif ($age >= 51 && $age <= 61) {
+                $ageGroups['51-61']++;
+            } elseif ($age >= 62 && $age <= 72) {
+                $ageGroups['62-72']++;
+            } elseif ($age >= 73 && $age <= 83) {
+                $ageGroups['73-83']++;
+            } elseif ($age >= 84 && $age <= 94) {
+                $ageGroups['84-94']++;
+            }
+        }
+        $ageCounts = [];
+        foreach ($ageGroups as $range => $count) {
+            $ageCounts[$range] = [
+                'count'      => $count,
+                'percentage' => $totalAgeFilled > 0 ? round(($count / $totalAgeFilled) * 100, 2) : 0,
+            ];
+        }
+
+        return response()->json([
+            'year'                => $year,
+            'ragSummary'          => [
+                'totalRecords'  => $totalRagAll,
+                'totalRag'      => $totalRagFilled,
+                'ragPercentage' => $totalRagAll > 0 ? round(($totalRagFilled / $totalRagAll) * 100, 2) : 0,
+                'red'           => $ragCounts['red'] ?? ['count' => 0, 'percentage' => 0],
+                'amber'         => $ragCounts['amber'] ?? ['count' => 0, 'percentage' => 0],
+                'green'         => $ragCounts['green'] ?? ['count' => 0, 'percentage' => 0],
+            ],
+            'categorySummary'     => $categoryCounts,
+            'genderSummary'       => $genderCounts,
+            'statusSummary'       => $statusCounts,
+            'employeeTypeSummary' => $empTypeCounts,
+            'stateSummary'        => $stateCounts,
+            'ageGroupSummary'     => [
+                'totalAge' => $totalAgeFilled,
+                'groups'   => $ageCounts,
+            ],
+        ]);
+    }
+
 }

@@ -335,6 +335,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('rag-dashboard/{startDate}/{endDate}/category-total-record', [SaRagRecodeController::class, 'getCategoryTotalRecord']);
     Route::get('rag-dashboard/{startDate}/{endDate}/gender-total-record', [SaRagRecodeController::class, 'getGenderTotalRecord']);
     Route::get('rag-dashboard/{startDate}/{endDate}/status-total-record', [SaRagRecodeController::class, 'getStatusTotalRecord']);
+    Route::get('rag-dashboard/{startDate}/{endDate}/employee-type-record', [SaRagRecodeController::class, 'getEmployeeTypeRecord']);
+    Route::get('rag-dashboard/{startDate}/{endDate}/state-total-record', [SaRagRecodeController::class, 'getStateTotalRecord']);
+    Route::get('rag-dashboard/{startDate}/{endDate}/age-total-record', [SaRagRecodeController::class, 'getAgeTotalRecord']);
+    Route::get('rag-dashboard/{year}/all-summary', [SaRagRecodeController::class, 'getAllSummary']);
 
 
     Route::get('attrition-record', [SaAttritionRecordController::class, 'index']);
