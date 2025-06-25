@@ -53,13 +53,11 @@ use App\Http\Controllers\SocialApps\SaGrSubmissionsController;
 use App\Http\Controllers\SocialApps\SaGrTopicController;
 use App\Http\Controllers\SocialApps\SaRagRecodeController;
 use App\Http\Controllers\SocialApps\SaRrCategoryController;
-use App\Http\Controllers\SocialApps\SaRrCountryNameController;
 use App\Http\Controllers\SocialApps\SaRrDesignationNameController;
 use App\Http\Controllers\SocialApps\SaRrEmployeeTypeController;
 use App\Http\Controllers\SocialApps\SaRrEmploymentTypeController;
 use App\Http\Controllers\SocialApps\SaRrFunctionController;
 use App\Http\Controllers\SocialApps\SaRrSourceOfHirngController;
-use App\Http\Controllers\SocialApps\SaRrStateController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditCategoryController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditFirmController;
 use App\Http\Controllers\SustainabilityAppsControllers\SaAiExternalAuditRecodeController;
@@ -573,12 +571,6 @@ Route::post('rag-source-of-hirng', [SaRrSourceOfHirngController::class, 'store']
 Route::get('rag-employee-types', [SaRrEmployeeTypeController::class, 'index']);
 Route::post('rag-employee-types', [SaRrEmployeeTypeController::class, 'store']);
 
-Route::get('rag-country-names', [SaRrCountryNameController::class, 'index']);
-Route::post('rag-country-names', [SaRrCountryNameController::class, 'store']);
-
-Route::get('rag-state-names/{countryId}', [SaRrStateController::class, 'index']);
-Route::post('rag-state-names', [SaRrStateController::class, 'store']);
-
 Route::get('rag-category-names', [SaRrCategoryController::class, 'index']);
 Route::post('rag-category-names', [SaRrCategoryController::class, 'store']);
 
@@ -593,12 +585,6 @@ Route::post('attrition-employment-classifications', [SaArEmploymentClassificatio
 
 Route::get('attrition-designation-names', [SaRrDesignationNameController::class, 'index']);
 Route::post('attrition-designation-names', [SaRrDesignationNameController::class, 'store']);
-
-Route::get('attrition-country-names', [SaRrCountryNameController::class, 'index']);
-Route::post('attrition-country-names', [SaRrCountryNameController::class, 'store']);
-
-Route::get('attrition-state-names/{countryId}', [SaRrStateController::class, 'index']);
-Route::post('attrition-state-names', [SaRrStateController::class, 'store']);
 
 Route::get('attrition-employee-types', [SaRrEmployeeTypeController::class, 'index']);
 Route::post('attrition-employee-types', [SaRrEmployeeTypeController::class, 'store']);
