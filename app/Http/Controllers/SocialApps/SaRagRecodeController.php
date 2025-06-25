@@ -12,13 +12,11 @@ class SaRagRecodeController extends Controller
 {
     protected $ragRecodeInterface;
     protected $userInterface;
-    protected $rrCountryNameInterface;
 
-    public function __construct(RagRecodeInterface $ragRecodeInterface, UserInterface $userInterface, RrCountryNameInterface $rrCountryNameInterface)
+    public function __construct(RagRecodeInterface $ragRecodeInterface, UserInterface $userInterface)
     {
         $this->ragRecodeInterface = $ragRecodeInterface;
         $this->userInterface      = $userInterface;
-        $this->rrCountryNameInterface = $rrCountryNameInterface;
     }
 
 
@@ -33,14 +31,6 @@ class SaRagRecodeController extends Controller
                 $risk->createdByUser = $creator ?? (object) ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $risk->createdByUser = 'Unknown';
-            }
-
-
-            try {
-                $country                = $this->rrCountryNameInterface->getById($risk->country);
-                $risk->countryName = $country ?? (object) ['countryName' => 'Unknown', 'id' => null];
-            } catch (\Exception $e) {
-                $risk->countryName = 'Unknown';
             }
 
             return $risk;
