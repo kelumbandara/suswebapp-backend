@@ -132,4 +132,42 @@ class SaRagRecodeController extends Controller
         ]);
     }
 
+     public function getGenderTotalRecord($startDate, $endDate)
+    {
+        $allRecords = $this->ragRecodeInterface->filterByParams($startDate, $endDate);
+
+        $filledGenderRecords = $allRecords->whereNotNull('gender');
+
+        $totalFilled = $filledGenderRecords->count();
+
+        $GenderCounts = $filledGenderRecords->groupBy('gender')->map(function ($group) use ($totalFilled) {
+            return [
+                'count'      => $group->count(),
+                'percentage' => $totalFilled > 0 ? round(($group->count() / $totalFilled) * 100, 2) : 0,
+            ];
+        });
+
+        return response()->json([
+             $GenderCounts,
+        ]);
+    }
+     public function getStatusTotalRecord($startDate, $endDate)
+    {
+        $allRecords = $this->ragRecodeInterface->filterByParams($startDate, $endDate);
+
+        $filledStatusRecords = $allRecords->whereNotNull('status');
+
+        $totalFilled = $filledStatusRecords->count();
+
+        $StatusCounts = $filledStatusRecords->groupBy('status')->map(function ($group) use ($totalFilled) {
+            return [
+                'count'      => $group->count(),
+                'percentage' => $totalFilled > 0 ? round(($group->count() / $totalFilled) * 100, 2) : 0,
+            ];
+        });
+
+        return response()->json([
+             $StatusCounts,
+        ]);
+    }
 }
