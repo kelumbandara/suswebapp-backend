@@ -23,7 +23,7 @@ class AttritionRecordRequest extends FormRequest
         return [
             'employeeName'             => 'required|string',
             'employeeId'               => 'required|string',
-            'country'                  => 'required|integer',
+            'country'                  => 'required|string',
             'state'                    => 'required|string',
             'resignedDate'             => 'required|string',
             'relievedDate'             => 'required|string',
@@ -44,7 +44,7 @@ class AttritionRecordRequest extends FormRequest
             'isNormalResignation'      => 'required|boolean',
             'remark'                   => 'nullable|string',
             'status'                   => 'nullable|string',
-            
+
         ];
     }
 }

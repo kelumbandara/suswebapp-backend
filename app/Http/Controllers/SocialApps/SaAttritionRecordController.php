@@ -14,13 +14,11 @@ class SaAttritionRecordController extends Controller
 
     protected $attritionRecordInterface;
     protected $userInterface;
-    protected $rrCountryNameInterface;
 
-    public function __construct(AttritionRecordInterface $attritionRecordInterface, UserInterface $userInterface, RrCountryNameInterface $rrCountryNameInterface)
+    public function __construct(AttritionRecordInterface $attritionRecordInterface, UserInterface $userInterface)
     {
         $this->attritionRecordInterface = $attritionRecordInterface;
         $this->userInterface      = $userInterface;
-        $this->rrCountryNameInterface = $rrCountryNameInterface;
     }
 
 
@@ -35,14 +33,6 @@ class SaAttritionRecordController extends Controller
                 $risk->createdByUser = $creator ?? (object) ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $risk->createdByUser = 'Unknown';
-            }
-
-
-            try {
-                $country                = $this->rrCountryNameInterface->getById($risk->country);
-                $risk->countryName = $country ?? (object) ['countryName' => 'Unknown', 'id' => null];
-            } catch (\Exception $e) {
-                $risk->countryName = 'Unknown';
             }
 
             return $risk;
