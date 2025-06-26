@@ -519,7 +519,7 @@ class DatabaseSeeder extends Seeder
         ComAssigneeLevel::factory()->create([
             'id'        => 3,
             'levelId'   => '3',
-            'levelName' => 'Excecutive',
+            'levelName' => 'Executive',
         ]);
         ComAssigneeLevel::factory()->create([
             'id'        => 4,
