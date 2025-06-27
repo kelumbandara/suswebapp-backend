@@ -173,6 +173,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('medicine-request/{id}/delete', [OsMiMedicineRequestController::class, 'destroy']);
     Route::get('medicine-request-assign-task', [OsMiMedicineRequestController::class, 'assignTask']);
     Route::get('medicine-request-assignee', [OsMiMedicineRequestController::class, 'assignee']);
+    Route::post('medicine-request-assign-task-approved', [OsMiMedicineRequestController::class, 'updateStatusToApproved']);
     Route::post('medicine-request/{id}/approve', [OsMiMedicineRequestController::class, 'approvedStatus']);
 
     Route::get('medicine-inventory', [OhMiPiMedicineInventoryController::class, 'index']);

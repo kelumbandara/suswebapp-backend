@@ -129,8 +129,54 @@ class OsMiMedicineRequestController extends Controller
         return response()->json($medicine, 200);
     }
 
+    public function updateStatusToApproved()
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+
+        $medicine = $this->medicineRequestInterface
+        ->getByAssigneeId($user->id)
+         ->filter(function ($med) {
+                return $med->status === 'approved';
+            })
+        ->sortByDesc('created_at')
+        ->sortByDesc('updated_at')
+        ->values();
+
+        $medicine = $medicine->map(function ($risk) {
+            try {
+                $approver       = $this->userInterface->getById($risk->approverId);
+                $risk->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $risk->approver = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $creator                 = $this->userInterface->getById($risk->createdByUser);
+                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->createdByUserName = 'Unknown';
+            }
+
+            return $risk;
+        });
+
+        return response()->json($medicine, 200);
+    }
+
     public function approvedStatus(string $id)
     {
+        $user = Auth::user();
+
+        if (! $user || $user->assigneeLevel != 5) {
+            return response()->json([
+                'message' => 'Unauthorized. Only CEO assignees can approve.',
+            ], 403);
+        }
         $medicineRequest = $this->medicineRequestInterface->findById($id);
 
         $this->medicineRequestInterface->update($id, ['status' => 'approved']);
