@@ -30,6 +30,11 @@ class SaRagRecodeController extends Controller
             } catch (\Exception $e) {
                 $risk->createdByUser = 'Unknown';
             }
+            if (is_array($risk->countryName) || is_object($risk->countryName)) {
+                $risk->countryName = (object) $risk->countryName;
+            } else {
+                $risk->countryName = (object) ['id' => null, 'countryName' => 'Unknown'];
+            }
 
             return $risk;
         });
@@ -59,14 +64,19 @@ class SaRagRecodeController extends Controller
 
     public function update($id, RagRecordRequest $request)
     {
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
         $record = $this->ragRecodeInterface->findById($id);
 
         if (! $record) {
             return response()->json(['message' => 'RAG record not found.'], 404);
         }
-
-        $validatedData = $request->validated();
-        $updated       = $this->ragRecodeInterface->update($id, $validatedData);
+        $userId                      = $user->id;
+        $validatedData               = $request->validated();
+        $validatedData['approvedBy'] = $userId;
+        $updated                     = $this->ragRecodeInterface->update($id, $validatedData);
 
         if ($updated) {
             return response()->json([

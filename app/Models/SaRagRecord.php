@@ -25,7 +25,7 @@ class SaRagRecord extends Model
         'sourceOfHiring',
         'function',
         'reportingManager',
-        'country',
+        'countryName',
         'state',
         'origin',
         'category',
@@ -39,6 +39,10 @@ class SaRagRecord extends Model
         'rejectedBy',
         'inprogressBy',
         'approvedBy',
+    ];
+
+    protected $casts = [
+        'countryName' => 'array',
     ];
 
     protected static function booted()
