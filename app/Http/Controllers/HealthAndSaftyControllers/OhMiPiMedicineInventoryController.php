@@ -186,9 +186,7 @@ class OhMiPiMedicineInventoryController extends Controller
         return $risk;
     });
 
-    foreach ($records as $record) {
-        $record->inventory = $this->medicineDisposalInterface->findByInventoryId($record->id);
-    }
+   
 
     return response()->json($records, 200);
 }
