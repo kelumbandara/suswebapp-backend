@@ -13,7 +13,7 @@ class SaAttritionRecord extends Model
         'referenceNumber',
         'employeeName',
         'employeeId',
-        'country',
+        'countryName',
         'state',
         'resignedDate',
         'relievedDate',
@@ -45,6 +45,7 @@ class SaAttritionRecord extends Model
         'isHostelAccess' => 'boolean',
         'isWorkHistory' => 'boolean',
         'isNormalResignation' => 'boolean',
+        'countryName' => 'array',
 
     ];
 
