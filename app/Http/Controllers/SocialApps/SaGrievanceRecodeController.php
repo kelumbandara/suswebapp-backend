@@ -804,4 +804,16 @@ class SaGrievanceRecodeController extends Controller
         }
     }
 
+        public function assignee()
+    {
+        $user        = Auth::user();
+        $targetLevel = $user->assigneeLevel + 1;
+
+        $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Grievance Section')
+            ->where('availability', 1)
+            ->values();
+
+        return response()->json($assignees);
+    }
+
 }

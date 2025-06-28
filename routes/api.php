@@ -323,6 +323,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('grievance-record/{id}/feedback', [SaGrievanceRecodeController::class, 'updateFeedback']);
     Route::get('grievance-record-assign-task', [SaGrievanceRecodeController::class, 'assignTask']);
     Route::post('grievance-record-assign-task-complete', [SaGrievanceRecodeController::class, 'assignTaskComplete']);
+    Route::get('grievance-record-assignee', [SaGrievanceRecodeController::class, 'assignee']);
 
     Route::post('grievance-record', [SaGrievanceRecodeController::class, 'store']);
     Route::post('grievance-record/{id}/update', [SaGrievanceRecodeController::class, 'update']);
@@ -340,7 +341,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('rag-dashboard/{startDate}/{endDate}/state-total-record', [SaRagRecodeController::class, 'getStateTotalRecord']);
     Route::get('rag-dashboard/{startDate}/{endDate}/age-total-record', [SaRagRecodeController::class, 'getAgeTotalRecord']);
     Route::get('rag-dashboard/{year}/all-summary', [SaRagRecodeController::class, 'getAllSummary']);
-
 
     Route::get('attrition-record', [SaAttritionRecordController::class, 'index']);
     Route::post('attrition-record', [SaAttritionRecordController::class, 'store']);
