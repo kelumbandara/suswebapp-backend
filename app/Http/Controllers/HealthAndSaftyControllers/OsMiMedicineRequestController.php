@@ -106,7 +106,11 @@ class OsMiMedicineRequestController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $medicine = $this->medicineRequestInterface->getByAssigneeId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+        $medicine = $this->medicineRequestInterface->getByAssigneeId($user->id)
+            ->filter(function ($risk) {
+                return $risk->status !== 'Approved';
+            })
+            ->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         $medicine = $medicine->map(function ($risk) {
             try {
@@ -129,7 +133,7 @@ class OsMiMedicineRequestController extends Controller
         return response()->json($medicine, 200);
     }
 
-    public function updateStatusToApproved()
+    public function assignTaskApproved()
     {
         $user = Auth::user();
 
@@ -137,15 +141,14 @@ class OsMiMedicineRequestController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-
         $medicine = $this->medicineRequestInterface
-        ->getByAssigneeId($user->id)
-         ->filter(function ($med) {
+            ->getByAssigneeId($user->id)
+            ->filter(function ($med) {
                 return $med->status === 'approved';
             })
-        ->sortByDesc('created_at')
-        ->sortByDesc('updated_at')
-        ->values();
+            ->sortByDesc('created_at')
+            ->sortByDesc('updated_at')
+            ->values();
 
         $medicine = $medicine->map(function ($risk) {
             try {
@@ -169,6 +172,31 @@ class OsMiMedicineRequestController extends Controller
     }
 
     public function approvedStatus(string $id)
+    {
+        $medicineRequest = $this->medicineRequestInterface->findById($id);
+
+        $this->medicineRequestInterface->update($id, ['status' => 'approved']);
+
+        $inventoryData = [
+            'referenceNumber' => $medicineRequest->referenceNumber,
+            'medicineName'    => $medicineRequest->medicineName,
+            'requestQuantity' => $medicineRequest->requestQuantity,
+            'genericName'     => $medicineRequest->genericName,
+            'requestedBy'     => $medicineRequest->requestedBy,
+            'division'        => $medicineRequest->division,
+            'approverId'      => $medicineRequest->approverId,
+            'status'          => 'approved',
+            'inventoryNumber' => $medicineRequest->inventoryNumber,
+        ];
+
+        $this->medicineInventoryInterface->create($inventoryData);
+
+        return response()->json([
+            'message' => 'Medicine request approved and added to inventory.',
+        ], 200);
+    }
+
+    public function updateStatusToApproved(string $id)
     {
         $user = Auth::user();
 

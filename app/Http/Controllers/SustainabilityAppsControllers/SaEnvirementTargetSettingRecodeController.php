@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\SustainabilityAppsControllers;
 
 use App\Http\Controllers\Controller;
@@ -19,8 +18,8 @@ class SaEnvirementTargetSettingRecodeController extends Controller
     public function __construct(TargetSettingRecodeInterface $targetSettingRecodeInterface, UserInterface $userInterface, TargetSettingService $TargetSettingService)
     {
         $this->targetSettingRecodeInterface = $targetSettingRecodeInterface;
-        $this->userInterface          = $userInterface;
-        $this->TargetSettingService   = $TargetSettingService;
+        $this->userInterface                = $userInterface;
+        $this->TargetSettingService         = $TargetSettingService;
     }
     public function index()
     {
@@ -93,18 +92,16 @@ class SaEnvirementTargetSettingRecodeController extends Controller
         $targetSetting = $this->targetSettingRecodeInterface->create($validatedData);
 
         return response()->json([
-            'message'    => 'Target setting record created successfully!',
+            'message'       => 'Target setting record created successfully!',
             'targetSetting' => $targetSetting,
         ], 201);
     }
-
-
 
     public function update($id, TargetSettingRecodeRequest $request)
     {
         $targetSetting = $this->targetSettingRecodeInterface->findById($id);
 
-        if (!$targetSetting) {
+        if (! $targetSetting) {
             return response()->json(['message' => 'Target setting record not found.'], 404);
         }
 
@@ -121,7 +118,7 @@ class SaEnvirementTargetSettingRecodeController extends Controller
                 }
 
                 $documents = array_values(array_filter($documents, function ($doc) use ($removeDocs) {
-                    return !in_array($doc['gsutil_uri'], $removeDocs);
+                    return ! in_array($doc['gsutil_uri'], $removeDocs);
                 }));
             }
         }
@@ -148,14 +145,13 @@ class SaEnvirementTargetSettingRecodeController extends Controller
 
         if ($updated) {
             return response()->json([
-                'message'    => 'Target setting record updated successfully!',
+                'message'       => 'Target setting record updated successfully!',
                 'targetSetting' => $this->targetSettingRecodeInterface->findById($id),
             ], 200);
         } else {
             return response()->json(['message' => 'Failed to update the target setting record.'], 500);
         }
     }
-
 
     public function destroy($id)
     {
@@ -190,7 +186,11 @@ class SaEnvirementTargetSettingRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $targetSetting = $this->targetSettingRecodeInterface->getByApproverId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+        $targetSetting = $this->targetSettingRecodeInterface->getByApproverId($user->id)
+            ->filter(function ($risk) {
+                return $risk->status !== 'Approved';
+            })
+            ->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         $targetSetting = $targetSetting->map(function ($risk) {
             try {
@@ -227,6 +227,90 @@ class SaEnvirementTargetSettingRecodeController extends Controller
         return response()->json($targetSetting, 200);
     }
 
+    public function assignTaskApproved()
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $targetSetting = $this->targetSettingRecodeInterface->getByApproverId($user->id)
+            ->filter(function ($med) {
+                return $med->status === 'approved';
+            })->sortByDesc('created_at')->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+
+        $targetSetting = $targetSetting->map(function ($risk) {
+            try {
+                $approver       = $this->userInterface->getById($risk->approverId);
+                $risk->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $risk->approver = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $creator                 = $this->userInterface->getById($risk->createdByUser);
+                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->createdByUserName = 'Unknown';
+            }
+            if (! empty($risk->documents) && is_string($risk->documents)) {
+                $documents = json_decode($risk->documents, true);
+            } else {
+                $documents = is_array($risk->documents) ? $risk->documents : [];
+            }
+
+            foreach ($documents as &$document) {
+                if (isset($document['gsutil_uri'])) {
+                    $imageData            = $this->TargetSettingService->getImageUrl($document['gsutil_uri']);
+                    $document['imageUrl'] = $imageData['signedUrl'];
+                    $document['fileName'] = $imageData['fileName'];
+                }
+            }
+
+            $risk->documents = $documents;
+            return $risk;
+        });
+
+        return response()->json($targetSetting, 200);
+    }
+
+    public function updateStatusToApproved(string $id)
+    {
+        $user = Auth::user();
+
+        if (! $user || $user->assigneeLevel != 5) {
+            return response()->json([
+                'message' => 'Unauthorized. Only CEO assignees can approve.',
+            ], 403);
+        }
+
+        $record = $this->targetSettingRecodeInterface->findById($id);
+
+        if (! $record) {
+            return response()->json([
+                'message' => 'Target setting record not found.',
+            ], 404);
+        }
+
+        $updated = $this->targetSettingRecodeInterface->update($id, [
+            'status' => 'Approved',
+        ]);
+
+        if (! $updated) {
+            return response()->json([
+                'message' => 'Failed to approve the target setting record.',
+            ], 500);
+        }
+
+        $record = $this->targetSettingRecodeInterface->findById($id);
+
+        return response()->json([
+            'message' => 'Target setting record approved successfully!',
+            'record'  => $record,
+        ], 200);
+    }
+
     public function assignee()
     {
         $user        = Auth::user();
@@ -238,6 +322,5 @@ class SaEnvirementTargetSettingRecodeController extends Controller
 
         return response()->json($assignees);
     }
-
 
 }

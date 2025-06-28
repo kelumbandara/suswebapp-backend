@@ -220,7 +220,11 @@ class SaSrSDGReportingRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $record = $this->sdgRecodeInterface->getByAssigneeId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+        $record = $this->sdgRecodeInterface->getByAssigneeId($user->id)
+            ->filter(function ($risk) {
+                return $risk->status !== 'Approved';
+            })
+            ->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         $record = $record->map(function ($impactDetails) {
             try {
@@ -257,6 +261,92 @@ class SaSrSDGReportingRecodeController extends Controller
         });
 
         return response()->json($record, 200);
+    }
+
+    public function assignTaskApproved()
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $record = $this->sdgRecodeInterface->getByAssigneeId($user->id)
+            ->filter(function ($med) {
+                return $med->status === 'approved';
+            })->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+
+        $record = $record->map(function ($impactDetails) {
+            try {
+                $assignee                = $this->userInterface->getById($impactDetails->assigneeId);
+                $impactDetails->assignee = $assignee ? ['name' => $assignee->name, 'id' => $assignee->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $impactDetails->assignee = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $creator                          = $this->userInterface->getById($impactDetails->createdByUser);
+                $impactDetails->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $impactDetails->createdByUserName = 'Unknown';
+            }
+            if (! empty($impactDetails->documents) && is_string($impactDetails->documents)) {
+                $decodedEvidence = json_decode($impactDetails->documents, true);
+                $documents       = is_array($decodedEvidence) ? $decodedEvidence : [];
+            } else {
+                $documents = is_array($impactDetails->documents) ? $impactDetails->documents : [];
+            }
+
+            foreach ($documents as &$item) {
+                if (isset($item['gsutil_uri'])) {
+                    $imageData        = $this->sdgService->getImageUrl($item['gsutil_uri']);
+                    $item['fileName'] = $imageData['fileName'];
+                    $item['imageUrl'] = $imageData['signedUrl'];
+                }
+            }
+
+            $impactDetails->documents = $documents;
+
+            return $impactDetails;
+        });
+
+        return response()->json($record, 200);
+    }
+
+    public function updateStatusToApproved(string $id)
+    {
+        $user = Auth::user();
+
+        if (! $user || $user->assigneeLevel != 5) {
+            return response()->json([
+                'message' => 'Unauthorized. Only CEO assignees can approve.',
+            ], 403);
+        }
+
+        $record = $this->sdgRecodeInterface->findById($id);
+
+        if (! $record) {
+            return response()->json([
+                'message' => 'SDG record not found.',
+            ], 404);
+        }
+
+        $updated = $this->sdgRecodeInterface->update($id, [
+            'status' => 'Approved',
+        ]);
+
+        if (! $updated) {
+            return response()->json([
+                'message' => 'Failed to approve the sdg record.',
+            ], 500);
+        }
+
+        $record = $this->sdgRecodeInterface->findById($id);
+
+        return response()->json([
+            'message' => 'SDG record approved successfully!',
+            'record'  => $record,
+        ], 200);
     }
 
     public function assignee()

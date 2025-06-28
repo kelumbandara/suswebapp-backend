@@ -148,8 +148,16 @@ class SaEnvirementManagementRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $record = $this->envirementManagementRecodeInterface->getByApproverId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
-        $record = $this->envirementManagementRecodeInterface->getByReviewerId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+        $record = $this->envirementManagementRecodeInterface->getByApproverId($user->id)
+            ->filter(function ($risk) {
+                return $risk->status !== 'Approved';
+            })
+            ->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+        $record = $this->envirementManagementRecodeInterface->getByReviewerId($user->id)
+            ->filter(function ($risk) {
+                return $risk->status !== 'Approved';
+            })
+            ->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
         $record = $record->map(function ($impactConsumption) {
             try {
@@ -176,6 +184,84 @@ class SaEnvirementManagementRecodeController extends Controller
         });
 
         return response()->json($record, 200);
+    }
+
+    public function assignTaskApproved()
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $record = $this->envirementManagementRecodeInterface->getByApproverId($user->id)->filter(function ($med) {
+            return $med->status === 'approved';
+        })->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+        $record = $this->envirementManagementRecodeInterface->getByReviewerId($user->id)->filter(function ($med) {
+            return $med->status === 'approved';
+        })->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+
+        $record = $record->map(function ($impactConsumption) {
+            try {
+                $approver                    = $this->userInterface->getById($impactConsumption->approverId);
+                $impactConsumption->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $impactConsumption->approver = ['name' => 'Unknown', 'id' => null];
+            }
+            try {
+                $reviewer                    = $this->userInterface->getById($impactConsumption->reviewerId);
+                $impactConsumption->reviewer = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $impactConsumption->reviewer = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $creator                              = $this->userInterface->getById($impactConsumption->createdByUser);
+                $impactConsumption->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $impactConsumption->createdByUserName = 'Unknown';
+            }
+
+            return $impactConsumption;
+        });
+
+        return response()->json($record, 200);
+    }
+
+    public function updateStatusToApproved(string $id)
+    {
+        $user = Auth::user();
+
+        if (! $user || $user->assigneeLevel != 5) {
+            return response()->json([
+                'message' => 'Unauthorized. Only CEO assignees can approve.',
+            ], 403);
+        }
+
+        $record = $this->envirementManagementRecodeInterface->findById($id);
+
+        if (! $record) {
+            return response()->json([
+                'message' => 'Environment management record not found.',
+            ], 404);
+        }
+
+        $updated = $this->envirementManagementRecodeInterface->update($id, [
+            'status' => 'Approved',
+        ]);
+
+        if (! $updated) {
+            return response()->json([
+                'message' => 'Failed to approve the environment management record.',
+            ], 500);
+        }
+
+        $record = $this->envirementManagementRecodeInterface->findById($id);
+
+        return response()->json([
+            'message' => 'Environment management record approved successfully!',
+            'record'  => $record,
+        ], 200);
     }
 
     public function assignee()
