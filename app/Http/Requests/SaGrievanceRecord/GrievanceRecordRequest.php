@@ -22,13 +22,13 @@ class GrievanceRecordRequest extends FormRequest
     {
         return [
             'type'                                           => 'required|string',
-            'personType'                                     => 'required_unless:isAnonymous,false|string',
-            'name'                                           => 'required_unless:isAnonymous,false|string',
-            'gender'                                         => 'required_unless:isAnonymous,false|string',
-            'supervisor'                                     => 'required_unless:isAnonymous,false|string',
+            'personType'                                     => 'required_unless:isAnonymous,true|string',
+            'name'                                           => 'required_unless:isAnonymous,true|string',
+            'gender'                                         => 'required_unless:isAnonymous,true|string',
+            'supervisor'                                     => 'required_unless:isAnonymous,true|string',
             'employeeShift'                                  => 'nullable|string',
             'employeeId'                                     => 'nullable|string',
-            'location'                                       => 'required_unless:isAnonymous,false|string',
+            'location'                                       => 'required_unless:isAnonymous,true|string',
             'submissionDate'                                 => 'nullable|string',
             'isAnonymous'                                    => 'boolean|nullable',
             'channel'                                        => 'required|string',
