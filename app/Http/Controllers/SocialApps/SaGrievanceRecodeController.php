@@ -314,7 +314,6 @@ class SaGrievanceRecodeController extends Controller
                 if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
                     $newEvidence[] = [
                         'gsutil_uri' => $uploadResult['gsutil_uri'],
-                        'file_name'  => $uploadResult['file_name'],
                     ];
                 }
             }
@@ -428,7 +427,6 @@ class SaGrievanceRecodeController extends Controller
                 if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
                     $newEvidence[] = [
                         'gsutil_uri' => $uploadResult['gsutil_uri'],
-                        'file_name'  => $uploadResult['file_name'],
                     ];
                 }
             }
