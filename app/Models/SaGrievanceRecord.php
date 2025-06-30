@@ -55,6 +55,7 @@ class SaGrievanceRecord extends Model
         'department',
         'division',
         'assigneeId',
+        'solutionRemark',
         'feedback',
         'stars',
         'status',
@@ -79,7 +80,7 @@ class SaGrievanceRecord extends Model
     {
         static::created(function ($model) {
             $year  = now()->year;
-            $month = strtoupper(now()->format('M')); 
+            $month = strtoupper(now()->format('M'));
 
             $model->updateQuietly([
                 'referenceNumber' => 'GRI-' . $model->id,
