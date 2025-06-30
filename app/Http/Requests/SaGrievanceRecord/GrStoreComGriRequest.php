@@ -31,15 +31,18 @@ class GrStoreComGriRequest extends FormRequest
             'location'              => 'nullable|string',
             'submissionDate'        => 'nullable|string',
             'businessUnit'          => 'required|string',
+            'dateOfJoin'            => 'nullable|string',
             'dueDate'               => 'nullable|string',
             'assigneeId'            => 'nullable|integer',
             'isAnonymous'           => 'boolean|nullable',
             'division'              => 'nullable|string',
             'channel'               => 'required|string',
+            'servicePeriod'         => 'nullable|string',
             'category'              => 'required|string',
             'topic'                 => 'required|string',
             'submissions'           => 'required|string',
             'description'           => 'nullable|string',
+            'tenureSplit'           => 'nullable|string',
             'remarks'               => 'nullable|string',
             'helpDeskPerson'        => 'nullable|string',
             'responsibleDepartment' => 'required|string',
@@ -51,10 +54,7 @@ class GrStoreComGriRequest extends FormRequest
             'evidence'              => 'nullable|array',
             'evidence.*'            => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
             'status'                => 'nullable|string',
-            'createdByUserId'       => 'nullable|integer',
-            'updatedByUserId'       => 'nullable|integer',
-            'inprogressBy'          => 'nullable|integer',
-            'openedByUserId'        => 'nullable|integer',
+
 
         ];
     }

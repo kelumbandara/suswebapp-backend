@@ -96,6 +96,7 @@ class SaGrievanceRecodeController extends Controller
                 $record->gender        = null;
                 $record->supervisor    = null;
                 $record->employeeShift = null;
+                $record->employeeId    = null;
                 $record->location      = null;
             }
 

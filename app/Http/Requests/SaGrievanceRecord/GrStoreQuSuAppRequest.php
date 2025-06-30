@@ -35,6 +35,8 @@ class GrStoreQuSuAppRequest extends FormRequest
             'topic'                 => 'nullable|string',
             'submissions'           => 'required|string',
             'description'           => 'nullable|string',
+            'dateOfJoin'            => 'nullable|string',
+            'servicePeriod'         => 'nullable|string',
             'division'              => 'nullable|string',
             'remarks'               => 'nullable|string',
             'responsibleDepartment' => 'required|string',
@@ -44,7 +46,6 @@ class GrStoreQuSuAppRequest extends FormRequest
             'evidence'              => 'nullable|array',
             'evidence.*'            => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
             'status'                => 'nullable|string',
-
 
         ];
     }
