@@ -79,8 +79,9 @@ class SaGrievanceRecord extends Model
     {
         static::created(function ($model) {
             $model->referenceNumber = 'GRI-' . $model->id;
-
+            $model->caseId = 'GRV-' . $model->id;
             $model->save();
         });
     }
+
 }

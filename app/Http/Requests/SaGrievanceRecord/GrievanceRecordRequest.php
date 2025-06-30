@@ -69,13 +69,6 @@ class GrievanceRecordRequest extends FormRequest
             'department'                                     => 'nullable|string',
             'division'                                       => 'nullable|string',
             'status'                                         => 'nullable|string',
-            'rejectedBy'                                     => 'nullable|integer',
-            'approvedBy'                                     => 'nullable|integer',
-            'createdByUser'                                  => 'nullable|integer',
-            'updatedBy'                                      => 'nullable|integer',
-            'inprogressBy'                                   => 'nullable|integer',
-            'publishedBy'                                    => 'nullable|integer',
-            'completedBy'                                    => 'nullable|integer',
 
             'committeeMembers'                               => 'nullable|array',
             'committeeMembers.*.grievanceId'                 => 'nullable|integer',
