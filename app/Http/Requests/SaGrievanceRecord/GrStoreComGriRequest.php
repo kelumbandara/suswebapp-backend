@@ -21,7 +21,6 @@ class GrStoreComGriRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'caseId'                => 'required|string',
             'type'                  => 'required|string',
             'personType'            => 'required|string',
             'name'                  => 'required|string',
