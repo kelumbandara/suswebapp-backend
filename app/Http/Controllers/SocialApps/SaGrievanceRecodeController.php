@@ -14,6 +14,7 @@ use App\Repositories\All\SaGrRespondentDetails\GrRespondentDetailsInterface;
 use App\Repositories\All\User\UserInterface;
 use App\Services\GrievanceService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class SaGrievanceRecodeController extends Controller
 {
@@ -449,9 +450,10 @@ class SaGrievanceRecodeController extends Controller
         }
     }
 
-    public function updateStatusInprogress($id)
+    public function updateStatus(Request $request, $id)
     {
         $user = Auth::user();
+
         if (! $user) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
@@ -461,15 +463,40 @@ class SaGrievanceRecodeController extends Controller
             return response()->json(['message' => 'Grievance record not found'], 404);
         }
 
-        $updated = $this->grievanceInterface->update($id, [
-            'status'             => 'inprogress',
-            'assigneeId'         => $user->id,
-            'inprogressByUserId' => $user->id,
-        ]);
+        $status     = $request->input('status');
+        $assigneeId = $request->input('assigneeId');
+
+        $validStatuses = ['draft', 'open', 'inprogress', 'completed'];
+        if (! in_array($status, $validStatuses)) {
+            return response()->json(['message' => 'Invalid status'], 422);
+        }
+
+        $updateData = [
+            'status'          => $status,
+            'updatedByUserId' => $user->id,
+        ];
+
+        if (! is_null($assigneeId)) {
+            $updateData['assigneeId'] = $assigneeId;
+        }
+
+        if ($status === 'inprogress') {
+            $updateData['inprogressByUserId'] = $user->id;
+        }
+
+        if ($status === 'open') {
+            $updateData['openedByUserId'] = $user->id;
+        }
+
+        if ($status === 'completed') {
+            $updateData['completedByUserId'] = $user->id;
+        }
+
+        $updated = $this->grievanceInterface->update($id, $updateData);
 
         if ($updated) {
             return response()->json([
-                'message' => 'Grievance record updated to inprogress',
+                'message' => "Grievance record updated to '{$status}'",
                 'record'  => $this->grievanceInterface->findById($id),
             ], 200);
         } else {
@@ -803,7 +830,7 @@ class SaGrievanceRecodeController extends Controller
         }
     }
 
-        public function assignee()
+    public function assignee()
     {
         $user        = Auth::user();
         $targetLevel = $user->assigneeLevel + 1;
