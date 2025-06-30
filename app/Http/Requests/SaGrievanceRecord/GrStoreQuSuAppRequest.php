@@ -25,8 +25,8 @@ class GrStoreQuSuAppRequest extends FormRequest
             'personType'            => 'required|string',
             'name'                  => 'required|string',
             'gender'                => 'required|string',
-            'employeeShift'         => 'required|string',
-            'employeeId'            => 'required|string',
+            'employeeShift'         => 'nullable|string',
+            'employeeId'            => 'nullable|string',
             'submissionDate'        => 'nullable|string',
             'businessUnit'          => 'required|string',
             'isAnonymous'           => 'boolean|nullable',
@@ -39,14 +39,12 @@ class GrStoreQuSuAppRequest extends FormRequest
             'remarks'               => 'nullable|string',
             'responsibleDepartment' => 'required|string',
             'humanRightsViolation'  => 'nullable|string',
-            'assigneeId'            => 'nullable|string',
+            'assigneeId'            => 'nullable|integer',
             'removeEvidence'        => 'nullable|array',
             'evidence'              => 'nullable|array',
             'evidence.*'            => 'file|mimes:pdf,doc,docx,xlsx,ppt,pptx,jpg,jpeg,png,gif,zip,webp',
             'status'                => 'nullable|string',
-            'createdByUserId'       => 'nullable|integer',
-            'updatedByUserId'       => 'nullable|integer',
-            'inprogressBy'          => 'nullable|integer',
+
 
         ];
     }
