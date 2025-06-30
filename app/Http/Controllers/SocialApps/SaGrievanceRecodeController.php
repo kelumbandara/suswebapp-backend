@@ -344,28 +344,24 @@ class SaGrievanceRecodeController extends Controller
 
     $updated = $this->grievanceInterface->update($id, $data);
 
-    // Update committee members
     $this->commiteeMemberDetailsInterface->deleteByGrievanceId($id);
     foreach ($data['committeeMembers'] ?? [] as $m) {
         $m['grievanceId'] = $id;
         $this->commiteeMemberDetailsInterface->create($m);
     }
 
-    // Update legal advisors
     $this->legalAdvisorDetailsInterface->deleteByGrievanceId($id);
     foreach ($data['legalAdvisors'] ?? [] as $a) {
         $a['grievanceId'] = $id;
         $this->legalAdvisorDetailsInterface->create($a);
     }
 
-    // Update nominees
     $this->nomineeDetailsInterface->deleteByGrievanceId($id);
     foreach ($data['nominees'] ?? [] as $n) {
         $n['grievanceId'] = $id;
         $this->nomineeDetailsInterface->create($n);
     }
 
-    // Update respondents
     $this->respondentDetailsInterface->deleteByGrievanceId($id);
     foreach ($data['respondents'] ?? [] as $r) {
         $r['grievanceId'] = $id;
@@ -379,105 +375,6 @@ class SaGrievanceRecodeController extends Controller
         'record'  => $this->grievanceInterface->findById($id),
     ], $updated ? 200 : 500);
 }
-
-    // public function updateQuSuApp($id, GrievanceRecordRequest $request)
-    // {
-    //     $user   = Auth::user();
-    //     $record = $this->grievanceInterface->findById($id);
-    //     if (! $record) {
-    //         return response()->json(['message' => 'Grievance record not found.'], 404);
-    //     }
-
-    //     $data   = $request->validated();
-    //     $status = $data['status'] ?? null;
-
-    //     if ($status === 'inprogress') {
-    //         $data['inprogressByUserId'] = $user->id;
-    //     }
-
-    //     if ($status === 'open') {
-    //         $data['openedByUserId'] = $user->id;
-    //     }
-
-    //     if ($status === 'completed') {
-    //         $data['completedByUserId'] = $user->id;
-    //     }
-
-    //     $handleJsonColumn = function (string $column, string $removeKey, string $fileKey) use ($request, $record) {
-    //         $existing = json_decode($record->{$column} ?? '[]', true);
-
-    //         if ($request->has($removeKey)) {
-    //             foreach ((array) $request->input($removeKey) as $uri) {
-    //                 $this->grievanceService->removeOldDocumentFromStorage($uri);
-    //             }
-    //             $existing = array_filter($existing, fn($doc) => ! in_array($doc['gsutil_uri'], $request->input($removeKey)));
-    //             $existing = array_values($existing);
-    //         }
-
-    //         if ($request->hasFile($fileKey)) {
-    //             foreach ($request->file($fileKey) as $file) {
-    //                 $res = $this->grievanceService->updateDocuments($file);
-    //                 if (! empty($res['gsutil_uri'])) {
-    //                     $existing[] = [
-    //                         'gsutil_uri' => $res['gsutil_uri'],
-    //                         'file_name'  => $res['file_name'],
-    //                     ];
-    //                 }
-    //             }
-    //         }
-
-    //         return json_encode($existing);
-    //     };
-
-    //     $data['statementDocuments'] = $handleJsonColumn(
-    //         'statementDocuments',
-    //         'removeStatementDocuments',
-    //         'statementDocuments'
-    //     );
-    //     $data['investigationCommitteeStatementDocuments'] = $handleJsonColumn(
-    //         'investigationCommitteeStatementDocuments',
-    //         'removeInvestigationCommitteeStatementDocuments',
-    //         'investigationCommitteeStatementDocuments'
-    //     );
-    //     $data['evidence'] = $handleJsonColumn(
-    //         'evidence',
-    //         'removeEvidence',
-    //         'evidence'
-    //     );
-
-    //     $updated = $this->grievanceInterface->update($id, $data);
-
-    //     $this->commiteeMemberDetailsInterface->deleteByGrievanceId($id);
-    //     foreach ($data['committeeMembers'] ?? [] as $m) {
-    //         $m['grievanceId'] = $id;
-    //         $this->commiteeMemberDetailsInterface->create($m);
-    //     }
-
-    //     $this->legalAdvisorDetailsInterface->deleteByGrievanceId($id);
-    //     foreach ($data['legalAdvisors'] ?? [] as $a) {
-    //         $a['grievanceId'] = $id;
-    //         $this->legalAdvisorDetailsInterface->create($a);
-    //     }
-
-    //     $this->nomineeDetailsInterface->deleteByGrievanceId($id);
-    //     foreach ($data['nominees'] ?? [] as $n) {
-    //         $n['grievanceId'] = $id;
-    //         $this->nomineeDetailsInterface->create($n);
-    //     }
-
-    //     $this->respondentDetailsInterface->deleteByGrievanceId($id);
-    //     foreach ($data['respondents'] ?? [] as $r) {
-    //         $r['grievanceId'] = $id;
-    //         $this->respondentDetailsInterface->create($r);
-    //     }
-
-    //     return response()->json([
-    //         'message' => $updated
-    //         ? 'Grievance record updated successfully.'
-    //         : 'Update failed.',
-    //         'record'  => $this->grievanceInterface->findById($id),
-    //     ], $updated ? 200 : 500);
-    // }
 
     public function storeComGri(GrStoreComGriRequest $request)
     {
