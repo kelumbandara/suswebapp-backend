@@ -75,12 +75,16 @@ class SaGrievanceRecord extends Model
         'evidence' => 'array',
     ];
 
-        protected static function booted()
+       protected static function booted()
     {
         static::created(function ($model) {
-            $model->referenceNumber = 'GRI-' . $model->id;
-            $model->caseId = 'GRV-' . $model->id;
-            $model->save();
+            $year  = now()->year;
+            $month = strtoupper(now()->format('M')); 
+
+            $model->updateQuietly([
+                'referenceNumber' => 'GRI-' . $model->id,
+                'caseId'          => "GRV/{$year}/{$month}/{$model->id}",
+            ]);
         });
     }
 
