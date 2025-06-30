@@ -86,6 +86,7 @@ class SaGrievanceRecodeController extends Controller
             $record->updatedByUser    = $this->safeUser($record->updatedByUserId);
             $record->inprogressByUser = $this->safeUser($record->inprogressByUserId);
             $record->completedByUser  = $this->safeUser($record->completedByUserId);
+            $record->assignee     = $this->safeUser($record->assigneeId);
 
             $record->statementDocuments                       = $this->resolveGcsFiles($record->statementDocuments);
             $record->investigationCommitteeStatementDocuments = $this->resolveGcsFiles($record->investigationCommitteeStatementDocuments);
