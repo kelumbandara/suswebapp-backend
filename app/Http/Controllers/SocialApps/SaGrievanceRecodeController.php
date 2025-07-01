@@ -276,105 +276,105 @@ class SaGrievanceRecodeController extends Controller
     }
 
     public function updateQuSuApp($id, GrievanceRecordRequest $request)
-{
-    $user   = Auth::user();
-    $record = $this->grievanceInterface->findById($id);
-    if (! $record) {
-        return response()->json(['message' => 'Grievance record not found.'], 404);
-    }
-
-    $data   = $request->validated();
-    $status = $data['status'] ?? null;
-
-    if ($status === 'inprogress') {
-        $data['inprogressByUserId'] = $user->id;
-    }
-
-    if ($status === 'open') {
-        $data['openedByUserId'] = $user->id;
-    }
-
-    if ($status === 'completed') {
-        $data['completedByUserId'] = $user->id;
-    }
-
-    $handleJsonColumn = function (string $column, string $removeKey, string $fileKey) use ($request, $record) {
-        $existingRaw = $record->{$column} ?? '[]';
-        $existing = is_array($existingRaw) ? $existingRaw : json_decode($existingRaw, true);
-        $existing = $existing ?? [];
-
-        if ($request->has($removeKey)) {
-            foreach ((array) $request->input($removeKey) as $uri) {
-                $this->grievanceService->removeOldDocumentFromStorage($uri);
-            }
-            $existing = array_filter($existing, fn($doc) => !in_array($doc['gsutil_uri'], $request->input($removeKey)));
-            $existing = array_values($existing); // reindex array
+    {
+        $user   = Auth::user();
+        $record = $this->grievanceInterface->findById($id);
+        if (! $record) {
+            return response()->json(['message' => 'Grievance record not found.'], 404);
         }
 
-        if ($request->hasFile($fileKey)) {
-            foreach ($request->file($fileKey) as $file) {
-                $res = $this->grievanceService->updateDocuments($file);
-                if (!empty($res['gsutil_uri'])) {
-                    $existing[] = [
-                        'gsutil_uri' => $res['gsutil_uri'],
-                        'file_name'  => $res['file_name'],
-                    ];
+        $data   = $request->validated();
+        $status = $data['status'] ?? null;
+
+        if ($status === 'inprogress') {
+            $data['inprogressByUserId'] = $user->id;
+        }
+
+        if ($status === 'open') {
+            $data['openedByUserId'] = $user->id;
+        }
+
+        if ($status === 'completed') {
+            $data['completedByUserId'] = $user->id;
+        }
+
+        $handleJsonColumn = function (string $column, string $removeKey, string $fileKey) use ($request, $record) {
+            $existingRaw = $record->{$column} ?? '[]';
+            $existing    = is_array($existingRaw) ? $existingRaw : json_decode($existingRaw, true);
+            $existing    = $existing ?? [];
+
+            if ($request->has($removeKey)) {
+                foreach ((array) $request->input($removeKey) as $uri) {
+                    $this->grievanceService->removeOldDocumentFromStorage($uri);
+                }
+                $existing = array_filter($existing, fn($doc) => ! in_array($doc['gsutil_uri'], $request->input($removeKey)));
+                $existing = array_values($existing); // reindex array
+            }
+
+            if ($request->hasFile($fileKey)) {
+                foreach ($request->file($fileKey) as $file) {
+                    $res = $this->grievanceService->updateDocuments($file);
+                    if (! empty($res['gsutil_uri'])) {
+                        $existing[] = [
+                            'gsutil_uri' => $res['gsutil_uri'],
+                            'file_name'  => $res['file_name'],
+                        ];
+                    }
                 }
             }
+
+            return json_encode($existing);
+        };
+
+        $data['statementDocuments'] = $handleJsonColumn(
+            'statementDocuments',
+            'removeStatementDocuments',
+            'statementDocuments'
+        );
+        $data['investigationCommitteeStatementDocuments'] = $handleJsonColumn(
+            'investigationCommitteeStatementDocuments',
+            'removeInvestigationCommitteeStatementDocuments',
+            'investigationCommitteeStatementDocuments'
+        );
+        $data['evidence'] = $handleJsonColumn(
+            'evidence',
+            'removeEvidence',
+            'evidence'
+        );
+
+        $updated = $this->grievanceInterface->update($id, $data);
+
+        $this->commiteeMemberDetailsInterface->deleteByGrievanceId($id);
+        foreach ($data['committeeMembers'] ?? [] as $m) {
+            $m['grievanceId'] = $id;
+            $this->commiteeMemberDetailsInterface->create($m);
         }
 
-        return json_encode($existing);
-    };
+        $this->legalAdvisorDetailsInterface->deleteByGrievanceId($id);
+        foreach ($data['legalAdvisors'] ?? [] as $a) {
+            $a['grievanceId'] = $id;
+            $this->legalAdvisorDetailsInterface->create($a);
+        }
 
-    $data['statementDocuments'] = $handleJsonColumn(
-        'statementDocuments',
-        'removeStatementDocuments',
-        'statementDocuments'
-    );
-    $data['investigationCommitteeStatementDocuments'] = $handleJsonColumn(
-        'investigationCommitteeStatementDocuments',
-        'removeInvestigationCommitteeStatementDocuments',
-        'investigationCommitteeStatementDocuments'
-    );
-    $data['evidence'] = $handleJsonColumn(
-        'evidence',
-        'removeEvidence',
-        'evidence'
-    );
+        $this->nomineeDetailsInterface->deleteByGrievanceId($id);
+        foreach ($data['nominees'] ?? [] as $n) {
+            $n['grievanceId'] = $id;
+            $this->nomineeDetailsInterface->create($n);
+        }
 
-    $updated = $this->grievanceInterface->update($id, $data);
+        $this->respondentDetailsInterface->deleteByGrievanceId($id);
+        foreach ($data['respondents'] ?? [] as $r) {
+            $r['grievanceId'] = $id;
+            $this->respondentDetailsInterface->create($r);
+        }
 
-    $this->commiteeMemberDetailsInterface->deleteByGrievanceId($id);
-    foreach ($data['committeeMembers'] ?? [] as $m) {
-        $m['grievanceId'] = $id;
-        $this->commiteeMemberDetailsInterface->create($m);
-    }
-
-    $this->legalAdvisorDetailsInterface->deleteByGrievanceId($id);
-    foreach ($data['legalAdvisors'] ?? [] as $a) {
-        $a['grievanceId'] = $id;
-        $this->legalAdvisorDetailsInterface->create($a);
-    }
-
-    $this->nomineeDetailsInterface->deleteByGrievanceId($id);
-    foreach ($data['nominees'] ?? [] as $n) {
-        $n['grievanceId'] = $id;
-        $this->nomineeDetailsInterface->create($n);
-    }
-
-    $this->respondentDetailsInterface->deleteByGrievanceId($id);
-    foreach ($data['respondents'] ?? [] as $r) {
-        $r['grievanceId'] = $id;
-        $this->respondentDetailsInterface->create($r);
-    }
-
-    return response()->json([
-        'message' => $updated
+        return response()->json([
+            'message' => $updated
             ? 'Grievance record updated successfully.'
             : 'Update failed.',
-        'record'  => $this->grievanceInterface->findById($id),
-    ], $updated ? 200 : 500);
-}
+            'record'  => $this->grievanceInterface->findById($id),
+        ], $updated ? 200 : 500);
+    }
 
     public function storeComGri(GrStoreComGriRequest $request)
     {
