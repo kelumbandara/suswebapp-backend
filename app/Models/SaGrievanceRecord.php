@@ -55,7 +55,7 @@ class SaGrievanceRecord extends Model
         'department',
         'division',
         'assigneeId',
-        'solutionRemark',
+        'solutionRemarks',
         'feedback',
         'stars',
         'status',
