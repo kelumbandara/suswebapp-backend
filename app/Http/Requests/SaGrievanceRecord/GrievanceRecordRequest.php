@@ -50,7 +50,7 @@ class GrievanceRecordRequest extends FormRequest
             'grievantStatement'                              => 'nullable|string',
             'tradeUnionRepresentative'                       => 'nullable|string',
             'isFollowUp'                                     => 'boolean|nullable',
-            'solutionRemarks'                                 => 'nullable|string',
+            'solutionRemark'                                 => 'nullable|string',
             'isAppeal'                                       => 'boolean|nullable',
             'solutionProvided'                               => 'nullable|string',
             'isIssuesPreviouslyRaised'                       => 'boolean|nullable',
