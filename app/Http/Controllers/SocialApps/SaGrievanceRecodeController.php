@@ -915,4 +915,141 @@ class SaGrievanceRecodeController extends Controller
         return response()->json($assignees);
     }
 
+    public function getStatusSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $totalRecords = $this->grievanceInterface->All()->count();
+
+        $filtered      = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $filteredCount = $filtered->count();
+
+        $filteredPercentage = $totalRecords > 0 ? round(($filteredCount / $totalRecords) * 100, 2) : 0;
+
+        $statusCounts = $filtered->groupBy('status')->map(function ($items) use ($filteredCount) {
+            $count      = $items->count();
+            $percentage = $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0;
+            return [
+                'count'      => $count,
+                'percentage' => $percentage,
+            ];
+        });
+
+        $feedbackGivenCount = $filtered->whereNotNull('feedback')->count();
+        $feedbackPercentage = $filteredCount > 0 ? round(($feedbackGivenCount / $filteredCount) * 100, 2) : 0;
+
+        return response()->json([
+            'total_records'       => $totalRecords,
+            'filtered_records'    => $filteredCount,
+            'filtered_percentage' => $filteredPercentage,
+            'status_summary'      => $statusCounts,
+            'feedback_summary'    => [
+                'count'      => $feedbackGivenCount,
+                'percentage' => $feedbackPercentage,
+            ],
+        ]);
+    }
+
+    public function getMonthlyStatusSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $records = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+
+        $aggregated = [];
+
+        foreach ($records as $record) {
+            $updatedAt = \Carbon\Carbon::parse($record->updated_at);
+
+            if ($updatedAt->lt($startDate) || $updatedAt->gt($endDate)) {
+                continue;
+            }
+
+            $month = $updatedAt->format('F');
+
+            if (! isset($aggregated[$month])) {
+                $aggregated[$month] = [
+                    'total'    => 0,
+                    'statuses' => [],
+                ];
+            }
+
+            $aggregated[$month]['total'] += 1;
+
+            $status = $record->status ?? 'unknown';
+            if (! isset($aggregated[$month]['statuses'][$status])) {
+                $aggregated[$month]['statuses'][$status] = 0;
+            }
+            $aggregated[$month]['statuses'][$status] += 1;
+        }
+
+        $response = [];
+        foreach ($aggregated as $month => $data) {
+            $response = [
+                'month'    => $month,
+                'total'    => $data['total'],
+                'statuses' => $data['statuses'],
+            ];
+        }
+
+        return response()->json([
+            'monthlyStatusCount' => $response,
+        ]);
+    }
+
+    public function getTypeOfGrievance($startDate, $endDate, $businessUnit, $category)
+    {
+        $filtered      = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $filteredCount = $filtered->count();
+
+        $typeSummary = $filtered->groupBy('type')->map(function ($items) use ($filteredCount) {
+            $count      = $items->count();
+            $percentage = $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0;
+            return [
+                'count'      => $count,
+                'percentage' => $percentage,
+            ];
+        });
+
+        $result = [];
+        foreach ($typeSummary as $type => $data) {
+            $result = [
+                'type'       => $type,
+                'count'      => $data['count'],
+                'percentage' => $data['percentage'],
+            ];
+        }
+
+        return response()->json([
+            'total' => $filteredCount,
+            'types' => $result,
+        ]);
+    }
+
+    public function getCategorySummary($startDate, $endDate, $businessUnit)
+    {
+        $filtered      = $this->grievanceInterface->filterByStartEndDate($startDate, $endDate, $businessUnit);
+        $filteredCount = $filtered->count();
+
+        $categorySummary = $filtered->groupBy('category')->map(function ($items) use ($filteredCount) {
+            $count      = $items->count();
+            $percentage = $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0;
+
+            return [
+                'count'      => $count,
+                'percentage' => $percentage,
+            ];
+        });
+
+        $result = [];
+        foreach ($categorySummary as $category => $data) {
+            $result = [
+                'category'   => $category,
+                'count'      => $data['count'],
+                'percentage' => $data['percentage'],
+            ];
+        }
+
+        return response()->json([
+            'total'      => $filteredCount,
+            'categories' => $result,
+        ]);
+    }
+
 }
