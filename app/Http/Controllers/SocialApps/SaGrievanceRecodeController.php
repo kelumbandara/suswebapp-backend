@@ -937,7 +937,7 @@ class SaGrievanceRecodeController extends Controller
         $feedbackPercentage = $filteredCount > 0 ? round(($feedbackGivenCount / $filteredCount) * 100, 2) : 0;
 
         return response()->json([
-            'total_records'       => $totalRecords,
+            'totalRecords'        => $totalRecords,
             'filtered_records'    => $filteredCount,
             'filtered_percentage' => $filteredPercentage,
             'status_summary'      => $statusCounts,
@@ -950,6 +950,13 @@ class SaGrievanceRecodeController extends Controller
 
     public function getMonthlyStatusSummary($startDate, $endDate, $businessUnit, $category)
     {
+        $monthNames = [
+            1  => 'January', 2  => 'February', 3  => 'March',
+            4  => 'April', 5    => 'May', 6       => 'June',
+            7  => 'July', 8     => 'August', 9    => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December',
+        ];
+
         $records = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
 
         $aggregated = [];
@@ -961,28 +968,37 @@ class SaGrievanceRecodeController extends Controller
                 continue;
             }
 
-            $month = $updatedAt->format('F');
+            $monthName = $updatedAt->format('F');
 
-            if (! isset($aggregated[$month])) {
-                $aggregated[$month] = [
+            if (! isset($aggregated[$monthName])) {
+                $aggregated[$monthName] = [
                     'total'    => 0,
                     'statuses' => [],
                 ];
             }
 
-            $aggregated[$month]['total'] += 1;
+            $aggregated[$monthName]['total'] += 1;
 
             $status = $record->status ?? 'unknown';
-            if (! isset($aggregated[$month]['statuses'][$status])) {
-                $aggregated[$month]['statuses'][$status] = 0;
+
+            if (! isset($aggregated[$monthName]['statuses'][$status])) {
+                $aggregated[$monthName]['statuses'][$status] = 0;
             }
-            $aggregated[$month]['statuses'][$status] += 1;
+
+            $aggregated[$monthName]['statuses'][$status] += 1;
         }
 
+        // Prepare response for all 12 months
         $response = [];
-        foreach ($aggregated as $month => $data) {
-            $response = [
-                'month'    => $month,
+
+        foreach ($monthNames as $i => $monthName) {
+            $data = $aggregated[$monthName] ?? [
+                'total'    => 0,
+                'statuses' => [],
+            ];
+
+            $response[] = [
+                'month'    => $monthName,
                 'total'    => $data['total'],
                 'statuses' => $data['statuses'],
             ];
@@ -1039,7 +1055,7 @@ class SaGrievanceRecodeController extends Controller
 
         $result = [];
         foreach ($categorySummary as $category => $data) {
-            $result = [
+            $result[] = [
                 'category'   => $category,
                 'count'      => $data['count'],
                 'percentage' => $data['percentage'],
@@ -1049,6 +1065,62 @@ class SaGrievanceRecodeController extends Controller
         return response()->json([
             'total'      => $filteredCount,
             'categories' => $result,
+        ]);
+    }
+    public function getTopicSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $filtered      = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $filteredCount = $filtered->count();
+
+        $topicSummary = $filtered->groupBy('topic')->map(function ($items) use ($filteredCount) {
+            $count      = $items->count();
+            $percentage = $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0;
+            return [
+                'count'      => $count,
+                'percentage' => $percentage,
+            ];
+        });
+
+        $topics = [];
+        foreach ($topicSummary as $topic => $data) {
+            $topics[] = [
+                'topic'      => $topic,
+                'count'      => $data['count'],
+                'percentage' => $data['percentage'],
+            ];
+        }
+
+        return response()->json([
+            'total' => $filteredCount,
+        ]);
+    }
+
+    public function getChannelSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $filtered      = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $filteredCount = $filtered->count();
+
+        $channelSummary = $filtered->groupBy('channel')->map(function ($items) use ($filteredCount) {
+            $count      = $items->count();
+            $percentage = $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0;
+            return [
+                'count'      => $count,
+                'percentage' => $percentage,
+            ];
+        });
+
+        $channels = [];
+        foreach ($channelSummary as $channel => $data) {
+            $channels[] = [
+                'channel'    => $channel ?? 'unknown',
+                'count'      => $data['count'],
+                'percentage' => $data['percentage'],
+            ];
+        }
+
+        return response()->json([
+            'total'    => $filteredCount,
+            'channels' => $channels,
         ]);
     }
 
