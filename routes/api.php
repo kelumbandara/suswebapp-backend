@@ -335,6 +335,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/monthly-status-summary', [SaGrievanceRecodeController::class, 'getMonthlyStatusSummary']);
     Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/type-of-grievance', [SaGrievanceRecodeController::class, 'getTypeOfGrievance']);
     Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/category-summary', [SaGrievanceRecodeController::class, 'getCategorySummary']);
+    Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/topic-summary', [SaGrievanceRecodeController::class, 'getTopicSummary']);
+    Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/channel-summary', [SaGrievanceRecodeController::class, 'getChannelSummary']);
+
 
     Route::get('rag-record', [SaRagRecodeController::class, 'index']);
     Route::post('rag-record', [SaRagRecodeController::class, 'store']);
