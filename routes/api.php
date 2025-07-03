@@ -332,11 +332,12 @@ Route::middleware('auth:sanctum')->group(function () {
     //dashboard routes
 
     Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/status-summary', [SaGrievanceRecodeController::class, 'getStatusSummary']);
-    Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/monthly-status-summary', [SaGrievanceRecodeController::class, 'getMonthlyStatusSummary']);
+    Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/monthly-type-summary', [SaGrievanceRecodeController::class, 'getMonthlyTypeSummary']);
     Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/type-of-grievance', [SaGrievanceRecodeController::class, 'getTypeOfGrievance']);
     Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/category-summary', [SaGrievanceRecodeController::class, 'getCategorySummary']);
     Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/topic-summary', [SaGrievanceRecodeController::class, 'getTopicSummary']);
     Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/channel-summary', [SaGrievanceRecodeController::class, 'getChannelSummary']);
+    Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/department-summary', [SaGrievanceRecodeController::class, 'getDepartmentSummary']);
 
 
     Route::get('rag-record', [SaRagRecodeController::class, 'index']);
