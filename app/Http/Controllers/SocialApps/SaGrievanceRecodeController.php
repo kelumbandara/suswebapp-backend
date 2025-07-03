@@ -937,18 +937,18 @@ class SaGrievanceRecodeController extends Controller
         $feedbackPercentage = $filteredCount > 0 ? round(($feedbackGivenCount / $filteredCount) * 100, 2) : 0;
 
         return response()->json([
-            'totalRecords'        => $totalRecords,
-            'filtered_records'    => $filteredCount,
-            'filtered_percentage' => $filteredPercentage,
-            'status_summary'      => $statusCounts,
-            'feedback_summary'    => [
+            'totalRecords'       => $totalRecords,
+            'filteredRecords'    => $filteredCount,
+            'filteredPercentage' => $filteredPercentage,
+            'statusSummary'      => $statusCounts,
+            'feedbackSummary'    => [
                 'count'      => $feedbackGivenCount,
                 'percentage' => $feedbackPercentage,
             ],
         ]);
     }
 
-    public function getMonthlyStatusSummary($startDate, $endDate, $businessUnit, $category)
+    public function getMonthlyTypeSummary($startDate, $endDate, $businessUnit, $category)
     {
         $monthNames = [
             1  => 'January', 2  => 'February', 3  => 'March',
@@ -972,40 +972,39 @@ class SaGrievanceRecodeController extends Controller
 
             if (! isset($aggregated[$monthName])) {
                 $aggregated[$monthName] = [
-                    'total'    => 0,
-                    'statuses' => [],
+                    'total' => 0,
+                    'types' => [],
                 ];
             }
 
             $aggregated[$monthName]['total'] += 1;
 
-            $status = $record->status ?? 'unknown';
+            $type = $record->type ?? 'unknown';
 
-            if (! isset($aggregated[$monthName]['statuses'][$status])) {
-                $aggregated[$monthName]['statuses'][$status] = 0;
+            if (! isset($aggregated[$monthName]['types'][$type])) {
+                $aggregated[$monthName]['types'][$type] = 0;
             }
 
-            $aggregated[$monthName]['statuses'][$status] += 1;
+            $aggregated[$monthName]['types'][$type] += 1;
         }
 
-        // Prepare response for all 12 months
         $response = [];
 
         foreach ($monthNames as $i => $monthName) {
             $data = $aggregated[$monthName] ?? [
-                'total'    => 0,
-                'statuses' => [],
+                'total' => 0,
+                'types' => [],
             ];
 
             $response[] = [
-                'month'    => $monthName,
-                'total'    => $data['total'],
-                'statuses' => $data['statuses'],
+                'month' => $monthName,
+                'total' => $data['total'],
+                'types' => $data['types'],
             ];
         }
 
         return response()->json([
-            'monthlyStatusCount' => $response,
+            'monthlyTypeCount' => $response,
         ]);
     }
 
@@ -1121,6 +1120,36 @@ class SaGrievanceRecodeController extends Controller
         return response()->json([
             'total'    => $filteredCount,
             'channels' => $channels,
+        ]);
+    }
+
+    public function getDepartmentSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $filtered      = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $filteredCount = $filtered->count();
+
+        $departmentSummary = $filtered->groupBy('department')->map(function ($items) use ($filteredCount) {
+            $count      = $items->count();
+            $percentage = $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0;
+
+            return [
+                'count'      => $count,
+                'percentage' => $percentage,
+            ];
+        });
+
+        $departments = [];
+        foreach ($departmentSummary as $department => $data) {
+            $departments[] = [
+                'department' => $department ?? 'unknown',
+                'count'      => $data['count'],
+                'percentage' => $data['percentage'],
+            ];
+        }
+
+        return response()->json([
+            'total'       => $filteredCount,
+            'departments' => $departments,
         ]);
     }
 
