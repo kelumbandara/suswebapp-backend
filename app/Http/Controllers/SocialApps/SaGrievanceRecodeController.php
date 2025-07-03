@@ -1128,7 +1128,7 @@ class SaGrievanceRecodeController extends Controller
         $filtered      = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
         $filteredCount = $filtered->count();
 
-        $departmentSummary = $filtered->groupBy('department')->map(function ($items) use ($filteredCount) {
+        $departmentSummary = $filtered->groupBy('responsibleDepartment')->map(function ($items) use ($filteredCount) {
             $count      = $items->count();
             $percentage = $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0;
 
@@ -1141,15 +1141,146 @@ class SaGrievanceRecodeController extends Controller
         $departments = [];
         foreach ($departmentSummary as $department => $data) {
             $departments[] = [
-                'department' => $department ?? 'unknown',
-                'count'      => $data['count'],
-                'percentage' => $data['percentage'],
+                'responsibleDepartment' => $department ?? 'unknown',
+                'count'                 => $data['count'],
+                'percentage'            => $data['percentage'],
             ];
         }
 
         return response()->json([
-            'total'       => $filteredCount,
-            'departments' => $departments,
+            'total'                 => $filteredCount,
+            'responsibleDepartment' => $departments,
+        ]);
+    }
+
+    public function getStarsSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $records = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $total   = $records->count();
+
+        $starCounts = [
+            '5 stars' => ['count' => 0, 'percentage' => 0],
+            '4 stars' => ['count' => 0, 'percentage' => 0],
+            '3 stars' => ['count' => 0, 'percentage' => 0],
+            '2 stars' => ['count' => 0, 'percentage' => 0],
+            '1 stars' => ['count' => 0, 'percentage' => 0],
+            '0 stars' => ['count' => 0, 'percentage' => 0],
+        ];
+
+        foreach ($records as $record) {
+            $stars = $record->stars;
+
+            switch ($stars) {
+                case 5:
+                    $starCounts['5 stars']['count']++;
+                    break;
+                case 4:
+                    $starCounts['4 stars']['count']++;
+                    break;
+                case 3:
+                    $starCounts['3 stars']['count']++;
+                    break;
+                case 2:
+                    $starCounts['2 stars']['count']++;
+                    break;
+                case 1:
+                    $starCounts['1 stars']['count']++;
+                    break;
+                default:
+                    $starCounts['0 stars']['count']++;
+                    break;
+            }
+        }
+
+        foreach ($starCounts as $key => &$data) {
+            $data['percentage'] = $total > 0 ? round(($data['count'] / $total) * 100, 2) : 0;
+        }
+
+        return response()->json([
+            'total'        => $total,
+            'starsSummary' => $starCounts,
+        ]);
+    }
+
+    public function getAnonymousSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $records = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $total   = $records->count();
+
+        $anonymousCount    = $records->where('isAnonymous', true)->count();
+        $nonAnonymousCount = $records->where('isAnonymous', false)->count();
+
+        $anonymousPercentage    = $total > 0 ? round(($anonymousCount / $total) * 100, 2) : 0;
+        $nonAnonymousPercentage = $total > 0 ? round(($nonAnonymousCount / $total) * 100, 2) : 0;
+
+        return response()->json([
+            'total'            => $total,
+            'anonymousSummary' => [
+                'anonymous'    => [
+                    'count'      => $anonymousCount,
+                    'percentage' => $anonymousPercentage,
+                ],
+                'nonAnonymous' => [
+                    'count'      => $nonAnonymousCount,
+                    'percentage' => $nonAnonymousPercentage,
+                ],
+            ],
+        ]);
+    }
+
+    public function getMonthlyStatusSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $monthNames = [
+            1  => 'January', 2  => 'February', 3  => 'March',
+            4  => 'April', 5    => 'May', 6       => 'June',
+            7  => 'July', 8     => 'August', 9    => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December',
+        ];
+
+        $records    = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $aggregated = [];
+
+        foreach ($records as $record) {
+            $updatedAt = \Carbon\Carbon::parse($record->updated_at);
+
+            if ($updatedAt->lt($startDate) || $updatedAt->gt($endDate)) {
+                continue;
+            }
+
+            $monthName = $updatedAt->format('F');
+            $status    = $record->status ?? 'unknown';
+
+            if (! isset($aggregated[$monthName])) {
+                $aggregated[$monthName] = [
+                    'total'    => 0,
+                    'statuses' => [],
+                ];
+            }
+
+            $aggregated[$monthName]['total'] += 1;
+            if (! isset($aggregated[$monthName]['statuses'][$status])) {
+                $aggregated[$monthName]['statuses'][$status] = 0;
+            }
+            $aggregated[$monthName]['statuses'][$status] += 1;
+        }
+
+        $response = [];
+
+        foreach ($monthNames as $i => $monthName) {
+            $data = $aggregated[$monthName] ?? [
+                'total'    => 0,
+                'statuses' => [],
+            ];
+
+            $response[] = [
+                'month'    => $monthName,
+                'total'    => $data['total'],
+                'statuses' => $data['statuses'],
+            ];
+        }
+
+        return response()->json([
+            'monthlyStatusCount' => $response,
         ]);
     }
 
