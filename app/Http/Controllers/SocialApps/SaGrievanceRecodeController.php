@@ -1291,7 +1291,7 @@ class SaGrievanceRecodeController extends Controller
         $total   = $records->count();
 
         $grouped = $records->groupBy(function ($item) {
-            return $item->severityScore ?? 'unknown';
+            return $item->severityScore ?? 'N/A';
         });
 
         $summary = [];
