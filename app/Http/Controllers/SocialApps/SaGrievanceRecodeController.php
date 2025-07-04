@@ -1090,7 +1090,8 @@ class SaGrievanceRecodeController extends Controller
         }
 
         return response()->json([
-            'total' => $filteredCount,
+            'total'  => $filteredCount,
+            'topics' => $topics,
         ]);
     }
 
@@ -1281,6 +1282,34 @@ class SaGrievanceRecodeController extends Controller
 
         return response()->json([
             'monthlyStatusCount' => $response,
+        ]);
+    }
+
+    public function getSeverityScoreSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $records = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $total   = $records->count();
+
+        $grouped = $records->groupBy(function ($item) {
+            return $item->severityScore ?? 'unknown';
+        });
+
+        $summary = [];
+
+        foreach ($grouped as $severity => $items) {
+            $count      = $items->count();
+            $percentage = $total > 0 ? round(($count / $total) * 100, 2) : 0;
+
+            $summary[] = [
+                'severityScore' => $severity,
+                'count'         => $count,
+                'percentage'    => $percentage,
+            ];
+        }
+
+        return response()->json([
+            'total'          => $total,
+            'severityScores' => $summary,
         ]);
     }
 
