@@ -1288,10 +1288,15 @@ class SaGrievanceRecodeController extends Controller
     public function getSeverityScoreSummary($startDate, $endDate, $businessUnit, $category)
     {
         $records = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
-        $total   = $records->count();
 
-        $grouped = $records->groupBy(function ($item) {
-            return $item->severityScore ?? 'N/A';
+        $filtered = $records->filter(function ($item) {
+            return ! is_null($item->severityScore);
+        });
+
+        $total = $filtered->count();
+
+        $grouped = $filtered->groupBy(function ($item) {
+            return $item->severityScore;
         });
 
         $summary = [];
@@ -1310,6 +1315,185 @@ class SaGrievanceRecodeController extends Controller
         return response()->json([
             'total'          => $total,
             'severityScores' => $summary,
+        ]);
+    }
+
+    public function getAllSummary($year)
+    {
+        // 1) pull only those records whose updated_at falls in $year
+        $records       = $this->grievanceInterface->filterByYear($year);
+        $filteredCount = $records->count();
+
+        // 2) total across all years (if you still need it)
+        $totalRecords = $this->grievanceInterface->All()->count();
+
+        // --- Status Summary (adapted from getStatusSummary) ---
+        $filteredPercentage = $totalRecords > 0
+        ? round(($filteredCount / $totalRecords) * 100, 2)
+        : 0;
+
+        $statusCounts = $records
+            ->groupBy('status')
+            ->map(function ($items) use ($filteredCount) {
+                $count      = $items->count();
+                $percentage = $filteredCount > 0
+                ? round(($count / $filteredCount) * 100, 2)
+                : 0;
+                return ['count' => $count, 'percentage' => $percentage];
+            });
+
+        $feedbackGivenCount = $records->whereNotNull('feedback')->count();
+        $feedbackPercentage = $filteredCount > 0
+        ? round(($feedbackGivenCount / $filteredCount) * 100, 2)
+        : 0;
+
+        $statusSummary = [
+            'totalRecords'       => $totalRecords,
+            'filteredRecords'    => $filteredCount,
+            'filteredPercentage' => $filteredPercentage,
+            'statusCounts'       => $statusCounts,
+            'feedbackSummary'    => [
+                'count'      => $feedbackGivenCount,
+                'percentage' => $feedbackPercentage,
+            ],
+        ];
+
+        // --- Monthly Type Summary ---
+        $monthNames = [
+            1 => 'January', 2    => 'February', 3 => 'March', 4     => 'April',
+            5 => 'May', 6        => 'June', 7     => 'July', 8      => 'August',
+            9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December',
+        ];
+        $monthlyTypeCount = [];
+        foreach ($monthNames as $i => $monthName) {
+            $monthRecords = $records->filter(function ($r) use ($i) {
+                return \Carbon\Carbon::parse($r->updated_at)->month == $i;
+            });
+            $monthlyTypeCount[] = [
+                'month' => $monthName,
+                'total' => $monthRecords->count(),
+                'types' => $monthRecords->groupBy('type')->map->count(),
+            ];
+        }
+
+        // --- Type Summary ---
+        $typeSummary = $records
+            ->groupBy('type')
+            ->map(function ($items) use ($filteredCount) {
+                $count = $items->count();
+                return [
+                    'count'      => $count,
+                    'percentage' => $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0,
+                ];
+            });
+
+        // --- Category Summary ---
+        $categorySummary = $records
+            ->groupBy('category')
+            ->map(function ($items) use ($filteredCount) {
+                $count = $items->count();
+                return [
+                    'count'      => $count,
+                    'percentage' => $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0,
+                ];
+            });
+
+        // --- Topic Summary ---
+        $topicSummary = $records
+            ->groupBy('topic')
+            ->map(function ($items) use ($filteredCount) {
+                $count = $items->count();
+                return [
+                    'count'      => $count,
+                    'percentage' => $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0,
+                ];
+            });
+
+        // --- Channel Summary ---
+        $channelSummary = $records
+            ->groupBy('channel')
+            ->map(function ($items) use ($filteredCount) {
+                $count = $items->count();
+                return [
+                    'count'      => $count,
+                    'percentage' => $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0,
+                ];
+            });
+
+        // --- Department Summary ---
+        $departmentSummary = $records
+            ->groupBy('responsibleDepartment')
+            ->map(function ($items) use ($filteredCount) {
+                $count = $items->count();
+                return [
+                    'count'      => $count,
+                    'percentage' => $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0,
+                ];
+            });
+
+        // --- Stars Summary ---
+        $starCounts = array_fill_keys(
+            ['5 stars', '4 stars', '3 stars', '2 stars', '1 stars', '0 stars'],
+            0
+        );
+        foreach ($records as $r) {
+            $key = $r->stars ? $r->stars . ' stars' : '0 stars';
+            $starCounts[$key]++;
+        }
+        $starsSummary = [];
+        foreach ($starCounts as $key => $count) {
+            $starsSummary[$key] = [
+                'count'      => $count,
+                'percentage' => $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0,
+            ];
+        }
+
+        // --- Anonymous Summary ---
+        $anonymousCount   = $records->where('isAnonymous', true)->count();
+        $nonAnonCount     = $records->where('isAnonymous', false)->count();
+        $anonymousSummary = [
+            'anonymous'    => ['count' => $anonymousCount, 'percentage' => $filteredCount > 0 ? round($anonymousCount / $filteredCount * 100, 2) : 0],
+            'nonAnonymous' => ['count' => $nonAnonCount, 'percentage' => $filteredCount > 0 ? round($nonAnonCount / $filteredCount * 100, 2) : 0],
+        ];
+
+        // --- Monthly Status Summary ---
+        $monthlyStatusSummary = [];
+        foreach ($monthNames as $i => $monthName) {
+            $monthRecords           = $records->filter(fn($r) => \Carbon\Carbon::parse($r->updated_at)->month == $i);
+            $monthlyStatusSummary[] = [
+                'month'    => $monthName,
+                'total'    => $monthRecords->count(),
+                'statuses' => $monthRecords->groupBy('status')->map->count(),
+            ];
+        }
+
+        // --- Severity Score Summary ---
+        $sevRecords           = $records->filter(fn($r) => ! is_null($r->severityScore));
+        $severityScoreSummary = $sevRecords
+            ->groupBy('severityScore')
+            ->map(function ($items) use ($sevRecords) {
+                $count = $items->count();
+                return [
+                    'count'      => $count,
+                    'percentage' => $sevRecords->count() > 0 ? round($count / $sevRecords->count() * 100, 2) : 0,
+                ];
+            });
+
+        return response()->json([
+            'year'                 => $year,
+            'totalRecordsAllTime'  => $totalRecords,
+            'totalRecordsThisYear' => $filteredCount,
+            'statusSummary'        => $statusSummary,
+            'monthlyTypeCount'     => $monthlyTypeCount,
+            'typeSummary'          => $typeSummary,
+            'categorySummary'      => $categorySummary,
+            'topicSummary'         => $topicSummary,
+            'channelSummary'       => $channelSummary,
+            'departmentSummary'    => $departmentSummary,
+            'starsSummary'         => $starsSummary,
+            'anonymousSummary'     => $anonymousSummary,
+            'monthlyStatusSummary' => $monthlyStatusSummary,
+            'severityScoreSummary' => $severityScoreSummary,
         ]);
     }
 

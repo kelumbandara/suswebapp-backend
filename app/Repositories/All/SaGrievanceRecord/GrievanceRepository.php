@@ -46,7 +46,9 @@ class GrievanceRepository extends BaseRepository implements GrievanceInterface
 
     public function filterByYear($year)
     {
-        return $this->model->where('updated_at', $year)->get();
+        return $this->model
+            ->whereYear('updated_at', $year)
+            ->get();
     }
 
     public function filterByStartEndDate($startDate, $endDate, $businessUnit)
@@ -60,8 +62,6 @@ class GrievanceRepository extends BaseRepository implements GrievanceInterface
             $query->where('businessUnit', $businessUnit);
         }
 
-
-        return $query->get();
-    }
+        return $query->get();}
 
 }
