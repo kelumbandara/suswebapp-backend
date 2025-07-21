@@ -25,5 +25,43 @@ class GrievanceRepository extends BaseRepository implements GrievanceInterface
     {
         return $this->model->where('assigneeId', $assigneeId)->get();
     }
+    public function filterByParams($startDate, $endDate, $category, $businessUnit)
+    {
+        $query = $this->model->newQuery();
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('updated_at', [$startDate, $endDate]);
+        }
+
+        if ($businessUnit) {
+            $query->where('businessUnit', $businessUnit);
+        }
+        if ($category) {
+            $query->where('category', $category);
+        }
+
+        return $query->get();
+
+    }
+
+    public function filterByYear($year)
+    {
+        return $this->model
+            ->whereYear('updated_at', $year)
+            ->get();
+    }
+
+    public function filterByStartEndDate($startDate, $endDate, $businessUnit)
+    {$query = $this->model->newQuery();
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('updated_at', [$startDate, $endDate]);
+        }
+
+        if ($businessUnit) {
+            $query->where('businessUnit', $businessUnit);
+        }
+
+        return $query->get();}
 
 }

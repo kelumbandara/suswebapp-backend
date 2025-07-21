@@ -139,58 +139,60 @@ class OhMiPiMedicineInventoryController extends Controller
         return response()->json(['message' => 'Inventory record deleted successfully'], 200);
     }
 
-
     public function publishedStatus(MedicineInventoryRequest $request, string $id)
-{
-    $validatedData = $request->validated();
+    {
+        $validatedData = $request->validated();
 
-    $medicineStock = $this->medicineInventoryInterface->findById($id);
+        $medicineStock = $this->medicineInventoryInterface->findById($id);
 
-    if (!$medicineStock) {
-        return response()->json(['message' => 'Medicine stock not found.'], 404);
+        if (! $medicineStock) {
+            return response()->json(['message' => 'Medicine stock not found.'], 404);
+        }
+
+        $medicineStock->update($validatedData);
+
+        $inventoryData = [
+            'medicineName'       => $medicineStock->medicineName,
+            'inStock'            => $medicineStock->issuedQuantity ?? 0, // Default to 0 if null
+            'division'           => $medicineStock->division,
+            'status'             => $medicineStock->status, // Using updated status
+            'responsibleSection' => $medicineStock->responsibleSection,
+            'assigneeLevel'      => $medicineStock->assigneeLevel,
+        ];
+
+        $this->medicineStockInterface->create($inventoryData);
+
+        return response()->json([
+            'message' => 'Medicine inventory published and added to medicine stock.',
+        ], 200);
     }
-
-    $medicineStock->update($validatedData);
-
-    $inventoryData = [
-        'medicineName'      => $medicineStock->medicineName,
-        'inStock'           => $medicineStock->issuedQuantity ?? 0,  // Default to 0 if null
-        'division'          => $medicineStock->division,
-        'status'            => $medicineStock->status, // Using updated status
-        'responsibleSection'=> $medicineStock->responsibleSection,
-        'assigneeLevel'     => $medicineStock->assigneeLevel,
-    ];
-
-    $this->medicineStockInterface->create($inventoryData);
-
-    return response()->json([
-        'message' => 'Medicine inventory published and added to medicine stock.',
-    ], 200);
-}
 
     public function published()
-{
-    $records = $this->medicineInventoryInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+    {
+        $records = $this->medicineInventoryInterface->All()
+            ->sortByDesc('created_at')
+            ->sortByDesc('updated_at')
+            ->values();
 
-    $records = $records->filter(function ($record) {
-        return $record->status === 'published';
-    });
+        $records = $records->filter(function ($record) {
+            return $record->status === 'published';
+        });
 
-    $records = $records->map(function ($risk) {
-        try {
-            $creator = $this->userInterface->getById($risk->createdByUser);
-            $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
-        } catch (\Exception $e) {
-            $risk->createdByUserName = 'Unknown';
+        $records = $records->map(function ($risk) {
+            try {
+                $creator                 = $this->userInterface->getById($risk->createdByUser);
+                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->createdByUserName = 'Unknown';
+            }
+            return $risk;
+        });
+
+        foreach ($records as $record) {
+            $record->inventory = $this->medicineDisposalInterface->findByInventoryId($record->id);
         }
-        return $risk;
-    });
 
-    foreach ($records as $record) {
-        $record->inventory = $this->medicineDisposalInterface->findByInventoryId($record->id);
+        return response()->json($records->values()->all(), 200); // <-- Convert to simple array
     }
-
-    return response()->json($records, 200);
-}
 
 }

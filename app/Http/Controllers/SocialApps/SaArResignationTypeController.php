@@ -5,8 +5,6 @@ namespace App\Http\Controllers\SocialApps;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaArResignationType\ArResignationTypeRequest;
 use App\Repositories\All\SaArResignationType\ArResignationTypeInterface;
-use Illuminate\Http\Request;
-
 class SaArResignationTypeController extends Controller
 {
       protected $arResignationTypeInterface;
@@ -19,11 +17,7 @@ class SaArResignationTypeController extends Controller
     public function index()
     {
         $type = $this->arResignationTypeInterface->All();
-        if ($type->isEmpty()) {
-            return response()->json([
-                'message' => 'No resignation types found.',
-            ]);
-        }
+
         return response()->json($type);
     }
 

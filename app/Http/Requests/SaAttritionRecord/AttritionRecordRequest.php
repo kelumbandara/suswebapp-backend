@@ -23,7 +23,9 @@ class AttritionRecordRequest extends FormRequest
         return [
             'employeeName'             => 'required|string',
             'employeeId'               => 'required|string',
-            'country'                  => 'required|string',
+            'countryName'              => 'required|array',
+            'countryName.id'           => 'required|integer',
+            'countryName.countryName'  => 'required|string',
             'state'                    => 'required|string',
             'resignedDate'             => 'required|string',
             'relievedDate'             => 'required|string',

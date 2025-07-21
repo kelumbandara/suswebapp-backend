@@ -505,7 +505,12 @@ class DatabaseSeeder extends Seeder
             'sectionCode'   => 'CMS',
             'responsibleId' => '11',
         ]);
-
+        ComResponsibleSection::factory()->create([
+            'id'            => 12,
+            'sectionName'   => 'Grievance Section',
+            'sectionCode'   => 'GS',
+            'responsibleId' => '12',
+        ]);
         ComAssigneeLevel::factory()->create([
             'id'        => 1,
             'levelId'   => '1',
@@ -533,8 +538,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         ComOrganization::factory()->create([
-            'id'   => 1,
-            'organizationName' => 'ABA',
+            'id'                      => 1,
+            'organizationName'        => 'ABA',
             'organizationFactoryName' => 'Corporate',
         ]);
     }

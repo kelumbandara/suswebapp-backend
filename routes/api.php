@@ -133,6 +133,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('hazard-risk/{id}/show', [HazardAndRiskController::class, 'show']);
     Route::post('hazard-risk/{id}/update', [HazardAndRiskController::class, 'update']);
     Route::delete('hazard-risk/{id}/delete', [HazardAndRiskController::class, 'destroy']);
+    Route::get('hazard-risks-assignee', [HazardAndRiskController::class, 'assignee']);
     Route::get('hazard-risks-assign-task', [HazardAndRiskController::class, 'assignTask']);
     Route::post('hazard-risks-assign-task-approved', [HazardAndRiskController::class, 'assignTaskApproved']);
     Route::post('hazard-risks/{id}/update-status-to-approved', [HazardAndRiskController::class, 'updateStatusToApproved']);
@@ -330,16 +331,32 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('grievance-record-que-sug-app/{id}/update', [SaGrievanceRecodeController::class, 'updateQuSuApp']);
     Route::post('grievance-record-com-gri', [SaGrievanceRecodeController::class, 'storeComGri']);
     Route::post('grievance-record-com-gri/{id}/update', [SaGrievanceRecodeController::class, 'updateComGri']);
-    Route::post('grievance-record/{id}/update-status-inprogress', [SaGrievanceRecodeController::class, 'updateStatusInprogress']);
-    Route::post('grievance-record/{id}/update-complete-status', [SaGrievanceRecodeController::class, 'updateCompleteStatus']);
+    Route::post('grievance-record/{id}/update-status', [SaGrievanceRecodeController::class, 'updateStatus']);
+    Route::post('grievance-record/{id}/update-solution', [SaGrievanceRecodeController::class, 'updateCompleteStatus']);
     Route::delete('grievance-record/{id}/delete', [SaGrievanceRecodeController::class, 'destroy']);
     Route::post('grievance-record/{id}/feedback', [SaGrievanceRecodeController::class, 'updateFeedback']);
     Route::get('grievance-record-assign-task', [SaGrievanceRecodeController::class, 'assignTask']);
     Route::post('grievance-record-assign-task-complete', [SaGrievanceRecodeController::class, 'assignTaskComplete']);
+    Route::get('grievance-record-assignee', [SaGrievanceRecodeController::class, 'assignee']);
 
     Route::post('grievance-record', [SaGrievanceRecodeController::class, 'store']);
     Route::post('grievance-record/{id}/update', [SaGrievanceRecodeController::class, 'update']);
     Route::post('grievance-record/{id}/update-status-to-approved', [SaGrievanceRecodeController::class, 'updateStatusToApproved']);
+
+    //dashboard routes
+
+    Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/status-summary', [SaGrievanceRecodeController::class, 'getStatusSummary']);
+    Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/monthly-type-summary', [SaGrievanceRecodeController::class, 'getMonthlyTypeSummary']);
+    Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/type-of-grievance', [SaGrievanceRecodeController::class, 'getTypeOfGrievance']);
+    Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/category-summary', [SaGrievanceRecodeController::class, 'getCategorySummary']);
+    Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/topic-summary', [SaGrievanceRecodeController::class, 'getTopicSummary']);
+    Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/channel-summary', [SaGrievanceRecodeController::class, 'getChannelSummary']);
+    Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/department-summary', [SaGrievanceRecodeController::class, 'getDepartmentSummary']);
+    Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/stars-summary', [SaGrievanceRecodeController::class, 'getStarsSummary']);
+    Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/anonymous-summary', [SaGrievanceRecodeController::class, 'getAnonymousSummary']);
+    Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/monthly-status-summary', [SaGrievanceRecodeController::class, 'getMonthlyStatusSummary']);
+    Route::get('grievance-dashboard/{startDate}/{endDate}/{businessUnit}/{category}/severity-score-summary', [SaGrievanceRecodeController::class, 'getSeverityScoreSummary']);
+    Route::get('grievance-dashboard/{year}/all-summary', [SaGrievanceRecodeController::class, 'getAllSummary']);
 
     Route::get('rag-record', [SaRagRecodeController::class, 'index']);
     Route::post('rag-record', [SaRagRecodeController::class, 'store']);

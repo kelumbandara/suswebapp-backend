@@ -35,6 +35,12 @@ class SaAttritionRecordController extends Controller
                 $risk->createdByUser = 'Unknown';
             }
 
+             if (is_array($risk->countryName) || is_object($risk->countryName)) {
+                $risk->countryName = (object) $risk->countryName;
+            } else {
+                $risk->countryName = (object) ['id' => null, 'countryName' => 'Unknown'];
+            }
+
             return $risk;
         });
 
@@ -48,6 +54,7 @@ class SaAttritionRecordController extends Controller
         if (! $user) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
+
 
         $userId                         = $user->id;
         $validatedData                  = $request->validated();

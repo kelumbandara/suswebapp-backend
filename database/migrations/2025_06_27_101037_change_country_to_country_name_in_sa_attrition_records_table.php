@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('sa_rag_records', function (Blueprint $table) {
+        Schema::table('sa_attrition_records', function (Blueprint $table) {
             $table->dropColumn('country');
             $table->json('countryName')->nullable();
         });
@@ -22,10 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('sa_rag_records', function (Blueprint $table) {
+        Schema::table('sa_attrition_records', function (Blueprint $table) {
             $table->dropColumn('countryName');
             $table->string('country')->nullable();
         });
-
     }
 };

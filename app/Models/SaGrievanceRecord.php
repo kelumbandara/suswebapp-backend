@@ -26,7 +26,7 @@ class SaGrievanceRecord extends Model
         'channel',
         'category',
         'topic',
-        'submission',
+        'submissions',
         'description',
         'dueDate',
         'businessUnit',
@@ -54,6 +54,8 @@ class SaGrievanceRecord extends Model
         'designation',
         'department',
         'division',
+        'assigneeId',
+        'solutionRemark',
         'feedback',
         'stars',
         'status',
@@ -74,12 +76,17 @@ class SaGrievanceRecord extends Model
         'evidence' => 'array',
     ];
 
-        protected static function booted()
+       protected static function booted()
     {
         static::created(function ($model) {
-            $model->referenceNumber = 'GRI-' . $model->id;
+            $year  = now()->year;
+            $month = strtoupper(now()->format('M'));
 
-            $model->save();
+            $model->updateQuietly([
+                'referenceNumber' => 'GRI-' . $model->id,
+                'caseId'          => "GRV/{$year}/{$month}/{$model->id}",
+            ]);
         });
     }
+
 }

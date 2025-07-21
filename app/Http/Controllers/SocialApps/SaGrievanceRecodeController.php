@@ -13,6 +13,7 @@ use App\Repositories\All\SaGrNomineeDetails\GrNomineeDetailsInterface;
 use App\Repositories\All\SaGrRespondentDetails\GrRespondentDetailsInterface;
 use App\Repositories\All\User\UserInterface;
 use App\Services\GrievanceService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SaGrievanceRecodeController extends Controller
@@ -85,6 +86,7 @@ class SaGrievanceRecodeController extends Controller
             $record->updatedByUser    = $this->safeUser($record->updatedByUserId);
             $record->inprogressByUser = $this->safeUser($record->inprogressByUserId);
             $record->completedByUser  = $this->safeUser($record->completedByUserId);
+            $record->assignee         = $this->safeUser($record->assigneeId);
 
             $record->statementDocuments                       = $this->resolveGcsFiles($record->statementDocuments);
             $record->investigationCommitteeStatementDocuments = $this->resolveGcsFiles($record->investigationCommitteeStatementDocuments);
@@ -96,9 +98,13 @@ class SaGrievanceRecodeController extends Controller
                 $record->gender        = null;
                 $record->supervisor    = null;
                 $record->employeeShift = null;
+                $record->employeeId    = null;
                 $record->location      = null;
             }
-
+            $record->committeeMembers = $this->commiteeMemberDetailsInterface->findByGrievanceId($record->id);
+            $record->legalAdvisors    = $this->legalAdvisorDetailsInterface->findByGrievanceId($record->id);
+            $record->nominees         = $this->nomineeDetailsInterface->findByGrievanceId($record->id);
+            $record->respondents      = $this->respondentDetailsInterface->findByGrievanceId($record->id);
             return $record;
         });
 
@@ -269,71 +275,105 @@ class SaGrievanceRecodeController extends Controller
         ], 201);
     }
 
-    public function updateQuSuApp($id, GrStoreQuSuAppRequest $request)
+    public function updateQuSuApp($id, GrievanceRecordRequest $request)
     {
-        $user = Auth::user();
-        if (! $user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+        $user   = Auth::user();
+        $record = $this->grievanceInterface->findById($id);
+        if (! $record) {
+            return response()->json(['message' => 'Grievance record not found.'], 404);
         }
 
-        $data                    = $request->validated();
-        $data['updatedByUserId'] = $user->id;
-        if (isset($data['status']) && $data['status'] === 'open') {
+        $data   = $request->validated();
+        $status = $data['status'] ?? null;
+
+        if ($status === 'inprogress') {
+            $data['inprogressByUserId'] = $user->id;
+        }
+
+        if ($status === 'open') {
             $data['openedByUserId'] = $user->id;
         }
 
-        $record = $this->grievanceInterface->findById($id);
-        if (! $record) {
-            return response()->json(['message' => 'Grievance record not found'], 404);
+        if ($status === 'completed') {
+            $data['completedByUserId'] = $user->id;
         }
 
-        $validatedData = $request->validated();
+        $handleJsonColumn = function (string $column, string $removeKey, string $fileKey) use ($request, $record) {
+            $existingRaw = $record->{$column} ?? '[]';
+            $existing    = is_array($existingRaw) ? $existingRaw : json_decode($existingRaw, true);
+            $existing    = $existing ?? [];
 
-        $evidence = json_decode($record->evidence, true) ?? [];
-
-        if ($request->has('removeEvidence')) {
-            $removeEvidence = $request->input('removeEvidence');
-
-            if (is_array($removeEvidence)) {
-                foreach ($removeEvidence as $removeItem) {
-                    $this->grievanceService->removeOldDocumentFromStorage($removeItem);
+            if ($request->has($removeKey)) {
+                foreach ((array) $request->input($removeKey) as $uri) {
+                    $this->grievanceService->removeOldDocumentFromStorage($uri);
                 }
-
-                $evidence = array_values(array_filter($evidence, function ($doc) use ($removeEvidence) {
-                    return ! in_array($doc['gsutil_uri'], $removeEvidence);
-                }));
+                $existing = array_filter($existing, fn($doc) => ! in_array($doc['gsutil_uri'], $request->input($removeKey)));
+                $existing = array_values($existing); // reindex array
             }
-        }
 
-        if ($request->hasFile('evidence')) {
-            $newEvidence = [];
-
-            foreach ($request->file('evidence') as $file) {
-                $uploadResult = $this->grievanceService->uploadImageToGCS($file, 'evidence');
-
-                if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
-                    $newEvidence[] = [
-                        'gsutil_uri' => $uploadResult['gsutil_uri'],
-                        'file_name'  => $uploadResult['file_name'],
-                    ];
+            if ($request->hasFile($fileKey)) {
+                foreach ($request->file($fileKey) as $file) {
+                    $res = $this->grievanceService->updateDocuments($file);
+                    if (! empty($res['gsutil_uri'])) {
+                        $existing[] = [
+                            'gsutil_uri' => $res['gsutil_uri'],
+                            'file_name'  => $res['file_name'],
+                        ];
+                    }
                 }
             }
 
-            $evidence = array_merge($evidence, $newEvidence);
+            return json_encode($existing);
+        };
+
+        $data['statementDocuments'] = $handleJsonColumn(
+            'statementDocuments',
+            'removeStatementDocuments',
+            'statementDocuments'
+        );
+        $data['investigationCommitteeStatementDocuments'] = $handleJsonColumn(
+            'investigationCommitteeStatementDocuments',
+            'removeInvestigationCommitteeStatementDocuments',
+            'investigationCommitteeStatementDocuments'
+        );
+        $data['evidence'] = $handleJsonColumn(
+            'evidence',
+            'removeEvidence',
+            'evidence'
+        );
+
+        $updated = $this->grievanceInterface->update($id, $data);
+
+        $this->commiteeMemberDetailsInterface->deleteByGrievanceId($id);
+        foreach ($data['committeeMembers'] ?? [] as $m) {
+            $m['grievanceId'] = $id;
+            $this->commiteeMemberDetailsInterface->create($m);
         }
 
-        $validatedData['evidence'] = json_encode($evidence);
-
-        $updated = $this->grievanceInterface->update($id, $validatedData);
-
-        if ($updated) {
-            return response()->json([
-                'message' => 'Grievance record updated successfully',
-                'record'  => $this->grievanceInterface->findById($id),
-            ], 200);
-        } else {
-            return response()->json(['message' => 'Failed to update grievance record'], 500);
+        $this->legalAdvisorDetailsInterface->deleteByGrievanceId($id);
+        foreach ($data['legalAdvisors'] ?? [] as $a) {
+            $a['grievanceId'] = $id;
+            $this->legalAdvisorDetailsInterface->create($a);
         }
+
+        $this->nomineeDetailsInterface->deleteByGrievanceId($id);
+        foreach ($data['nominees'] ?? [] as $n) {
+            $n['grievanceId'] = $id;
+            $this->nomineeDetailsInterface->create($n);
+        }
+
+        $this->respondentDetailsInterface->deleteByGrievanceId($id);
+        foreach ($data['respondents'] ?? [] as $r) {
+            $r['grievanceId'] = $id;
+            $this->respondentDetailsInterface->create($r);
+        }
+
+        return response()->json([
+            'message' => $updated
+            ? 'Grievance record updated successfully.'
+            : 'Update failed.',
+            'record'  => $this->grievanceInterface->findById($id),
+        ], $updated ? 200 : 500);
     }
 
     public function storeComGri(GrStoreComGriRequest $request)
@@ -383,76 +423,110 @@ class SaGrievanceRecodeController extends Controller
         ], 201);
     }
 
-    public function updateComGri($id, GrStoreComGriRequest $request)
+    public function updateComGri($id, GrievanceRecordRequest $request)
     {
-        $user = Auth::user();
-        if (! $user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+        $user   = Auth::user();
+        $record = $this->grievanceInterface->findById($id);
+        if (! $record) {
+            return response()->json(['message' => 'Grievance record not found.'], 404);
         }
 
-        $data                    = $request->validated();
-        $data['updatedByUserId'] = $user->id;
-        if (isset($data['status']) && $data['status'] === 'open') {
+        $data = $request->validated();
+
+        $status = $data['status'] ?? null;
+
+        if ($status === 'inprogress') {
+            $data['inprogressByUserId'] = $user->id;
+        }
+
+        if ($status === 'open') {
             $data['openedByUserId'] = $user->id;
         }
 
-        $record = $this->grievanceInterface->findById($id);
-        if (! $record) {
-            return response()->json(['message' => 'Grievance record not found'], 404);
+        if ($status === 'completed') {
+            $data['completedByUserId'] = $user->id;
         }
 
-        $validatedData = $request->validated();
+        $handleJsonColumn = function (string $column, string $removeKey, string $fileKey) use ($request, $record) {
+            $existing = json_decode($record->{$column} ?? '[]', true);
 
-        $evidence = json_decode($record->evidence, true) ?? [];
-
-        if ($request->has('removeEvidence')) {
-            $removeEvidence = $request->input('removeEvidence');
-
-            if (is_array($removeEvidence)) {
-                foreach ($removeEvidence as $removeItem) {
-                    $this->grievanceService->removeOldDocumentFromStorage($removeItem);
+            if ($request->has($removeKey)) {
+                foreach ((array) $request->input($removeKey) as $uri) {
+                    $this->grievanceService->removeOldDocumentFromStorage($uri);
                 }
-
-                $evidence = array_values(array_filter($evidence, function ($doc) use ($removeEvidence) {
-                    return ! in_array($doc['gsutil_uri'], $removeEvidence);
-                }));
+                $existing = array_filter($existing, fn($doc) => ! in_array($doc['gsutil_uri'], $request->input($removeKey)));
+                $existing = array_values($existing);
             }
-        }
 
-        if ($request->hasFile('evidence')) {
-            $newEvidence = [];
-
-            foreach ($request->file('evidence') as $file) {
-                $uploadResult = $this->grievanceService->uploadImageToGCS($file, 'evidence');
-
-                if ($uploadResult && isset($uploadResult['gsutil_uri'])) {
-                    $newEvidence[] = [
-                        'gsutil_uri' => $uploadResult['gsutil_uri'],
-                        'file_name'  => $uploadResult['file_name'],
-                    ];
+            if ($request->hasFile($fileKey)) {
+                foreach ($request->file($fileKey) as $file) {
+                    $res = $this->grievanceService->updateDocuments($file);
+                    if (! empty($res['gsutil_uri'])) {
+                        $existing[] = [
+                            'gsutil_uri' => $res['gsutil_uri'],
+                            'file_name'  => $res['file_name'],
+                        ];
+                    }
                 }
             }
 
-            $evidence = array_merge($evidence, $newEvidence);
+            return json_encode($existing);
+        };
+
+        $data['statementDocuments'] = $handleJsonColumn(
+            'statementDocuments',
+            'removeStatementDocuments',
+            'statementDocuments'
+        );
+        $data['investigationCommitteeStatementDocuments'] = $handleJsonColumn(
+            'investigationCommitteeStatementDocuments',
+            'removeInvestigationCommitteeStatementDocuments',
+            'investigationCommitteeStatementDocuments'
+        );
+        $data['evidence'] = $handleJsonColumn(
+            'evidence',
+            'removeEvidence',
+            'evidence'
+        );
+
+        $updated = $this->grievanceInterface->update($id, $data);
+
+        $this->commiteeMemberDetailsInterface->deleteByGrievanceId($id);
+        foreach ($data['committeeMembers'] ?? [] as $m) {
+            $m['grievanceId'] = $id;
+            $this->commiteeMemberDetailsInterface->create($m);
         }
 
-        $validatedData['evidence'] = json_encode($evidence);
-
-        $updated = $this->grievanceInterface->update($id, $validatedData);
-
-        if ($updated) {
-            return response()->json([
-                'message' => 'Grievance record updated successfully',
-                'record'  => $this->grievanceInterface->findById($id),
-            ], 200);
-        } else {
-            return response()->json(['message' => 'Failed to update grievance record'], 500);
+        $this->legalAdvisorDetailsInterface->deleteByGrievanceId($id);
+        foreach ($data['legalAdvisors'] ?? [] as $a) {
+            $a['grievanceId'] = $id;
+            $this->legalAdvisorDetailsInterface->create($a);
         }
+
+        $this->nomineeDetailsInterface->deleteByGrievanceId($id);
+        foreach ($data['nominees'] ?? [] as $n) {
+            $n['grievanceId'] = $id;
+            $this->nomineeDetailsInterface->create($n);
+        }
+
+        $this->respondentDetailsInterface->deleteByGrievanceId($id);
+        foreach ($data['respondents'] ?? [] as $r) {
+            $r['grievanceId'] = $id;
+            $this->respondentDetailsInterface->create($r);
+        }
+
+        return response()->json([
+            'message' => $updated
+            ? 'Grievance record updated successfully.'
+            : 'Update failed.',
+            'record'  => $this->grievanceInterface->findById($id),
+        ], $updated ? 200 : 500);
     }
 
-    public function updateStatusInprogress($id)
+    public function updateStatus(Request $request, $id)
     {
         $user = Auth::user();
+
         if (! $user) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
@@ -462,15 +536,40 @@ class SaGrievanceRecodeController extends Controller
             return response()->json(['message' => 'Grievance record not found'], 404);
         }
 
-        $updated = $this->grievanceInterface->update($id, [
-            'status'             => 'inprogress',
-            'assigneeId'         => $user->id,
-            'inprogressByUserId' => $user->id,
-        ]);
+        $status     = $request->input('status');
+        $assigneeId = $request->input('assigneeId');
+
+        $validStatuses = ['draft', 'open', 'inprogress', 'completed'];
+        if (! in_array($status, $validStatuses)) {
+            return response()->json(['message' => 'Invalid status'], 422);
+        }
+
+        $updateData = [
+            'status'          => $status,
+            'updatedByUserId' => $user->id,
+        ];
+
+        if (! is_null($assigneeId)) {
+            $updateData['assigneeId'] = $assigneeId;
+        }
+
+        if ($status === 'inprogress') {
+            $updateData['inprogressByUserId'] = $user->id;
+        }
+
+        if ($status === 'open') {
+            $updateData['openedByUserId'] = $user->id;
+        }
+
+        if ($status === 'completed') {
+            $updateData['completedByUserId'] = $user->id;
+        }
+
+        $updated = $this->grievanceInterface->update($id, $updateData);
 
         if ($updated) {
             return response()->json([
-                'message' => 'Grievance record updated to inprogress',
+                'message' => "Grievance record updated to '{$status}'",
                 'record'  => $this->grievanceInterface->findById($id),
             ], 200);
         } else {
@@ -804,5 +903,598 @@ class SaGrievanceRecodeController extends Controller
         }
     }
 
+    public function assignee()
+    {
+        $user        = Auth::user();
+        $targetLevel = $user->assigneeLevel + 1;
+
+        $assignees = $this->userInterface->getUsersByAssigneeLevelAndSection($targetLevel, 'Grievance Section')
+            ->where('availability', 1)
+            ->values();
+
+        return response()->json($assignees);
+    }
+
+    public function getStatusSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $totalRecords = $this->grievanceInterface->All()->count();
+
+        $filtered      = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $filteredCount = $filtered->count();
+
+        $filteredPercentage = $totalRecords > 0 ? round(($filteredCount / $totalRecords) * 100, 2) : 0;
+
+        $statusCounts = $filtered->groupBy('status')->map(function ($items) use ($filteredCount) {
+            $count      = $items->count();
+            $percentage = $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0;
+            return [
+                'count'      => $count,
+                'percentage' => $percentage,
+            ];
+        });
+
+        $feedbackGivenCount = $filtered->whereNotNull('feedback')->count();
+        $feedbackPercentage = $filteredCount > 0 ? round(($feedbackGivenCount / $filteredCount) * 100, 2) : 0;
+
+        return response()->json([
+            'totalRecords'       => $totalRecords,
+            'filteredRecords'    => $filteredCount,
+            'filteredPercentage' => $filteredPercentage,
+            'statusSummary'      => $statusCounts,
+            'feedbackSummary'    => [
+                'count'      => $feedbackGivenCount,
+                'percentage' => $feedbackPercentage,
+            ],
+        ]);
+    }
+
+    public function getMonthlyTypeSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $monthNames = [
+            1  => 'January', 2  => 'February', 3  => 'March',
+            4  => 'April', 5    => 'May', 6       => 'June',
+            7  => 'July', 8     => 'August', 9    => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December',
+        ];
+
+        $records = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+
+        $aggregated = [];
+
+        foreach ($records as $record) {
+            $updatedAt = \Carbon\Carbon::parse($record->updated_at);
+
+            if ($updatedAt->lt($startDate) || $updatedAt->gt($endDate)) {
+                continue;
+            }
+
+            $monthName = $updatedAt->format('F');
+
+            if (! isset($aggregated[$monthName])) {
+                $aggregated[$monthName] = [
+                    'total' => 0,
+                    'types' => [],
+                ];
+            }
+
+            $aggregated[$monthName]['total'] += 1;
+
+            $type = $record->type ?? 'unknown';
+
+            if (! isset($aggregated[$monthName]['types'][$type])) {
+                $aggregated[$monthName]['types'][$type] = 0;
+            }
+
+            $aggregated[$monthName]['types'][$type] += 1;
+        }
+
+        $response = [];
+
+        foreach ($monthNames as $i => $monthName) {
+            $data = $aggregated[$monthName] ?? [
+                'total' => 0,
+                'types' => [],
+            ];
+
+            $response[] = [
+                'month' => $monthName,
+                'total' => $data['total'],
+                'types' => $data['types'],
+            ];
+        }
+
+        return response()->json([
+            'monthlyTypeCount' => $response,
+        ]);
+    }
+
+    public function getTypeOfGrievance($startDate, $endDate, $businessUnit, $category)
+    {
+        $filtered      = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $filteredCount = $filtered->count();
+
+        $typeSummary = $filtered->groupBy('type')->map(function ($items) use ($filteredCount) {
+            $count      = $items->count();
+            $percentage = $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0;
+            return [
+                'count'      => $count,
+                'percentage' => $percentage,
+            ];
+        });
+
+        $result = [];
+        foreach ($typeSummary as $type => $data) {
+            $result = [
+                'type'       => $type,
+                'count'      => $data['count'],
+                'percentage' => $data['percentage'],
+            ];
+        }
+
+        return response()->json([
+            'total' => $filteredCount,
+            'types' => $result,
+        ]);
+    }
+
+    public function getCategorySummary($startDate, $endDate, $businessUnit)
+    {
+        $filtered      = $this->grievanceInterface->filterByStartEndDate($startDate, $endDate, $businessUnit);
+        $filteredCount = $filtered->count();
+
+        $categorySummary = $filtered->groupBy('category')->map(function ($items) use ($filteredCount) {
+            $count      = $items->count();
+            $percentage = $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0;
+
+            return [
+                'count'      => $count,
+                'percentage' => $percentage,
+            ];
+        });
+
+        $result = [];
+        foreach ($categorySummary as $category => $data) {
+            $result[] = [
+                'category'   => $category,
+                'count'      => $data['count'],
+                'percentage' => $data['percentage'],
+            ];
+        }
+
+        return response()->json([
+            'total'      => $filteredCount,
+            'categories' => $result,
+        ]);
+    }
+    public function getTopicSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $filtered      = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $filteredCount = $filtered->count();
+
+        $topicSummary = $filtered->groupBy('topic')->map(function ($items) use ($filteredCount) {
+            $count      = $items->count();
+            $percentage = $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0;
+            return [
+                'count'      => $count,
+                'percentage' => $percentage,
+            ];
+        });
+
+        $topics = [];
+        foreach ($topicSummary as $topic => $data) {
+            $topics[] = [
+                'topic'      => $topic,
+                'count'      => $data['count'],
+                'percentage' => $data['percentage'],
+            ];
+        }
+
+        return response()->json([
+            'total'  => $filteredCount,
+            'topics' => $topics,
+        ]);
+    }
+
+    public function getChannelSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $filtered      = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $filteredCount = $filtered->count();
+
+        $channelSummary = $filtered->groupBy('channel')->map(function ($items) use ($filteredCount) {
+            $count      = $items->count();
+            $percentage = $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0;
+            return [
+                'count'      => $count,
+                'percentage' => $percentage,
+            ];
+        });
+
+        $channels = [];
+        foreach ($channelSummary as $channel => $data) {
+            $channels[] = [
+                'channel'    => $channel ?? 'unknown',
+                'count'      => $data['count'],
+                'percentage' => $data['percentage'],
+            ];
+        }
+
+        return response()->json([
+            'total'    => $filteredCount,
+            'channels' => $channels,
+        ]);
+    }
+
+    public function getDepartmentSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $filtered      = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $filteredCount = $filtered->count();
+
+        $departmentSummary = $filtered->groupBy('responsibleDepartment')->map(function ($items) use ($filteredCount) {
+            $count      = $items->count();
+            $percentage = $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0;
+
+            return [
+                'count'      => $count,
+                'percentage' => $percentage,
+            ];
+        });
+
+        $departments = [];
+        foreach ($departmentSummary as $department => $data) {
+            $departments[] = [
+                'responsibleDepartment' => $department ?? 'unknown',
+                'count'                 => $data['count'],
+                'percentage'            => $data['percentage'],
+            ];
+        }
+
+        return response()->json([
+            'total'                 => $filteredCount,
+            'responsibleDepartment' => $departments,
+        ]);
+    }
+
+    public function getStarsSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $records = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $total   = $records->count();
+
+        $starCounts = [
+            '5 stars' => ['count' => 0, 'percentage' => 0],
+            '4 stars' => ['count' => 0, 'percentage' => 0],
+            '3 stars' => ['count' => 0, 'percentage' => 0],
+            '2 stars' => ['count' => 0, 'percentage' => 0],
+            '1 stars' => ['count' => 0, 'percentage' => 0],
+            '0 stars' => ['count' => 0, 'percentage' => 0],
+        ];
+
+        foreach ($records as $record) {
+            $stars = $record->stars;
+
+            switch ($stars) {
+                case 5:
+                    $starCounts['5 stars']['count']++;
+                    break;
+                case 4:
+                    $starCounts['4 stars']['count']++;
+                    break;
+                case 3:
+                    $starCounts['3 stars']['count']++;
+                    break;
+                case 2:
+                    $starCounts['2 stars']['count']++;
+                    break;
+                case 1:
+                    $starCounts['1 stars']['count']++;
+                    break;
+                default:
+                    $starCounts['0 stars']['count']++;
+                    break;
+            }
+        }
+
+        foreach ($starCounts as $key => &$data) {
+            $data['percentage'] = $total > 0 ? round(($data['count'] / $total) * 100, 2) : 0;
+        }
+
+        return response()->json([
+            'total'        => $total,
+            'starsSummary' => $starCounts,
+        ]);
+    }
+
+    public function getAnonymousSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $records = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $total   = $records->count();
+
+        $anonymousCount    = $records->where('isAnonymous', true)->count();
+        $nonAnonymousCount = $records->where('isAnonymous', false)->count();
+
+        $anonymousPercentage    = $total > 0 ? round(($anonymousCount / $total) * 100, 2) : 0;
+        $nonAnonymousPercentage = $total > 0 ? round(($nonAnonymousCount / $total) * 100, 2) : 0;
+
+        return response()->json([
+            'total'            => $total,
+            'anonymousSummary' => [
+                'anonymous'    => [
+                    'count'      => $anonymousCount,
+                    'percentage' => $anonymousPercentage,
+                ],
+                'nonAnonymous' => [
+                    'count'      => $nonAnonymousCount,
+                    'percentage' => $nonAnonymousPercentage,
+                ],
+            ],
+        ]);
+    }
+
+    public function getMonthlyStatusSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $monthNames = [
+            1  => 'January', 2  => 'February', 3  => 'March',
+            4  => 'April', 5    => 'May', 6       => 'June',
+            7  => 'July', 8     => 'August', 9    => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December',
+        ];
+
+        $records    = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+        $aggregated = [];
+
+        foreach ($records as $record) {
+            $updatedAt = \Carbon\Carbon::parse($record->updated_at);
+
+            if ($updatedAt->lt($startDate) || $updatedAt->gt($endDate)) {
+                continue;
+            }
+
+            $monthName = $updatedAt->format('F');
+            $status    = $record->status ?? 'unknown';
+
+            if (! isset($aggregated[$monthName])) {
+                $aggregated[$monthName] = [
+                    'total'    => 0,
+                    'statuses' => [],
+                ];
+            }
+
+            $aggregated[$monthName]['total'] += 1;
+            if (! isset($aggregated[$monthName]['statuses'][$status])) {
+                $aggregated[$monthName]['statuses'][$status] = 0;
+            }
+            $aggregated[$monthName]['statuses'][$status] += 1;
+        }
+
+        $response = [];
+
+        foreach ($monthNames as $i => $monthName) {
+            $data = $aggregated[$monthName] ?? [
+                'total'    => 0,
+                'statuses' => [],
+            ];
+
+            $response[] = [
+                'month'    => $monthName,
+                'total'    => $data['total'],
+                'statuses' => $data['statuses'],
+            ];
+        }
+
+        return response()->json([
+            'monthlyStatusCount' => $response,
+        ]);
+    }
+
+    public function getSeverityScoreSummary($startDate, $endDate, $businessUnit, $category)
+    {
+        $records = $this->grievanceInterface->filterByParams($startDate, $endDate, $category, $businessUnit);
+
+        $filtered = $records->filter(function ($item) {
+            return ! is_null($item->severityScore);
+        });
+
+        $total = $filtered->count();
+
+        $grouped = $filtered->groupBy(function ($item) {
+            return $item->severityScore;
+        });
+
+        $summary = [];
+
+        foreach ($grouped as $severity => $items) {
+            $count      = $items->count();
+            $percentage = $total > 0 ? round(($count / $total) * 100, 2) : 0;
+
+            $summary[] = [
+                'severityScore' => $severity,
+                'count'         => $count,
+                'percentage'    => $percentage,
+            ];
+        }
+
+        return response()->json([
+            'total'          => $total,
+            'severityScores' => $summary,
+        ]);
+    }
+
+    public function getAllSummary($year)
+    {
+        // 1) pull only those records whose updated_at falls in $year
+        $records       = $this->grievanceInterface->filterByYear($year);
+        $filteredCount = $records->count();
+
+        // 2) total across all years (if you still need it)
+        $totalRecords = $this->grievanceInterface->All()->count();
+
+        // --- Status Summary (adapted from getStatusSummary) ---
+        $filteredPercentage = $totalRecords > 0
+        ? round(($filteredCount / $totalRecords) * 100, 2)
+        : 0;
+
+        $statusCounts = $records
+            ->groupBy('status')
+            ->map(function ($items) use ($filteredCount) {
+                $count      = $items->count();
+                $percentage = $filteredCount > 0
+                ? round(($count / $filteredCount) * 100, 2)
+                : 0;
+                return ['count' => $count, 'percentage' => $percentage];
+            });
+
+        $feedbackGivenCount = $records->whereNotNull('feedback')->count();
+        $feedbackPercentage = $filteredCount > 0
+        ? round(($feedbackGivenCount / $filteredCount) * 100, 2)
+        : 0;
+
+        $statusSummary = [
+            'totalRecords'       => $totalRecords,
+            'filteredRecords'    => $filteredCount,
+            'filteredPercentage' => $filteredPercentage,
+            'statusCounts'       => $statusCounts,
+            'feedbackSummary'    => [
+                'count'      => $feedbackGivenCount,
+                'percentage' => $feedbackPercentage,
+            ],
+        ];
+
+        // --- Monthly Type Summary ---
+        $monthNames = [
+            1 => 'January', 2    => 'February', 3 => 'March', 4     => 'April',
+            5 => 'May', 6        => 'June', 7     => 'July', 8      => 'August',
+            9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December',
+        ];
+        $monthlyTypeCount = [];
+        foreach ($monthNames as $i => $monthName) {
+            $monthRecords = $records->filter(function ($r) use ($i) {
+                return \Carbon\Carbon::parse($r->updated_at)->month == $i;
+            });
+            $monthlyTypeCount[] = [
+                'month' => $monthName,
+                'total' => $monthRecords->count(),
+                'types' => $monthRecords->groupBy('type')->map->count(),
+            ];
+        }
+
+        // --- Type Summary ---
+        $typeSummary = $records
+            ->groupBy('type')
+            ->map(function ($items) use ($filteredCount) {
+                $count = $items->count();
+                return [
+                    'count'      => $count,
+                    'percentage' => $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0,
+                ];
+            });
+
+        // --- Category Summary ---
+        $categorySummary = $records
+            ->groupBy('category')
+            ->map(function ($items) use ($filteredCount) {
+                $count = $items->count();
+                return [
+                    'count'      => $count,
+                    'percentage' => $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0,
+                ];
+            });
+
+        // --- Topic Summary ---
+        $topicSummary = $records
+            ->groupBy('topic')
+            ->map(function ($items) use ($filteredCount) {
+                $count = $items->count();
+                return [
+                    'count'      => $count,
+                    'percentage' => $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0,
+                ];
+            });
+
+        // --- Channel Summary ---
+        $channelSummary = $records
+            ->groupBy('channel')
+            ->map(function ($items) use ($filteredCount) {
+                $count = $items->count();
+                return [
+                    'count'      => $count,
+                    'percentage' => $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0,
+                ];
+            });
+
+        // --- Department Summary ---
+        $departmentSummary = $records
+            ->groupBy('responsibleDepartment')
+            ->map(function ($items) use ($filteredCount) {
+                $count = $items->count();
+                return [
+                    'count'      => $count,
+                    'percentage' => $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0,
+                ];
+            });
+
+        // --- Stars Summary ---
+        $starCounts = array_fill_keys(
+            ['5 stars', '4 stars', '3 stars', '2 stars', '1 stars', '0 stars'],
+            0
+        );
+        foreach ($records as $r) {
+            $key = $r->stars ? $r->stars . ' stars' : '0 stars';
+            $starCounts[$key]++;
+        }
+        $starsSummary = [];
+        foreach ($starCounts as $key => $count) {
+            $starsSummary[$key] = [
+                'count'      => $count,
+                'percentage' => $filteredCount > 0 ? round(($count / $filteredCount) * 100, 2) : 0,
+            ];
+        }
+
+        // --- Anonymous Summary ---
+        $anonymousCount   = $records->where('isAnonymous', true)->count();
+        $nonAnonCount     = $records->where('isAnonymous', false)->count();
+        $anonymousSummary = [
+            'anonymous'    => ['count' => $anonymousCount, 'percentage' => $filteredCount > 0 ? round($anonymousCount / $filteredCount * 100, 2) : 0],
+            'nonAnonymous' => ['count' => $nonAnonCount, 'percentage' => $filteredCount > 0 ? round($nonAnonCount / $filteredCount * 100, 2) : 0],
+        ];
+
+        // --- Monthly Status Summary ---
+        $monthlyStatusSummary = [];
+        foreach ($monthNames as $i => $monthName) {
+            $monthRecords           = $records->filter(fn($r) => \Carbon\Carbon::parse($r->updated_at)->month == $i);
+            $monthlyStatusSummary[] = [
+                'month'    => $monthName,
+                'total'    => $monthRecords->count(),
+                'statuses' => $monthRecords->groupBy('status')->map->count(),
+            ];
+        }
+
+        // --- Severity Score Summary ---
+        $sevRecords           = $records->filter(fn($r) => ! is_null($r->severityScore));
+        $severityScoreSummary = $sevRecords
+            ->groupBy('severityScore')
+            ->map(function ($items) use ($sevRecords) {
+                $count = $items->count();
+                return [
+                    'count'      => $count,
+                    'percentage' => $sevRecords->count() > 0 ? round($count / $sevRecords->count() * 100, 2) : 0,
+                ];
+            });
+
+        return response()->json([
+            'year'                 => $year,
+            'totalRecordsAllTime'  => $totalRecords,
+            'totalRecordsThisYear' => $filteredCount,
+            'statusSummary'        => $statusSummary,
+            'monthlyTypeCount'     => $monthlyTypeCount,
+            'typeSummary'          => $typeSummary,
+            'categorySummary'      => $categorySummary,
+            'topicSummary'         => $topicSummary,
+            'channelSummary'       => $channelSummary,
+            'departmentSummary'    => $departmentSummary,
+            'starsSummary'         => $starsSummary,
+            'anonymousSummary'     => $anonymousSummary,
+            'monthlyStatusSummary' => $monthlyStatusSummary,
+            'severityScoreSummary' => $severityScoreSummary,
+        ]);
+    }
 
 }
