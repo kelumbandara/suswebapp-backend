@@ -142,7 +142,7 @@ class OsMiMedicineRequestController extends Controller
         }
 
         $medicine = $this->medicineRequestInterface
-            ->getByAssigneeId($user->id)
+            ->all()
             ->filter(function ($med) {
                 return $med->status === 'approved';
             })

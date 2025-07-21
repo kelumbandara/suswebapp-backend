@@ -194,7 +194,7 @@ class SaEnvirementManagementRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $record = $this->envirementManagementRecodeInterface->getByApproverId($user->id)->filter(function ($med) {
+        $record = $this->envirementManagementRecodeInterface->all()->filter(function ($med) {
             return $med->status === 'approved';
         })->sortByDesc('created_at')->sortByDesc('updated_at')->values();
         $record = $this->envirementManagementRecodeInterface->getByReviewerId($user->id)->filter(function ($med) {

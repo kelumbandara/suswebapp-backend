@@ -235,7 +235,7 @@ class SaEnvirementTargetSettingRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $targetSetting = $this->targetSettingRecodeInterface->getByApproverId($user->id)
+        $targetSetting = $this->targetSettingRecodeInterface->all()
             ->filter(function ($med) {
                 return $med->status === 'approved';
             })->sortByDesc('created_at')->sortByDesc('created_at')->sortByDesc('updated_at')->values();

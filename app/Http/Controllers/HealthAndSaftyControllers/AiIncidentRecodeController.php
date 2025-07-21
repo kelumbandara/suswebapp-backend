@@ -32,8 +32,8 @@ class AiIncidentRecodeController extends Controller
     {
         $records = $this->incidentRecordInterface->All()->sortByDesc('created_at')->sortByDesc('updated_at')->values();
         $records = $records->map(function ($risk) {
-           try {
-                $assignee           = $this->userInterface->getById($risk->assigneeId);
+            try {
+                $assignee       = $this->userInterface->getById($risk->assigneeId);
                 $risk->assignee = $assignee ?? (object) ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $risk->assignee = (object) ['name' => 'Unknown', 'id' => null];
@@ -248,13 +248,13 @@ class AiIncidentRecodeController extends Controller
         }
 
         $record = $this->incidentRecordInterface
-        ->getByAssigneeId($user->id)
-         ->filter(function ($risk) {
+            ->getByAssigneeId($user->id)
+            ->filter(function ($risk) {
                 return $risk->status !== 'approved';
             })
-        ->sortByDesc('created_at')
-        ->sortByDesc('updated_at')
-        ->values();
+            ->sortByDesc('created_at')
+            ->sortByDesc('updated_at')
+            ->values();
 
         $record = $record->map(function ($incident) {
             try {
@@ -293,8 +293,7 @@ class AiIncidentRecodeController extends Controller
         return response()->json($record, 200);
     }
 
-
-   public function assignTaskApproved()
+    public function assignTaskApproved()
     {
         $user = Auth::user();
 
@@ -303,13 +302,13 @@ class AiIncidentRecodeController extends Controller
         }
 
         $record = $this->incidentRecordInterface
-        ->getByAssigneeId($user->id)
-         ->filter(function ($risk) {
+            ->all()
+            ->filter(function ($risk) {
                 return $risk->status === 'approved';
             })
-        ->sortByDesc('created_at')
-        ->sortByDesc('updated_at')
-        ->values();
+            ->sortByDesc('created_at')
+            ->sortByDesc('updated_at')
+            ->values();
 
         $record = $record->map(function ($incident) {
             try {
@@ -347,7 +346,6 @@ class AiIncidentRecodeController extends Controller
 
         return response()->json($record, 200);
     }
-
 
     public function updateStatusToApproved(string $id)
     {

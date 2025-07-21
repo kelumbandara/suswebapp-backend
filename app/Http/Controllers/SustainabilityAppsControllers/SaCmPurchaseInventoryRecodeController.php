@@ -496,7 +496,7 @@ class SaCmPurchaseInventoryRecodeController extends Controller
         }
 
         $records = $this->purchaseInventoryInterface
-            ->getByReviewerId($user->id)
+            ->all()
             ->filter(function ($med) {
                 return $med->status === 'approved';
             })

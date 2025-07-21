@@ -769,7 +769,7 @@ class SaAiInternalAuditRecodeController extends Controller
         }
 
         try {
-            $internalAudits = $this->internalAuditRecodeInterface->getByApproverId($user->id)
+            $internalAudits = $this->internalAuditRecodeInterface->all()
                 ->filter(function ($med) {
                     return $med->status === 'approved';
                 })

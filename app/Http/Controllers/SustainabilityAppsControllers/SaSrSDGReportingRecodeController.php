@@ -271,7 +271,7 @@ class SaSrSDGReportingRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $record = $this->sdgRecodeInterface->getByAssigneeId($user->id)
+        $record = $this->sdgRecodeInterface->all()
             ->filter(function ($med) {
                 return $med->status === 'approved';
             })->sortByDesc('created_at')->sortByDesc('updated_at')->values();

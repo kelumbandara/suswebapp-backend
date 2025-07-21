@@ -331,7 +331,7 @@ class SaAiExternalAuditRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $externalAudit = $this->externalAuditInterface->getByApproverId($user->id)->filter(function ($med) {
+        $externalAudit = $this->externalAuditInterface->all()->filter(function ($med) {
             return $med->status === 'approved';
         })
             ->sortByDesc('created_at')
