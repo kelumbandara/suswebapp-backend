@@ -135,7 +135,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('hazard-risk/{id}/delete', [HazardAndRiskController::class, 'destroy']);
     Route::get('hazard-risks-assignee', [HazardAndRiskController::class, 'assignee']);
     Route::get('hazard-risks-assign-task', [HazardAndRiskController::class, 'assignTask']);
-    Route::post('hazard-risks-assign-task-approved', [HazardAndRiskController::class, 'assignTaskApproved']);
+    Route::get('hazard-risks-assign-task-approved', [HazardAndRiskController::class, 'assignTaskApproved']);
     Route::post('hazard-risks/{id}/update-status-to-approved', [HazardAndRiskController::class, 'updateStatusToApproved']);
 
     Route::get('accidents', [AiAccidentRecordController::class, 'index']);
