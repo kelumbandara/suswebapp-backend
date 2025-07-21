@@ -244,7 +244,7 @@ class HazardAndRiskController extends Controller
         }
 
         $hazardRisks = $this->hazardAndRiskInterface
-            ->getByAssigneeId($user->id)
+            ->all()
             ->filter(function ($risk) {
                 return $risk->status === 'Approved';
             })
