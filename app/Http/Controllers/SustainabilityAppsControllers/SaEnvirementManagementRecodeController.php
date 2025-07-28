@@ -150,12 +150,12 @@ class SaEnvirementManagementRecodeController extends Controller
 
         $record = $this->envirementManagementRecodeInterface->getByApproverId($user->id)
             ->filter(function ($risk) {
-                return $risk->status !== 'Approved';
+                return $risk->status !== 'approved';
             })
             ->sortByDesc('created_at')->sortByDesc('updated_at')->values();
         $record = $this->envirementManagementRecodeInterface->getByReviewerId($user->id)
             ->filter(function ($risk) {
-                return $risk->status !== 'Approved';
+                return $risk->status !== 'approved';
             })
             ->sortByDesc('created_at')->sortByDesc('updated_at')->values();
 
@@ -182,6 +182,9 @@ class SaEnvirementManagementRecodeController extends Controller
 
             return $impactConsumption;
         });
+        foreach ($record as $record) {
+            $record->impactConsumption = $this->addConcumptionInterface->findByEnvirementId($record->id);
+        }
 
         return response()->json($record, 200);
     }
@@ -224,6 +227,9 @@ class SaEnvirementManagementRecodeController extends Controller
 
             return $impactConsumption;
         });
+        foreach ($record as $record) {
+            $record->impactConsumption = $this->addConcumptionInterface->findByEnvirementId($record->id);
+        }
 
         return response()->json($record, 200);
     }
