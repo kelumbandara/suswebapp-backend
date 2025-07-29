@@ -144,7 +144,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('accidents/{id}/update', [AiAccidentRecordController::class, 'update']);
     Route::delete('accidents/{id}/delete', [AiAccidentRecordController::class, 'destroy']);
     Route::get('accidents-assign-task', [AiAccidentRecordController::class, 'assignTask']);
-    Route::post('accidents-assign-task-approved', [AiAccidentRecordController::class, 'assignTaskApproved']);
+    Route::get('accidents-assign-task-approved', [AiAccidentRecordController::class, 'assignTaskApproved']);
     Route::get('accidents-assignee', [AiAccidentRecordController::class, 'assignee']);
     Route::post('accidents/{id}/update-status-to-approved', [AiAccidentRecordController::class, 'updateStatusToApproved']);
 
@@ -153,8 +153,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('incidents/{id}/update', [AiIncidentRecodeController::class, 'update']);
     Route::delete('incidents/{id}/delete', [AiIncidentRecodeController::class, 'destroy']);
     Route::get('incidents-assign-task', [AiIncidentRecodeController::class, 'assignTask']);
-    Route::post('incidents-assign-task-approved', [AiIncidentRecodeController::class, 'assignTaskApproved']);
-    Route::post('accidents/{id}/update-status-to-approved', [AiIncidentRecodeController::class, 'updateStatusToApproved']);
+    Route::get('incidents-assign-task-approved', [AiIncidentRecodeController::class, 'assignTaskApproved']);
+    Route::post('incidents/{id}/update-status-to-approved', [AiIncidentRecodeController::class, 'updateStatusToApproved']);
     Route::get('incidents-assignee', [AiIncidentRecodeController::class, 'assignee']);
 
     Route::get('documents', [DocumentRecodeController::class, 'index']);
@@ -336,7 +336,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('grievance-record/{id}/delete', [SaGrievanceRecodeController::class, 'destroy']);
     Route::post('grievance-record/{id}/feedback', [SaGrievanceRecodeController::class, 'updateFeedback']);
     Route::get('grievance-record-assign-task', [SaGrievanceRecodeController::class, 'assignTask']);
-    Route::post('grievance-record-assign-task-complete', [SaGrievanceRecodeController::class, 'assignTaskComplete']);
+    Route::get('grievance-record-assign-task-complete', [SaGrievanceRecodeController::class, 'assignTaskComplete']);
     Route::get('grievance-record-assignee', [SaGrievanceRecodeController::class, 'assignee']);
 
     Route::post('grievance-record', [SaGrievanceRecodeController::class, 'store']);
