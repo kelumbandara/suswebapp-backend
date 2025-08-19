@@ -231,7 +231,7 @@ class SaEnvirementManagementRecodeController extends Controller
             $record->impactConsumption = $this->addConcumptionInterface->findByEnvirementId($record->id);
         }
 
-        return response()->json([$record, 200]);
+        return response()->json([$record]);
     }
 
     public function updateStatusToApproved(string $id)
