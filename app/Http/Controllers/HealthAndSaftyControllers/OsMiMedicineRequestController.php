@@ -106,7 +106,49 @@ class OsMiMedicineRequestController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $medicine = $this->medicineRequestInterface->getByAssigneeId($user->id)->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+        $medicine = $this->medicineRequestInterface->getByAssigneeId($user->id)
+            ->filter(function ($risk) {
+                return $risk->status !== 'Approved';
+            })
+            ->sortByDesc('created_at')->sortByDesc('updated_at')->values();
+
+        $medicine = $medicine->map(function ($risk) {
+            try {
+                $approver       = $this->userInterface->getById($risk->approverId);
+                $risk->approver = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $risk->approver = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $creator                 = $this->userInterface->getById($risk->createdByUser);
+                $risk->createdByUserName = $creator ? $creator->name : 'Unknown';
+            } catch (\Exception $e) {
+                $risk->createdByUserName = 'Unknown';
+            }
+
+            return $risk;
+        });
+
+        return response()->json($medicine, 200);
+    }
+
+    public function assignTaskApproved()
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $medicine = $this->medicineRequestInterface
+            ->all()
+            ->filter(function ($med) {
+                return $med->status === 'approved';
+            })
+            ->sortByDesc('created_at')
+            ->sortByDesc('updated_at')
+            ->values();
 
         $medicine = $medicine->map(function ($risk) {
             try {
@@ -131,6 +173,38 @@ class OsMiMedicineRequestController extends Controller
 
     public function approvedStatus(string $id)
     {
+        $medicineRequest = $this->medicineRequestInterface->findById($id);
+
+        $this->medicineRequestInterface->update($id, ['status' => 'approved']);
+
+        $inventoryData = [
+            'referenceNumber' => $medicineRequest->referenceNumber,
+            'medicineName'    => $medicineRequest->medicineName,
+            'requestQuantity' => $medicineRequest->requestQuantity,
+            'genericName'     => $medicineRequest->genericName,
+            'requestedBy'     => $medicineRequest->requestedBy,
+            'division'        => $medicineRequest->division,
+            'approverId'      => $medicineRequest->approverId,
+            'status'          => 'approved',
+            'inventoryNumber' => $medicineRequest->inventoryNumber,
+        ];
+
+        $this->medicineInventoryInterface->create($inventoryData);
+
+        return response()->json([
+            'message' => 'Medicine request approved and added to inventory.',
+        ], 200);
+    }
+
+    public function updateStatusToApproved(string $id)
+    {
+        $user = Auth::user();
+
+        if (! $user || $user->assigneeLevel != 5) {
+            return response()->json([
+                'message' => 'Unauthorized. Only CEO assignees can approve.',
+            ], 403);
+        }
         $medicineRequest = $this->medicineRequestInterface->findById($id);
 
         $this->medicineRequestInterface->update($id, ['status' => 'approved']);

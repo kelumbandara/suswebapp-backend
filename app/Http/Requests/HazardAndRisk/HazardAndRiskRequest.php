@@ -34,6 +34,10 @@ class HazardAndRiskRequest extends FormRequest
             'assigneeLevel'        => 'nullable|integer',
             'responsibleSection'   => 'nullable|string|max:255',
             'createdByUser'        => 'nullable|string|max:255',
+            'control'              => 'nullable|string|max:255',
+            'cost'                 => 'nullable|numeric|min:0',
+            'actionTaken'          => 'nullable|string|max:2000',
+            'remarks'              => 'nullable|string',
 
         ];
     }

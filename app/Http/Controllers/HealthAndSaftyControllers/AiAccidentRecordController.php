@@ -312,7 +312,7 @@ class AiAccidentRecordController extends Controller
         }
 
         $record = $this->accidentRecordInterface
-            ->getByAssigneeId($user->id)
+            ->all()
             ->filter(function ($risk) {
                 return $risk->status === 'approved';
             })

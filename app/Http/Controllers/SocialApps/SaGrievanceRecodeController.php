@@ -847,7 +847,7 @@ class SaGrievanceRecodeController extends Controller
         $assigneeId = Auth::id();
 
         $tasks = $this->grievanceInterface
-            ->getByAssigneeId($assigneeId)
+            ->all()
             ->filter(fn($g) => $g->status === 'completed')
             ->sortByDesc('created_at')
             ->values();

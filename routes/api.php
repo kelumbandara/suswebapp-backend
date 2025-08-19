@@ -135,7 +135,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('hazard-risk/{id}/delete', [HazardAndRiskController::class, 'destroy']);
     Route::get('hazard-risks-assignee', [HazardAndRiskController::class, 'assignee']);
     Route::get('hazard-risks-assign-task', [HazardAndRiskController::class, 'assignTask']);
-    Route::post('hazard-risks-assign-task-approved', [HazardAndRiskController::class, 'assignTaskApproved']);
+    Route::get('hazard-risks-assign-task-approved', [HazardAndRiskController::class, 'assignTaskApproved']);
     Route::post('hazard-risks/{id}/update-status-to-approved', [HazardAndRiskController::class, 'updateStatusToApproved']);
 
     Route::get('accidents', [AiAccidentRecordController::class, 'index']);
@@ -144,7 +144,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('accidents/{id}/update', [AiAccidentRecordController::class, 'update']);
     Route::delete('accidents/{id}/delete', [AiAccidentRecordController::class, 'destroy']);
     Route::get('accidents-assign-task', [AiAccidentRecordController::class, 'assignTask']);
-    Route::post('accidents-assign-task-approved', [AiAccidentRecordController::class, 'assignTaskApproved']);
+    Route::get('accidents-assign-task-approved', [AiAccidentRecordController::class, 'assignTaskApproved']);
     Route::get('accidents-assignee', [AiAccidentRecordController::class, 'assignee']);
     Route::post('accidents/{id}/update-status-to-approved', [AiAccidentRecordController::class, 'updateStatusToApproved']);
 
@@ -153,8 +153,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('incidents/{id}/update', [AiIncidentRecodeController::class, 'update']);
     Route::delete('incidents/{id}/delete', [AiIncidentRecodeController::class, 'destroy']);
     Route::get('incidents-assign-task', [AiIncidentRecodeController::class, 'assignTask']);
-    Route::post('incidents-assign-task-approved', [AiIncidentRecodeController::class, 'assignTaskApproved']);
-    Route::post('accidents/{id}/update-status-to-approved', [AiIncidentRecodeController::class, 'updateStatusToApproved']);
+    Route::get('incidents-assign-task-approved', [AiIncidentRecodeController::class, 'assignTaskApproved']);
+    Route::post('incidents/{id}/update-status-to-approved', [AiIncidentRecodeController::class, 'updateStatusToApproved']);
     Route::get('incidents-assignee', [AiIncidentRecodeController::class, 'assignee']);
 
     Route::get('documents', [DocumentRecodeController::class, 'index']);
@@ -174,7 +174,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('medicine-request/{id}/delete', [OsMiMedicineRequestController::class, 'destroy']);
     Route::get('medicine-request-assign-task', [OsMiMedicineRequestController::class, 'assignTask']);
     Route::get('medicine-request-assignee', [OsMiMedicineRequestController::class, 'assignee']);
+    Route::get('medicine-request-assign-task-approved', [OsMiMedicineRequestController::class, 'assignTaskApproved']);
     Route::post('medicine-request/{id}/approve', [OsMiMedicineRequestController::class, 'approvedStatus']);
+    Route::post('medicine-request/{id}/update-status-to-approved', [OsMiMedicineRequestController::class, 'updateStatusToApproved']);
 
     Route::get('medicine-inventory', [OhMiPiMedicineInventoryController::class, 'index']);
     Route::post('medicine-inventory', [OhMiPiMedicineInventoryController::class, 'store']);
@@ -198,6 +200,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('external-audit/{id}/delete', [SaAiExternalAuditRecodeController::class, 'destroy']);
     Route::get('external-audit-assign-task', [SaAiExternalAuditRecodeController::class, 'assignTask']);
     Route::get('external-audit-assignee', [SaAiExternalAuditRecodeController::class, 'assignee']);
+    Route::get('external-audit-assign-task-approved', [SaAiExternalAuditRecodeController::class, 'assignTaskApproved']);
+    Route::post('external-audit/{id}/approve', [SaAiExternalAuditRecodeController::class, 'updateStatusToApproved']);
     Route::post('external-audit-action-plan', [SaAiExternalAuditRecodeController::class, 'actionPlanStore']);
     Route::post('external-audit-action-plan/{id}/update', [SaAiExternalAuditRecodeController::class, 'actionPlanUpdate']);
     Route::delete('external-audit-action-plan/{id}/delete', [SaAiExternalAuditRecodeController::class, 'actionPlanDelete']);
@@ -228,6 +232,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('internal-audit/{id}/update', [SaAiInternalAuditRecodeController::class, 'update']);
     Route::delete('internal-audit/{id}/delete', [SaAiInternalAuditRecodeController::class, 'destroy']);
     Route::get('internal-audit-assign-task', [SaAiInternalAuditRecodeController::class, 'assignTask']);
+    Route::get('internal-audit-assign-task-approved', [SaAiInternalAuditRecodeController::class, 'assignTaskApproved']);
+    Route::post('internal-audit/{id}/approve', [SaAiInternalAuditRecodeController::class, 'updateStatusToApproved']);
     Route::get('internal-audit-assignee', [SaAiInternalAuditRecodeController::class, 'assignee']);
     Route::post('internal-audit-draft', [SaAiInternalAuditRecodeController::class, 'saveDraft']);
     Route::post('internal-audit-draft/{id}/update', [SaAiInternalAuditRecodeController::class, 'updateDraft']);
@@ -251,6 +257,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('sdg-report/{id}/update', [SaSrSDGReportingRecodeController::class, 'update']);
     Route::delete('sdg-report/{id}/delete', [SaSrSDGReportingRecodeController::class, 'destroy']);
     Route::get('sdg-report-assign-task', [SaSrSDGReportingRecodeController::class, 'assignTask']);
+    Route::get('sdg-report-assign-task-approved', [SaSrSDGReportingRecodeController::class, 'assignTaskApproved']);
+    Route::post('sdg-report/{id}/approve', [SaSrSDGReportingRecodeController::class, 'updateStatusToApproved']);
     Route::get('sdg-report-assignee', [SaSrSDGReportingRecodeController::class, 'assignee']);
 
     Route::get('environment-record', [SaEnvirementManagementRecodeController::class, 'index']);
@@ -258,6 +266,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('environment-record/{id}/update', [SaEnvirementManagementRecodeController::class, 'update']);
     Route::delete('environment-record/{id}/delete', [SaEnvirementManagementRecodeController::class, 'destroy']);
     Route::get('environment-record-assign-task', [SaEnvirementManagementRecodeController::class, 'assignTask']);
+    Route::get('environment-record-assign-task-approved', [SaEnvirementManagementRecodeController::class, 'assignTaskApproved']);
+    Route::post('environment-record/{id}/approve', [SaEnvirementManagementRecodeController::class, 'updateStatusToApproved']);
     Route::get('environment-record-assignee', [SaEnvirementManagementRecodeController::class, 'assignee']);
 
     //environment dashboard api
@@ -280,6 +290,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('target-setting/{id}/update', [SaEnvirementTargetSettingRecodeController::class, 'update']);
     Route::delete('target-setting/{id}/delete', [SaEnvirementTargetSettingRecodeController::class, 'destroy']);
     Route::get('target-setting-assign-task', [SaEnvirementTargetSettingRecodeController::class, 'assignTask']);
+    Route::get('target-setting-assign-task-approved', [SaEnvirementTargetSettingRecodeController::class, 'assignTaskApproved']);
+    Route::post('target-setting/{id}/approve', [SaEnvirementTargetSettingRecodeController::class, 'updateStatusToApproved']);
     Route::get('target-setting-assignee', [SaEnvirementTargetSettingRecodeController::class, 'assignee']);
 
     Route::get('chemical-records', [SaCmChemicalManagementRecodeController::class, 'index']);
@@ -295,6 +307,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('purchase-inventory-record/{id}/delete', [SaCmPurchaseInventoryRecodeController::class, 'destroy']);
     Route::get('chemical-transaction-published', [SaCmPurchaseInventoryRecodeController::class, 'getPublishedStatus']);
     Route::get('purchase-inventory-records-assign-task', [SaCmPurchaseInventoryRecodeController::class, 'assignTask']);
+    Route::get('purchase-inventory-records-assign-task-approved', [SaCmPurchaseInventoryRecodeController::class, 'assignTaskApproved']);
+    Route::post('purchase-inventory-records/{id}/approve', [SaCmPurchaseInventoryRecodeController::class, 'updateStatusToApproved']);
 
     Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/stock-amount', [SaCmPurchaseInventoryRecodeController::class, 'getStockAmount']);
     Route::get('chemical-dashboard/{startDate}/{endDate}/{division}/monthly-delivery', [SaCmPurchaseInventoryRecodeController::class, 'getMonthlyDelivery']);
@@ -322,7 +336,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('grievance-record/{id}/delete', [SaGrievanceRecodeController::class, 'destroy']);
     Route::post('grievance-record/{id}/feedback', [SaGrievanceRecodeController::class, 'updateFeedback']);
     Route::get('grievance-record-assign-task', [SaGrievanceRecodeController::class, 'assignTask']);
-    Route::post('grievance-record-assign-task-complete', [SaGrievanceRecodeController::class, 'assignTaskComplete']);
+    Route::get('grievance-record-assign-task-complete', [SaGrievanceRecodeController::class, 'assignTaskComplete']);
     Route::get('grievance-record-assignee', [SaGrievanceRecodeController::class, 'assignee']);
 
     Route::post('grievance-record', [SaGrievanceRecodeController::class, 'store']);

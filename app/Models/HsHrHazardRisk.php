@@ -30,10 +30,15 @@ class HsHrHazardRisk extends Model
         'assigneeLevel',
         'responsibleSection',
         'createdByUser',
+        'control',
+        'cost',
+        'actionTaken',
+        'remarks',
     ];
 
     protected $casts = [
         'documents' => 'array',
+        'cost' => 'decimal:2',
     ];
 
 

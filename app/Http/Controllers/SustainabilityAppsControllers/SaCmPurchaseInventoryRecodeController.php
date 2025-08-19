@@ -92,8 +92,8 @@ class SaCmPurchaseInventoryRecodeController extends Controller
                 $record->updatedByUser = ['name' => 'Unknown', 'id' => null];
             }
 
-             try {
-                $reviewer               = $this->userInterface->getById($record->reviewerId);
+            try {
+                $reviewer         = $this->userInterface->getById($record->reviewerId);
                 $record->reviewer = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $record->reviewer = ['name' => 'Unknown', 'id' => null];
@@ -243,10 +243,10 @@ class SaCmPurchaseInventoryRecodeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $userId = $user->id;
-        $validatedData = $request->validated();
+        $userId                     = $user->id;
+        $validatedData              = $request->validated();
         $validatedData['updatedBy'] = $userId;
-        $targetSetting = $this->purchaseInventoryInterface->findById($id);
+        $targetSetting              = $this->purchaseInventoryInterface->findById($id);
 
         $documents = json_decode($targetSetting->documents, true) ?? [];
 
@@ -347,7 +347,6 @@ class SaCmPurchaseInventoryRecodeController extends Controller
         ]);
     }
 
-
     public function destroy($id)
     {
         $record = $this->purchaseInventoryInterface->getById($id);
@@ -400,6 +399,9 @@ class SaCmPurchaseInventoryRecodeController extends Controller
 
         $records = $this->purchaseInventoryInterface
             ->getByReviewerId($user->id)
+            ->filter(function ($risk) {
+                return $risk->status !== 'Approved';
+            })
             ->sortByDesc('created_at')
             ->sortByDesc('updated_at')
             ->values();
@@ -460,8 +462,8 @@ class SaCmPurchaseInventoryRecodeController extends Controller
                 $record->updatedByUser = ['name' => 'Unknown', 'id' => null];
             }
 
-             try {
-                $reviewer               = $this->userInterface->getById($record->reviewerId);
+            try {
+                $reviewer         = $this->userInterface->getById($record->reviewerId);
                 $record->reviewer = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $record->reviewer = ['name' => 'Unknown', 'id' => null];
@@ -483,6 +485,140 @@ class SaCmPurchaseInventoryRecodeController extends Controller
         }
 
         return response()->json($records, 200);
+    }
+
+    public function assignTaskApproved()
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $records = $this->purchaseInventoryInterface
+            ->all()
+            ->filter(function ($med) {
+                return $med->status === 'approved';
+            })
+            ->sortByDesc('created_at')
+            ->sortByDesc('updated_at')
+            ->values();
+
+        foreach ($records as &$record) {
+            $documents = [];
+            if (! empty($record->documents) && is_string($record->documents)) {
+                $documents = json_decode($record->documents, true);
+            } elseif (is_array($record->documents)) {
+                $documents = $record->documents;
+            }
+
+            foreach ($documents as &$doc) {
+                if (isset($doc['gsutil_uri'])) {
+                    $urlData         = $this->chemicalManagementService->getImageUrl($doc['gsutil_uri']);
+                    $doc['imageUrl'] = $urlData['signedUrl'];
+                    $doc['fileName'] = $urlData['fileName'];
+                }
+            }
+
+            $record->documents = $documents;
+
+            $certificate = $this->certificateRecordInterface->findByInventoryId($record->id);
+
+            foreach ($certificate as &$certificate) {
+                $certificateDocs = [];
+
+                if (! empty($certificate->documents) && is_string($certificate->documents)) {
+                    $certificateDocs = json_decode($certificate->documents, true);
+                } elseif (is_array($certificate->documents)) {
+                    $certificateDocs = $certificate->documents;
+                }
+
+                foreach ($certificateDocs as &$doc) {
+                    if (isset($doc['gsutil_uri'])) {
+                        $urlData         = $this->certificationRecodeService->getImageUrl($doc['gsutil_uri']);
+                        $doc['imageUrl'] = $urlData['signedUrl'];
+                        $doc['fileName'] = $urlData['fileName'];
+                    }
+                }
+
+                $certificate->documents = $certificateDocs;
+            }
+
+            $record->certificate = [$certificate] ? $certificate : null;
+
+            try {
+                $creator               = $this->userInterface->getById($record->createdByUser);
+                $record->createdByUser = $creator ? ['name' => $creator->name, 'id' => $creator->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $record->createdByUser = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $updater               = $this->userInterface->getById($record->updatedBy);
+                $record->updatedByUser = $updater ? ['name' => $updater->name, 'id' => $updater->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $record->updatedByUser = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $reviewer         = $this->userInterface->getById($record->reviewerId);
+                $record->reviewer = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $record->reviewer = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $approver               = $this->userInterface->getById($record->approverId);
+                $record->approvedByUser = $approver ? ['name' => $approver->name, 'id' => $approver->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $record->approvedByUser = ['name' => 'Unknown', 'id' => null];
+            }
+
+            try {
+                $publisher               = $this->userInterface->getById($record->publishedBy);
+                $record->publishedByUser = $publisher ? ['name' => $publisher->name, 'id' => $publisher->id] : ['name' => 'Unknown', 'id' => null];
+            } catch (\Exception $e) {
+                $record->publishedByUser = ['name' => 'Unknown', 'id' => null];
+            }
+        }
+
+        return response()->json($records, 200);
+    }
+
+    public function updateStatusToApproved(string $id)
+    {
+        $user = Auth::user();
+
+        if (! $user || $user->assigneeLevel != 5) {
+            return response()->json([
+                'message' => 'Unauthorized. Only CEO assignees can approve.',
+            ], 403);
+        }
+
+        $record = $this->purchaseInventoryInterface->findById($id);
+
+        if (! $record) {
+            return response()->json([
+                'message' => 'Purchase inventory record not found.',
+            ], 404);
+        }
+
+        $updated = $this->purchaseInventoryInterface->update($id, [
+            'status' => 'Approved',
+        ]);
+
+        if (! $updated) {
+            return response()->json([
+                'message' => 'Failed to approve the purchase inventory record.',
+            ], 500);
+        }
+
+        $record = $this->purchaseInventoryInterface->findById($id);
+
+        return response()->json([
+            'message' => 'Purchase inventory record approved successfully!',
+            'record'  => $record,
+        ], 200);
     }
 
     public function getPublishedStatus()
@@ -544,8 +680,8 @@ class SaCmPurchaseInventoryRecodeController extends Controller
                 $record->updatedByUser = ['name' => 'Unknown', 'id' => null];
             }
 
-             try {
-                $reviewer               = $this->userInterface->getById($record->reviewerId);
+            try {
+                $reviewer         = $this->userInterface->getById($record->reviewerId);
                 $record->reviewer = $reviewer ? ['name' => $reviewer->name, 'id' => $reviewer->id] : ['name' => 'Unknown', 'id' => null];
             } catch (\Exception $e) {
                 $record->reviewer = ['name' => 'Unknown', 'id' => null];
